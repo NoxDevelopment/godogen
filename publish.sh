@@ -18,10 +18,8 @@ CLAUDE_MD="${2:-$REPO_ROOT/teleforge.md}"
 
 echo "Publishing to: $TARGET"
 
-rm -rf "$TARGET"
-
 mkdir -p "$TARGET/.claude/skills"
-rsync -a --exclude='doc_source/' --exclude='__pycache__/' \
+rsync -a --delete --exclude='doc_source/' --exclude='__pycache__/' \
     "$REPO_ROOT/skills/" "$TARGET/.claude/skills/"
 
 cp "$CLAUDE_MD" "$TARGET/CLAUDE.md"
