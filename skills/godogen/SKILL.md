@@ -14,6 +14,7 @@ Read each sub-file from `${CLAUDE_SKILL_DIR}/` when you reach its pipeline stage
 
 | File | Purpose |
 |------|---------|
+| `personas.md` | Pick Chat / Plan / Code persona for the current turn — read first |
 | `visual-target.md` | Generate reference image anchoring art direction |
 | `decomposer.md` | Decompose game into a development plan (`PLAN.md`) |
 | `scaffold.md` | Design architecture and produce compilable Godot skeleton |

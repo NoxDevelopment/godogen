@@ -13,6 +13,7 @@ All files below are in `${CLAUDE_SKILL_DIR}/`. Load progressively — read each 
 |------|---------|--------------|
 | `quirks.md` | Known Godot gotchas and workarounds | Before writing any code |
 | `gdscript.md` | GDScript syntax reference | Before writing any code |
+| `loop-guard.md` | Iteration limits + stop signals for the implement→verify loop | Re-read before iteration 4+ |
 | `scene-generation.md` | Building `.tscn` files via headless GDScript builders | Targets include `.tscn` |
 | `script-generation.md` | Writing runtime `.gd` scripts for node behavior | Targets include `.gd` |
 | `coordination.md` | Ordering scene + script generation | Targets include both `.tscn` and `.gd` |
