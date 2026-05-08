@@ -1,22 +1,47 @@
 # Asset Generator
 
-Generate PNG images (Gemini) and GLB 3D models (Tripo3D) from text prompts.
+Generate PNG images and GLB 3D models. **Routed through the `image-pipeline` skill** — ComfyUI-first (free, local, style-locked), Gemini fallback (paid, generic).
+
+## ⚠ Always pass `--type`
+
+The router selects workflow, prompt prefix, and post-processing by asset type. Skipping `--type` produces generic output. See [image-pipeline/SKILL.md](../image-pipeline/SKILL.md) for the full type table; quick map:
+
+| Asset | `--type` |
+|---|---|
+| The visual target anchor (`reference.png`) | `reference` |
+| Character face / NPC headshot / dialog avatar | `portrait` |
+| Full-body character / hero / enemy sprite | `character` |
+| UI avatar | `avatar` |
+| Game item / pickup / icon | `item` |
+| Floor / wall / terrain tile | `tile` (or `tileset`) |
+| Generic sprite / animated frame | `sprite` |
+| Background / parallax / sky | `landscape` |
+| In-game scene / level vista | `environment` |
+| HUD / button / panel | `ui` |
+| Anything else | `general` |
+
+For `portrait`/`character`/`avatar`, the router automatically passes `reference.png` as img2img conditioning if it exists — that's the style-lock.
 
 ## CLI Reference
 
-Tools live at `${CLAUDE_SKILL_DIR}/tools/`. Run from the project root.
+The dispatcher lives at `.claude/skills/image-pipeline/tools/asset_gen.py`. Run from the project root.
 
-### Generate image (5-10 cents)
+### Generate image (free on ComfyUI, 5-15¢ on Gemini fallback)
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/tools/asset_gen.py image \
+python3 .claude/skills/image-pipeline/tools/asset_gen.py image \
+  --type {asset-type} \
   --prompt "the full prompt" -o assets/img/car.png
 ```
 
-`--size` (default `1K`): `512` (5c), `1K` (7c), `2K` (10c)
-`--aspect-ratio` (default `1:1`): `1:1`, `1:4`, `1:8`, `2:3`, `3:2`, `3:4`, `4:1`, `4:3`, `4:5`, `5:4`, `8:1`, `9:16`, `16:9`, `21:9`
+`--size` (default `1K`): `512`, `1K`, `2K`, `4K`
+`--aspect-ratio` (default `1:1`): `1:1`, `16:9`, `9:16`, `3:2`, `2:3`, `4:3`, `3:4`, `21:9`, `1:4`, `4:1`, `8:1`, `1:8`, `4:5`, `5:4`
 
 Typical combos: `--size 2K --aspect-ratio 16:9` (landscape bg), `--size 2K --aspect-ratio 9:16` (portrait), `--size 1K` (textures, sprites, 3D refs).
+
+ComfyUI-only flags (no-op on Gemini): `--checkpoint`, `--lora`, `--lora-strength`, `--steps`, `--cfg`, `--denoise`, `--reference`.
+
+Pixel-art post-process (auto-on for `sprite`/`tile`/`item`/`icon`): `--palette pico8|nes|endesga32|...`, `--target-size 64`, `--colors 16`, `--dither`, or `--pixelize` to force on a non-pixel type.
 
 ### Remove background
 
@@ -33,18 +58,24 @@ python3 ${CLAUDE_SKILL_DIR}/tools/rembg_matting.py \
   assets/img/car.png -o assets/img/car_nobg.png
 ```
 
-### Generate sprite sheet (7 cents)
+### Generate sprite sheet (free on ComfyUI, 7¢ on Gemini)
 
-Always 4x4 = exactly 16 cells. All 16 must be used — no more, no less. Template and grid instructions are injected automatically; you provide only the subject and BG color.
+On ComfyUI: **batch generation** of N frames in one pass — same KSampler call → consistent style/lighting across frames. On Gemini: 4x4 = 16 cells via the template trick.
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/tools/asset_gen.py spritesheet \
-  --prompt "Animation: a knight swinging a sword" \
-  --bg "#4A6741" -o assets/img/knight_swing_raw.png
+python3 .claude/skills/image-pipeline/tools/asset_gen.py spritesheet \
+  --prompt "warrior 16-frame run cycle, side view, consistent silhouette" \
+  --frames 16 --columns 4 --frame-size 512 \
+  --palette endesga32 --pixelize \
+  -o assets/img/warrior_run.png
 ```
 
-- `--prompt` — subject only. Don't specify frame count (system prompt handles it). For animations describe the action; for collections number each item 1-16.
-- `--bg` — background color hex (default: `#00FF00`). See BG color strategy below.
+- `--prompt` — subject and motion description.
+- `--frames` (ComfyUI only, default 16) — frame count.
+- `--columns` (default 4) — sheet column count.
+- `--frame-size` (default 512) — per-frame px on ComfyUI.
+- `--bg` (Gemini only, default `#00FF00`) — background hex. See BG color strategy below.
+- `--palette` / `--pixelize` — apply pixel-art quantization to the assembled sheet.
 
 ### Process sprite sheet
 
@@ -78,14 +109,14 @@ For split modes, `-o` is the output **directory**. `--names` provides filenames 
 ### Convert image to GLB (30-60 cents)
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/tools/asset_gen.py glb \
+python3 .claude/skills/image-pipeline/tools/asset_gen.py glb \
   --image assets/img/car.png --quality medium -o assets/glb/car.glb
 ```
 
-### Set budget
+### Set budget (Gemini fallback only)
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/tools/asset_gen.py set_budget 500
+python3 .claude/skills/image-pipeline/tools/asset_gen.py set_budget 500
 ```
 
 Sets the generation budget to 500 cents. All subsequent generations check remaining budget and reject if insufficient. CRITICAL: only call once at the start, and only when the user explicitly provides a budget.

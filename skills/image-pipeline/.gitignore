@@ -1,0 +1,32 @@
+# image-pipeline — what's ignored and why
+#
+# This file controls what Git tracks under skills/image-pipeline/. The rule
+# is simple: SOURCE is tracked, GENERATED ARTIFACTS are not. If you've added
+# a new kind of output that you think should be in version control, prefer
+# putting a regenerable copy under assets/ (ignored) and a curated/canonical
+# reference under a separate tracked path — don't loosen this file.
+#
+# Tracked (canonical):
+#   - SKILL.md, *.md docs
+#   - tools/*.py        (asset_gen.py, comfyui_client.py, zit_styles.py,
+#                       style_smoketest.py, pixel_art_toolkit.py, ...)
+#   - presets/*.py      (palette / preset registries)
+#   - workflows/*.json  (ComfyUI workflow templates)
+#
+# Ignored (regenerable):
+#   - assets/style_smoketest/        — driver output, regen via tools/style_smoketest.py
+#   - assets/style_smoketest_*/      — alt-prompt / strength-bumped reruns of the same driver
+#   - assets/*_run.log               — log files emitted by smoketest runs
+#   - assets/budget.json             — Gemini-fallback runtime budget state
+#   - any other transient output under assets/
+#
+# Re-running tools/style_smoketest.py recreates the entire assets/style_smoketest/
+# tree in ~11 minutes (20 styles × ~33s on an RTX 3090). The contact sheet at
+# assets/style_smoketest/_contact_sheet.png is the visual reference for the
+# style registry — regenerate after any zit_styles.py edit.
+
+# ---- ignored paths ----
+assets/
+*.log
+tools/__pycache__/
+presets/__pycache__/
