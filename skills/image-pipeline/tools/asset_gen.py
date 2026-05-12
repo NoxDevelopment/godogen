@@ -39,11 +39,72 @@ import sys
 from pathlib import Path
 
 THIS_DIR = Path(__file__).parent
+PRESETS_DIR = THIS_DIR.parent / "presets"
 BUDGET_FILE = Path("assets/budget.json")
 
 # Make sibling tools importable when invoked as a script.
 if str(THIS_DIR) not in sys.path:
     sys.path.insert(0, str(THIS_DIR))
+# Make presets/ importable too (pixel_art_presets lives there).
+if str(PRESETS_DIR) not in sys.path:
+    sys.path.insert(0, str(PRESETS_DIR))
+
+
+def _load_pixel_presets():
+    """Lazy import of presets/pixel_art_presets.PIXEL_STYLE_PRESETS so the
+    rest of the script doesn't pay the cost when no --preset flag is used.
+    Cached on the function object.
+    """
+    cached = getattr(_load_pixel_presets, "_cache", None)
+    if cached is not None:
+        return cached
+    try:
+        import pixel_art_presets as _p
+    except ImportError as e:
+        raise SystemExit(
+            f"asset_gen: --preset requires presets/pixel_art_presets.py "
+            f"(import failed: {e})"
+        )
+    _load_pixel_presets._cache = _p.PIXEL_STYLE_PRESETS
+    return _p.PIXEL_STYLE_PRESETS
+
+
+def _apply_preset(args) -> dict | None:
+    """Resolve --preset against PIXEL_STYLE_PRESETS and mutate args in place.
+
+    Order of precedence: explicit CLI flags win over preset defaults. So
+    --palette / --target-size / --colors set by the user are NOT overridden
+    by the preset's suggestions; only unset values get filled in.
+
+    The preset's prompt_prefix is prepended to args.prompt so the existing
+    type-prefix + style + user-prompt assembly still works downstream.
+
+    Returns the resolved preset dict (or None if --preset not used) so
+    callers can stash the negative_extra for late application.
+    """
+    name = getattr(args, "preset", "") or ""
+    if not name:
+        return None
+    presets = _load_pixel_presets()
+    if name not in presets:
+        raise SystemExit(
+            f"asset_gen: unknown --preset '{name}'. "
+            f"Run 'asset_gen.py list-presets' to see options."
+        )
+    p = presets[name]
+    prefix = (p.get("prompt_prefix") or "").rstrip(", ")
+    if prefix:
+        args.prompt = f"{prefix}, {args.prompt}".strip(", ")
+    if not args.palette and p.get("suggested_palette"):
+        args.palette = p["suggested_palette"]
+    if not args.target_size and p.get("suggested_resolution"):
+        args.target_size = int(p["suggested_resolution"])
+    # All pixel-art presets imply pixelize post-process.
+    args.pixelize = True
+    # Stash negative_extra for _comfy_generate to append after the
+    # type-aware negative is resolved by _resolve_style.
+    args.preset_negative_extra = (p.get("negative_extra") or "").strip()
+    return p
 
 # ---------------------------------------------------------------------------
 # Asset-type routing config
@@ -129,6 +190,12 @@ ZIT_PIXEL_LORA_TYPES = {
 
 # Asset types that benefit from img2img against reference.png if it exists
 IMG2IMG_AGAINST_REFERENCE = {"portrait", "character", "avatar"}
+
+# Asset types that auto-trigger the face_detailer.json second pass after the
+# base txt2img completes. SAM+YOLO mask detection + inpaint via Z-Image-Turbo
+# fixes the wonky-face problem the base model produces on character work.
+# Gated on use_zit because face_detailer.json hard-codes z_image_turbo_bf16.
+FACE_DETAILER_TYPES = {"portrait", "character", "avatar"}
 
 
 def _load_budget():
@@ -311,6 +378,7 @@ def _comfy_generate(args, asset_type: str) -> Path:
         is_zit_checkpoint,
         poll_completion,
         queue_prompt,
+        run_face_detailer,
         upload_image,
     )
 
@@ -342,6 +410,11 @@ def _comfy_generate(args, asset_type: str) -> Path:
         legacy_lora_strength=args.lora_strength,
         auto_default_lora=ZIT_PIXEL_LORA if (use_zit and asset_type in ZIT_PIXEL_LORA_TYPES) else "",
     )
+
+    # Append preset's negative_extra (if --preset was used).
+    preset_neg = getattr(args, "preset_negative_extra", "") or ""
+    if preset_neg:
+        negative = f"{negative}, {preset_neg}".strip(", ")
 
     # Steps/CFG: caller's args.steps default is 25 (SD-tuned). When dispatching
     # to ZIT, drop to its 8-step / cfg 4.5 sweet spot unless user explicitly
@@ -450,6 +523,39 @@ def _comfy_generate(args, asset_type: str) -> Path:
 
     download_image(images[0], output, base_url)
 
+    # Face/body detailer second pass. SAM+YOLO mask the face, then Z-Image
+    # inpaints with ColorMatch blending. Fixes wonky base-model faces before
+    # any pixelize step (so the cleaner face geometry survives downsample).
+    # When the asset is pixel-art, override the workflow's "ultra realistic
+    # face" prompt so the inpaint doesn't clash with the surrounding LoRA.
+    if (
+        use_zit
+        and asset_type in FACE_DETAILER_TYPES
+        and not getattr(args, "no_face_detailer", False)
+    ):
+        is_pixel = args.pixelize or asset_type in PIXEL_ART_TYPES
+        prompt_override = (
+            "clean symmetric pixel-art face, defined eyes, sharp features, "
+            "no anti-aliasing, no smooth gradients"
+            if is_pixel
+            else None
+        )
+        try:
+            print(
+                f"[asset_gen] face-detailer pass on {asset_type}"
+                f"{' (pixel-art prompt)' if is_pixel else ''}",
+                file=sys.stderr,
+            )
+            run_face_detailer(
+                output, output, base_url,
+                prompt_override=prompt_override,
+                timeout=args.timeout,
+            )
+        except FileNotFoundError as e:
+            print(f"[asset_gen] face-detailer skipped: {e}", file=sys.stderr)
+        except Exception as e:
+            print(f"[asset_gen] face-detailer failed (non-fatal): {e}", file=sys.stderr)
+
     # Post-process for pixel-art asset types — nearest-neighbor downscale +
     # palette quantization. Per the apatero guide, NEVER use AI upscalers
     # for pixel art (they introduce anti-aliasing).
@@ -539,11 +645,32 @@ def _gemini_generate(args, asset_type: str) -> Path:
 # Subcommands
 # ---------------------------------------------------------------------------
 
+def cmd_list_presets(args):
+    presets = _load_pixel_presets()
+    rows = sorted(presets.items(), key=lambda kv: (kv[1].get("tier", ""), kv[0]))
+    print(f"{len(presets)} pixel-art presets available:")
+    for k, v in rows:
+        tier = v.get("tier", "")
+        pal = v.get("suggested_palette") or "-"
+        res = v.get("suggested_resolution") or "-"
+        print(f"  {k:24s} [{tier:5s}] palette={pal:12s} res={res}")
+
+
 def cmd_image(args):
     asset_type = args.type
     if asset_type not in ASSET_TYPES:
         result_json(False, error=f"Unknown --type {asset_type}; choose one of {ASSET_TYPES}")
         sys.exit(1)
+
+    # Resolve --preset before anything reads args.prompt / args.palette / etc.
+    preset = _apply_preset(args)
+    if preset:
+        print(
+            f"[asset_gen] preset='{preset.get('name', '?')}' "
+            f"palette={args.palette or '-'} target_size={args.target_size or '-'} "
+            f"pixelize={args.pixelize}",
+            file=sys.stderr,
+        )
 
     backend = "comfyui" if _comfy_available() else "gemini"
     try:
@@ -846,7 +973,21 @@ def main():
     p.add_argument("--palette", default="",
                    help="Built-in palette name (pico8, nes, gameboy, endesga32, sweetie16, ...)")
     p.add_argument("--dither", action="store_true")
+    p.add_argument("--no-face-detailer", action="store_true",
+                   help="Skip the auto face-detailer second pass on "
+                        "portrait/character/avatar (ZIT path only).")
+    p.add_argument("--preset", default="",
+                   help="Pixel-art preset name (e.g. fantasy_rpg, gameboy, "
+                        "scifi, nes_retro). Applies prompt prefix, negative "
+                        "extras, palette, and target resolution from "
+                        "presets/pixel_art_presets.py. Forces --pixelize. "
+                        "Run 'asset_gen.py list-presets' to enumerate.")
     p.set_defaults(func=cmd_image)
+
+    # list-presets (own subcommand so --prompt/--type aren't required)
+    p = sub.add_parser("list-presets",
+                       help="List pixel-art presets from presets/pixel_art_presets.py")
+    p.set_defaults(func=cmd_list_presets)
 
     # spritesheet
     p = sub.add_parser("spritesheet", help="Generate a sprite sheet")

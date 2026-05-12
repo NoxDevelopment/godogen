@@ -187,6 +187,45 @@ If pixel art isn't the right aesthetic, override `--lora` with a relevant style 
 
 Pass via `--lora "{filename}"`; combine with `--lora-strength 0.6-1.0`. Many ZIT LoRAs are NSFW-tuned — don't auto-load those for game projects unless that's the user's brief.
 
+## Genre presets via `--preset`
+
+`presets/pixel_art_presets.py` ships 53 named presets (RetroDiffusion-style) that bundle a prompt prefix, a negative-extras snippet, a suggested palette, and a target pixel-grid resolution in a single flag. Use it to lock a project's aesthetic up front:
+
+```bash
+python3 .claude/skills/image-pipeline/tools/asset_gen.py image \
+  --type sprite \
+  --prompt "a sturdy knight with a crimson cape" \
+  --preset fantasy_rpg \
+  -o assets/sprites/knight.png
+```
+
+What `--preset fantasy_rpg` does on top of your prompt:
+- prepends `"16-bit fantasy RPG pixel art, rich warm colors, medieval setting,"`
+- appends `"modern, sci-fi, realistic, photo"` to the negative
+- sets `--palette endesga32` (if you didn't already)
+- sets `--target-size 64` (if you didn't already)
+- forces `--pixelize`
+
+Explicit CLI flags always win — pass `--palette pico8 --preset fantasy_rpg` and the palette stays pico8.
+
+`--preset` and `--style` are **orthogonal**: `--preset` shapes prompt/palette/resolution; `--style` picks the ZIT LoRA stack. Combine them freely (e.g. `--preset scifi --style pc98` for an 80s-anime sci-fi aesthetic).
+
+Enumerate presets with `python3 .claude/skills/image-pipeline/tools/asset_gen.py list-presets`. Common picks:
+
+| Preset | Era / Look | Palette | Res |
+|---|---|---|---|
+| `fantasy_rpg` | 16-bit medieval | endesga32 | 64 |
+| `scifi` | Cyberpunk / neon | sweetie16 | 64 |
+| `horror` | Eerie / desaturated | endesga32 | 64 |
+| `painterly` | Soft brushstroke pixel | endesga64 | 96 |
+| `isometric` | 3/4 dimetric | endesga32 | 128 |
+| `nes_retro` | NES era | nes | 32 |
+| `gameboy` | Original GB green | gameboy | 32 |
+| `gba` / `gbc` | GBA / GB Color | endesga32 / sweetie16 | 64 / 32 |
+| `c64` / `cga` / `1_bit` | 80s home computer | c64 / cga / 1bit | 32 / 32 / 64 |
+| `low_res` | PICO-8 chunky | pico8 | 16 |
+| `mc_item` / `mc_texture` | Minecraft items / blocks | mc | 16 |
+
 ## Pixel art post-process
 
 When `--type` is `sprite`, `tile`, `tileset`, `item`, or `icon`, the toolkit auto-runs:
@@ -224,25 +263,20 @@ python3 ${CLAUDE_SKILL_DIR}/image-pipeline/tools/asset_gen.py spritesheet \
 
 On ComfyUI, this batches all frames in a single generation pass — they share style/lighting because they share the same KSampler call. On Gemini fallback, it uses the 4×4 template trick from the old asset_gen.
 
-## Face detailing (workflow JSON)
+## Face detailing (auto for portrait / character / avatar)
 
-`workflows/face_detailer.json` is a Z-Image-Turbo + SAM + YOLO + ColorMatch workflow that auto-detects faces and inpaints them at full resolution. Use it when:
+When `--type` is `portrait`, `character`, or `avatar` and the backend is Z-Image-Turbo, `asset_gen.py` now **auto-invokes** a second pass through `workflows/face_detailer.json` (SAM + YOLO mask → Z-Image inpaint → ColorMatch blend). This runs after the base txt2img completes and before any `--pixelize` post-process, so the cleaner face geometry survives the downsample.
 
-- A portrait or character has a wonky face after generation
-- A scene with multiple NPCs has cumulatively bad faces
-- You need character-consistent faces across many sprites (combine with Reactor for face-locking from a reference photo)
+For pixel-art runs (`--pixelize`, or asset_type in PIXEL_ART_TYPES), the detailer's hard-coded "ultra realistic face" prompt is auto-swapped for a pixel-art-friendly variant so the inpaint doesn't clash with the surrounding LoRA aesthetic.
 
-Invocation pattern (manual ComfyUI API call):
-```python
-import json, requests
-workflow = json.load(open("workflows/face_detailer.json"))
-# Patch in your input image filename and prompt:
-workflow["<load_node_id>"]["inputs"]["image"] = "uploaded_filename.png"
-workflow["<prompt_node_id>"]["inputs"]["text"] = "ultra realistic face, sharp eyes, ..."
-r = requests.post("http://localhost:8188/prompt", json={"prompt": workflow})
-```
+**Opt out** with `--no-face-detailer` when you want the raw base output (e.g. for diffing whether the detailer helped, or when you're stacking your own post-process).
 
-This is power-user; the router doesn't use it automatically yet. Apply when output quality demands it.
+**One-time setup** — the detailer needs the API-format export of the workflow:
+1. Open ComfyUI in the browser.
+2. Load `workflows/face_detailer.json`.
+3. `File > Save (API Format)`, save as `workflows/face_detailer_api.json` next to the UI version.
+
+Until that file exists, the auto pass is a no-op (logged as `[asset_gen] face-detailer skipped: ...` and the base image is kept).
 
 ## What NOT to do
 

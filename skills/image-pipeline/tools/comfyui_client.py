@@ -115,6 +115,68 @@ def upload_image(image_path: Path, base_url: str = COMFYUI_URL) -> str:
     return r.json()["name"]
 
 
+# Path to the API-format export of face_detailer.json. The raw UI export
+# (workflows/face_detailer.json) is not directly queue-able — ComfyUI's
+# /prompt endpoint requires the API-format dict keyed by node id.
+FACE_DETAILER_API_WORKFLOW = (
+    Path(__file__).resolve().parent.parent / "workflows" / "face_detailer_api.json"
+)
+
+
+def run_face_detailer(
+    input_image: Path,
+    output_image: Path,
+    base_url: str = COMFYUI_URL,
+    prompt_override: str | None = None,
+    timeout: int = 300,
+) -> Path:
+    """Run the Z-Image-Turbo face/body detailer (SAM + YOLO + ColorMatch
+    inpainting) over an existing image and write the detailed result to
+    `output_image` (overwrites in-place if same path).
+
+    Reads ``workflows/face_detailer_api.json`` (the API-format export from
+    ComfyUI, NOT the raw UI workflow). Uploads `input_image` to ComfyUI's
+    input/ dir, patches the LoadImage node to point at it, optionally
+    overrides the inpaint prompt (used to bias for pixel-art runs), then
+    queues + polls + downloads.
+
+    Raises FileNotFoundError with explicit export instructions if the
+    API-format workflow file is missing — callers should catch this and
+    decide whether to warn or hard-fail.
+    """
+    if not FACE_DETAILER_API_WORKFLOW.exists():
+        raise FileNotFoundError(
+            f"face_detailer_api.json missing at {FACE_DETAILER_API_WORKFLOW}. "
+            "To enable auto face-detailing: open ComfyUI in browser, load "
+            "workflows/face_detailer.json, then File > Save (API Format) "
+            "and save the export next to face_detailer.json as "
+            "face_detailer_api.json."
+        )
+
+    workflow = json.loads(FACE_DETAILER_API_WORKFLOW.read_text())
+    uploaded_name = upload_image(input_image, base_url)
+
+    # Patch nodes in-place. API format: {"<id>": {"class_type": ..., "inputs": {...}}}
+    for node in workflow.values():
+        ct = node.get("class_type", "")
+        inputs = node.get("inputs", {})
+        if ct == "LoadImage":
+            inputs["image"] = uploaded_name
+        elif ct == "CLIPTextEncode" and prompt_override:
+            # Only override the face/positive prompt — leave any other
+            # CLIPTextEncode nodes (e.g. negative prompts) untouched.
+            existing = (inputs.get("text") or "").lower()
+            if "face" in existing or "realistic" in existing:
+                inputs["text"] = prompt_override
+
+    prompt_id = queue_prompt(workflow, base_url)
+    history = poll_completion(prompt_id, base_url, timeout=timeout)
+    images = get_output_images(history)
+    if not images:
+        raise RuntimeError("face_detailer returned no images")
+    return download_image(images[0], output_image, base_url)
+
+
 def list_checkpoints(base_url: str = COMFYUI_URL) -> list[str]:
     """List available checkpoint models."""
     try:
