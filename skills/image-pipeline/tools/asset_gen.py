@@ -265,6 +265,29 @@ def _resolve_comfy_dimensions(size: str, aspect_ratio: str) -> tuple[int, int]:
     return resolve_dimensions(size, aspect_ratio)
 
 
+def _parse_loras_arg(raw: str, default_strength: float) -> list[dict]:
+    """Parse a --loras CSV of ``name[:strength]`` into LoRA dicts.
+
+    e.g. "pixel_v3.safetensors:0.8, faces_v2.safetensors" → two LoRA entries,
+    the second using ``default_strength``. Blank/garbled entries are skipped.
+    """
+    out: list[dict] = []
+    for part in (raw or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        name, _, strength_s = part.partition(":")
+        name = name.strip()
+        if not name:
+            continue
+        try:
+            strength = float(strength_s) if strength_s.strip() else default_strength
+        except ValueError:
+            strength = default_strength
+        out.append({"name": name, "strength_model": strength, "strength_clip": strength})
+    return out
+
+
 def _resolve_style(
     *,
     style_key: str,
@@ -276,6 +299,7 @@ def _resolve_style(
     legacy_lora_name: str,
     legacy_lora_strength: float,
     auto_default_lora: str,
+    legacy_loras: list[dict] | None = None,
 ) -> tuple[list, str, str, str]:
     """Resolve --style / --lora into (loras_list, prompt, negative, label).
 
@@ -293,9 +317,9 @@ def _resolve_style(
       negative: full negative prompt
       label: short string for the [asset_gen] log line
     """
-    if style_key and legacy_lora_name:
+    if style_key and (legacy_lora_name or legacy_loras):
         raise SystemExit(
-            f"asset_gen: --style {style_key!r} and --lora {legacy_lora_name!r} are "
+            f"asset_gen: --style {style_key!r} and explicit --lora/--loras are "
             "mutually exclusive. Pick one."
         )
 
@@ -348,7 +372,11 @@ def _resolve_style(
         label = f"style={spec.key}({len(loras)}L:{','.join(style_lora_files(spec))[:80]})"
         return loras, full_prompt, negative, label
 
-    # No --style: legacy --lora or auto-default
+    # No --style: explicit multi-LoRA list (--loras), then single --lora, then auto-default.
+    if legacy_loras:
+        names = ",".join(le["name"] for le in legacy_loras)
+        return legacy_loras, full_prompt, negative, f"loras({len(legacy_loras)}:{names[:80]})"
+
     chosen_lora = legacy_lora_name or auto_default_lora
     if chosen_lora:
         loras = [{
@@ -408,6 +436,7 @@ def _comfy_generate(args, asset_type: str) -> Path:
         base_negative=base_neg,
         legacy_lora_name=args.lora or "",
         legacy_lora_strength=args.lora_strength,
+        legacy_loras=_parse_loras_arg(getattr(args, "loras", "") or "", args.lora_strength),
         auto_default_lora=ZIT_PIXEL_LORA if (use_zit and asset_type in ZIT_PIXEL_LORA_TYPES) else "",
     )
 
@@ -728,6 +757,7 @@ def cmd_spritesheet(args):
             base_negative=base_neg,
             legacy_lora_name=args.lora or "",
             legacy_lora_strength=args.lora_strength,
+            legacy_loras=_parse_loras_arg(getattr(args, "loras", "") or "", args.lora_strength),
             auto_default_lora=ZIT_PIXEL_LORA if use_zit else "",
         )
 
@@ -954,6 +984,9 @@ def main():
     p.add_argument("--checkpoint", default="", help="ComfyUI checkpoint name (overrides default)")
     p.add_argument("--lora", default="", help="Optional LoRA filename (single-LoRA path; mutually exclusive with --style)")
     p.add_argument("--lora-strength", type=float, default=0.8)
+    p.add_argument("--loras", default="",
+                   help="Explicit multi-LoRA stack: CSV of name[:strength] "
+                        "(mutually exclusive with --style; ZIT only for >1).")
     p.add_argument("--style", default="",
                    help="Named style from zit_styles.STYLES (e.g. 'pc98', 'zx-spectrum', 'soft-pixel-8x'). "
                         "Loads the style's LoRA stack, injects trigger words after the type prefix, "
@@ -1004,6 +1037,9 @@ def main():
     p.add_argument("--checkpoint", default="")
     p.add_argument("--lora", default="")
     p.add_argument("--lora-strength", type=float, default=0.8)
+    p.add_argument("--loras", default="",
+                   help="Explicit multi-LoRA stack: CSV of name[:strength] "
+                        "(mutually exclusive with --style; ZIT only for >1).")
     p.add_argument("--style", default="",
                    help="Named style from zit_styles.STYLES; mutually exclusive with --lora.")
     p.add_argument("--steps", type=int, default=25)
