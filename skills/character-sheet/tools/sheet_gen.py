@@ -122,10 +122,32 @@ def _lora_to_dict(entry) -> dict:
     }
 
 
+def _parse_loras_arg(raw: str, default_strength: float = 0.8) -> list[dict]:
+    """Parse a --loras CSV of ``name[:strength]`` into LoRA dicts."""
+    out: list[dict] = []
+    for part in (raw or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        name, _, strength_s = part.partition(":")
+        name = name.strip()
+        if not name:
+            continue
+        try:
+            strength = float(strength_s) if strength_s.strip() else default_strength
+        except ValueError:
+            strength = default_strength
+        out.append({"name": name, "strength_model": strength, "strength_clip": strength})
+    return out
+
+
 def _generate_sheet_png(prompt: str, output_path: Path, sheet_size: int,
-                        style_key: str, seed: int) -> Path:
-    """Run a single ZIT txt2img workflow and download the result to output_path."""
-    loras = [_lora_to_dict(e) for e in _style_loras(style_key)]
+                        style_key: str, seed: int,
+                        explicit_loras: list[dict] | None = None) -> Path:
+    """Run a single ZIT txt2img workflow and download the result to output_path.
+
+    An explicit LoRA stack (from --loras) overrides the style's LoRAs."""
+    loras = explicit_loras if explicit_loras else [_lora_to_dict(e) for e in _style_loras(style_key)]
     workflow = build_zit_txt2img_workflow(
         prompt=prompt,
         loras=loras,
@@ -368,7 +390,10 @@ def cmd_generate(args) -> None:
         print(f"[character-sheet] attempt {attempt}: generating 3x3 sheet "
               f"(seed={seed}, size={sheet_size}x{sheet_size})", file=sys.stderr)
         try:
-            _generate_sheet_png(prompt, sheet_path, sheet_size, args.style, seed)
+            _generate_sheet_png(
+                prompt, sheet_path, sheet_size, args.style, seed,
+                explicit_loras=_parse_loras_arg(getattr(args, "loras", "") or ""),
+            )
         except Exception as e:
             raise SystemExit(f"sheet generation failed: {type(e).__name__}: {e}")
         # Validate
@@ -447,6 +472,8 @@ def main():
                    help="Character description prompt (silhouette, gear, colors, vibe)")
     p.add_argument("--poses", default="",
                    help="Comma-separated pose keys (max 9). Default: full 9-pose catalog.")
+    p.add_argument("--loras", default="",
+                   help="Explicit LoRA stack: CSV of name[:strength]; overrides the style's LoRAs.")
     p.add_argument("--style", default=DEFAULT_STYLE_KEY,
                    help=f"image-pipeline style key (default: {DEFAULT_STYLE_KEY})")
     p.add_argument("--cell-size", type=int, default=64,
