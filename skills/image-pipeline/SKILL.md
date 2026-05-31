@@ -58,7 +58,13 @@ The CLI surface is identical either way — your prompt and `--type` work the sa
 --lora {filename}            # ZIT default: pixel_art_style_z_image_turbo.safetensors
                              #              (auto for sprite/character/portrait/etc.)
                              # Mutually exclusive with --style.
+--loras "a:0.8, b"           # Explicit multi-LoRA stack: CSV of name[:strength].
+                             # Per-entry default strength comes from --lora-strength;
+                             # blank/garbled entries are skipped. Replaces a curated
+                             # --style (mutually exclusive with --style). ZIT only when
+                             # stacking >1 LoRA — the SD path takes a single LoRA.
 --lora-strength 0.8          # ZIT pixel-art sweet spot per apatero guide
+                             # (also the per-entry default for --loras entries without :strength)
 --style {key}                # Named style from zit_styles.STYLES — loads the style's LoRA stack
                              # (1 or more LoRAs), injects trigger words after the type prefix, and
                              # appends the style descriptor. See "Named styles via --style" below.
@@ -164,7 +170,7 @@ python3 .claude/skills/image-pipeline/tools/asset_gen.py image \
 |---|---|
 | `new-pixel-core-ill` | SDXL/Illustrious base. Pass `--checkpoint <sdxl ckpt>` to use, otherwise asset_gen.py raises with a clear message. |
 
-`--style` and `--lora` are mutually exclusive. Programmatic listing: `from zit_styles import list_styles; list_styles()` returns all keys; `list_styles("zimage")` filters to ZIT-compatible ones.
+`--style` is mutually exclusive with both `--lora` and `--loras` — a curated style and an explicit LoRA stack can't be combined; pick one. To pass your own multi-LoRA stack instead of a registry style, use `--loras "name[:strength], ..."` (see the *ComfyUI tuning flags* block). Programmatic listing: `from zit_styles import list_styles; list_styles()` returns all keys; `list_styles("zimage")` filters to ZIT-compatible ones.
 
 The `tools/style_smoketest.py` driver runs every zimage style against a fixed prompt and writes a labeled contact sheet to `assets/style_smoketest/_contact_sheet.png` — useful when adding a new style to the registry. Smoketest outputs (`assets/style_smoketest*/`, `*.log`) are gitignored — see `.gitignore` in this skill for the canonical "what's tracked vs regenerable" list. Re-run the driver any time you want a fresh contact sheet (~11 min on an RTX 3090).
 

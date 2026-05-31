@@ -62,6 +62,7 @@ Required:
 Optional:
 - `--poses` — comma-separated pose list. Default: `idle,walk_a,walk_b,attack,hurt,death,jump_up,jump_down,cast`. Fewer than 9 OK; extras beyond 9 raise an error.
 - `--style` — godogen `image-pipeline` style key (default: `default-pixel`)
+- `--loras` — explicit LoRA stack: CSV of `name[:strength]` (e.g. `pixel_v3.safetensors:0.8, faces_v2.safetensors`). When set, this stack **overrides the style's LoRAs**; entries without `:strength` default to 0.8.
 - `--cell-size` — output sprite cell size in pixels (default: 64). Generation runs at `3 * cell_size` per dimension, then slices.
 - `--aspect` — output aspect ratio for padded sprites (default: `2:3` — vertical, character-sized). Pass `1:1` for square sprites.
 - `--bg` — sentinel background color name (default: `magenta` = `#FF00FF`). The skill prompts the model to use this color and then keys it out.
