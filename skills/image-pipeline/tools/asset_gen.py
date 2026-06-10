@@ -244,6 +244,112 @@ def result_json(ok, path=None, cost_cents=0, error=None, **extra):
 
 
 # ---------------------------------------------------------------------------
+# ml_workbench primary path (curated LoRA registry + families)
+# ---------------------------------------------------------------------------
+# For "generic" asset types (no special ComfyUI workflow / post-process) we route
+# generation through the local ml_workbench server (POST /v1/generate -> ComfyUI
+# + the CURATED LoRA registry) so every asset draws from ONE LoRA library — the
+# coherence win. The same --style/--lora resolution is reused, so styles match
+# the ComfyUI path. Special types (tile/tileset/portrait/avatar/sprite/item/icon)
+# keep the ComfyUI-direct path below, which has the seamless / face-detailer /
+# pixelize workflows that ml_workbench's generic /v1/generate can't replicate yet.
+# (Proper long-term fix: have ml_workbench expose those workflows via /v1/workflows,
+# then route EVERYTHING through here.)
+#
+# Per-type chain:  ml_workbench (primary types) -> ComfyUI-direct -> Gemini.
+#
+# Env: MLWB_URL / ML_WORKBENCH_URL (default :8787) · MLWB_TIMEOUT (180) ·
+#      MLWB_DISABLE=1 (skip it) · ASSET_GEN_BACKEND=ml_workbench (force for ALL
+#      types — raw gen, accepts losing the special workflows).
+MLWB_URL = (
+    os.environ.get("MLWB_URL") or os.environ.get("ML_WORKBENCH_URL") or "http://localhost:8787"
+).rstrip("/")
+MLWB_TIMEOUT = float(os.environ.get("MLWB_TIMEOUT", "180"))
+MLWB_PRIMARY_TYPES = {"general", "reference", "character", "landscape", "environment", "ui"}
+
+
+def _mlwb_primary_for(asset_type: str) -> bool:
+    backend = os.environ.get("ASSET_GEN_BACKEND")
+    if os.environ.get("MLWB_DISABLE") == "1" or backend == "gemini":
+        return False
+    if backend == "ml_workbench":
+        return True  # force ml_workbench for every type
+    return asset_type in MLWB_PRIMARY_TYPES
+
+
+def _mlwb_available() -> bool:
+    import urllib.request
+
+    try:
+        with urllib.request.urlopen(f"{MLWB_URL}/health", timeout=3) as r:
+            return r.status == 200
+    except Exception:
+        return False
+
+
+def _mlwb_generate(args, asset_type: str) -> Path:
+    """Generate via ml_workbench /v1/generate (curated LoRA registry). Reuses the
+    same --style/--lora resolution as the ComfyUI path so styles match. Raises on
+    failure so the caller falls through to ComfyUI/Gemini."""
+    import base64
+    import urllib.request
+
+    from comfyui_client import (
+        DEFAULT_NEGATIVE,
+        ZIT_NEGATIVE,
+        ZIT_PIXEL_LORA,
+        ZIT_UNET,
+        is_zit_checkpoint,
+    )
+
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    width, height = _resolve_comfy_dimensions(args.size, args.aspect_ratio)
+
+    checkpoint = args.checkpoint or os.environ.get("COMFYUI_CHECKPOINT", "") or ZIT_UNET
+    use_zit = is_zit_checkpoint(checkpoint)
+    type_prefix = (ZIT_TYPE_PROMPT_PREFIX if use_zit else SD_TYPE_PROMPT_PREFIX).get(asset_type, "")
+    base_neg = ZIT_NEGATIVE if use_zit else DEFAULT_NEGATIVE
+    type_neg_prefix = TYPE_NEGATIVE_PREFIX.get(asset_type, "")
+
+    loras, full_prompt, negative, _label = _resolve_style(
+        style_key=getattr(args, "style", "") or "",
+        use_zit=use_zit,
+        type_prefix=type_prefix,
+        user_prompt=args.prompt,
+        type_negative_prefix=type_neg_prefix,
+        base_negative=base_neg,
+        legacy_lora_name=args.lora or "",
+        legacy_lora_strength=args.lora_strength,
+        legacy_loras=_parse_loras_arg(getattr(args, "loras", "") or "", args.lora_strength),
+        auto_default_lora=ZIT_PIXEL_LORA if (use_zit and asset_type in ZIT_PIXEL_LORA_TYPES) else "",
+    )
+
+    body = {
+        "family": "zit" if use_zit else "sdxl",
+        "prompt": full_prompt,
+        "negativePrompt": negative,
+        "width": width,
+        "height": height,
+        "loras": [
+            {"filename": le["name"], "weight": le.get("strength_model", 1.0)} for le in loras
+        ],
+    }
+    req = urllib.request.Request(
+        f"{MLWB_URL}/v1/generate",
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=MLWB_TIMEOUT) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    b64 = data.get("imageBase64")
+    if not b64:
+        raise RuntimeError("ml_workbench returned no image")
+    output.write_bytes(base64.b64decode(b64))
+    return output
+
+
 # ComfyUI primary path
 # ---------------------------------------------------------------------------
 
@@ -700,6 +806,20 @@ def cmd_image(args):
             f"pixelize={args.pixelize}",
             file=sys.stderr,
         )
+
+    # Backend chain (per type): ml_workbench -> ComfyUI-direct -> Gemini.
+    # ml_workbench is primary only for generic types (no special workflow lost);
+    # tile/tileset/portrait/avatar/sprite/item/icon stay on ComfyUI-direct.
+    if _mlwb_primary_for(asset_type) and _mlwb_available():
+        try:
+            output = _mlwb_generate(args, asset_type)
+            result_json(True, path=output, cost_cents=0, backend="ml_workbench", asset_type=asset_type)
+            return
+        except Exception as e:
+            print(
+                f"[asset_gen] ml_workbench failed ({e}); falling back to ComfyUI/Gemini.",
+                file=sys.stderr,
+            )
 
     backend = "comfyui" if _comfy_available() else "gemini"
     try:
