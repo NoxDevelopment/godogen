@@ -250,6 +250,8 @@ Main (Node3D or Node2D)
 
 For pause menus, set `process_mode = Node.PROCESS_MODE_ALWAYS` on the CanvasLayer so it runs during pause.
 
+**Theme the UI — don't ship the default gray look.** Once per project, generate a `theme.tres` from the palette with the [`ui-theme`](../ui-theme/SKILL.md) skill and set it on the root `Control` (it cascades to every child). Use the [`ui-screens`](../ui-screens/SKILL.md) skill for the title/menu/hud/inventory/dialog scaffolds and assign that same theme. A laid-out screen in the *default* theme still looks generic — the theme is what makes the UI look like this game. Pipeline: `style-anchor` (palette) → `ui-theme` (theme.tres) → `ui-screens` (scaffolds) → `ui-elements`/`image-pipeline` (textures).
+
 ## Architecture Rules
 
 1. **Explicit 2D or 3D** — never mix dimensions in the same hierarchy.
