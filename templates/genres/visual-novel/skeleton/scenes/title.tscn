@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://vntitle00001"]
+
+[ext_resource type="Script" path="res://scripts/title.gd" id="1_ti"]
+
+[node name="Title" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ti")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0862745, 0.0901961, 0.121569, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Center/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
+text = "Visual Novel Template"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Center/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65098, 0.678431, 0.741176, 1)
+text = "A branching story with dice"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Center/Rows"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="BeginButton" type="Button" parent="Center/Rows"]
+custom_minimum_size = Vector2(240, 48)
+layout_mode = 2
+text = "Begin"
+
+[node name="QuitButton" type="Button" parent="Center/Rows"]
+custom_minimum_size = Vector2(240, 48)
+layout_mode = 2
+text = "Quit"

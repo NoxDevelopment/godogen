@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://vnstory00001"]
+
+[ext_resource type="Script" path="res://scripts/story.gd" id="1_st"]
+
+[node name="Story" type="Node2D"]
+script = ExtResource("1_st")
+
+[node name="Background" type="Polygon2D" parent="."]
+z_index = -10
+color = Color(0.121569, 0.137255, 0.180392, 1)
+polygon = PackedVector2Array(0, 0, 1280, 0, 1280, 720, 0, 720)
+
+[node name="Stage" type="Node2D" parent="."]
+
+[node name="VaultDoor" type="Polygon2D" parent="Stage"]
+color = Color(0.207843, 0.231373, 0.290196, 1)
+polygon = PackedVector2Array(500, 120, 780, 120, 780, 560, 500, 560)
+
+[node name="CipherWheel" type="Polygon2D" parent="Stage"]
+color = Color(0.407843, 0.360784, 0.262745, 1)
+polygon = PackedVector2Array(640, 280, 690, 310, 690, 370, 640, 400, 590, 370, 590, 310)
+
+[node name="MiraPortrait" type="Polygon2D" parent="Stage"]
+color = Color(0.34902, 0.278431, 0.360784, 1)
+polygon = PackedVector2Array(980, 260, 1120, 260, 1120, 560, 980, 560)

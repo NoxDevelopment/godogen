@@ -135,6 +135,65 @@
       ]
     },
     {
+      "id": "visual-novel",
+      "name": "Visual Novel (with dice checks)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Visual-novel base on Dialogue Manager 3 plus a pen-and-paper dice layer: title scene, story scene with blockout stage, a VN textbox (name plate, typewriter DialogueLabel, response menu, click/accept to advance), one .dialogue file with a branch and a skill-check gate, and a SkillCheck autoload (d20 + stat modifier vs DC, crit rules, seedable RNG) whose dice-roll popup is awaited as a Dialogue Manager mutation (`do SkillCheck.skill_check(\"mind\", 12)` then `if SkillCheck.last_success`). Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/visual-novel/skeleton",
+      "doc": "genres/visual-novel/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Dialogue Manager",
+          "repo": "https://github.com/nathanhoad/godot_dialogue_manager.git",
+          "ref": "v3.10.4",
+          "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
+          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/dialogue_manager",
+          "targetDir": "addons/dialogue_manager",
+          "enablePlugins": [
+            "res://addons/dialogue_manager/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "narrative",
+          "params": {},
+          "note": "story content lives in dialogue/*.dialogue — Dialogue Manager syntax (titles, responses, conditions, mutations); the skill_check gate in intro.dialogue is the pattern to copy for new checks"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "generate a theme.tres from the game palette and set it on the textbox Panel, title screen, and dice popup to de-generic the default gray look"
+        },
+        {
+          "skill": "character-mime",
+          "params": {},
+          "note": "VN portrait pipelines (talking portraits, expression sets) for the Stage placeholders in story.tscn"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Background paintings (1280x720, one per scene/location)",
+        "Character portraits (~400x600 px, transparent PNG; neutral + 2-3 expressions each)",
+        "Textbox 9-patch panel + name plate art",
+        "Title screen key art (1280x720)",
+        "d20 die face art or spritesheet for the dice popup (replaces the number label)",
+        "UI SFX (advance blip, dice tumble, success/failure stingers)"
+      ]
+    },
+    {
       "id": "bullet-hell",
       "name": "Bullet Hell / Shmup",
       "engine": "godot",

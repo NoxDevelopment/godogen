@@ -1,0 +1,41 @@
+~ start
+Narrator: Rain hammers the archive district as you reach the sealed door of the Veritas Vault.
+Mira: You made it. The cipher wheel on this door is older than both of us — think you can work it?
+- Study the wheel before touching it
+	Mira: Careful and slow. I can respect that.
+	do GameManager.set_flag("studied_wheel", true)
+	=> gate
+- Just start turning rings
+	Mira: Bold. Terrible, but bold.
+	=> gate
+
+~ gate
+Narrator: The cipher wheel waits. Symbols drift under your fingers, almost readable.
+- Work the cipher (Mind, DC 12)
+	do SkillCheck.skill_check("mind", 12)
+	if SkillCheck.last_success
+		=> cracked
+	else
+		=> jammed
+- Walk away
+	=> ending_walk_away
+
+~ cracked
+Narrator: Tumblers align one by one — the vault door breathes open.
+if GameManager.get_flag("studied_wheel")
+	Mira: Studying it first paid off. In and out before anyone notices.
+else
+	Mira: I genuinely cannot believe that worked.
+Narrator: THE END — the vault stands open.
+=> END
+
+~ jammed
+Narrator: The wheel seizes. Somewhere below, a bell begins to toll.
+Mira: That's the watch! Time to go — NOW.
+Narrator: THE END — you flee empty-handed into the rain.
+=> END
+
+~ ending_walk_away
+Mira: ...Yeah. Some doors are better left shut.
+Narrator: THE END — you melt back into the rain, the vault unopened.
+=> END
