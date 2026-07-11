@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Asset Generator (image-pipeline) — ComfyUI-first, Gemini fallback.
+"""Asset Generator (image-pipeline).
+
+Backend chain: ml-workbench workflow library (:8787, validated ComfyUI graphs)
+-> ml-workbench /v1/generate (legacy) -> ComfyUI direct (:8188) -> Gemini.
 
 This replaces the old single-path Gemini-only asset_gen.py. Routes by asset
-type to the right ComfyUI workflow:
+type to the right workflow:
 
   - portrait / character / avatar → img2img with reference.png as IPAdapter-style
                                      conditioning + face-LoRA + pixel post-process
@@ -244,23 +247,35 @@ def result_json(ok, path=None, cost_cents=0, error=None, **extra):
 
 
 # ---------------------------------------------------------------------------
-# ml_workbench primary path (curated LoRA registry + families)
+# ml_workbench paths (workflow library primary, /v1/generate legacy fallback)
 # ---------------------------------------------------------------------------
-# For "generic" asset types (no special ComfyUI workflow / post-process) we route
-# generation through the local ml_workbench server (POST /v1/generate -> ComfyUI
-# + the CURATED LoRA registry) so every asset draws from ONE LoRA library — the
-# coherence win. The same --style/--lora resolution is reused, so styles match
-# the ComfyUI path. Special types (tile/tileset/portrait/avatar/sprite/item/icon)
-# keep the ComfyUI-direct path below, which has the seamless / face-detailer /
-# pixelize workflows that ml_workbench's generic /v1/generate can't replicate yet.
-# (Proper long-term fix: have ml_workbench expose those workflows via /v1/workflows,
-# then route EVERYTHING through here.)
+# ml-workbench (:8787) serves a VALIDATED workflow library (GET /v1/workflows,
+# POST /v1/workflows/{id}/run). Every workflow graph is validated against the
+# live ComfyUI install before it lands in the manifest, so this is the primary
+# path for ALL asset types — the coherence + reliability win over hand-built
+# graphs. Contract doc: ml-workbench/workflows/README.md.
 #
-# Per-type chain:  ml_workbench (primary types) -> ComfyUI-direct -> Gemini.
+# Routing (asset type -> workflow id):
+#   sprite / tile / tileset / item  -> zit-pixel-art   (server-side pixel grid +
+#                                      palette quantize; returns asset + preview)
+#   icon / ui                       -> qwen-icon       (centered, plain background)
+#   anything with a reference image -> qwen-edit-instruct (identity-preserving edit)
+#   everything else                 -> zit-txt2img     (general ZIT + LoRA slot)
+#
+# The OLD /v1/generate path (curated LoRA registry, family-based) is kept as the
+# first fallback for generic types when the workflow library is missing (older
+# ml-workbench builds). Special types skip it — /v1/generate can't replicate the
+# seamless / face-detailer / pixelize workflows, so they drop straight to
+# ComfyUI-direct.
+#
+# Full chain:  ml_workbench workflows (all types)
+#              -> ml_workbench /v1/generate (generic types only)
+#              -> ComfyUI-direct -> Gemini.
 #
 # Env: MLWB_URL / ML_WORKBENCH_URL (default :8787) · MLWB_TIMEOUT (180) ·
-#      MLWB_DISABLE=1 (skip it) · ASSET_GEN_BACKEND=ml_workbench (force for ALL
-#      types — raw gen, accepts losing the special workflows).
+#      MLWB_DISABLE=1 (skip both mlwb paths) · MLWB_WORKFLOWS_DISABLE=1 (skip
+#      only the workflow-library path) · MLWB_WORKFLOWS_TTL (cache secs, 300) ·
+#      ASSET_GEN_BACKEND=ml_workbench|comfyui|gemini (force a backend).
 MLWB_URL = (
     os.environ.get("MLWB_URL") or os.environ.get("ML_WORKBENCH_URL") or "http://localhost:8787"
 ).rstrip("/")
@@ -270,7 +285,7 @@ MLWB_PRIMARY_TYPES = {"general", "reference", "character", "landscape", "environ
 
 def _mlwb_primary_for(asset_type: str) -> bool:
     backend = os.environ.get("ASSET_GEN_BACKEND")
-    if os.environ.get("MLWB_DISABLE") == "1" or backend == "gemini":
+    if os.environ.get("MLWB_DISABLE") == "1" or backend in ("gemini", "comfyui"):
         return False
     if backend == "ml_workbench":
         return True  # force ml_workbench for every type
@@ -348,6 +363,272 @@ def _mlwb_generate(args, asset_type: str) -> Path:
         raise RuntimeError("ml_workbench returned no image")
     output.write_bytes(base64.b64decode(b64))
     return output
+
+
+# ---------------------------------------------------------------------------
+# ml_workbench WORKFLOW-LIBRARY path (primary)
+# ---------------------------------------------------------------------------
+
+# Asset-type -> workflow-id routing table (see module comment above).
+WF_PIXEL_TYPES = {"sprite", "tile", "tileset", "item"}
+WF_ICON_TYPES = {"icon", "ui"}
+WF_PIXEL_WORKFLOW = "zit-pixel-art"
+WF_ICON_WORKFLOW = "qwen-icon"
+WF_TXT2IMG_WORKFLOW = "zit-txt2img"
+WF_EDIT_WORKFLOW = "qwen-edit-instruct"
+
+# argparse defaults for --steps/--cfg are SD-tuned; the library workflows carry
+# their own VALIDATED defaults in the manifest (zit: 15/3.5, qwen: 20/2.5).
+# Only forward steps/cfg when the caller explicitly overrode the CLI defaults.
+_CLI_DEFAULT_STEPS = 25
+_CLI_DEFAULT_CFG = 7.0
+
+# Workflow-id-list cache: the availability probe (GET /v1/workflows) runs once
+# per batch, not once per asset — provider-preflight pattern. Cached on disk
+# with a TTL so consecutive CLI invocations in the same batch share it.
+MLWB_WORKFLOWS_TTL = float(os.environ.get("MLWB_WORKFLOWS_TTL", "300"))
+_MLWB_WORKFLOWS_FAIL_TTL = 60.0  # don't re-probe a dead server every asset
+
+
+def _workflow_cache_file() -> Path:
+    import tempfile
+    return Path(tempfile.gettempdir()) / "godogen_mlwb_workflows.json"
+
+
+def _mlwb_workflow_ids() -> set[str] | None:
+    """Return the set of workflow ids served by ml-workbench, or None when the
+    workflow library is unavailable. Doubles as the once-per-batch health check:
+    result (success OR failure) is cached to disk with a TTL keyed on MLWB_URL."""
+    import time
+    import urllib.request
+
+    cache_file = _workflow_cache_file()
+    now = time.time()
+    try:
+        cached = json.loads(cache_file.read_text(encoding="utf-8"))
+        if cached.get("url") == MLWB_URL:
+            age = now - float(cached.get("ts", 0))
+            ids = cached.get("ids")
+            if ids is None and age < _MLWB_WORKFLOWS_FAIL_TTL:
+                return None
+            if ids is not None and age < MLWB_WORKFLOWS_TTL:
+                return set(ids)
+    except (OSError, ValueError):
+        pass
+
+    ids: set[str] | None
+    try:
+        with urllib.request.urlopen(f"{MLWB_URL}/v1/workflows", timeout=5) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        ids = {w["id"] for w in data.get("workflows", []) if w.get("id")}
+    except Exception as e:
+        print(f"[asset_gen] ml_workbench workflow library unreachable: {e}", file=sys.stderr)
+        ids = None
+
+    try:
+        cache_file.write_text(
+            json.dumps({"url": MLWB_URL, "ts": now, "ids": sorted(ids) if ids else None}),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+    return ids
+
+
+def _mlwb_workflows_enabled() -> bool:
+    backend = os.environ.get("ASSET_GEN_BACKEND")
+    if os.environ.get("MLWB_DISABLE") == "1" or os.environ.get("MLWB_WORKFLOWS_DISABLE") == "1":
+        return False
+    return backend not in ("gemini", "comfyui")
+
+
+class _WorkflowRouteError(RuntimeError):
+    """The workflow path can't honor this request (missing workflow, LoRA
+    family mismatch, multi-LoRA stack). Fall through to the next backend."""
+
+
+def _workflow_for(asset_type: str, ref_path: str) -> str:
+    if ref_path:
+        return WF_EDIT_WORKFLOW
+    if asset_type in WF_PIXEL_TYPES:
+        return WF_PIXEL_WORKFLOW
+    if asset_type in WF_ICON_TYPES:
+        return WF_ICON_WORKFLOW
+    return WF_TXT2IMG_WORKFLOW
+
+
+def _mlwb_workflow_generate(args, asset_type: str, workflow_ids: set[str]) -> tuple[Path, dict]:
+    """Generate via ml_workbench POST /v1/workflows/{id}/run.
+
+    Reuses the same --style/--lora/--preset resolution as the ComfyUI path so
+    styles and prompt prefixes match across backends. Returns (output_path,
+    extra) where extra carries workflow id / preview path / elapsedMs for the
+    result JSON. Raises _WorkflowRouteError to fall through cleanly, any other
+    exception on a hard failure."""
+    import base64
+    import urllib.request
+
+    from comfyui_client import DEFAULT_NEGATIVE, ZIT_NEGATIVE, ZIT_PIXEL_LORA
+
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    # Reference detection mirrors _comfy_generate: explicit --reference wins,
+    # else portrait/character/avatar auto-anchor on reference.png when present.
+    ref_path = args.reference
+    if not ref_path and asset_type in IMG2IMG_AGAINST_REFERENCE:
+        candidate = Path("reference.png")
+        if candidate.exists():
+            ref_path = str(candidate)
+
+    workflow_id = _workflow_for(asset_type, ref_path)
+    if workflow_id not in workflow_ids:
+        raise _WorkflowRouteError(
+            f"workflow '{workflow_id}' not in ml_workbench library "
+            f"({len(workflow_ids)} workflows served)"
+        )
+
+    is_zit_wf = workflow_id.startswith("zit-")
+
+    # Prompt/negative/LoRA resolution — ZIT workflows use the ZIT trigger-word
+    # tables; qwen workflows get the natural-language SD prefixes (better prompt
+    # adherence, and qwen-icon carries its own tuned negative in the manifest).
+    type_prefix = (ZIT_TYPE_PROMPT_PREFIX if is_zit_wf else SD_TYPE_PROMPT_PREFIX).get(asset_type, "")
+    base_neg = ZIT_NEGATIVE if is_zit_wf else DEFAULT_NEGATIVE
+    try:
+        loras, full_prompt, negative, lora_label = _resolve_style(
+            style_key=getattr(args, "style", "") or "",
+            use_zit=is_zit_wf,
+            type_prefix=type_prefix,
+            user_prompt=args.prompt,
+            type_negative_prefix=TYPE_NEGATIVE_PREFIX.get(asset_type, ""),
+            base_negative=base_neg,
+            legacy_lora_name=args.lora or "",
+            legacy_lora_strength=args.lora_strength,
+            legacy_loras=_parse_loras_arg(getattr(args, "loras", "") or "", args.lora_strength),
+            # zit-pixel-art already bakes the pixel LoRA into its graph — no auto-add.
+            auto_default_lora=(
+                ZIT_PIXEL_LORA
+                if (workflow_id == WF_TXT2IMG_WORKFLOW and asset_type in ZIT_PIXEL_LORA_TYPES)
+                else ""
+            ),
+        )
+    except SystemExit as e:
+        # Style/base-model gate mismatch against THIS workflow's family — the
+        # ComfyUI-direct path (own checkpoint selection) may still honor it.
+        raise _WorkflowRouteError(str(e)) from None
+    preset_neg = getattr(args, "preset_negative_extra", "") or ""
+    if preset_neg:
+        negative = f"{negative}, {preset_neg}".strip(", ")
+
+    # LoRA slot mapping: the library workflows expose ONE LoRA slot (slot 0).
+    # The pipeline's registry is ZIT LoRAs — never send those into a qwen graph.
+    if loras and not is_zit_wf:
+        raise _WorkflowRouteError(
+            f"LoRA/style '{lora_label}' is ZIT-family but '{workflow_id}' is a "
+            "qwen workflow — falling through so ComfyUI-direct can honor it"
+        )
+    if len(loras) > 1:
+        raise _WorkflowRouteError(
+            f"style stacks {len(loras)} LoRAs but library workflows expose a "
+            "single slot — falling through to ComfyUI-direct"
+        )
+    lora_payload = [
+        {"slot": 0, "name": le["name"], "strength": le.get("strength_model", 0.8)}
+        for le in loras
+    ]
+
+    # Semantic params per workflow (manifest defaults win unless overridden).
+    params: dict = {"prompt": full_prompt}
+    if negative:
+        params["negative"] = negative
+    if getattr(args, "seed", None) is not None:
+        params["seed"] = args.seed
+    if workflow_id == WF_PIXEL_WORKFLOW:
+        grid = args.target_size or 64
+        params["grid_width"] = grid
+        params["grid_height"] = grid
+        params["preview_width"] = grid * 4
+        params["preview_height"] = grid * 4
+        if args.colors:
+            params["colors"] = args.colors
+    else:
+        width, height = _resolve_comfy_dimensions(args.size, args.aspect_ratio)
+        if workflow_id == WF_EDIT_WORKFLOW:
+            params["megapixels"] = round(max(width * height, 1) / 1_000_000, 2)
+        else:
+            params["width"] = width
+            params["height"] = height
+        if args.steps != _CLI_DEFAULT_STEPS:
+            params["steps"] = args.steps
+        if args.cfg != _CLI_DEFAULT_CFG:
+            params["cfg"] = args.cfg
+
+    body: dict = {"params": params}
+    if lora_payload:
+        body["loras"] = lora_payload
+    if ref_path:
+        body["images"] = {
+            "ref_image": base64.b64encode(Path(ref_path).read_bytes()).decode("ascii")
+        }
+
+    print(
+        f"[asset_gen] ml_workbench workflow={workflow_id} type={asset_type} "
+        f"lora={lora_label}"
+        + (f" ref={ref_path}" if ref_path else ""),
+        file=sys.stderr,
+    )
+
+    req = urllib.request.Request(
+        f"{MLWB_URL}/v1/workflows/{workflow_id}/run",
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=MLWB_TIMEOUT) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+
+    extra: dict = {"workflow": workflow_id}
+    if data.get("elapsedMs") is not None:
+        extra["elapsed_ms"] = data["elapsedMs"]
+
+    images_b64 = data.get("imagesBase64") or ([data["imageBase64"]] if data.get("imageBase64") else [])
+    if not images_b64:
+        raise RuntimeError(f"workflow '{workflow_id}' returned no image")
+
+    # Multi-output contract (zit-pixel-art): index 0 = grid-size asset,
+    # index 1 = 4x nearest-neighbor preview, saved alongside as *_preview.png.
+    output.write_bytes(base64.b64decode(images_b64[0]))
+    if len(images_b64) > 1:
+        preview_path = output.with_name(f"{output.stem}_preview.png")
+        preview_path.write_bytes(base64.b64decode(images_b64[1]))
+        extra["preview"] = str(preview_path)
+
+    if workflow_id == WF_PIXEL_WORKFLOW:
+        # Grid downscale + color quantize already happened server-side. Only a
+        # named --palette still needs a local snap (the workflow quantizes to a
+        # color COUNT, not a fixed palette).
+        if args.palette:
+            from PIL import Image as PILImage
+            from pixel_art_toolkit import reduce_palette
+            print(f"[asset_gen] post-process palette snap → {args.palette}", file=sys.stderr)
+            img = PILImage.open(output).convert("RGBA")
+            reduce_palette(img, args.colors or 16, args.palette, args.dither).save(output)
+    elif args.pixelize or asset_type in PIXEL_ART_TYPES:
+        # Same local pixelize contract as the other backends (e.g. icon via
+        # qwen-icon, or --pixelize forced on a generic type).
+        from PIL import Image as PILImage
+        from pixel_art_toolkit import pixelize as _pixelize
+        target_size = args.target_size or 64
+        print(
+            f"[asset_gen] post-process pixelize → {target_size}px "
+            f"palette={args.palette or 'auto'}",
+            file=sys.stderr,
+        )
+        img = PILImage.open(output).convert("RGBA")
+        _pixelize(img, target_size, args.colors, args.palette, args.dither).save(output)
+
+    return output, extra
 
 
 # ComfyUI primary path
@@ -807,9 +1088,28 @@ def cmd_image(args):
             file=sys.stderr,
         )
 
-    # Backend chain (per type): ml_workbench -> ComfyUI-direct -> Gemini.
-    # ml_workbench is primary only for generic types (no special workflow lost);
-    # tile/tileset/portrait/avatar/sprite/item/icon stay on ComfyUI-direct.
+    # Backend chain: ml_workbench WORKFLOW library (all types, primary)
+    #   -> ml_workbench /v1/generate (legacy, generic types only)
+    #   -> ComfyUI-direct -> Gemini.
+    if _mlwb_workflows_enabled():
+        workflow_ids = _mlwb_workflow_ids()
+        if workflow_ids:
+            try:
+                output, extra = _mlwb_workflow_generate(args, asset_type, workflow_ids)
+                result_json(
+                    True, path=output, cost_cents=0,
+                    backend="ml_workbench_workflow", asset_type=asset_type, **extra,
+                )
+                return
+            except _WorkflowRouteError as e:
+                print(f"[asset_gen] workflow path skipped: {e}", file=sys.stderr)
+            except Exception as e:
+                print(
+                    f"[asset_gen] ml_workbench workflow failed ({e}); "
+                    "falling back to /v1/generate / ComfyUI / Gemini.",
+                    file=sys.stderr,
+                )
+
     if _mlwb_primary_for(asset_type) and _mlwb_available():
         try:
             output = _mlwb_generate(args, asset_type)
@@ -1113,6 +1413,9 @@ def main():
                         "and appends the style descriptor. Mutually exclusive with --lora.")
     p.add_argument("--steps", type=int, default=25)
     p.add_argument("--cfg", type=float, default=7.0)
+    p.add_argument("--seed", type=int, default=None,
+                   help="Deterministic seed (honored on the ml_workbench "
+                        "workflow path; other backends randomize)")
     p.add_argument("--denoise", type=float, default=0.6, help="img2img denoise (0..1)")
     p.add_argument("--reference", default="", help="Optional reference image path for img2img")
     p.add_argument("--timeout", type=int, default=300)

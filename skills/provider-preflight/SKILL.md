@@ -7,7 +7,7 @@ Pure-CLI; no model dependencies. Probes the actual services with cheap health ch
 ## TL;DR
 
 ```bash
-python3 .claude/skills/provider-preflight/tools/preflight.py {check|comfyui|loras|disk|budget|mcps|all} [opts]
+python3 .claude/skills/provider-preflight/tools/preflight.py {check|mlworkbench|comfyui|loras|disk|budget|mcps|all} [opts]
 ```
 
 The `all` subcommand runs the full battery and exits non-zero if any **required** provider fails. Optional providers (no LoRA file for a style the user isn't trying to use) emit warnings only.
@@ -30,7 +30,23 @@ The skill emits one-page JSON reports the agent can read to decide "go" vs "stop
 python3 .claude/skills/provider-preflight/tools/preflight.py check
 ```
 
-Equivalent to `all --skip mcps,disk` — the fast path for an agent about to kick off a single image generation. Hits ComfyUI's `/system_stats` endpoint, confirms the default ZIT checkpoint + pixel-art LoRA are present, returns. Sub-second normally.
+Equivalent to `all --skip mcps,disk` — the fast path for an agent about to kick off a single image generation. Probes ml-workbench's `/v1/workflows` and ComfyUI's `/system_stats`, confirms the default ZIT checkpoint + pixel-art LoRA are present, returns. Sub-second normally.
+
+### mlworkbench — Verify the ml-workbench workflow library is reachable
+
+```bash
+python3 .claude/skills/provider-preflight/tools/preflight.py mlworkbench \
+  --url http://localhost:8787
+```
+
+Hits `GET /v1/workflows` — the same probe `asset_gen.py` uses (and caches) for its **primary** backend, the validated workflow library (`zit-pixel-art`, `qwen-icon`, `zit-txt2img`, `qwen-edit-instruct`, ...). Defaults to `$MLWB_URL` / `$ML_WORKBENCH_URL` or `http://localhost:8787`. Reports:
+
+- `ok`: bool (reachable + responded with a workflow list)
+- `workflow_count`: int
+- `workflow_ids`: sorted list — check the ids your batch will route to are present
+- `error`: string if ok=false
+
+Standalone, exits non-zero if unreachable. **Inside `all`/`check` it is a soft check**: ml-workbench down demotes to a warning (asset_gen falls back to ComfyUI-direct), so a batch isn't blocked — but the workflow-library routing (server-side pixelize, qwen icons, reference edits) is lost for that run.
 
 ### comfyui — Verify ComfyUI is reachable
 
@@ -132,6 +148,7 @@ The `all` subcommand wraps individual results:
   "ok": true,
   "duration_ms": 1843,
   "results": {
+    "mlworkbench": { … },
     "comfyui": { … },
     "loras": { … },
     "disk": { … },

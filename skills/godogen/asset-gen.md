@@ -1,6 +1,6 @@
 # Asset Generator
 
-Generate PNG images and GLB 3D models. **Routed through the `image-pipeline` skill** — ComfyUI-first (free, local, style-locked), Gemini fallback (paid, generic).
+Generate PNG images and GLB 3D models. **Routed through the `image-pipeline` skill** — ml-workbench workflow library first (`:8787`, validated graphs: `zit-pixel-art` / `qwen-icon` / `zit-txt2img` / `qwen-edit-instruct`), then ml-workbench legacy `/v1/generate`, then ComfyUI-direct, then Gemini fallback (paid, generic). See [image-pipeline/SKILL.md](../image-pipeline/SKILL.md) "Backend selection" for the routing table. Pixel types generated on the workflow path also write a 4x nearest preview alongside the asset (`<name>_preview.png`), and `--seed` is deterministic there.
 
 ## ⚠ Always pass `--type`
 
