@@ -135,6 +135,91 @@
       ]
     },
     {
+      "id": "bullet-hell",
+      "name": "Bullet Hell / Shmup",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Bullet-hell base on BulletUpHell: the Spawning autoload (pooled shape-based bullets in a shared Area2D), one arena with a spawner firing an infinite 12-way ring pattern (PatternCircle, 0.8s volleys), a player ship with 8-dir movement, focus-slowdown, small hurtbox, lives/invulnerability/respawn wired to BulletUpHell's collision signal, HUD (lives + live bullet count), and the standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, topdown input action set).",
+      "status": "validated",
+      "skeleton": "genres/bullet-hell/skeleton",
+      "doc": "genres/bullet-hell/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "BulletUpHell",
+          "repo": "https://github.com/Dark-Peace/BulletUpHell.git",
+          "ref": "Demo-V4.4",
+          "commit": "750d816c3b86655e53ea12d711333f9a8fb69e9b",
+          "version": "4.4 (branch Demo-V4.4 @ pinned SHA — the default branch and the maintained Godot-4 line; release tags stop at 4.2.3)",
+          "license": "MIT",
+          "licenseFile": "LICENSE.md",
+          "payload": "addons/BulletUpHell",
+          "targetDir": "addons/BulletUpHell",
+          "enablePlugins": [
+            "res://addons/BulletUpHell/plugin.cfg"
+          ],
+          "patches": [
+            {
+              "file": "Spawning.tscn",
+              "find": "[ext_resource type=\"Texture2D\" uid=\"uid://wywclfkxgk1k\" path=\"res://addons/BulletUpHell/Bullet/Sprites/Bullet_3.png\" id=\"2_3slxn\"]",
+              "replace": "[ext_resource type=\"Texture2D\" path=\"res://addons/BulletUpHell/Bullet/Sprites/Bullet_3.png\" id=\"2_3slxn\"]",
+              "reason": "upstream ships no .import files, so fresh imports assign new texture UIDs; drop the stale committed UID and load by path (silences per-boot invalid-UID warnings)"
+            },
+            {
+              "file": "Spawning.tscn",
+              "find": "[ext_resource type=\"Texture2D\" uid=\"uid://cn1hbqvy8trj\" path=\"res://addons/BulletUpHell/Bullet/Sprites/Bullet_06.png\" id=\"3_6fafs\"]",
+              "replace": "[ext_resource type=\"Texture2D\" path=\"res://addons/BulletUpHell/Bullet/Sprites/Bullet_06.png\" id=\"3_6fafs\"]",
+              "reason": "same stale-UID cleanup"
+            },
+            {
+              "file": "Spawning.tscn",
+              "find": "[ext_resource type=\"Texture2D\" uid=\"uid://cud12jgusn0mu\" path=\"res://addons/BulletUpHell/Bullet/Sprites/Bullet_11.png\" id=\"4_gntuv\"]",
+              "replace": "[ext_resource type=\"Texture2D\" path=\"res://addons/BulletUpHell/Bullet/Sprites/Bullet_11.png\" id=\"4_gntuv\"]",
+              "reason": "same stale-UID cleanup"
+            },
+            {
+              "file": "Spawning.tscn",
+              "find": "[ext_resource type=\"AudioStream\" uid=\"uid://c6x5p1wu4yo3q\" path=\"res://addons/BulletUpHell/Bullet/Hit Hurt.wav\" id=\"5_rada6\"]",
+              "replace": "[ext_resource type=\"AudioStream\" path=\"res://addons/BulletUpHell/Bullet/Hit Hurt.wav\" id=\"5_rada6\"]",
+              "reason": "same stale-UID cleanup"
+            }
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "topdown" },
+          "note": "the topdown action set is baked into the skeleton's project.godot ('dash' doubles as shmup focus-slowdown); re-run only for rebinding UI"
+        },
+        {
+          "skill": "vfx-particles",
+          "params": {},
+          "note": "bullet spawn/despawn flashes and player death bursts; BulletUpHell handles bullet visuals, vfx covers everything around them"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "screen shake on player hit and hitstop on death — hook player.lives_changed / died"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Player ship sprite (~32x32 px, readable silhouette, subtle thruster animation)",
+        "Enemy spawner / boss sprite (~64x64 px)",
+        "Bullet sprites (8-16 px, high-contrast: round shot, needle shot; BulletUpHell swaps them via animState resources)",
+        "Scrolling background (vertical, tileable, low-contrast so bullets stay readable)",
+        "Hit/death explosion flipbook (small, additive)"
+      ]
+    },
+    {
       "id": "top-down-action",
       "name": "Top-Down Action (Hotline-Miami-like)",
       "engine": "godot",

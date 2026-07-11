@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://bhplayer0001"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_pl"]
+
+[sub_resource type="CircleShape2D" id="shape_hurtbox"]
+radius = 6.0
+
+[node name="Player" type="CharacterBody2D" groups=["Player", "persistent", "player"]]
+z_index = 10
+collision_layer = 2
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_pl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_hurtbox")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.419608, 0.796078, 0.909804, 1)
+polygon = PackedVector2Array(0, -16, 12, 12, 0, 6, -12, 12)
+
+[node name="HurtboxDot" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.9)
+polygon = PackedVector2Array(-3, -3, 3, -3, 3, 3, -3, 3)

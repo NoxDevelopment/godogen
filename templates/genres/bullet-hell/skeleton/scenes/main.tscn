@@ -1,0 +1,146 @@
+[gd_scene load_steps=11 format=3 uid="uid://bhmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Script" path="res://addons/BulletUpHell/Nodes/BuHPattern.gd" id="2_pat"]
+[ext_resource type="Script" path="res://addons/BulletUpHell/SpawnPatterns/PatternCircle.gd" id="3_circ"]
+[ext_resource type="Script" path="res://addons/BulletUpHell/Nodes/BuHBulletProperties.gd" id="4_bp"]
+[ext_resource type="Script" path="res://addons/BulletUpHell/Bullet/BulletProps.gd" id="5_props"]
+[ext_resource type="Script" path="res://addons/BulletUpHell/Nodes/BuHSpawnPoint.gd" id="6_sp"]
+[ext_resource type="PackedScene" uid="uid://bhplayer0001" path="res://scenes/player.tscn" id="7_pl"]
+
+[sub_resource type="PackedDataContainer" id="props_standard"]
+__data__ = PackedByteArray(255, 255, 255, 255, 0, 0, 0, 0)
+script = ExtResource("5_props")
+damage = 1.0
+speed = 140.0
+death_after_time = 10.0
+death_outside_box = Rect2(-64, -64, 1280, 776)
+
+[sub_resource type="NavigationPolygon" id="pattern_ring"]
+resource_name = "PatternCircle"
+script = ExtResource("3_circ")
+radius = 24
+angle_total = 6.28319
+angle_decal = 0
+symmetric = false
+center = 0
+symmetry_type = 0
+bullet = "standard"
+nbr = 12
+iterations = -1
+pattern_angle = 0.0
+forced_angle = 0.0
+forced_pattern_lookat = true
+cooldown_stasis = false
+cooldown_spawn = 0.8
+cooldown_shoot = 0.0
+cooldown_next_spawn = 0.0
+cooldown_next_shoot = 0.0
+
+[sub_resource type="RectangleShape2D" id="shape_wall_h"]
+size = Vector2(1152, 32)
+
+[sub_resource type="RectangleShape2D" id="shape_wall_v"]
+size = Vector2(32, 584)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_mn")
+
+[node name="Background" type="Polygon2D" parent="."]
+z_index = -10
+color = Color(0.0784314, 0.0862745, 0.113725, 1)
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="TopShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(576, 16)
+shape = SubResource("shape_wall_h")
+
+[node name="BottomShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(576, 632)
+shape = SubResource("shape_wall_h")
+
+[node name="LeftShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(16, 324)
+shape = SubResource("shape_wall_v")
+
+[node name="RightShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(1136, 324)
+shape = SubResource("shape_wall_v")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="Top" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 32, 0, 32)
+
+[node name="Bottom" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(0, 616, 1152, 616, 1152, 648, 0, 648)
+
+[node name="Left" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(0, 32, 32, 32, 32, 616, 0, 616)
+
+[node name="Right" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(1120, 32, 1152, 32, 1152, 616, 1120, 616)
+
+[node name="Patterns" type="Node2D" parent="."]
+
+[node name="RingPattern" type="Path2D" parent="Patterns"]
+script = ExtResource("2_pat")
+id = "ring"
+pattern = SubResource("pattern_ring")
+
+[node name="BulletProps" type="Node2D" parent="."]
+
+[node name="StandardBullet" type="Path2D" parent="BulletProps"]
+script = ExtResource("4_bp")
+id = "standard"
+props = SubResource("props_standard")
+
+[node name="Spawner" type="Node2D" parent="."]
+position = Vector2(576, 150)
+
+[node name="Visual" type="Polygon2D" parent="Spawner"]
+color = Color(0.768627, 0.290196, 0.317647, 1)
+polygon = PackedVector2Array(0, -20, 20, 0, 0, 20, -20, 0)
+
+[node name="SpawnPoint" type="Node2D" parent="Spawner"]
+script = ExtResource("6_sp")
+active = true
+auto_pattern_id = "ring"
+shared_area_name = "0"
+rotating_speed = 0.0
+pool_amount = 64
+auto_start_on_cam = false
+auto_start_after_time = 0.0
+auto_start_at_distance = 5.0
+auto_distance_from = NodePath("")
+trigger_container = NodePath("")
+
+[node name="Player" parent="." instance=ExtResource("7_pl")]
+position = Vector2(576, 540)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 320.0
+offset_bottom = 100.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="LivesLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Lives 3/3"
+
+[node name="BulletsLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Bullets: 0"
