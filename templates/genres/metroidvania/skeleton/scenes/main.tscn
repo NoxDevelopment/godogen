@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://mvmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="PackedScene" uid="uid://mvplayer0001" path="res://scenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://dch8dyylb7526" path="res://addons/MetroidvaniaSystem/Template/Nodes/Minimap.tscn" id="3_mm"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_mn")
+
+[node name="Player" parent="." instance=ExtResource("2_pl")]
+position = Vector2(200, 552)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Minimap" parent="HUD" instance=ExtResource("3_mm")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 160.0
+grow_horizontal = 0

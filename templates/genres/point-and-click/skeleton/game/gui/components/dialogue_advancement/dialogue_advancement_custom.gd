@@ -1,0 +1,1 @@
+extends "dialogue_advancement.gd"

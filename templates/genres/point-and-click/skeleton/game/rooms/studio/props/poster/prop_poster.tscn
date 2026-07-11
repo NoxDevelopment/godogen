@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://qs0afa4mdi37"]
+
+[ext_resource type="Script" path="res://game/rooms/studio/props/poster/prop_poster.gd" id="1_alfwt"]
+
+[node name="Poster" type="Area2D" unique_id=420676505]
+script = ExtResource("1_alfwt")
+script_name = "Poster"
+description = "Poster"
+cursor = 1
+interaction_polygon = PackedVector2Array(-24, -32, 24, -32, 24, 32, -24, 32)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1748868960]
+texture_filter = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1899603290]
+
+[node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=1702089017]
+visible = false
+modulate = Color(1, 1, 0, 1)
+polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
+
+[node name="ObstaclePolygon" type="NavigationObstacle2D" parent="." unique_id=393925063]
+visible = false
+affect_navigation_mesh = true
+carve_navigation_mesh = true

@@ -1,0 +1,1 @@
+extends "simple_click_bar.gd"
