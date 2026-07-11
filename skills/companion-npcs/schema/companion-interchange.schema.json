@@ -1,0 +1,405 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noxdev.dev/schemas/companion-interchange/v1.json",
+  "title": "Companion Interchange v1",
+  "description": "Game-relevant projection of a companion_ai_core CompleteCompanionEntity for design-time baking into game templates (Pandora entities, Dialogue Manager personas, portrait asset-plans). POINT-IN-TIME MAPPING: companion_ai_core is under active development; this schema was last mapped 2026-07-11 against localllm_poc@1eb530af. On breaking library changes: re-explore the entity structure (read-only), bump interchangeVersion, and route unmapped data through the `extensions` passthrough. See schema/FIELD_MAPPINGS.md for the exact Dart-entity-to-interchange mapping.",
+  "oneOf": [
+    { "$ref": "#/$defs/companion" },
+    {
+      "type": "array",
+      "items": { "$ref": "#/$defs/companion" },
+      "minItems": 1
+    }
+  ],
+  "$defs": {
+    "companion": {
+      "type": "object",
+      "required": ["interchangeVersion", "identity", "meta"],
+      "additionalProperties": false,
+      "properties": {
+        "interchangeVersion": {
+          "const": 1,
+          "description": "Schema version. Bumped on breaking changes to the projection; additive optional fields inside groups do NOT bump this."
+        },
+        "identity": { "$ref": "#/$defs/identity" },
+        "personality": { "$ref": "#/$defs/personality" },
+        "appearance": { "$ref": "#/$defs/appearance" },
+        "voice": { "$ref": "#/$defs/voice" },
+        "social": { "$ref": "#/$defs/social" },
+        "narrative": { "$ref": "#/$defs/narrative" },
+        "relationships": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipLink" },
+          "description": "Typed links to other entities (NPCs, factions, the player). From entity.relationshipData (Map<entityId, type>), entity.socialNetwork (Dunbar layers), entity.relationships (RelationshipSystem: user bond)."
+        },
+        "emotionalBaseline": { "$ref": "#/$defs/emotionalBaseline" },
+        "meta": { "$ref": "#/$defs/meta" },
+        "extensions": {
+          "type": "object",
+          "description": "Lossless passthrough valve. Anything not covered by the v1 projection goes here unmodified — including the full CompleteCompanionEntity.toJson() dump under extensions.fullEntity if desired. Importers MUST preserve this object verbatim into companion.json and MUST ignore unknown keys. This is the forward-compat mechanism while companion_ai_core evolves."
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable unique id. From entity.companionId."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name. From entity.name."
+        },
+        "age": {
+          "type": "integer",
+          "minimum": 18,
+          "description": "From demographicProfile.age (flat entity.age is deprecated but still emitted by toJson)."
+        },
+        "gender": {
+          "type": "string",
+          "description": "From demographicProfile.gender."
+        },
+        "pronouns": {
+          "type": "string",
+          "description": "From demographicProfile.pronouns."
+        },
+        "culture": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string",
+              "description": "CulturalOrigin.displayName of demographicProfile.primaryCulture (e.g. 'Japanese', 'Brazilian')."
+            },
+            "secondary": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "displayNames of demographicProfile.secondaryCultures."
+            },
+            "ethnicity": { "type": "string" },
+            "nationality": { "type": "string" },
+            "languages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "From demographicProfile.languages."
+            },
+            "religion": { "type": "string" },
+            "hofstede": {
+              "type": "object",
+              "description": "Hofstede 6D scores 0-100 from entity toJson 'hofstedeDimensions' (flat field or derived from culturalProfile.advancedCulturalDynamics.hofstede).",
+              "properties": {
+                "powerDistance": { "type": "number" },
+                "individualism": { "type": "number" },
+                "masculinity": { "type": "number" },
+                "uncertaintyAvoidance": { "type": "number" },
+                "longTermOrientation": { "type": "number" },
+                "indulgence": { "type": "number" }
+              }
+            }
+          }
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "city": { "type": "string" },
+            "country": { "type": "string" },
+            "region": { "type": "string" }
+          },
+          "description": "From demographicProfile.currentLocation (GeographicLocation: city/country/region)."
+        }
+      }
+    },
+    "personality": {
+      "type": "object",
+      "properties": {
+        "archetype": {
+          "type": "string",
+          "enum": [
+            "rebel", "caregiver", "explorer", "ruler", "creator", "innocent",
+            "sage", "hero", "magician", "jester", "lover", "everyman"
+          ],
+          "description": "Jungian archetype from entity.archetype (CompanionArchetype enum, companion_types.dart)."
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["minimal", "standard", "complete", "legendary"],
+          "description": "From entity.complexity (CompanionComplexity)."
+        },
+        "bigFive": {
+          "type": "object",
+          "description": "FFM trait scores 0.0-1.0. From personalityProfile.bigFive (BigFiveTraits) / flat bigFiveTraits.",
+          "required": ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"],
+          "properties": {
+            "openness": { "$ref": "#/$defs/unit" },
+            "conscientiousness": { "$ref": "#/$defs/unit" },
+            "extraversion": { "$ref": "#/$defs/unit" },
+            "agreeableness": { "$ref": "#/$defs/unit" },
+            "neuroticism": { "$ref": "#/$defs/unit" }
+          }
+        },
+        "hexaco": {
+          "type": "object",
+          "description": "Optional HEXACO scores 0.0-1.0 where available (honestyHumility, emotionality, extraversion, agreeableness, conscientiousness, openness).",
+          "additionalProperties": { "$ref": "#/$defs/unit" }
+        },
+        "mbti": {
+          "type": "string",
+          "pattern": "^[EI][NS][TF][JP]$",
+          "description": "From personalityProfile.mbtiType."
+        },
+        "enneagram": {
+          "type": "string",
+          "description": "From flat entity.enneagramType (e.g. '2w3')."
+        },
+        "attachmentStyle": {
+          "type": "string",
+          "description": "From psychologicalProfile.attachmentStyle / flat attachmentStyle (secure, anxious, avoidant, fearful-avoidant)."
+        },
+        "quirks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Top behavioral quirks/mannerisms as human-readable strings. From entity.mannerisms (the entity's `quirks` getter aliases mannerisms; source pools in lib/src/data/quirks/comprehensive_quirks_data.dart). Keep to the top ~8 game-relevant ones."
+        },
+        "behaviorTendencies": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/unit" },
+          "description": "Named tendency scores 0-1 (nurturing, curious, cautious, ...). From entity.behaviorTendencies."
+        },
+        "moralFoundations": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "Haidt moral foundations scores. From flat entity.moralFoundations."
+        }
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "description": "Structured physical summary projected from physicalProfile (ComprehensivePhysicalCharacteristics, lib/src/domain/physical/comprehensive_physical_characteristics.dart — 300+ attributes; we keep the portrait-relevant surface).",
+      "properties": {
+        "heightCm": { "type": "number", "description": "physicalProfile.height" },
+        "weightKg": { "type": "number", "description": "physicalProfile.weight" },
+        "bodyType": { "type": "string", "description": "physicalProfile.bodyType" },
+        "fitnessLevel": { "type": "string", "description": "physicalProfile.fitnessLevel (sedentary|average|active|fit|athletic)" },
+        "hairColor": { "type": "string", "description": "physicalProfile.generatedHairColor" },
+        "hairStyle": { "type": "string", "description": "Stage-2 field or hair characteristics summary" },
+        "eyeColor": { "type": "string", "description": "physicalProfile.generatedEyeColor / facial.eyeColor" },
+        "skinTone": { "type": "string", "description": "physicalProfile.generatedSkinTone" },
+        "face": {
+          "type": "object",
+          "description": "From physicalProfile.facial (FacialCharacteristics).",
+          "properties": {
+            "faceShape": { "type": "string" },
+            "eyeShape": { "type": "string" },
+            "eyebrowShape": { "type": "string" },
+            "noseShape": { "type": "string" },
+            "lipShape": { "type": "string" },
+            "jawline": { "type": "string" },
+            "cheekStructure": { "type": "string" },
+            "facialHair": { "type": "string" }
+          }
+        },
+        "presence": {
+          "type": "string",
+          "description": "Overall vibe from physicalProfile.aesthetic.presence + postureCharacteristics."
+        },
+        "distinguishingFeatures": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Freckles, scars, glasses, tattoos, etc. From asymmetries / bodyModifications / Stage-2 descriptions."
+        },
+        "typicalOutfit": {
+          "type": "string",
+          "description": "One-line wardrobe summary from fashionStyleProfile / fullWardrobe."
+        },
+        "portraitPrompt": {
+          "type": "string",
+          "description": "Pre-composed portrait prompt string. MUST contain the literal token {style} where the template's style anchor is injected (style-anchor skill). The importer regenerates a prompt if absent."
+        }
+      }
+    },
+    "voice": {
+      "type": "object",
+      "description": "Voice hints for TTS/VoiceDesign and dialogue speech-style authoring. From entity.voiceProfile (Map generated by Stage1InstantGenerator._generateVoiceProfile: pitch_range, pitch (Hz), voice_quality, accent, speech_pattern, volume, pace, tempo, tone, timbre, breathiness, nasality, roughness, strain, resonance) plus entity.speechPatterns / linguisticPatterns.",
+      "properties": {
+        "pitch": {
+          "type": "string",
+          "enum": ["very-low", "low", "medium", "high", "very-high"],
+          "description": "Bucketed from voiceProfile.pitch (Hz): female F0 ~217.5 avg, male ~132.5 (Titze 1994)."
+        },
+        "pitchHz": { "type": "number", "description": "voiceProfile.pitch raw fundamental frequency." },
+        "pace": { "type": "string", "description": "voiceProfile.pace (quick|moderate|slow)." },
+        "tone": { "type": "string", "description": "voiceProfile.tone (warm|neutral|...)." },
+        "timbre": { "type": "string", "description": "voiceProfile.timbre ('warm and resonant', 'clear and precise', ...)." },
+        "accent": { "type": "string", "description": "voiceProfile.accent (CulturalOrigin displayName, e.g. 'Brazilian')." },
+        "speechStyle": { "type": "string", "description": "voiceProfile.speech_pattern + voice_quality merged ('varied and expressive, clear and confident')." },
+        "volume": { "type": "string", "description": "voiceProfile.volume." },
+        "styleTags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Freeform descriptors for VoiceDesign-style prompt TTS (e.g. 'smiling', 'raspy edge', 'code-switches into Portuguese when excited')."
+        }
+      }
+    },
+    "social": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "Named value weights (family: 0.9, tradition: 0.7, ...). From personalityProfile.values / flat entity.values / culturalValues."
+        },
+        "occupation": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "field": { "type": "string" },
+            "seniority": { "type": "string" },
+            "workplace": { "type": "string" }
+          },
+          "description": "From demographicProfile.occupation / flat entity.occupation Map."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "proficiency": { "$ref": "#/$defs/unit" },
+              "source": { "type": "string", "description": "occupation | archetype | additional (CompanionSkillProficiency.source)" },
+              "dreyfusLevel": { "type": "string", "description": "novice|advancedBeginner|competent|proficient|expert|master" }
+            }
+          },
+          "description": "Top-N skills. From entity.skillProficiencies (Map<name, CompanionSkillProficiency{name, source, proficiency, practiceHours}>), fallback flat entity.skills list."
+        },
+        "hobbies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "skillLevel": { "$ref": "#/$defs/unit" }
+            }
+          },
+          "description": "From entity.hobbyProficiencies (HobbyProficiency{name, skillLevel, estimatedHours})."
+        },
+        "interests": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/unit" },
+          "description": "Interest → intensity 0-1. From entity.interestIntensityProfile (0.5 genuine, 0.7 enthusiast, 0.9 obsessive)."
+        },
+        "affiliations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "From entity.affiliations."
+        },
+        "socialClass": { "type": "string", "description": "From entity.socialClass / demographicProfile.socioeconomicClass." },
+        "wealth": { "$ref": "#/$defs/unit", "description": "From entity.wealth (0 impoverished .. 1 extremely wealthy)." },
+        "reputation": { "$ref": "#/$defs/unit", "description": "From entity.reputation." }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "properties": {
+        "backstorySummary": {
+          "type": "string",
+          "description": "Condensed 1-3 paragraph version of entity.backstory (full narrative can ride in extensions)."
+        },
+        "lifeEvents": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "From entity.lifeEvents / demographicProfile.significantLifeEvents."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["description"],
+            "properties": {
+              "description": { "type": "string" },
+              "severity": { "type": "string", "enum": ["minor", "moderate", "major", "life-defining"] },
+              "knownBy": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "description": "From entity.secrets (complexity-scaled Map: simple 1-2 minor, legendary 5-7 life-defining)."
+        },
+        "goals": {
+          "type": "object",
+          "properties": {
+            "shortTerm": { "type": "array", "items": { "type": "string" } },
+            "longTerm": { "type": "array", "items": { "type": "string" } },
+            "life": { "type": "array", "items": { "type": "string" } }
+          },
+          "description": "From entity.goals {shortTerm, longTerm, life}."
+        },
+        "fears": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "From psychologicalProfile.fears / flat entity.fears keys."
+        },
+        "dreams": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "From entity.dreamsAspirations."
+        }
+      }
+    },
+    "relationshipLink": {
+      "type": "object",
+      "required": ["target", "type"],
+      "properties": {
+        "target": { "type": "string", "description": "Target id or name ('player', another companion's identity.id, or a named NPC)." },
+        "targetName": { "type": "string" },
+        "type": {
+          "type": "string",
+          "description": "Relationship type: friend, rival, sibling, parent, mentor, ex-partner, regular-customer, ... From relationshipData values / socialNetwork layer names."
+        },
+        "closeness": { "$ref": "#/$defs/unit", "description": "0-1; from socialNetwork entry closeness or bondLevel/10 for the user link." },
+        "notes": { "type": "string" }
+      }
+    },
+    "emotionalBaseline": {
+      "type": "object",
+      "description": "Resting emotional disposition from entity.emotionalState (EmotionalState, lib/src/domain/emotions/emotional_state.dart — Russell circumplex) and emotionalSystems.moodBaseline.",
+      "properties": {
+        "valence": { "type": "number", "minimum": -1, "maximum": 1, "description": "Pleasure/displeasure. EmotionalState.valence." },
+        "arousal": { "$ref": "#/$defs/unit", "description": "Energy/activation. EmotionalState.arousal." },
+        "dominance": { "$ref": "#/$defs/unit", "description": "Control/power. EmotionalState.dominance." },
+        "dominantEmotions": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/unit" },
+          "description": "Top resting emotions with intensity (from EmotionalState.emotions Map<EmotionCategory, double>)."
+        },
+        "moodStability": { "$ref": "#/$defs/unit", "description": "Derived: 1 - neuroticism, adjusted by emotionalSystems.emotionRegulation." }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Producing system, e.g. 'companion_ai_core'. Hand-authored fixtures use 'handcrafted'."
+        },
+        "sourceVersion": { "type": "string", "description": "entity.generatorVersion (e.g. 'v1.0.0')." },
+        "sourceCommit": { "type": "string", "description": "Git commit of the source library at export time (companion_ai_core moves fast — record it)." },
+        "generatedAt": { "type": "string", "format": "date-time", "description": "entity.generatedAt (ISO 8601)." },
+        "exportedAt": { "type": "string", "format": "date-time" },
+        "generationSeed": { "type": "integer", "description": "entity.generationSeed (reproducibility)." },
+        "qualityScore": { "$ref": "#/$defs/unit", "description": "entity.qualityScore." },
+        "attributeCount": { "type": "integer", "description": "entity.attributeCount." },
+        "contentRating": {
+          "type": "string",
+          "enum": ["sfw", "mature"],
+          "default": "sfw",
+          "description": "Game-side projections default to sfw; intimacy-system attribute groups are never projected into v1 fields (extensions only, and only when rating is 'mature')."
+        }
+      }
+    },
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}
