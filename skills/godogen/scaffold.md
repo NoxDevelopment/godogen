@@ -4,6 +4,22 @@ Design game architecture and produce a compilable Godot project skeleton: `proje
 
 Works for both fresh projects and incremental changes (adding scenes/scripts, reimplementing subsystems).
 
+## Genre templates (check BEFORE scaffolding from scratch)
+
+When the user names a genre (metroidvania, point-and-click, ...), check the genre-template registry first — `templates/registry.json` at the repo root (see `templates/README.md` for the schema). If an entry with `status: "validated"` matches, offer it and scaffold from it instead of building the skeleton by hand:
+
+```bash
+python <repo>/templates/tools/scaffold.py <genre-id> <target-dir> --name "Game Name"
+```
+
+That copies a runnable skeleton, vendors the genre's pinned addons (MIT kits, license manifest in `addons/LICENSES.md`), runs the bootstrap import, and enables the plugins — the project imports and boots with zero script errors before any generation starts. Then continue the normal pipeline on top of it:
+
+- Read the genre's `TEMPLATE.md` (`templates/genres/<id>/TEMPLATE.md`) — it states what already exists (player controller, rooms, GUI, groups, input actions) so STRUCTURE.md extends rather than duplicates.
+- The registry entry's `primitives` lists the godogen skills that pair with the template (with params); `assetPlanHints` seeds the asset planner; `systems` names godotsmith drop-in templates that fit the ABI (buses `Master`/`Music`/`SFX`; groups `player`/`game_manager`/`persistent`).
+- Respect the entry's `engineVersion` pin — addon pins are chosen for it.
+
+If no registry entry matches (or the user declines), fall back to the from-scratch scaffold below.
+
 ## Workflow
 
 1. **Read `reference.png`** — understand the visual target: camera angle, distance, FOV, lighting direction, environment structure, scene layout. Use this to inform architecture decisions (node hierarchy, camera setup, lighting rig).

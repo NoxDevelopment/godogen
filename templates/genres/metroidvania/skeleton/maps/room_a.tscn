@@ -1,0 +1,69 @@
+[gd_scene load_steps=6 format=3 uid="uid://mvrooma00001"]
+
+[ext_resource type="PackedScene" uid="uid://bsg0351mx3b4u" path="res://addons/MetroidvaniaSystem/Nodes/RoomInstance.tscn" id="1_ri"]
+
+[sub_resource type="RectangleShape2D" id="shape_floor"]
+size = Vector2(1152, 64)
+
+[sub_resource type="RectangleShape2D" id="shape_ceiling"]
+size = Vector2(1152, 32)
+
+[sub_resource type="RectangleShape2D" id="shape_wall_left"]
+size = Vector2(32, 552)
+
+[sub_resource type="RectangleShape2D" id="shape_wall_right_top"]
+size = Vector2(32, 408)
+
+[node name="RoomA" type="Node2D"]
+
+[node name="RoomInstance" parent="." instance=ExtResource("1_ri")]
+
+[node name="Background" type="Polygon2D" parent="."]
+z_index = -10
+color = Color(0.113725, 0.12549, 0.14902, 1)
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="FloorShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(576, 616)
+shape = SubResource("shape_floor")
+
+[node name="CeilingShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(576, 16)
+shape = SubResource("shape_ceiling")
+
+[node name="LeftWallShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(16, 308)
+shape = SubResource("shape_wall_left")
+
+[node name="RightWallTopShape" type="CollisionShape2D" parent="Walls"]
+position = Vector2(1136, 236)
+shape = SubResource("shape_wall_right_top")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="Floor" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(0, 584, 1152, 584, 1152, 648, 0, 648)
+
+[node name="Ceiling" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 32, 0, 32)
+
+[node name="LeftWall" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(0, 32, 32, 32, 32, 584, 0, 584)
+
+[node name="RightWallTop" type="Polygon2D" parent="Visuals"]
+color = Color(0.227451, 0.247059, 0.290196, 1)
+polygon = PackedVector2Array(1120, 32, 1152, 32, 1152, 440, 1120, 440)
+
+[node name="PassageMark" type="Polygon2D" parent="Visuals"]
+color = Color(0.180392, 0.313726, 0.278431, 1)
+polygon = PackedVector2Array(1120, 440, 1152, 440, 1152, 584, 1120, 584)
+
+[node name="SpawnPoint" type="Marker2D" parent="."]
+position = Vector2(200, 552)

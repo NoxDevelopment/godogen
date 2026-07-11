@@ -2,7 +2,7 @@
 
 Generate game art that **matches the visual target**, with the right tool for the right asset type. Use this whenever you need to produce an image — **prefer this over any other image-generation path.**
 
-**Primary model:** **Z-Image-Turbo** (`z_image_turbo_bf16.safetensors`) — Flux-class, 8-step sampling, paired with the `pixel_art_style_z_image_turbo.safetensors` LoRA for pixel-art games. The dispatcher auto-selects the ZIT workflow and auto-loads the pixel-art LoRA for relevant asset types (`sprite`, `character`, `portrait`, `tile`, etc.). SD/SDXL/Pony are fallback paths used only when `--checkpoint` explicitly names a non-ZIT model.
+**Primary backend:** the **ml-workbench workflow library** (`:8787`) — validated ComfyUI graphs routed by asset type (see *Backend selection* below). **Primary model:** **Z-Image-Turbo** — Flux-class, paired with the `pixel_art_style_z_image_turbo.safetensors` LoRA for pixel-art games; icon/UI and reference-edit types route to Qwen-Image workflows. On the ComfyUI-direct fallback the dispatcher auto-selects the ZIT workflow and auto-loads the pixel-art LoRA for relevant asset types; SD/SDXL/Pony paths are used only when `--checkpoint` explicitly names a non-ZIT model.
 
 ## TL;DR
 
@@ -42,11 +42,31 @@ Always pass `--type`. The router picks the workflow, prefix, post-process, and (
 
 ## Backend selection (transparent)
 
-- **ComfyUI** at `$COMFYUI_URL` (default `http://localhost:8188`) is the primary path. Free, fast on a local GPU, supports LoRA, IPAdapter-style img2img, batch generation.
-- **Gemini fallback** kicks in only when ComfyUI is unreachable. Costs 5-15¢ per image, budget-capped via `set_budget`.
-- Force a backend with `ASSET_GEN_BACKEND=gemini` (or `comfyui`) in env.
+Preference order (all free except Gemini):
 
-The CLI surface is identical either way — your prompt and `--type` work the same.
+1. **ml-workbench workflow library** at `$MLWB_URL` (default `http://localhost:8787`) — **primary for ALL asset types.** `POST /v1/workflows/{id}/run` against validated, versioned ComfyUI graphs (contract: `ml-workbench/workflows/README.md`). Availability is health-checked **once per batch** via `GET /v1/workflows` and the workflow-id list is cached to a temp file (TTL `MLWB_WORKFLOWS_TTL`, default 300s; failures cached 60s) — the provider-preflight pattern.
+2. **ml-workbench `/v1/generate`** (legacy) — fallback for generic types (`general`, `reference`, `character`, `landscape`, `environment`, `ui`) on older ml-workbench builds without the workflow library.
+3. **ComfyUI direct** at `$COMFYUI_URL` (default `http://localhost:8188`) — hand-built graphs; keeps the seamless-tiling and face-detailer specials.
+4. **Gemini fallback** — last resort when nothing local is reachable. Costs 5-15¢ per image, budget-capped via `set_budget`.
+
+Force a backend with `ASSET_GEN_BACKEND=ml_workbench|comfyui|gemini`. Skip both ml-workbench paths with `MLWB_DISABLE=1`, or only the workflow-library path with `MLWB_WORKFLOWS_DISABLE=1`.
+
+The CLI surface is identical on every backend — your prompt and `--type` work the same.
+
+### Workflow-library routing table (backend 1)
+
+| `--type` | Workflow id | Notes |
+|---|---|---|
+| `sprite`, `tile`, `tileset`, `item` | `zit-pixel-art` | Pixel grid downscale + color quantize run **server-side** (`--target-size` → `grid_width/height`, `--colors` → `colors`). Output index 0 = grid-size asset → `-o` path; index 1 = 4x nearest preview → saved alongside as `<name>_preview.png`. A named `--palette` is still snapped locally. |
+| `icon`, `ui` | `qwen-icon` | Qwen-Image tuned for centered subjects on plain backgrounds. `icon` still gets the local pixelize post-process. |
+| any type with a reference image (`--reference`, or `reference.png` auto-anchor for `portrait`/`character`/`avatar`) | `qwen-edit-instruct` | Identity-preserving instruction edit; `--size`/`--aspect-ratio` map to the `megapixels` param. |
+| everything else (`general`, `reference`, `landscape`, `environment`, no-ref `portrait`/`character`/`avatar`) | `zit-txt2img` | Auto-loads the pixel-art LoRA into slot 0 for the usual types. |
+
+Style/LoRA/preset flags resolve exactly as on the ComfyUI path, then map to the run contract's `loras: [{slot: 0, name, strength}]`. The workflow path **falls through** to the next backend (with a stderr note) when it can't honor the request: workflow id missing from the library, a multi-LoRA style (library graphs expose one slot), or a ZIT LoRA/style requested for a qwen-routed type.
+
+`--seed` is deterministic on the workflow path (`seed` param); other backends randomize. `--steps`/`--cfg` are only forwarded when you override the CLI defaults — otherwise each workflow's validated manifest defaults win (zit: 15/3.5, qwen: 20/2.5).
+
+**Face-detailer caveat:** the auto second pass for `portrait`/`character`/`avatar` runs on the **ComfyUI-direct backend only**. If a face needs the detailer, re-run with `MLWB_WORKFLOWS_DISABLE=1` (or `ASSET_GEN_BACKEND=comfyui`).
 
 ## ComfyUI tuning flags
 
@@ -294,7 +314,7 @@ Until that file exists, the auto pass is a no-op (logged as `[asset_gen] face-de
 
 ## Verification
 
-After each asset generation, the JSON output includes `backend` (`comfyui` or `gemini`) and `asset_type`. If you got `backend: gemini` and didn't expect to, ComfyUI isn't reachable — investigate before committing the assets.
+After each asset generation, the JSON output includes `backend` (`ml_workbench_workflow`, `ml_workbench`, `comfyui`, or `gemini`) and `asset_type`. On the workflow path it also carries `workflow` (the library id), `elapsed_ms`, and — for `zit-pixel-art` — `preview` (the `<name>_preview.png` path). If you got `backend: gemini` and didn't expect to, nothing local was reachable — investigate before committing the assets.
 
 For pixel art assets, also verify:
 - Edges are sharp (no anti-aliased halo around silhouettes)

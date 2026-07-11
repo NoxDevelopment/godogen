@@ -3,13 +3,14 @@ a long-running asset batch.
 
 Subcommands
 -----------
-comfyui   Verify ComfyUI is reachable (GET /system_stats).
-loras     Verify required LoRA files exist on disk.
-disk      Verify output dir is writable + has minimum free space.
-budget    Check projected paid-provider spend against budget file.
-mcps      Health-check named MCP servers.
-all       Full battery (comfyui + loras + disk).
-check     Fast path = `all --skip mcps,budget`.
+mlworkbench  Verify ml-workbench workflow library is reachable (GET /v1/workflows).
+comfyui      Verify ComfyUI is reachable (GET /system_stats).
+loras        Verify required LoRA files exist on disk.
+disk         Verify output dir is writable + has minimum free space.
+budget       Check projected paid-provider spend against budget file.
+mcps         Health-check named MCP servers.
+all          Full battery (mlworkbench + comfyui + loras + disk).
+check        Fast path = `all --skip mcps,budget`.
 
 All subcommands emit a JSON report on stdout. Exit code 0 = green-light.
 """
@@ -50,6 +51,13 @@ try:
 except Exception:
     COMFYUI_URL = "http://localhost:8188"
 
+# ml-workbench serves the validated workflow library asset_gen.py uses as its
+# PRIMARY backend (image-pipeline SKILL.md, "Backend selection").
+MLWB_URL = (
+    os.environ.get("MLWB_URL") or os.environ.get("ML_WORKBENCH_URL")
+    or "http://localhost:8787"
+).rstrip("/")
+
 
 DEFAULT_LORA_DIR_CANDIDATES = [
     "D:/AI/Loras/ZIT",
@@ -83,6 +91,42 @@ def _wrap_result(subcommand: str, started_ms: float, ok: bool,
         "errors": errors or [],
         "warnings": warnings or [],
     }
+
+
+# ---------------------------------------------------------------------------
+# mlworkbench
+# ---------------------------------------------------------------------------
+
+def check_mlworkbench(url: str = MLWB_URL, timeout: float = 5.0) -> dict:
+    """Probe the ml-workbench workflow library (GET /v1/workflows).
+
+    Reports the served workflow ids so a batch script can verify the ids it
+    plans to route to (zit-pixel-art, qwen-icon, ...) actually exist."""
+    started = time.monotonic()
+    errors: list[str] = []
+    details: dict[str, Any] = {"url": url, "reachable": False}
+    try:
+        req = urllib.request.Request(f"{url.rstrip('/')}/v1/workflows")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8", errors="replace"))
+        workflows = data.get("workflows") or []
+        details["reachable"] = True
+        details["workflow_count"] = len(workflows)
+        details["workflow_ids"] = sorted(w.get("id") for w in workflows if w.get("id"))
+        return _wrap_result("mlworkbench", started, ok=True, details=details)
+    except (urllib.error.URLError, socket.timeout, ConnectionError) as e:
+        errors.append(f"ml-workbench unreachable at {url}: {e}")
+    except (json.JSONDecodeError, ValueError) as e:
+        errors.append(f"ml-workbench returned non-JSON / unparseable response: {e}")
+        details["reachable"] = True
+        details["parse_failed"] = True
+    except Exception as e:
+        errors.append(f"Unexpected error: {type(e).__name__}: {e}")
+    return _wrap_result("mlworkbench", started, ok=False, details=details, errors=errors)
+
+
+def cmd_mlworkbench(args) -> dict:
+    return check_mlworkbench(url=args.url, timeout=args.timeout)
 
 
 # ---------------------------------------------------------------------------
@@ -353,7 +397,7 @@ def cmd_mcps(args) -> dict:
 # all + check
 # ---------------------------------------------------------------------------
 
-ALL_SUBCOMMANDS = ["comfyui", "loras", "disk", "budget", "mcps"]
+ALL_SUBCOMMANDS = ["mlworkbench", "comfyui", "loras", "disk", "budget", "mcps"]
 
 
 def cmd_all(args) -> dict:
@@ -363,6 +407,9 @@ def cmd_all(args) -> dict:
     aggregate_warnings: list[str] = []
     aggregate_errors: list[str] = []
 
+    if "mlworkbench" not in skip:
+        results["mlworkbench"] = check_mlworkbench(
+            url=getattr(args, "mlwb_url", MLWB_URL), timeout=args.timeout)
     if "comfyui" not in skip:
         results["comfyui"] = check_comfyui(url=args.comfyui_url, timeout=args.timeout)
     if "loras" not in skip:
@@ -382,10 +429,23 @@ def cmd_all(args) -> dict:
     if "mcps" not in skip and args.mcp_check:
         results["mcps"] = check_mcps(args.mcp_check, timeout=args.timeout)
 
-    overall_ok = all(r.get("ok") for r in results.values()) if results else True
-    for r in results.values():
+    # ml-workbench down is a SOFT failure: asset_gen falls back to
+    # ComfyUI-direct (losing the workflow-library routing, not the batch).
+    # Demote its errors to warnings and exclude it from the overall gate.
+    mlwb_result = results.get("mlworkbench")
+    if mlwb_result and not mlwb_result.get("ok"):
+        aggregate_warnings.append(
+            "[mlworkbench] workflow library unreachable — asset_gen will fall "
+            "back to ComfyUI-direct (no zit-pixel-art/qwen-icon routing).")
+        aggregate_warnings.extend(f"[mlworkbench] {e}" for e in mlwb_result.get("errors", []))
+
+    overall_ok = all(
+        r.get("ok") for name, r in results.items() if name != "mlworkbench"
+    ) if results else True
+    for name, r in results.items():
         aggregate_warnings.extend(f"[{r['subcommand']}] {w}" for w in r.get("warnings", []))
-        aggregate_errors.extend(f"[{r['subcommand']}] {e}" for e in r.get("errors", []))
+        if name != "mlworkbench":
+            aggregate_errors.extend(f"[{r['subcommand']}] {e}" for e in r.get("errors", []))
 
     return {
         "subcommand": args.cmd,
@@ -411,6 +471,12 @@ def main():
     parser = argparse.ArgumentParser(
         description="provider-preflight: verify upstream services before a long batch")
     sub = parser.add_subparsers(required=True, dest="cmd")
+
+    p = sub.add_parser("mlworkbench",
+                       help="Check ml-workbench workflow library reachability")
+    p.add_argument("--url", default=MLWB_URL)
+    p.add_argument("--timeout", type=float, default=5.0)
+    p.set_defaults(func=lambda a: _emit(cmd_mlworkbench(a)))
 
     p = sub.add_parser("comfyui", help="Check ComfyUI reachability")
     p.add_argument("--url", default=COMFYUI_URL)
@@ -445,6 +511,7 @@ def main():
     p.set_defaults(func=lambda a: _emit(cmd_mcps(a)))
 
     p = sub.add_parser("all", help="Run full battery")
+    p.add_argument("--mlwb-url", default=MLWB_URL)
     p.add_argument("--comfyui-url", default=COMFYUI_URL)
     p.add_argument("--required-style", help="Style key whose LoRAs must exist")
     p.add_argument("--lora-dir")
@@ -459,7 +526,8 @@ def main():
     p.add_argument("--skip", help="Comma-separated subcommand names to skip")
     p.set_defaults(func=lambda a: _emit(cmd_all(a)))
 
-    p = sub.add_parser("check", help="Fast path: comfyui + loras + disk")
+    p = sub.add_parser("check", help="Fast path: mlworkbench + comfyui + loras + disk")
+    p.add_argument("--mlwb-url", default=MLWB_URL)
     p.add_argument("--comfyui-url", default=COMFYUI_URL)
     p.add_argument("--required-style", help="Style key (default: default-pixel)")
     p.add_argument("--lora-dir")

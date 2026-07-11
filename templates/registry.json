@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-07-11",
+  "templates": [
+    {
+      "id": "metroidvania",
+      "name": "Metroidvania (2D side-scroller)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "2D metroidvania base: MetSys world map/minimap with a 2-room starter map, platformer player (coyote time, jump buffer, variable jump height), automatic room transitions, cell discovery, and the standard NoxDev ABI (Master/Music/SFX buses, player/game_manager groups, save_data() contract).",
+      "status": "validated",
+      "skeleton": "genres/metroidvania/skeleton",
+      "doc": "genres/metroidvania/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "MetroidvaniaSystem",
+          "repo": "https://github.com/KoBeWi/Metroidvania-System.git",
+          "ref": "4.6",
+          "commit": "5b8817361c46766e6b924dce7c8f217ce748aea8",
+          "version": "1.5 (branch 4.6 — repo has no release tags; master tracks Godot 4.7-dev)",
+          "license": "MIT",
+          "licenseFile": "LICENSE.txt",
+          "payload": "addons/MetroidvaniaSystem",
+          "targetDir": "addons/MetroidvaniaSystem",
+          "enablePlugins": [
+            "res://addons/MetroidvaniaSystem/plugin.cfg"
+          ],
+          "patches": [
+            {
+              "file": "MetSysPlugin.gd",
+              "find": "\tmain = load(\"uid://crxgu2q73va5y\").instantiate()",
+              "replace": "\tif not ResourceUID.has_id(ResourceUID.text_to_id(\"uid://crxgu2q73va5y\")):\n\t\t# Bootstrap import (godot --headless --import): the UID cache is not\n\t\t# built yet, so the editor UI cannot load. Skip it; the plugin loads\n\t\t# fully on the next editor start.\n\t\treturn\n\tmain = load(\"uid://crxgu2q73va5y\").instantiate()",
+              "reason": "skip editor-UI creation during bootstrap --import runs where the UID cache does not exist yet"
+            },
+            {
+              "file": "MetSysPlugin.gd",
+              "find": "\tmain.queue_free()\n\tremove_tool_menu_item(\"MetSys\")",
+              "replace": "\tif not is_instance_valid(main):\n\t\treturn\n\tmain.queue_free()\n\tremove_tool_menu_item(\"MetSys\")",
+              "reason": "guard _exit_tree teardown for bootstrap/instant-quit editor runs where the UI was never created"
+            },
+            {
+              "file": "MetSysPlugin.gd",
+              "find": "func _make_visible(visible: bool) -> void:\n\tmain.visible = visible",
+              "replace": "func _make_visible(visible: bool) -> void:\n\tif not main:\n\t\treturn\n\tmain.visible = visible",
+              "reason": "same guard for _make_visible"
+            }
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "platformer" },
+          "note": "the platformer action set is already baked into the skeleton's project.godot; re-run only to add gamepad rebinding UI"
+        },
+        {
+          "skill": "camera-rigs",
+          "params": { "kind": "sidescroller" },
+          "note": "the player carries a Camera2D whose limits are clamped to the current MetSys room; swap in the sidescroller rig for deadzone/look-ahead"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "player controller already implements coyote time + jump buffering; use game-feel for shake/hitstop when combat is added"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Player character spritesheet (~32x48 px, idle/run/jump/fall, pixel art)",
+        "Tileset for rooms (16px or 32px grid, tileable: ground, walls, platforms)",
+        "Parallax background layers (2-3, per biome)",
+        "Door / passage frame sprite (marks MetSys border type 1)",
+        "Map theme override art only if the bundled MetSys 'Exquisite' minimap theme clashes with the palette"
+      ]
+    },
+    {
+      "id": "point-and-click",
+      "name": "Point-and-Click Adventure",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Classic point-and-click adventure base on Popochiu: one starter room with a clickable prop and a walkable area, a player character wired as PC, the simple_click GUI (look/interact verbs, inventory bar, dialog lines), transition layer, and Popochiu's room/character/inventory/dialog pipeline ready in the editor dock.",
+      "status": "validated",
+      "skeleton": "genres/point-and-click/skeleton",
+      "doc": "genres/point-and-click/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Popochiu",
+          "repo": "https://github.com/carenalgas/popochiu.git",
+          "ref": "v2.1.1",
+          "commit": "784d1474ef5fe79285a9da69d550504692a3f7e3",
+          "version": "2.1.1",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/popochiu",
+          "targetDir": "addons/popochiu",
+          "enablePlugins": [
+            "res://addons/popochiu/plugin.cfg",
+            "res://addons/popochiu/editor/gizmos/plugin.cfg",
+            "res://addons/popochiu/editor/importers/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "generate a theme.tres from the game palette and apply it to game/gui/gui.tscn to de-generic the Popochiu GUI"
+        },
+        {
+          "skill": "narrative",
+          "params": {},
+          "note": "room/prop descriptions and dialog trees; Popochiu dialogs live in game/dialogs/"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Room background painting (320x180 px, VGA-adventure look; one per room)",
+        "Player character walk/idle/talk spritesheets (4-direction or side view, ~32x64 px)",
+        "Prop sprites with readable silhouettes (transparent PNG, placed on the background)",
+        "Cursor sprite set (active/look/wait variants)",
+        "Inventory item icons (16x16 or 32x32 px)"
+      ]
+    }
+  ]
+}

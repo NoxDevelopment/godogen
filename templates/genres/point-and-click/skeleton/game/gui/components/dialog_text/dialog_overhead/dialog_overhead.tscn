@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bgr6ampnqvqx7"]
+
+[ext_resource type="Theme" uid="uid://dn5hgdxdhtle0" path="res://game/gui/resources/gui_theme.tres" id="1_dovqc"]
+[ext_resource type="Script" uid="uid://c6sjd1ctc6fji" path="res://game/gui/components/dialog_text/dialog_overhead/dialog_overhead_custom.gd" id="2_mqq0m"]
+[ext_resource type="Texture2D" uid="uid://ybuk21g8fl5t" path="res://game/gui/components/dialog_text/images/ico_continue.png" id="3_ufcrv"]
+
+[node name="DialogOverhead" type="Control" groups=["popochiu_gui_component"]]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_dovqc")
+script = ExtResource("2_mqq0m")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
+clip_contents = false
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 0
+offset_right = 153.0
+offset_bottom = 16.0
+size_flags_horizontal = 0
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+bbcode_enabled = true
+text = "An [shake]overhead[/shake] dialog text"
+fit_content = true
+scroll_active = false
+meta_underlined = false
+
+[node name="ContinueIcon" type="TextureProgressBar" parent="RichTextLabel"]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+value = 100.0
+fill_mode = 2
+texture_progress = ExtResource("3_ufcrv")
