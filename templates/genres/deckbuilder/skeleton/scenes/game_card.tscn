@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbgamecard01"]
+
+[ext_resource type="Script" path="res://scripts/game_card.gd" id="1_gc"]
+
+[node name="Card" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_gc")
+
+[node name="FrontFace" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 1
+
+[node name="TextureRect" type="TextureRect" parent="FrontFace"]
+layout_mode = 1
+offset_right = 150.0
+offset_bottom = 210.0
+
+[node name="CostLabel" type="Label" parent="FrontFace" groups=["scalable_text"]]
+layout_mode = 1
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 44.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.09, 0.09, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+text = "1"
+
+[node name="NameLabel" type="Label" parent="FrontFace" groups=["scalable_text"]]
+layout_mode = 1
+offset_left = 36.0
+offset_top = 14.0
+offset_right = 138.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.09, 0.09, 0.12, 1)
+theme_override_font_sizes/font_size = 16
+text = "Card"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="FrontFace" groups=["scalable_text"]]
+layout_mode = 1
+offset_left = 12.0
+offset_top = 150.0
+offset_right = 138.0
+offset_bottom = 200.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "Description"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BackFace" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 1
+
+[node name="TextureRect" type="TextureRect" parent="BackFace"]
+layout_mode = 1
+offset_right = 150.0
+offset_bottom = 210.0

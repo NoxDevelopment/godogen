@@ -1,0 +1,9 @@
+{
+    "name": "strike",
+    "front_image": "strike.png",
+    "display_name": "Strike",
+    "type": "attack",
+    "cost": 1,
+    "amount": 6,
+    "description": "Deal 6 damage."
+}

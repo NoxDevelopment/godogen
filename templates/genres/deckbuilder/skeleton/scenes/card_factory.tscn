@@ -1,0 +1,12 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbfactory001"]
+
+[ext_resource type="Script" path="res://addons/card-framework/json_card_factory.gd" id="1_jf"]
+[ext_resource type="PackedScene" uid="uid://dbgamecard01" path="res://scenes/game_card.tscn" id="2_gc"]
+[ext_resource type="Texture2D" path="res://cards/art/card_back.png" id="3_bk"]
+
+[node name="CardFactory" type="Node"]
+script = ExtResource("1_jf")
+default_card_scene = ExtResource("2_gc")
+card_asset_dir = "res://cards/art"
+card_info_dir = "res://cards/data"
+back_image = ExtResource("3_bk")

@@ -1,0 +1,9 @@
+{
+    "name": "defend",
+    "front_image": "defend.png",
+    "display_name": "Defend",
+    "type": "block",
+    "cost": 1,
+    "amount": 5,
+    "description": "Gain 5 block."
+}

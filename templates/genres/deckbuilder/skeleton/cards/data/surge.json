@@ -1,0 +1,9 @@
+{
+    "name": "surge",
+    "front_image": "surge.png",
+    "display_name": "Surge",
+    "type": "energy",
+    "cost": 0,
+    "amount": 2,
+    "description": "Gain 2 energy."
+}

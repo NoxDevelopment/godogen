@@ -1,0 +1,192 @@
+[gd_scene load_steps=7 format=3 uid="uid://dbmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="PackedScene" path="res://addons/card-framework/card_manager.tscn" id="2_cm"]
+[ext_resource type="PackedScene" uid="uid://dbfactory001" path="res://scenes/card_factory.tscn" id="3_cf"]
+[ext_resource type="PackedScene" path="res://addons/card-framework/pile.tscn" id="4_pi"]
+[ext_resource type="PackedScene" path="res://addons/card-framework/hand.tscn" id="5_ha"]
+[ext_resource type="Script" path="res://scripts/play_area.gd" id="6_pa"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mn")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.109804, 0.164706, 0.137255, 1)
+
+[node name="CardManager" parent="." instance=ExtResource("2_cm")]
+layout_mode = 1
+card_factory_scene = ExtResource("3_cf")
+
+[node name="EnemyPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+offset_left = 900.0
+offset_top = 60.0
+offset_right = 1220.0
+offset_bottom = 190.0
+
+[node name="Margin" type="MarginContainer" parent="EnemyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="Rows" type="VBoxContainer" parent="EnemyPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EnemyNameLabel" type="Label" parent="EnemyPanel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Cog-Golem"
+
+[node name="EnemyHPLabel" type="Label" parent="EnemyPanel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Cog-Golem  30/30"
+
+[node name="IntentLabel" type="Label" parent="EnemyPanel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85098, 0.560784, 0.560784, 1)
+text = "Intent: Attack 8"
+
+[node name="Deck" parent="." instance=ExtResource("4_pi")]
+layout_mode = 1
+offset_left = 80.0
+offset_top = 470.0
+offset_right = 230.0
+offset_bottom = 680.0
+enable_drop_zone = false
+card_face_up = false
+allow_card_movement = false
+
+[node name="Discard" parent="." instance=ExtResource("4_pi")]
+layout_mode = 1
+offset_left = 1050.0
+offset_top = 470.0
+offset_right = 1200.0
+offset_bottom = 680.0
+enable_drop_zone = false
+allow_card_movement = false
+
+[node name="PlayArea" parent="." instance=ExtResource("4_pi")]
+layout_mode = 1
+offset_left = 565.0
+offset_top = 140.0
+offset_right = 715.0
+offset_bottom = 350.0
+script = ExtResource("6_pa")
+
+[node name="Hand" parent="." instance=ExtResource("5_ha")]
+layout_mode = 1
+offset_left = 415.0
+offset_top = 500.0
+offset_right = 865.0
+offset_bottom = 710.0
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Stats" type="VBoxContainer" parent="HUD"]
+layout_mode = 1
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 240.0
+offset_bottom = 160.0
+theme_override_constants/separation = 6
+
+[node name="TurnLabel" type="Label" parent="HUD/Stats" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Turn 1"
+
+[node name="EnergyLabel" type="Label" parent="HUD/Stats" groups=["scalable_text"]]
+layout_mode = 2
+text = "Energy 3/3"
+
+[node name="BlockLabel" type="Label" parent="HUD/Stats" groups=["scalable_text"]]
+layout_mode = 2
+text = "Block 0"
+
+[node name="PlayerHPLabel" type="Label" parent="HUD/Stats" groups=["scalable_text"]]
+layout_mode = 2
+text = "HP 40/40"
+
+[node name="DeckLabel" type="Label" parent="HUD" groups=["scalable_text"]]
+layout_mode = 1
+offset_left = 80.0
+offset_top = 440.0
+offset_right = 230.0
+offset_bottom = 466.0
+text = "Deck: 10"
+horizontal_alignment = 1
+
+[node name="DiscardLabel" type="Label" parent="HUD" groups=["scalable_text"]]
+layout_mode = 1
+offset_left = 1050.0
+offset_top = 440.0
+offset_right = 1200.0
+offset_bottom = 466.0
+text = "Discard: 0"
+horizontal_alignment = 1
+
+[node name="PlayHintLabel" type="Label" parent="HUD" groups=["scalable_text"]]
+layout_mode = 1
+offset_left = 505.0
+offset_top = 356.0
+offset_right = 775.0
+offset_bottom = 382.0
+theme_override_colors/font_color = Color(0.6, 0.65098, 0.619608, 1)
+text = "Drag a card here to play it"
+horizontal_alignment = 1
+
+[node name="EndTurnButton" type="Button" parent="HUD"]
+layout_mode = 1
+offset_left = 1080.0
+offset_top = 330.0
+offset_right = 1230.0
+offset_bottom = 386.0
+text = "End Turn"
+
+[node name="BannerBox" type="CenterContainer" parent="HUD"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="HUD/BannerBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="BannerLabel" type="Label" parent="HUD/BannerBox/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
+text = "VICTORY"
+horizontal_alignment = 1
+
+[node name="ResetButton" type="Button" parent="HUD/BannerBox/Rows"]
+custom_minimum_size = Vector2(220, 52)
+layout_mode = 2
+text = "New Combat"

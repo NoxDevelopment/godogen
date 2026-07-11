@@ -1,0 +1,9 @@
+{
+    "name": "cleave",
+    "front_image": "cleave.png",
+    "display_name": "Cleave",
+    "type": "attack",
+    "cost": 2,
+    "amount": 9,
+    "description": "Deal 9 damage."
+}

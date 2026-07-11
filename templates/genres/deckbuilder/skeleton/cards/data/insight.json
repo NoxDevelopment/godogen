@@ -1,0 +1,9 @@
+{
+    "name": "insight",
+    "front_image": "insight.png",
+    "display_name": "Insight",
+    "type": "draw",
+    "cost": 1,
+    "amount": 2,
+    "description": "Draw 2 cards."
+}
