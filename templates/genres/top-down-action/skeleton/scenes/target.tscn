@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://tdatarget001"]
+
+[ext_resource type="Script" path="res://scripts/target.gd" id="1_tg"]
+
+[sub_resource type="RectangleShape2D" id="shape_target"]
+size = Vector2(32, 32)
+
+[node name="Target" type="StaticBody2D" groups=["targets"]]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_tg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_target")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.858824, 0.552941, 0.278431, 1)
+polygon = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)

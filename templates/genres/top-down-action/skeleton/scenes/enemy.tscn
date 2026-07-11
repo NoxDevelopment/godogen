@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://tdaenemy0001"]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_en"]
+
+[sub_resource type="CircleShape2D" id="shape_enemy"]
+radius = 14.0
+
+[node name="Enemy" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 7
+motion_mode = 1
+script = ExtResource("1_en")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_enemy")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.768627, 0.290196, 0.317647, 1)
+polygon = PackedVector2Array(-14, -14, 14, -14, 14, 14, -14, 14)
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 8.0
+target_desired_distance = 24.0
+path_max_distance = 64.0
