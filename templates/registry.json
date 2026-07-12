@@ -647,6 +647,177 @@
         "Inventory item icons (32x32, per item id used in the book)",
         "UI SFX (page turn, dice tumble, success/failure stingers)"
       ]
+    },
+    {
+      "id": "farming-sim",
+      "name": "Farming Sim (Stardew-like, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "2D farming base on the TimeTick GDExtension (shoyguer/time-tick — vendored from the sha256-pinned 1.1 release zip; prebuilt binaries for Windows/Linux/macOS/Android/iOS/Web, targets Godot 4.6): a TimeSystem autoload wrapping TimeTick (tick -> minute -> hour -> day at 0.1s/game-minute, derived 28-day seasons, sleep_to_next_day(), save/load of the clock), a first-party day/night CanvasModulate tint sampling a 24-hour gradient off the clock (day_started/night_started at 06:00/19:00), a 20x12 farm TileMapLayer (grass/tilled/watered atlas painted in code) with till/plant/harvest, one data-driven Crop resource (turnip.tres: 4 growth stages, 1 day/stage, blockout stage visuals) whose growth recomputes from day deltas on TimeSystem.day_changed (idempotent), a farmer (top-down movement + one contextual E action: harvest > plant > till on the tile underfoot), and a clock/season/harvest HUD. Kit note (2026-07-11): the survey's day/night pick (maetzemax day-and-night-cycle 0.3.0) was evaluated and is 3D-only (CycleController extends Node3D driving DirectionalLight3D + WorldEnvironment sky) — it does not fit a 2D TileMap farm, so the 2D tint layer is first-party; use that addon instead if the project goes 3D. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, pause action).",
+      "status": "validated",
+      "skeleton": "genres/farming-sim/skeleton",
+      "doc": "genres/farming-sim/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "TimeTick",
+          "repo": "https://github.com/shoyguer/time-tick.git",
+          "archive": {
+            "url": "https://github.com/shoyguer/time-tick/releases/download/1.1/time_tick_1.1.zip",
+            "sha256": "e30cd7c1150f47d5523c54972f6fc697344434966f9bfd48247fba245c0bc6b4"
+          },
+          "version": "1.1 (GDExtension release zip — repo tag 1.1 @ 796506ad is the C++ source; binaries only ship in the release asset, hence the archive pin)",
+          "license": "MIT",
+          "licenseFile": "time_tick_1.1/addons/time_tick/LICENSE",
+          "payload": "time_tick_1.1/addons/time_tick",
+          "targetDir": "addons/time_tick",
+          "enablePlugins": []
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "topdown" },
+          "note": "the movement action set is baked into the skeleton's project.godot; re-run only for rebinding UI"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the farm is one painted field; use world-layout for the village/interiors, keeping one TileMapLayer per farmable area with farm.gd attached"
+        },
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "Stardew's heart is its townsfolk — import companions as Pandora entities + Dialogue Manager personas for gift/schedule systems"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Farm tileset (32px grid: grass/tilled/watered plus paths, fences, water; replaces assets/tiles/farm_tiles.png)",
+        "Farmer spritesheet (~32x48 px, 4-direction walk + tool-use swings)",
+        "Crop growth spritesheets (one row per crop, stage_count frames; replaces the blockout stage colors)",
+        "Buildings (farmhouse, shipping bin, barn; 2-3 tile footprints)",
+        "Season palette variants or overlay tints (spring/summer/autumn/winter)",
+        "Ambient loops (birdsong day / crickets night — swap on day_started/night_started) + tool SFX"
+      ]
+    },
+    {
+      "id": "horror-fps",
+      "name": "Horror FPS (first-person horror)",
+      "engine": "godot",
+      "engineVersion": "4.5.1-stable",
+      "description": "First-person horror base: the COGITO immersive-sim stack (same vendor pins as fps-immersive — full player controller, component interactions, inventory, quests, menus) plus resonate adaptive music (GitLab continuation of the archived hugemenace repo — MusicBank with a 2-stem 'ambient' track: calm pad always on, dread drone gated) and a first-party Sanity autoload (0-100 stat, ambient drain, safe-zone restore via Area3D light pools, scare() hits, hysteresis low-sanity thresholds). The room script wires sanity to a vignette overlay shader (intensity = 1 - sanity) and to the dread stem (enable_stem under the low threshold, disable on recovery) — stat, presentation, and audio stay decoupled. Test room: night-lit blockout with the COGITO player, openable door, carryable pickup, one safe lamp pool, committed placeholder stem WAVs. Engine pin note: inherits fps-immersive's 4.5 pin (COGITO v1.1.6 targets Godot 4.5.1; its quest manager breaks the 4.6 GDScript analyzer) — scaffold and validate with a 4.5.x Godot. Standard NoxDev ABI on top.",
+      "status": "validated",
+      "skeleton": "genres/horror-fps/skeleton",
+      "doc": "genres/horror-fps/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "COGITO",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "1.1.6 (Codeberg is the live upstream — same pin as fps-immersive; targets Godot 4.5.1-stable)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/cogito",
+          "targetDir": "addons/cogito",
+          "enablePlugins": [
+            "res://addons/cogito/plugin.cfg"
+          ],
+          "patches": [
+            {
+              "file": "InventoryPD/UiScenes/Slot.tscn",
+              "find": "[ext_resource type=\"Texture2D\" uid=\"uid://cxrlavhscbsem\" path=\"res://addons/cogito/InventoryPD/UiScenes/SlotBorder.png\" id=\"4_303ij\"]",
+              "replace": "[ext_resource type=\"Texture2D\" path=\"res://addons/cogito/InventoryPD/UiScenes/SlotBorder.png\" id=\"4_303ij\"]",
+              "reason": "upstream ships no .import for SlotBorder.png, so fresh imports mint a new UID and the committed one warns on every boot; drop the stale UID and load by path"
+            }
+          ]
+        },
+        {
+          "name": "Input Helper (bundled with COGITO)",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 — same pin so versions can never skew)",
+          "license": "MIT",
+          "licenseFile": "addons/input_helper/LICENSE",
+          "payload": "addons/input_helper",
+          "targetDir": "addons/input_helper",
+          "enablePlugins": [
+            "res://addons/input_helper/plugin.cfg"
+          ]
+        },
+        {
+          "name": "Quick Audio (bundled with COGITO)",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "1.0 (bryceahn/quick_audio as vendored inside COGITO v1.1.6)",
+          "license": "MIT",
+          "licenseFile": "addons/quick_audio/LICENSE",
+          "payload": "addons/quick_audio",
+          "targetDir": "addons/quick_audio",
+          "enablePlugins": [
+            "res://addons/quick_audio/plugin.cfg"
+          ]
+        },
+        {
+          "name": "Resonate",
+          "repo": "https://gitlab.com/widgitgaming/godot/resonate.git",
+          "ref": "v2.4.0",
+          "commit": "e1cf2cff9b91c2672fa49c8518703e97e8ece5c0",
+          "version": "2.4.0 (GitLab widgitgaming continuation — official maintainer since Jan 2026; the hugemenace GitHub repo is archived at v2.3.4)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/resonate",
+          "targetDir": "addons/resonate",
+          "enablePlugins": [
+            "res://addons/resonate/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "resonate's SoundManager (pooled, spatial) replaces bare AudioStreamPlayers for scare stingers; the stem WAVs in assets/music/ are generated placeholders — replace with real stems, keep the names calm/dread"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "graybox the haunt: corridors + sightline blockers; keep layer 1 Environment / layer 2 Interactables, add SafeLamp pools where the player can breathe"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook Sanity.low_sanity_entered for camera sway/breathing SFX; COGITO ships headbob already"
+        },
+        {
+          "skill": "shader-effects",
+          "params": {},
+          "note": "shaders/sanity_overlay.gdshader is the single screen-effect hook — extend it (chromatic aberration, film grain) rather than stacking overlays"
+        }
+      ],
+      "systems": [],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Environment texture set (decayed interior: stained walls, worn wood floor, tileable PBR)",
+        "Interactable prop models (doors, drawers, fuse box, notes; GLB with collision)",
+        "Music stems: calm ambient pad + dread drone layers (loopable, same length/BPM — replace assets/music/*.wav, keep stem names)",
+        "Scare stinger SFX set + room-tone ambience loops",
+        "Flashlight / lantern first-person model (~5k tris)",
+        "UI: sanity-themed HUD accents (COGITO attribute bar reskin), scrawled-note font"
+      ]
     }
   ]
 }
