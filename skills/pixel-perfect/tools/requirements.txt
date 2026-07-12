@@ -1,0 +1,8 @@
+# pixeltool.py backends — all pip-installable (verified 2026-07-11, no vendoring needed)
+# pixel_snap.py (default backend) needs only numpy + Pillow.
+numpy
+Pillow
+unfake>=1.0.7            # runs/edge detect, QVote, morph, alpha binarize, flood key (Rust-accelerated)
+proper-pixel-art>=1.7.2  # Hough mesh for non-uniform grids (+ pixelate_video one-grid-one-palette)
+pixeloe>=0.1.4           # contrast-aware outline expansion: photo/render -> pixel conversion
+# pixeloe pulls opencv-python + torch; install only if the pixeloe backend is needed.

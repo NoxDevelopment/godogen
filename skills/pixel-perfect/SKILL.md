@@ -9,6 +9,38 @@ AI image models cannot produce grid-true pixel art: pixels drift in size and
 position, the grid wobbles across the image, and colors smear off-palette.
 Every "pixel art" output is FAKE pixel art until snapped. This skill makes it real.
 
+## tools/pixeltool.py — unified cleanup CLI (PREFERRED ENTRY POINT)
+
+One front-end over four backends, auto-dispatched: `snap` (our pixel_snap,
+default), `unfake` (PyPI: runs/edge detect, QVote, morph, alpha binarize,
+flood key), `hough` (proper-pixel-art PyPI: mesh for NON-uniform/warped
+grids), `pixeloe` (PyPI: outline expansion — photo/render → pixel; never
+auto-chosen, pass `--backend pixeloe`). Backends are pip deps
+(`tools/requirements.txt`), not vendored. Missing backend flags (dither,
+chroma key, morph, palette lock) are implemented locally — nothing is dropped.
+
+```
+# grid-true cleanup, auto backend
+python tools/pixeltool.py clean in.png out.png --pixel-size 8 --colors 32 --json
+
+# warped/non-uniform grid            -> hough mesh
+python tools/pixeltool.py clean in.png out.png --detect hough --colors 16
+
+# heavy cleanup (QVote + despeckle)  -> unfake
+python tools/pixeltool.py clean in.png out.png --downscale qvote --morph --alpha-binarize
+
+# photo -> pixel art (no grid yet)   -> PixelOE
+python tools/pixeltool.py clean photo.png out.png --backend pixeloe --pixel-size 8 --colors 32
+
+# chroma-bg sprite: key #FF00FF connected to the border only
+python tools/pixeltool.py clean sprite.png out.png --chroma flood --alpha-binarize
+```
+
+Full flags (`--dither none|ordered|fs`, `--palette`, `--chroma global|flood`,
+`--chroma-color/-tol`, `--scale N` preview, `--backend`): see `clean --help`.
+Output is always a true-resolution PNG. `--pixel-size 1` = image already at
+true res (skips grid detection; palette/post-ops only).
+
 ## tools/pixel_snap.py
 
 Python port of spritefusion-pixel-snapper (MIT, Hugo Duprez) with NoxDev
