@@ -1,0 +1,141 @@
+[gd_scene load_steps=13 format=3 uid="uid://armain000001"]
+
+[ext_resource type="Script" path="res://scripts/race_manager.gd" id="1_rm"]
+[ext_resource type="PackedScene" path="res://addons/gevp/scenes/vehicle_controller.tscn" id="2_vc"]
+[ext_resource type="PackedScene" path="res://addons/gevp/scenes/arcade_car.tscn" id="3_car"]
+[ext_resource type="Script" path="res://addons/gevp/scripts/camera.gd" id="4_cam"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_cp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_horizon_color = Color(0.66, 0.67, 0.69, 1)
+ground_horizon_color = Color(0.66, 0.67, 0.69, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[sub_resource type="BoxShape3D" id="shape_ground"]
+size = Vector3(600, 1, 600)
+
+[sub_resource type="BoxMesh" id="mesh_ground"]
+size = Vector3(600, 1, 600)
+
+[sub_resource type="StandardMaterial3D" id="mat_ground"]
+albedo_color = Color(0.294118, 0.317647, 0.290196, 1)
+
+[sub_resource type="BoxShape3D" id="shape_gate"]
+size = Vector3(18, 6, 2)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_rm")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 30, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("shape_ground")
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("mesh_ground")
+surface_material_override/0 = SubResource("mat_ground")
+
+[node name="VehicleController" parent="." node_paths=PackedStringArray("vehicle_node") instance=ExtResource("2_vc")]
+vehicle_node = NodePath("VehicleRigidBody")
+string_brake_input = "brake"
+string_steer_left = "steer_left"
+string_steer_right = "steer_right"
+string_throttle_input = "throttle"
+string_handbrake_input = "handbrake"
+string_clutch_input = ""
+string_toggle_transmission = ""
+string_shift_up = "shift_up"
+string_shift_down = "shift_down"
+
+[node name="VehicleRigidBody" parent="VehicleController" instance=ExtResource("3_car")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8)
+collision_layer = 2
+collision_mask = 3
+
+[node name="ChaseCamera" type="Camera3D" parent="." node_paths=PackedStringArray("follow_this")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 14)
+script = ExtResource("4_cam")
+follow_this = NodePath("../VehicleController/VehicleRigidBody")
+
+[node name="StartFinish" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StartFinish"]
+shape = SubResource("shape_gate")
+
+[node name="Checkpoints" type="Node3D" parent="."]
+
+[node name="Gate1" type="Area3D" parent="Checkpoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -40)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("5_cp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Checkpoints/Gate1"]
+shape = SubResource("shape_gate")
+
+[node name="Gate2" type="Area3D" parent="Checkpoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 80, 3, -40)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("5_cp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Checkpoints/Gate2"]
+shape = SubResource("shape_gate")
+
+[node name="Gate3" type="Area3D" parent="Checkpoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 3, 0)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("5_cp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Checkpoints/Gate3"]
+shape = SubResource("shape_gate")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 460.0
+offset_bottom = 120.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="LapLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Lap 0"
+
+[node name="TimeLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Time 00:00.000   Best --:--.---"
+
+[node name="GateLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Gate 0/3"
+
+[node name="SpeedLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "0 km/h  gear 0"
