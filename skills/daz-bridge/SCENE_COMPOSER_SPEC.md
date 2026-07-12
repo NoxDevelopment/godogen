@@ -81,10 +81,17 @@ generation before calling a generation supported.
 2. **Lip-sync** — portrait-framed render → `infinitetalk-talking-photo`
    workflow (ml-workbench) + Kokoro/Orpheus/Qwen3-TTS audio → talking
    character videos. Daz gives perfect identity consistency across shots.
-3. **Animations** — v2: aniMate/pose-preset animations rendered as frame
+3. **Videos from any Daz still (works today, zero new code)** — every
+   ml-workbench video workflow takes a start image: `wan22-i2v-lightning`
+   (animate the scene), the effect presets (`fx-squish`/`fx-orbit-360`/
+   aging pack…), `wan22-vace-restyle` (one Daz render → anime/ghibli/
+   claymation/pixel-world variants), `infinitetalk-talking-photo`
+   (portrait + TTS → talking character).
+4. **Animations** — v2: aniMate/pose-preset animations rendered as frame
    sequences → sprite sheets (pixel pipeline) or I2V/VACE conditioning
-   (`wan22-*` workflows). Also: 8-view turnarounds → character LoRA training
-   sets (`training/zimage-character-lora-24gb.yaml`).
+   (`wan22-*` workflows) — pose-perfect motion control without mocap.
+   Also: 8-view turnarounds → character LoRA training sets
+   (`training/` — see ml-workbench TRAINING_STUDIO_SPEC.md).
 
 ## Delivery plan
 
