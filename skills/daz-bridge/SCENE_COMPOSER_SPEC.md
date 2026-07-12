@@ -51,6 +51,28 @@ per spec.
 }
 ```
 
+## Figure generations (Genesis 1 → 9): support them all
+
+Loading is generation-agnostic — every generation ships as `.duf` and
+`openFile` handles any of them, so `figures`/`environment`/`cameras`/`render`
+work unchanged from Genesis 1 through Genesis 9 (incl. G9 Toon anime).
+What is generation-BOUND is preset application:
+
+- **Poses/expressions**: authored per generation (G3 pose ≠ G9 rig). DS has
+  conversion paths but they're lossy. Composer rule: detect the loaded
+  figure's generation (from its asset id / `data/DAZ 3D/Genesis N` payload
+  path), tag pose/expression presets with their target generation in the
+  spec, and **warn + skip on mismatch** rather than silently mangling.
+- **Wardrobe/hair**: auto-fit crosses generations via clones — allowed, but
+  the manifest records `autofit: true` so bad fits are traceable.
+- **Morph packs**: strictly per-generation; same tag-and-validate rule.
+
+Installed today (`C:\Daz 3D\Applications\Data\DAZ 3D\My DAZ 3D Library`):
+G3F, G8F/M, G8.1F/M, G9, G9 Toon + poses/morphs/wardrobe/hair/environments/
+light presets/shaders/**aniMate packs** (the P3 animation leg has content).
+Validation matrix: one turnaround + one posed render per installed
+generation before calling a generation supported.
+
 ## Consumers (the point of all this)
 
 1. **Visual novels** — godogen `visual-novel` template: character sprites
