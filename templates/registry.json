@@ -924,6 +924,52 @@
         "Upgrade icons (48x48 px, one per resources/upgrades entry) + level-up/death UI panel art",
         "SFX: shot, enemy death squish, gem pickup chime, level-up sting, player hurt"
       ]
+    },
+    {
+      "id": "zelda-like",
+      "name": "Zelda-like (top-down action-adventure)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Top-down action-adventure base (classic Zelda structure), pure first-party (per the Wave-3 survey no clearly-maintained MIT Zelda kit exists, and the adventure layer is build-cheap on top of the top-down-action archetype): a 4-directional hero with a sword-arc sweep (distance+angle hit-test against the enemies group), an item button driving the equipped-item slot (ships the boomerang — out-and-return flight that stuns enemies), and a 3-room world on a screen grid with Zelda-style room transitions: the camera snaps to whichever room the player walks into and each room wakes only its own enemies; rooms build their floor/perimeter walls (with doorway gaps) in code so scenes stay lean. Dungeon fundamentals: a small-key pickup, a locked door that consumes the key on bump, a latching pressure-plate puzzle opening a switch door, and a treasure chest granting + equipping the boomerang via the interact button — every key/door/plate/chest writes a GameManager flag so world state survives room transitions and scene reloads. Two enemy archetypes on a shared chassis (ping-pong patroller, straight-line chaser) with touch damage on cooldown, sword take_hit, boomerang stun, and chance heart drops; hearts row + key count + equipped-item HUD. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts — player saves hearts/keys/items, GameManager saves flags — scalable_text, pause action).",
+      "status": "validated",
+      "skeleton": "genres/zelda-like/skeleton",
+      "doc": "genres/zelda-like/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "topdown" },
+          "note": "the adventure action set (move, attack=Space, item=Shift, interact=E) is baked into the skeleton's project.godot; re-run only for rebinding UI"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook player.attacked / take_hit flashes and door.opened for hitstop, shake and door-rumble — the signals are already emitted"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "rooms are screen-grid instances of room.tscn (position = grid coord * 1152x648); use world-layout to plan dungeon floors, then place room instances with matching doorway gaps and a door on each shared boundary"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Hero spritesheet (~32x32 px, 4-direction walk + sword swing + item throw)",
+        "Enemy spritesheets (patroller + chaser families, ~32x32 px walk cycles; palette-distinct from hero)",
+        "Dungeon/overworld tileset (32px grid: floor variants, walls with top face; replaces the code-built Polygon2D rooms)",
+        "Door sprites (locked with keyhole, switch-barred, open frame; 64x128 to match the doorway gap)",
+        "Item + pickup sprites (small key, heart, boomerang) and 20x20 HUD item icons",
+        "Chest sprite (closed/open, ~48x36) and pressure-plate tile",
+        "SFX: sword swipe, boomerang whoosh loop, door unlock, chest fanfare, heart/key pickup, hero hurt"
+      ]
     }
   ]
 }

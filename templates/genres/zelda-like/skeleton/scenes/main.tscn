@@ -1,0 +1,110 @@
+[gd_scene load_steps=10 format=3 uid="uid://zlmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="PackedScene" uid="uid://zlroom000001" path="res://scenes/room.tscn" id="2_rm"]
+[ext_resource type="PackedScene" uid="uid://zlplayer0001" path="res://scenes/player.tscn" id="3_pl"]
+[ext_resource type="PackedScene" uid="uid://zlpatrol0001" path="res://scenes/patroller.tscn" id="4_pt"]
+[ext_resource type="PackedScene" uid="uid://zlchaser0001" path="res://scenes/chaser.tscn" id="5_ch"]
+[ext_resource type="PackedScene" uid="uid://zldoor000001" path="res://scenes/door.tscn" id="6_dr"]
+[ext_resource type="PackedScene" uid="uid://zlchest00001" path="res://scenes/chest.tscn" id="7_cs"]
+[ext_resource type="PackedScene" uid="uid://zlplate00001" path="res://scenes/switch_plate.tscn" id="8_sw"]
+[ext_resource type="PackedScene" uid="uid://zlkey0000001" path="res://scenes/key_pickup.tscn" id="9_ky"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_mn")
+
+[node name="RoomA" parent="." instance=ExtResource("2_rm")]
+gap_east = true
+floor_color = Color(0.113725, 0.12549, 0.14902, 1)
+
+[node name="Patroller" parent="RoomA" instance=ExtResource("4_pt")]
+position = Vector2(576, 480)
+patrol_axis = Vector2(1, 0)
+patrol_extent = 200.0
+
+[node name="KeyPickup" parent="RoomA" instance=ExtResource("9_ky")]
+position = Vector2(820, 190)
+flag_id = "key_room_a"
+
+[node name="RoomB" parent="." instance=ExtResource("2_rm")]
+position = Vector2(1152, 0)
+gap_east = true
+gap_west = true
+floor_color = Color(0.121569, 0.137255, 0.129412, 1)
+
+[node name="Patroller" parent="RoomB" instance=ExtResource("4_pt")]
+position = Vector2(330, 220)
+patrol_axis = Vector2(0, 1)
+patrol_extent = 130.0
+
+[node name="SwitchPlate" parent="RoomB" instance=ExtResource("8_sw")]
+position = Vector2(576, 470)
+target_door = NodePath("../../Doors/DoorBC")
+flag_id = "plate_room_b"
+
+[node name="RoomC" parent="." instance=ExtResource("2_rm")]
+position = Vector2(2304, 0)
+gap_west = true
+floor_color = Color(0.141176, 0.121569, 0.133333, 1)
+
+[node name="Chaser" parent="RoomC" instance=ExtResource("5_ch")]
+position = Vector2(576, 200)
+
+[node name="Chest" parent="RoomC" instance=ExtResource("7_cs")]
+position = Vector2(860, 324)
+item_id = "boomerang"
+flag_id = "chest_boomerang"
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="DoorAB" parent="Doors" instance=ExtResource("6_dr")]
+position = Vector2(1152, 324)
+kind = 1
+flag_id = "door_ab"
+
+[node name="DoorBC" parent="Doors" instance=ExtResource("6_dr")]
+position = Vector2(2304, 324)
+kind = 2
+flag_id = "door_bc"
+
+[node name="Player" parent="." instance=ExtResource("3_pl")]
+position = Vector2(400, 324)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 480.0
+offset_bottom = 140.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="HeartsRow" type="HBoxContainer" parent="HUD/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="KeysLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Keys: 0"
+
+[node name="ItemRow" type="HBoxContainer" parent="HUD/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ItemIcon" type="ColorRect" parent="HUD/Margin/Rows/ItemRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+color = Color(0.3, 0.32, 0.36, 1)
+
+[node name="ItemLabel" type="Label" parent="HUD/Margin/Rows/ItemRow" groups=["scalable_text"]]
+layout_mode = 2
+text = "Item: —"
+
+[node name="HintLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "WASD: move   Space: sword   Shift: item   E: open"

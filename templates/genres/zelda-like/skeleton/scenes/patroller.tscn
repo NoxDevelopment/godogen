@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://zlpatrol0001"]
+
+[ext_resource type="Script" path="res://scripts/patroller.gd" id="1_pt"]
+
+[sub_resource type="CircleShape2D" id="shape_patroller"]
+radius = 14.0
+
+[node name="Patroller" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_pt")
+move_speed = 90.0
+max_health = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_patroller")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.45, 0.65, 0.35, 1)
+polygon = PackedVector2Array(-14, -14, 14, -14, 14, 14, -14, 14)

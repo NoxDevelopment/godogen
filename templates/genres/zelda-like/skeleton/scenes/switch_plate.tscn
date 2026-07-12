@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://zlplate00001"]
+
+[ext_resource type="Script" path="res://scripts/switch_plate.gd" id="1_sw"]
+
+[sub_resource type="RectangleShape2D" id="shape_plate"]
+size = Vector2(44, 44)
+
+[node name="SwitchPlate" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_sw")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_plate")
+
+[node name="Visual" type="Polygon2D" parent="."]
+z_index = -5
+color = Color(0.42, 0.44, 0.5, 1)
+polygon = PackedVector2Array(-22, -22, 22, -22, 22, 22, -22, 22)

@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://zlchaser0001"]
+
+[ext_resource type="Script" path="res://scripts/chaser.gd" id="1_ch"]
+
+[sub_resource type="CircleShape2D" id="shape_chaser"]
+radius = 14.0
+
+[node name="Chaser" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_ch")
+move_speed = 150.0
+max_health = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_chaser")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.768627, 0.290196, 0.317647, 1)
+polygon = PackedVector2Array(-14, -14, 14, -14, 14, 14, -14, 14)

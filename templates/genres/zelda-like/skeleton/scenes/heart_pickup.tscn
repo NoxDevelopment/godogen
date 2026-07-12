@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://zlheart00001"]
+
+[ext_resource type="Script" path="res://scripts/heart_pickup.gd" id="1_hp"]
+
+[sub_resource type="CircleShape2D" id="shape_heart"]
+radius = 12.0
+
+[node name="HeartPickup" type="Area2D"]
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("1_hp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_heart")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.85, 0.2, 0.25, 1)
+polygon = PackedVector2Array(0, -6, 5, -10, 9, -6, 9, -2, 0, 8, -9, -2, -9, -6, -5, -10)
