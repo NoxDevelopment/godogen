@@ -970,6 +970,57 @@
         "Chest sprite (closed/open, ~48x36) and pressure-plate tile",
         "SFX: sword swipe, boomerang whoosh loop, door unlock, chest fanfare, heart/key pickup, hero hurt"
       ]
+    },
+    {
+      "id": "crowd-rush",
+      "name": "Crowd Rush (hypercasual crowd-runner)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Hypercasual 3D crowd-runner base (Count-Masters-like), pure first-party (per the Wave-3 survey no maintained MIT crowd-runner kit exists and the genre is build-cheap: one MultiMesh, disc-formation math, count arithmetic): an auto-forward crowd of capsule units running a straight track with horizontal steering (A/D-arrows or mouse-x), every unit drawn by ONE MultiMesh in a phyllotaxis disc around the leader — no per-unit nodes, no physics bodies, 400 slots allocated so 200+ units stay cheap. Multiplier/add gates in choice pairs (\"+10\"/\"-5\", \"-5\"/\"x2\") consumed by the leader's lane on crossing; a spike-strip obstacle that kills the individual units sweeping through its box; a blocking enemy crowd resolved by 1:1 annihilation at a fixed rate (the bigger crowd survives with exactly the difference, a tie wipes the run); and a finish line + end-tower comparison (strictly more survivors than the tower count = win, score = surviving units). Crowd-count/distance HUD plus floating 3D count labels over both crowds; finish or wipe opens a run summary (survivors/tower/distance, best-survivors + best-distance flags on GameManager, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "status": "validated",
+      "skeleton": "genres/crowd-rush/skeleton",
+      "doc": "genres/crowd-rush/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the steer_left/steer_right + pause action set is baked into the skeleton's project.godot and mouse-x steering is built into crowd.gd; re-run only for rebinding UI"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook crowd.gate_applied / units_lost and enemy clash_started for gate pops, clash shake and kill ticks — the signals are already emitted"
+        },
+        {
+          "skill": "vfx-particles",
+          "params": {},
+          "note": "unit poofs on units_lost, gate bursts on gate_applied, confetti on finish_line.finished; keep them pooled — the crowd itself never allocates in the hot loop"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the track is a straight strip of gate pairs / obstacles / enemy crowds ordered by z; layout work = placing (or generating) more of those nodes along a longer Track mesh"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Runner character model (low-poly ~1-2k tris, run cycle; ONE mesh swapped into the crowd MultiMesh — every unit shares it)",
+        "Enemy runner variant (palette/silhouette swap of the runner, same single-mesh constraint)",
+        "Gate arch + panel art (translucent good/bad panels with big readable operation text)",
+        "Obstacle set (spike strip, saw blade, gap decals; keep kill AABBs matching the visuals)",
+        "Track + rail textures (tileable, low-contrast so the crowd reads) and a skybox gradient",
+        "Finish gate + end-tower model (defender count readable from afar on the front plate)",
+        "SFX: unit-gain pop, unit-loss squish, good/bad gate chimes, clash brawl loop, finish fanfare"
+      ]
     }
   ]
 }

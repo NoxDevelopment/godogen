@@ -1,0 +1,169 @@
+[gd_scene load_steps=14 format=3 uid="uid://crmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Script" path="res://scripts/crowd.gd" id="2_cr"]
+[ext_resource type="Script" path="res://scripts/gate.gd" id="3_gt"]
+[ext_resource type="Script" path="res://scripts/obstacle.gd" id="4_ob"]
+[ext_resource type="Script" path="res://scripts/enemy_crowd.gd" id="5_ec"]
+[ext_resource type="Script" path="res://scripts/finish_line.gd" id="6_fl"]
+[ext_resource type="Script" path="res://scripts/run_summary.gd" id="7_rs"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_horizon_color = Color(0.66, 0.67, 0.69, 1)
+ground_horizon_color = Color(0.66, 0.67, 0.69, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[sub_resource type="BoxMesh" id="mesh_track"]
+size = Vector3(10, 1, 170)
+
+[sub_resource type="StandardMaterial3D" id="mat_track"]
+albedo_color = Color(0.223529, 0.243137, 0.301961, 1)
+
+[sub_resource type="BoxMesh" id="mesh_rail"]
+size = Vector3(0.3, 0.7, 170)
+
+[sub_resource type="StandardMaterial3D" id="mat_rail"]
+albedo_color = Color(0.54902, 0.580392, 0.65098, 1)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_mn")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 30, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Track" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -70)
+mesh = SubResource("mesh_track")
+surface_material_override/0 = SubResource("mat_track")
+
+[node name="RailLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.85, 0.35, -70)
+mesh = SubResource("mesh_rail")
+surface_material_override/0 = SubResource("mat_rail")
+
+[node name="RailRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.85, 0.35, -70)
+mesh = SubResource("mesh_rail")
+surface_material_override/0 = SubResource("mat_rail")
+
+[node name="Crowd" type="Node3D" parent="." groups=["player", "persistent"]]
+script = ExtResource("2_cr")
+
+[node name="Camera3D" type="Camera3D" parent="Crowd"]
+transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 8, 11)
+
+[node name="Gates" type="Node3D" parent="."]
+
+[node name="GateAdd10" type="Node3D" parent="Gates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -25)
+script = ExtResource("3_gt")
+operation = "add"
+amount = 10.0
+
+[node name="GateMinus5A" type="Node3D" parent="Gates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -25)
+script = ExtResource("3_gt")
+operation = "add"
+amount = -5.0
+
+[node name="GateMinus5B" type="Node3D" parent="Gates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -50)
+script = ExtResource("3_gt")
+operation = "add"
+amount = -5.0
+
+[node name="GateTimes2" type="Node3D" parent="Gates"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -50)
+script = ExtResource("3_gt")
+operation = "mul"
+amount = 2.0
+
+[node name="Spikes" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -75)
+script = ExtResource("4_ob")
+
+[node name="EnemyCrowd" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -105)
+script = ExtResource("5_ec")
+
+[node name="FinishLine" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -140)
+script = ExtResource("6_fl")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 460.0
+offset_bottom = 120.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="CountLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Crowd: 1"
+
+[node name="DistanceLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Distance: 0 m"
+
+[node name="HintLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "A/D or mouse: steer"
+
+[node name="RunSummary" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 11
+visible = false
+script = ExtResource("7_rs")
+
+[node name="Dim" type="ColorRect" parent="RunSummary"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.54902)
+
+[node name="Panel" type="PanelContainer" parent="RunSummary"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -100.0
+offset_right = 220.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="RunSummary/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "RUN OVER"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Crowd 0 vs tower 0"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Restart (Enter)"
