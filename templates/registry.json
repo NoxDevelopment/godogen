@@ -588,6 +588,65 @@
         "Skybox / horizon panorama (360°, outdoor daytime)",
         "Engine loop WAV (pitch-shiftable single-RPM sample) + tire screech + gate whoosh SFX"
       ]
+    },
+    {
+      "id": "gamebook",
+      "name": "Gamebook (solo pen-and-paper RPG)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Fighting-Fantasy-style gamebook base on Dialogue Manager 3 (same pin as visual-novel): keyed numbered passages in dialogue/book.dialogue (titles are passage numbers, choices read 'turn to N'), an adventure-sheet autoload (SKILL 1d6+6 / STAMINA 2d6+12 / LUCK 1d6+6 rolled per run, provisions, inventory LIST with add/has/remove used straight from dialogue mutations and conditions), and a 2d6 roll-UNDER dice layer (Dice.test('skill'), Dice.test_luck() with LUCK attrition, snake-eyes/double-six crit rules, seedable RNG) whose dice popup is awaited as a Dialogue Manager mutation. Ships a 6-passage starter adventure (The Toll Bridge) demonstrating passage jumps, an item-gated choice, a SKILL test with STAMINA damage on failure, and a LUCK test. Title screen rolls a fresh sheet; the story scene shows a live sheet panel. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/gamebook/skeleton",
+      "doc": "genres/gamebook/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Dialogue Manager",
+          "repo": "https://github.com/nathanhoad/godot_dialogue_manager.git",
+          "ref": "v3.10.4",
+          "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
+          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ — same pin as the visual-novel template)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/dialogue_manager",
+          "targetDir": "addons/dialogue_manager",
+          "enablePlugins": [
+            "res://addons/dialogue_manager/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "narrative",
+          "params": {},
+          "note": "the book lives in dialogue/book.dialogue — one title per numbered passage; The Toll Bridge shows every mechanic (jump, item gate, skill test, luck test) to copy from"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "generate a theme.tres from the game palette and set it on the textbox panel, sheet panel, title screen, and dice popup"
+        },
+        {
+          "skill": "image-pipeline",
+          "params": {},
+          "note": "per-passage illustrations for the Stage placeholders (classic gamebooks illustrate every few passages)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Passage illustrations (1280x720 or framed 800x500, ink/engraving look; one per key passage)",
+        "Adventure-sheet panel art (parchment 9-patch + stat icons for SKILL/STAMINA/LUCK)",
+        "2d6 dice faces or spritesheet for the dice popup (replaces the number labels)",
+        "Title screen key art (1280x720, book-cover composition)",
+        "Inventory item icons (32x32, per item id used in the book)",
+        "UI SFX (page turn, dice tumble, success/failure stingers)"
+      ]
     }
   ]
 }

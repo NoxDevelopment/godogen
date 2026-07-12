@@ -1,0 +1,55 @@
+~ passage_1
+Narrator: 1 — The Toll Bridge. A river of black water bars your road east; the only crossing for miles is a squat stone bridge, and squatting beside it, a troll with a ledger.
+Narrator: The toll, a sign says, is ten gold pieces. You have none.
+- Search the bramble thickets by the road (turn to 2)
+	=> passage_2
+- Walk straight up to the bridge (turn to 3)
+	=> passage_3
+
+~ passage_2
+Narrator: 2 — You push into the brambles. Thorns rake your arms, but half-buried in the mud you find a small BRASS KEY stamped with the toll-house crest.
+do Sheet.add_item("brass key")
+Narrator: You pocket the key (noted on your Adventure Sheet).
+- Head for the bridge (turn to 3)
+	=> passage_3
+
+~ passage_3
+Narrator: 3 — The troll unfolds to its full height, ledger snapping shut. "Ten gold. Or swim."
+Mira: (Your guide whispers:) The toll-house side gate — if you ever find its key, that's a way past. Otherwise... sneak or luck, your call.
+- Unlock the toll-house side gate with the brass key (turn to 7) [if Sheet.has_item("brass key")]
+	do Sheet.remove_item("brass key")
+	=> passage_7
+- Sneak across behind the toll-house — TEST YOUR SKILL (turn to 5)
+	=> passage_5
+- Chance the rotten plank ford — TEST YOUR LUCK (turn to 6)
+	=> passage_6
+
+~ passage_5
+Narrator: 5 — You slip along the toll-house wall, boots on wet stone.
+do Dice.test("skill")
+if Dice.last_success
+	Narrator: The troll never looks up from its ledger. You ghost across the bridge.
+	=> passage_7
+else
+	Narrator: A loose slate cracks like a whip. The troll's fist finds you before the excuse does — lose 2 STAMINA.
+	do Sheet.take_damage(2)
+	Narrator: You are hurled back to the road, bruised.
+	=> passage_3
+
+~ passage_6
+Narrator: 6 — Upstream, a line of rotten planks crosses the flood. You step out over the black water.
+do Dice.test_luck()
+if Dice.last_success
+	Narrator: The planks hold. Lucky — and your LUCK is a little thinner for it.
+	=> passage_7
+else
+	Narrator: A plank snaps. The river takes its toll instead — lose 3 STAMINA, and haul yourself back to the bank.
+	do Sheet.take_damage(3)
+	=> passage_3
+
+~ passage_7
+Narrator: 7 — The east bank. Behind you the troll bellows about paperwork; ahead, the road runs on toward the mountains.
+if Sheet.has_item("brass key")
+	Narrator: The brass key sits ready in your pocket for whatever door comes next.
+Narrator: THE END — your adventure continues in the next passage you write.
+=> END

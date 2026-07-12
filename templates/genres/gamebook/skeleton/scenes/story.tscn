@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=3 uid="uid://gbstory00001"]
+
+[ext_resource type="Script" path="res://scripts/story.gd" id="1_st"]
+
+[node name="Story" type="Node2D"]
+script = ExtResource("1_st")
+
+[node name="Background" type="Polygon2D" parent="."]
+z_index = -10
+color = Color(0.121569, 0.137255, 0.180392, 1)
+polygon = PackedVector2Array(0, 0, 1280, 0, 1280, 720, 0, 720)
+
+[node name="Stage" type="Node2D" parent="."]
+
+[node name="River" type="Polygon2D" parent="Stage"]
+color = Color(0.109804, 0.160784, 0.219608, 1)
+polygon = PackedVector2Array(0, 380, 1280, 320, 1280, 460, 0, 520)
+
+[node name="Bridge" type="Polygon2D" parent="Stage"]
+color = Color(0.301961, 0.290196, 0.278431, 1)
+polygon = PackedVector2Array(520, 300, 800, 290, 820, 470, 500, 480)
+
+[node name="TollHouse" type="Polygon2D" parent="Stage"]
+color = Color(0.243137, 0.207843, 0.180392, 1)
+polygon = PackedVector2Array(840, 200, 1010, 200, 1010, 360, 840, 360)
+
+[node name="Troll" type="Polygon2D" parent="Stage"]
+color = Color(0.32549, 0.380392, 0.278431, 1)
+polygon = PackedVector2Array(440, 220, 500, 190, 540, 230, 530, 330, 450, 330)
+
+[node name="SheetPanel" type="PanelContainer" parent="."]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 720.0
+offset_bottom = 92.0
+
+[node name="Margin" type="MarginContainer" parent="SheetPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="VBoxContainer" parent="SheetPanel/Margin"]
+layout_mode = 2
+
+[node name="StatsLabel" type="Label" parent="SheetPanel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "SKILL 9/9   STAMINA 19/19   LUCK 9/9   Provisions 4"
+
+[node name="InventoryLabel" type="Label" parent="SheetPanel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65098, 0.678431, 0.741176, 1)
+text = "Inventory: (empty)"
