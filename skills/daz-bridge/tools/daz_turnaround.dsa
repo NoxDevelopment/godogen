@@ -1,0 +1,116 @@
+// daz_turnaround.dsa — self-contained turnaround renderer (NoxDev daz-bridge P0).
+// No scene prep needed: loads a figure, builds N orbit cameras programmatically,
+// renders each view to PNG, writes a manifest, quits.
+//
+// Usage (DS6, headless-ish):
+//   "C:\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio6\DAZStudio.exe" ^
+//     "...\daz_turnaround.dsa" ^
+//     -scriptArg "cfgFigure='People/Genesis 8.1 Female/Genesis 8.1 Basic Female.duf'" ^
+//     -scriptArg "cfgOutDir='D:/Daz/NoxDev/renders/turnaround-g81'" ^
+//     -scriptArg "cfgViews=8" -scriptArg "cfgRes=1024" ^
+//     -scriptArg "cfgSmokeTest=false" -noPrompt
+//
+// cfgSmokeTest=true renders ONE empty-scene view (no figure needed) to prove
+// the headless script→render→quit loop works on this install.
+
+(function () {
+	// ---- args: -scriptArg "key='value'" arrive via App.scriptArgs (Autodazzler pattern) ----
+	var oArgs = {};
+	var aRaw = App.scriptArgs;
+	for (var a = 0; a < aRaw.length; a++) {
+		var aMatches = /^([a-zA-Z]+)=(.*)$/g.exec(aRaw[a]);
+		if (aMatches && aMatches.length == 3) {
+			var value = aMatches[2];
+			var aStr = /^(?:\"(.*)\")|(?:\'(.*)\')$/g.exec(value);
+			if (aStr && aStr.length == 3) value = aStr[1] || aStr[2];
+			oArgs[aMatches[1]] = value;
+		}
+	}
+	var figurePath = oArgs.cfgFigure !== undefined ? String(oArgs.cfgFigure) : "";
+	var outDir     = oArgs.cfgOutDir !== undefined ? String(oArgs.cfgOutDir) : "D:/Daz/NoxDev/renders/turnaround";
+	var nViews     = oArgs.cfgViews  !== undefined ? Number(oArgs.cfgViews)  : 8;
+	var res        = oArgs.cfgRes    !== undefined ? Number(oArgs.cfgRes)    : 1024;
+	var smokeTest  = String(oArgs.cfgSmokeTest) == "true";
+
+	function log(msg) { print("[daz_turnaround] " + msg); }
+
+	var dir = new DzDir(outDir);
+	if (!dir.exists()) dir.mkpath(outDir);
+
+	Scene.clear();
+
+	// ---- load figure (skipped in smoke test) ----
+	var target = null;
+	if (!smokeTest) {
+		var mgr = App.getContentMgr();
+		var absPath = figurePath;
+		var fi = new DzFileInfo(absPath);
+		if (!fi.exists()) absPath = mgr.findFile(figurePath);
+		if (!absPath) { log("FATAL: figure not found: " + figurePath); Scene.clear(); MainWindow.close(); return; }
+		if (!mgr.openFile(absPath, false)) { log("FATAL: openFile failed: " + absPath); Scene.clear(); MainWindow.close(); return; }
+		var skels = [];
+		for (var i = 0; i < Scene.getNumSkeletons(); i++) skels.push(Scene.getSkeleton(i));
+		target = skels.length > 0 ? skels[0] : Scene.getPrimarySelection();
+		if (!target) { log("FATAL: no figure node after load"); Scene.clear(); MainWindow.close(); return; }
+		log("figure loaded: " + target.getLabel());
+	}
+
+	// ---- framing: bounding box (or default human envelope in smoke test) ----
+	var cx = 0, cy = 155, cz = 0, sizeY = 170; // cm defaults ~ G8 standing
+	if (target) {
+		var box = target.getWorldBox();
+		var mn = box.min, mx = box.max;
+		cx = (mn.x + mx.x) / 2; cy = (mn.y + mx.y) / 2; cz = (mn.z + mx.z) / 2;
+		sizeY = mx.y - mn.y;
+	}
+	var distance = sizeY * 1.9; // full body + margin at ~65mm
+
+	// ---- render settings ----
+	var renderMgr = App.getRenderMgr();
+	var ro = renderMgr.getRenderOptions();
+	ro.renderImgToId = DzRenderOptions.DirectToFile;
+	ro.imageSize = new Size(res, res);
+	ro.aspectRatio = new Point(1, 1);
+	ro.isAspectConstrained = true;
+
+	var results = [];
+	for (var v = 0; v < (smokeTest ? 1 : nViews); v++) {
+		var yawDeg = v * (360.0 / Math.max(1, nViews));
+		var yaw = yawDeg * Math.PI / 180.0;
+
+		var cam = new DzBasicCamera();
+		cam.setName("cam_yaw" + ("00" + Math.round(yawDeg)).slice(-3));
+		Scene.addNode(cam);
+		var focalCtrl = cam.getFocalLengthControl();
+		if (focalCtrl) focalCtrl.setValue(65.0);
+		var px = cx + distance * Math.sin(yaw);
+		var pz = cz + distance * Math.cos(yaw);
+		// orbit camera: position via translation controls, aim via Y rotation only
+		// (default camera forward is -Z; at orbit angle yaw the camera faces the
+		// center when its Y rotation equals yawDeg)
+		cam.getXPosControl().setValue(px);
+		cam.getYPosControl().setValue(cy);
+		cam.getZPosControl().setValue(pz);
+		cam.getYRotControl().setValue(yawDeg);
+
+		var vp = MainViewport.getViewportMgr().getActiveViewport().get3DViewport();
+		vp.setCamera(cam);
+
+		var fname = outDir + "/view_" + ("0" + v).slice(-2) + "_yaw" + ("00" + Math.round(yawDeg)).slice(-3) + ".png";
+		ro.renderImgFilename = fname;
+		log("rendering " + fname);
+		renderMgr.doRender();
+		results.push(fname);
+	}
+
+	// ---- manifest ----
+	var manifest = {
+		figure: smokeTest ? "(smoke test — empty scene)" : figurePath,
+		views: results.length, resolution: res, files: results
+	};
+	var mf = new DzFile(outDir + "/manifest.json");
+	if (mf.open(DzFile.WriteOnly)) { mf.write(JSON.stringify(manifest, null, 2)); mf.close(); }
+	log("DONE — " + results.length + " views -> " + outDir);
+	Scene.clear();
+	MainWindow.close();
+})();
