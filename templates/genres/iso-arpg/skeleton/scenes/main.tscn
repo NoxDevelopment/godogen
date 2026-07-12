@@ -1,0 +1,77 @@
+[gd_scene load_steps=8 format=3 uid="uid://iamain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Texture2D" path="res://assets/tiles/iso_tiles.png" id="2_tx"]
+[ext_resource type="Script" path="res://scripts/floor.gd" id="3_fl"]
+[ext_resource type="PackedScene" uid="uid://iaplayer0001" path="res://scenes/player.tscn" id="4_pl"]
+[ext_resource type="PackedScene" uid="uid://iaenemy00001" path="res://scenes/enemy.tscn" id="5_en"]
+
+[sub_resource type="TileSetAtlasSource" id="atlas_floor"]
+texture = ExtResource("2_tx")
+texture_region_size = Vector2i(128, 64)
+0:0/0 = 0
+1:0/0 = 0
+
+[sub_resource type="TileSet" id="tileset_floor"]
+tile_shape = 1
+tile_layout = 5
+tile_size = Vector2i(128, 64)
+sources/0 = SubResource("atlas_floor")
+
+[sub_resource type="NavigationPolygon" id="nav_diamond"]
+vertices = PackedVector2Array(0, 24, 608, 328, 0, 632, -608, 328)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(0, 24, 608, 328, 0, 632, -608, 328)])
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_mn")
+
+[node name="World" type="Node2D" parent="."]
+position = Vector2(576, 4)
+
+[node name="Floor" type="TileMapLayer" parent="World"]
+z_index = -10
+tile_set = SubResource("tileset_floor")
+script = ExtResource("3_fl")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="World"]
+navigation_polygon = SubResource("nav_diamond")
+
+[node name="Player" parent="World" instance=ExtResource("4_pl")]
+position = Vector2(0, 328)
+
+[node name="EnemyA" parent="World" instance=ExtResource("5_en")]
+position = Vector2(320, 200)
+
+[node name="EnemyB" parent="World" instance=ExtResource("5_en")]
+position = Vector2(360, 420)
+
+[node name="EnemyC" parent="World" instance=ExtResource("5_en")]
+position = Vector2(-340, 400)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 480.0
+offset_bottom = 130.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "HP 20/20"
+
+[node name="AbilitiesLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "[1] Melee: READY   [2] Nova: READY"
+
+[node name="EnemiesLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Enemies left: 3"
+
+[node name="LootLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Picked up: (nothing yet)"

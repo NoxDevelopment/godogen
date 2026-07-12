@@ -1,0 +1,78 @@
+[gd_scene load_steps=4 format=3 uid="uid://gbtextbox001"]
+
+[ext_resource type="Script" path="res://scripts/textbox.gd" id="1_tb"]
+[ext_resource type="PackedScene" path="res://addons/dialogue_manager/dialogue_label.tscn" id="2_dl"]
+[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_responses_menu.gd" id="3_rm"]
+
+[node name="Textbox" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_tb")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 64.0
+offset_top = -212.0
+offset_right = -64.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Root/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="Rows" type="VBoxContainer" parent="Root/Panel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="CharacterLabel" type="Label" parent="Root/Panel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Character"
+
+[node name="DialogueLabel" parent="Root/Panel/Margin/Rows" instance=ExtResource("2_dl")]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Responses" type="VBoxContainer" parent="Root" node_paths=PackedStringArray("response_template")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -80.0
+offset_right = 320.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+alignment = 1
+script = ExtResource("3_rm")
+response_template = NodePath("ResponseTemplate")
+
+[node name="ResponseTemplate" type="Button" parent="Root/Responses"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Response"

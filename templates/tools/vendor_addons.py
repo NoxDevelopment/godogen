@@ -6,20 +6,25 @@ git-clones each vendored addon at its pinned ref/commit, copies only the addon
 payload into the target project's addons/ folder, enables editor plugins in
 project.godot, and writes addons/LICENSES.md.
 
-Handles both plugin-addons (payload contains plugin.cfg -> enabled in
-[editor_plugins]) and script-only kits (payload copied verbatim, nothing to
-enable).
+Handles plugin-addons (payload contains plugin.cfg -> enabled in
+[editor_plugins]), script-only kits (payload copied verbatim, nothing to
+enable), and — for kits distributed as prebuilt release archives instead of
+git checkouts (GDExtension binaries: TimeTick, godot_voxel) — sha256-pinned
+zip downloads via an `archive` entry: {"url": ..., "sha256": ...}. A hash
+mismatch hard-fails vendoring, which is the archive analogue of a moved
+commit pin.
 
 Usage:
     python vendor_addons.py --template metroidvania --project C:/path/to/game
     python vendor_addons.py --template point-and-click --project ./game --force
 
-Exit codes: 0 ok, 1 usage / registry error, 2 git error, 3 copy/patch error.
+Exit codes: 0 ok, 1 usage / registry error, 2 git/download error, 3 copy/patch error.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import shutil
@@ -27,6 +32,8 @@ import stat
 import subprocess
 import sys
 import tempfile
+import urllib.request
+import zipfile
 from datetime import date
 from pathlib import Path
 
@@ -114,6 +121,36 @@ def clone_pinned(repo: str, ref: str | None, commit: str | None, dest: Path) -> 
             )
         head = _head_sha(dest)
     return head
+
+
+def fetch_archive(url: str, sha256: str, work_dir: Path) -> Path:
+    """Download a pinned release archive, verify its sha256, extract it.
+
+    Returns the extraction root (the archive analogue of a git clone dir).
+    """
+    work_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = work_dir / "archive.zip"
+    try:
+        with urllib.request.urlopen(url, timeout=300) as resp, open(zip_path, "wb") as fh:
+            shutil.copyfileobj(resp, fh)
+    except OSError as exc:
+        sys.exit(f"[vendor] archive download failed for {url}: {exc}")
+
+    digest = hashlib.sha256(zip_path.read_bytes()).hexdigest()
+    if digest != sha256.lower():
+        sys.exit(
+            f"[vendor] archive sha256 mismatch for {url}:\n"
+            f"  expected {sha256}\n  got      {digest}\n"
+            f"(upstream re-published the asset? re-verify the pin)"
+        )
+
+    extract_dir = work_dir / "x"
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            zf.extractall(extract_dir)
+    except zipfile.BadZipFile as exc:
+        sys.exit(f"[vendor] archive is not a valid zip: {url}: {exc}")
+    return extract_dir
 
 
 def _head_sha(repo_dir: Path) -> str:
@@ -308,13 +345,22 @@ def vendor_template(template: dict, project_dir: Path, force: bool = False,
     try:
         for i, addon in enumerate(addons):
             name = addon["name"]
-            repo = addon["repo"]
-            ref = addon.get("ref")
-            commit = addon.get("commit")
-            print(f"[vendor] {name}: cloning {repo} @ {ref or commit} ...")
-            clone_dir = tmp_root / f"a{i}"
-            sha = clone_pinned(repo, ref, commit, clone_dir)
-            print(f"[vendor] {name}: checked out {sha[:12]}")
+            archive = addon.get("archive")
+            if archive:
+                url = archive["url"]
+                print(f"[vendor] {name}: downloading {url} ...")
+                clone_dir = fetch_archive(url, archive["sha256"], tmp_root / f"a{i}")
+                sha = archive["sha256"]
+                repo = addon.get("repo", url)
+                print(f"[vendor] {name}: archive verified sha256:{sha[:12]}")
+            else:
+                repo = addon["repo"]
+                ref = addon.get("ref")
+                commit = addon.get("commit")
+                print(f"[vendor] {name}: cloning {repo} @ {ref or commit} ...")
+                clone_dir = tmp_root / f"a{i}"
+                sha = clone_pinned(repo, ref, commit, clone_dir)
+                print(f"[vendor] {name}: checked out {sha[:12]}")
 
             dst = copy_payload(
                 clone_dir, addon.get("payload", "."), project_dir, addon["targetDir"], force
@@ -338,7 +384,7 @@ def vendor_template(template: dict, project_dir: Path, force: bool = False,
             records.append({
                 "name": name,
                 "repo": repo,
-                "version": addon.get("version", ref or ""),
+                "version": addon.get("version", addon.get("ref", "")),
                 "sha": sha,
                 "license": addon.get("license", "?"),
                 "license_dest": lic_dest,

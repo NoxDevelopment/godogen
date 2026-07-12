@@ -1,0 +1,87 @@
+[gd_scene load_steps=8 format=3 uid="uid://fsmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Texture2D" path="res://assets/tiles/farm_tiles.png" id="2_tx"]
+[ext_resource type="Script" path="res://scripts/farm.gd" id="3_fm"]
+[ext_resource type="PackedScene" uid="uid://fsplayer0001" path="res://scenes/player.tscn" id="4_pl"]
+[ext_resource type="Script" path="res://scripts/day_night.gd" id="5_dn"]
+
+[sub_resource type="TileSetAtlasSource" id="atlas_farm"]
+texture = ExtResource("2_tx")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+
+[sub_resource type="TileSet" id="tileset_farm"]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("atlas_farm")
+
+[sub_resource type="RectangleShape2D" id="shape_border"]
+size = Vector2(640, 20)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_mn")
+
+[node name="Sky" type="Polygon2D" parent="."]
+z_index = -20
+color = Color(0.16, 0.19, 0.15, 1)
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
+
+[node name="Farm" type="TileMapLayer" parent="."]
+z_index = -10
+position = Vector2(256, 132)
+tile_set = SubResource("tileset_farm")
+script = ExtResource("3_fm")
+
+[node name="Borders" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Top" type="CollisionShape2D" parent="Borders"]
+position = Vector2(576, 122)
+shape = SubResource("shape_border")
+
+[node name="Bottom" type="CollisionShape2D" parent="Borders"]
+position = Vector2(576, 526)
+shape = SubResource("shape_border")
+
+[node name="Left" type="CollisionShape2D" parent="Borders"]
+position = Vector2(246, 324)
+rotation = 1.5707964
+shape = SubResource("shape_border")
+
+[node name="Right" type="CollisionShape2D" parent="Borders"]
+position = Vector2(906, 324)
+rotation = 1.5707964
+shape = SubResource("shape_border")
+
+[node name="Player" parent="." instance=ExtResource("4_pl")]
+position = Vector2(576, 324)
+
+[node name="DayNight" type="CanvasModulate" parent="."]
+script = ExtResource("5_dn")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 560.0
+offset_bottom = 110.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="ClockLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Day 1 (spring)  06:00"
+
+[node name="HarvestLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Harvested: (nothing yet)"
+
+[node name="HintLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65098, 0.678431, 0.741176, 1)
+text = "WASD: move   E: till / plant / harvest"

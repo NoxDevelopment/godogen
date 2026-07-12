@@ -79,6 +79,20 @@ def bootstrap_import(godot: str, project_dir: Path) -> None:
         timeout=600,
     )
     if proc.returncode != 0:
+        # Some GDExtensions (e.g. TimeTick 1.1 on Godot 4.6.1) crash Godot's
+        # shutdown path on the very first import — AFTER the import itself has
+        # fully completed and written a valid cache. Verify with a second
+        # import: a clean exit means the project is fine and we proceed.
+        retry = subprocess.run(
+            [godot, "--headless", "--path", str(project_dir), "--import"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=600,
+        )
+        if retry.returncode == 0:
+            print(f"[scaffold] bootstrap import crashed on exit (exit {proc.returncode}) "
+                  "but the verification import is clean — continuing (known "
+                  "GDExtension first-import shutdown quirk)")
+            return
         tail = "\n".join((proc.stdout + proc.stderr).splitlines()[-25:])
         sys.exit(f"[scaffold] bootstrap import failed (exit {proc.returncode}):\n{tail}")
     print("[scaffold] bootstrap import ok")

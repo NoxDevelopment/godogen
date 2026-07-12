@@ -485,6 +485,399 @@
         "Muzzle flash + impact spark sprites (small, additive)",
         "Practice target / destructible prop sprite (~32x32 px)"
       ]
+    },
+    {
+      "id": "iso-arpg",
+      "name": "Isometric ARPG (Diablo-like)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Isometric action-RPG base, pure first-party (per the Wave-2 survey the genre's core loop is build-cheap): click-to-move player (NavigationAgent2D, hold-to-repath Diablo style) on an isometric TileMapLayer (diamond-down 128x64 tileset, floor painted in code from a 2-tile atlas), an ability bar with a melee swing and a cooldown AoE nova, three chasing enemies (the top-down-action chaser archetype), and a loot system: Pandora-style item database in data/items.json, weighted rarity roll (common/magic/rare/legendary) scaling the item's base stat, rarity-tinted ground pickups collected on walk-over into a run inventory. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/iso-arpg/skeleton",
+      "doc": "genres/iso-arpg/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hitstop on melee connects and shake on nova — hook player.ability_used and enemy take_hit flashes"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the diamond arena is one hand-authored NavigationPolygon; use world-layout for dungeon floors, then re-author each floor's nav polygon around its walls"
+        },
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "town NPCs / vendors import as Pandora entities — the same JSON style items.json already uses"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Isometric floor tileset (128x64 diamond tiles: ground variants, cracked/decorated; replaces assets/tiles/iso_tiles.png)",
+        "Player character isometric spritesheet (~64x96 px, idle/walk/attack in 4 or 8 directions)",
+        "Enemy isometric spritesheets (~64x64 px, walk/attack; one silhouette per enemy family)",
+        "Loot pickup sprites (small item icons on the ground + 32x32 inventory icons per items.json entry)",
+        "Ability bar icons (melee swing, nova burst; 48x48 px)",
+        "Impact/nova VFX flipbooks (additive, short)"
+      ]
+    },
+    {
+      "id": "arcade-racing",
+      "name": "Arcade Racing (checkpoint laps)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Arcade racing base on Godot-Easy-Vehicle-Physics (raycast vehicle: engine/torque curve, gearbox, per-wheel suspension and slip, arcade handling preset) plus first-party race logic: the addon's arcade car + VehicleController wired to the NoxDev input actions (throttle/brake/steer/handbrake/shift), a chase camera, a flat blockout track with three ordered checkpoint gates and a start/finish line, lap counting (timer armed on first line crossing, lap completed once all gates passed in order), lap/best-lap timing recorded into GameManager flags, and a HUD (lap, time, gate, speed/gear). Kit note (pinned 2026-07-11): upstream has no release tags — pinned to main @ c392257f (Aug 2025, latest); script-only addon, no editor plugin. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/arcade-racing/skeleton",
+      "doc": "genres/arcade-racing/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Godot Easy Vehicle Physics",
+          "repo": "https://github.com/DAShoe1/Godot-Easy-Vehicle-Physics.git",
+          "ref": "main",
+          "commit": "c392257f54f6ca537dc10bc5badad0c060f18982",
+          "version": "main @ c392257f (2025-08-17 — repo has no release tags; ray-cast vehicle for Godot 4)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/gevp",
+          "targetDir": "addons/gevp",
+          "enablePlugins": []
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the track is a flat blockout with gates; use world-layout for real track graybox (elevation, barriers), then reposition the Checkpoints children in racing order"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "speed-scaled FOV kick and gate-crossing flashes — hook race_manager.checkpoint_passed / lap_completed"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "GEVP ships an engine_sound.tscn (pitch-follows-RPM) — instance it under the car and feed it a loop; buses are ABI-standard"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Vehicle body model (~4.5m arcade car, GLB; replaces the addon's blockout mesh, keep wheel raycast positions)",
+        "Wheel model (single wheel GLB reused per corner)",
+        "Track surface textures (asphalt + kerb, tileable PBR, 4m repeat)",
+        "Checkpoint gate arch model or banner (replaces translucent blockout gates)",
+        "Skybox / horizon panorama (360°, outdoor daytime)",
+        "Engine loop WAV (pitch-shiftable single-RPM sample) + tire screech + gate whoosh SFX"
+      ]
+    },
+    {
+      "id": "gamebook",
+      "name": "Gamebook (solo pen-and-paper RPG)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Fighting-Fantasy-style gamebook base on Dialogue Manager 3 (same pin as visual-novel): keyed numbered passages in dialogue/book.dialogue (titles are passage numbers, choices read 'turn to N'), an adventure-sheet autoload (SKILL 1d6+6 / STAMINA 2d6+12 / LUCK 1d6+6 rolled per run, provisions, inventory LIST with add/has/remove used straight from dialogue mutations and conditions), and a 2d6 roll-UNDER dice layer (Dice.test('skill'), Dice.test_luck() with LUCK attrition, snake-eyes/double-six crit rules, seedable RNG) whose dice popup is awaited as a Dialogue Manager mutation. Ships a 6-passage starter adventure (The Toll Bridge) demonstrating passage jumps, an item-gated choice, a SKILL test with STAMINA damage on failure, and a LUCK test. Title screen rolls a fresh sheet; the story scene shows a live sheet panel. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/gamebook/skeleton",
+      "doc": "genres/gamebook/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Dialogue Manager",
+          "repo": "https://github.com/nathanhoad/godot_dialogue_manager.git",
+          "ref": "v3.10.4",
+          "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
+          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ — same pin as the visual-novel template)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/dialogue_manager",
+          "targetDir": "addons/dialogue_manager",
+          "enablePlugins": [
+            "res://addons/dialogue_manager/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "narrative",
+          "params": {},
+          "note": "the book lives in dialogue/book.dialogue — one title per numbered passage; The Toll Bridge shows every mechanic (jump, item gate, skill test, luck test) to copy from"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "generate a theme.tres from the game palette and set it on the textbox panel, sheet panel, title screen, and dice popup"
+        },
+        {
+          "skill": "image-pipeline",
+          "params": {},
+          "note": "per-passage illustrations for the Stage placeholders (classic gamebooks illustrate every few passages)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Passage illustrations (1280x720 or framed 800x500, ink/engraving look; one per key passage)",
+        "Adventure-sheet panel art (parchment 9-patch + stat icons for SKILL/STAMINA/LUCK)",
+        "2d6 dice faces or spritesheet for the dice popup (replaces the number labels)",
+        "Title screen key art (1280x720, book-cover composition)",
+        "Inventory item icons (32x32, per item id used in the book)",
+        "UI SFX (page turn, dice tumble, success/failure stingers)"
+      ]
+    },
+    {
+      "id": "farming-sim",
+      "name": "Farming Sim (Stardew-like, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "2D farming base on the TimeTick GDExtension (shoyguer/time-tick — vendored from the sha256-pinned 1.1 release zip; prebuilt binaries for Windows/Linux/macOS/Android/iOS/Web, targets Godot 4.6): a TimeSystem autoload wrapping TimeTick (tick -> minute -> hour -> day at 0.1s/game-minute, derived 28-day seasons, sleep_to_next_day(), save/load of the clock), a first-party day/night CanvasModulate tint sampling a 24-hour gradient off the clock (day_started/night_started at 06:00/19:00), a 20x12 farm TileMapLayer (grass/tilled/watered atlas painted in code) with till/plant/harvest, one data-driven Crop resource (turnip.tres: 4 growth stages, 1 day/stage, blockout stage visuals) whose growth recomputes from day deltas on TimeSystem.day_changed (idempotent), a farmer (top-down movement + one contextual E action: harvest > plant > till on the tile underfoot), and a clock/season/harvest HUD. Kit note (2026-07-11): the survey's day/night pick (maetzemax day-and-night-cycle 0.3.0) was evaluated and is 3D-only (CycleController extends Node3D driving DirectionalLight3D + WorldEnvironment sky) — it does not fit a 2D TileMap farm, so the 2D tint layer is first-party; use that addon instead if the project goes 3D. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, pause action).",
+      "status": "validated",
+      "skeleton": "genres/farming-sim/skeleton",
+      "doc": "genres/farming-sim/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "TimeTick",
+          "repo": "https://github.com/shoyguer/time-tick.git",
+          "archive": {
+            "url": "https://github.com/shoyguer/time-tick/releases/download/1.1/time_tick_1.1.zip",
+            "sha256": "e30cd7c1150f47d5523c54972f6fc697344434966f9bfd48247fba245c0bc6b4"
+          },
+          "version": "1.1 (GDExtension release zip — repo tag 1.1 @ 796506ad is the C++ source; binaries only ship in the release asset, hence the archive pin)",
+          "license": "MIT",
+          "licenseFile": "time_tick_1.1/addons/time_tick/LICENSE",
+          "payload": "time_tick_1.1/addons/time_tick",
+          "targetDir": "addons/time_tick",
+          "enablePlugins": []
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "topdown" },
+          "note": "the movement action set is baked into the skeleton's project.godot; re-run only for rebinding UI"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the farm is one painted field; use world-layout for the village/interiors, keeping one TileMapLayer per farmable area with farm.gd attached"
+        },
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "Stardew's heart is its townsfolk — import companions as Pandora entities + Dialogue Manager personas for gift/schedule systems"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Farm tileset (32px grid: grass/tilled/watered plus paths, fences, water; replaces assets/tiles/farm_tiles.png)",
+        "Farmer spritesheet (~32x48 px, 4-direction walk + tool-use swings)",
+        "Crop growth spritesheets (one row per crop, stage_count frames; replaces the blockout stage colors)",
+        "Buildings (farmhouse, shipping bin, barn; 2-3 tile footprints)",
+        "Season palette variants or overlay tints (spring/summer/autumn/winter)",
+        "Ambient loops (birdsong day / crickets night — swap on day_started/night_started) + tool SFX"
+      ]
+    },
+    {
+      "id": "horror-fps",
+      "name": "Horror FPS (first-person horror)",
+      "engine": "godot",
+      "engineVersion": "4.5.1-stable",
+      "description": "First-person horror base: the COGITO immersive-sim stack (same vendor pins as fps-immersive — full player controller, component interactions, inventory, quests, menus) plus resonate adaptive music (GitLab continuation of the archived hugemenace repo — MusicBank with a 2-stem 'ambient' track: calm pad always on, dread drone gated) and a first-party Sanity autoload (0-100 stat, ambient drain, safe-zone restore via Area3D light pools, scare() hits, hysteresis low-sanity thresholds). The room script wires sanity to a vignette overlay shader (intensity = 1 - sanity) and to the dread stem (enable_stem under the low threshold, disable on recovery) — stat, presentation, and audio stay decoupled. Test room: night-lit blockout with the COGITO player, openable door, carryable pickup, one safe lamp pool, committed placeholder stem WAVs. Engine pin note: inherits fps-immersive's 4.5 pin (COGITO v1.1.6 targets Godot 4.5.1; its quest manager breaks the 4.6 GDScript analyzer) — scaffold and validate with a 4.5.x Godot. Standard NoxDev ABI on top.",
+      "status": "validated",
+      "skeleton": "genres/horror-fps/skeleton",
+      "doc": "genres/horror-fps/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "COGITO",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "1.1.6 (Codeberg is the live upstream — same pin as fps-immersive; targets Godot 4.5.1-stable)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/cogito",
+          "targetDir": "addons/cogito",
+          "enablePlugins": [
+            "res://addons/cogito/plugin.cfg"
+          ],
+          "patches": [
+            {
+              "file": "InventoryPD/UiScenes/Slot.tscn",
+              "find": "[ext_resource type=\"Texture2D\" uid=\"uid://cxrlavhscbsem\" path=\"res://addons/cogito/InventoryPD/UiScenes/SlotBorder.png\" id=\"4_303ij\"]",
+              "replace": "[ext_resource type=\"Texture2D\" path=\"res://addons/cogito/InventoryPD/UiScenes/SlotBorder.png\" id=\"4_303ij\"]",
+              "reason": "upstream ships no .import for SlotBorder.png, so fresh imports mint a new UID and the committed one warns on every boot; drop the stale UID and load by path"
+            }
+          ]
+        },
+        {
+          "name": "Input Helper (bundled with COGITO)",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 — same pin so versions can never skew)",
+          "license": "MIT",
+          "licenseFile": "addons/input_helper/LICENSE",
+          "payload": "addons/input_helper",
+          "targetDir": "addons/input_helper",
+          "enablePlugins": [
+            "res://addons/input_helper/plugin.cfg"
+          ]
+        },
+        {
+          "name": "Quick Audio (bundled with COGITO)",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "1.0 (bryceahn/quick_audio as vendored inside COGITO v1.1.6)",
+          "license": "MIT",
+          "licenseFile": "addons/quick_audio/LICENSE",
+          "payload": "addons/quick_audio",
+          "targetDir": "addons/quick_audio",
+          "enablePlugins": [
+            "res://addons/quick_audio/plugin.cfg"
+          ]
+        },
+        {
+          "name": "Resonate",
+          "repo": "https://gitlab.com/widgitgaming/godot/resonate.git",
+          "ref": "v2.4.0",
+          "commit": "e1cf2cff9b91c2672fa49c8518703e97e8ece5c0",
+          "version": "2.4.0 (GitLab widgitgaming continuation — official maintainer since Jan 2026; the hugemenace GitHub repo is archived at v2.3.4)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/resonate",
+          "targetDir": "addons/resonate",
+          "enablePlugins": [
+            "res://addons/resonate/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "resonate's SoundManager (pooled, spatial) replaces bare AudioStreamPlayers for scare stingers; the stem WAVs in assets/music/ are generated placeholders — replace with real stems, keep the names calm/dread"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "graybox the haunt: corridors + sightline blockers; keep layer 1 Environment / layer 2 Interactables, add SafeLamp pools where the player can breathe"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook Sanity.low_sanity_entered for camera sway/breathing SFX; COGITO ships headbob already"
+        },
+        {
+          "skill": "shader-effects",
+          "params": {},
+          "note": "shaders/sanity_overlay.gdshader is the single screen-effect hook — extend it (chromatic aberration, film grain) rather than stacking overlays"
+        }
+      ],
+      "systems": [],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Environment texture set (decayed interior: stained walls, worn wood floor, tileable PBR)",
+        "Interactable prop models (doors, drawers, fuse box, notes; GLB with collision)",
+        "Music stems: calm ambient pad + dread drone layers (loopable, same length/BPM — replace assets/music/*.wav, keep stem names)",
+        "Scare stinger SFX set + room-tone ambience loops",
+        "Flashlight / lantern first-person model (~5k tris)",
+        "UI: sanity-themed HUD accents (COGITO attribute bar reskin), scrawled-note font"
+      ]
+    },
+    {
+      "id": "voxel-sandbox",
+      "name": "Voxel Sandbox (Minecraft-like, 3D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Blocky voxel sandbox on Zylann/godot_voxel, GDExtension edition (vendored from the sha256-pinned v1.6x release zip — 'Voxel Tools 1.6 GDExtension for Godot 4.5+', prebuilt Windows/Linux/macOS/iOS/Android binaries, self-registering, works on the official engine build; validated on official 4.6.1). The terrain is built entirely in code (scripts/main.gd) so the scene stays parseable without the extension and the setup is diffable: a 2-model VoxelBlockyLibrary (air + colored cube) on VoxelMesherBlocky over a flat TYPE-channel VoxelGeneratorFlat, streamed around a VoxelViewer attached to the player. First-person fly controller (mouse capture/look, WASD + Space/Shift) with dig (LMB) and place (RMB) through VoxelToolTerrain raycasts; edits counted into GameManager flags + HUD. GDExtension notes: no FastNoise2 in the extension edition; exports work out of the box on official templates. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/voxel-sandbox/skeleton",
+      "doc": "genres/voxel-sandbox/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Voxel Tools (godot_voxel GDExtension)",
+          "repo": "https://github.com/Zylann/godot_voxel.git",
+          "archive": {
+            "url": "https://github.com/Zylann/godot_voxel/releases/download/v1.6x/GodotVoxelExtension.zip",
+            "sha256": "dfee985a0cff7059a31ada665e88a634fdcc3eab51f83fe5f6dd48939dd5372a"
+          },
+          "version": "1.6 GDExtension (release tag v1.6x @ 595f52ee; the plain v1.6 release is the module edition — a full custom engine build — do not confuse them)",
+          "license": "MIT",
+          "licenseFile": "addons/zylann.voxel/LICENSE.md",
+          "payload": "addons/zylann.voxel",
+          "targetDir": "addons/zylann.voxel",
+          "enablePlugins": []
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "fps" },
+          "note": "the fly/dig/place action set is baked into the skeleton's project.godot; re-run only for rebinding UI when a walking controller lands"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "terrain is generator-driven — layout work means swapping VoxelGeneratorFlat for VoxelGeneratorNoise2D/Graph, not placing meshes"
+        },
+        {
+          "skill": "image-pipeline",
+          "params": {},
+          "note": "block textures: a texture atlas + VoxelBlockyModelCube tiles per block type replaces the flat-color cube"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Block texture atlas (16x16 px tiles: grass top/side, dirt, stone, wood, leaves)",
+        "First-person arm/tool models (~2k tris, swing animation)",
+        "Skybox gradient or panorama (day; night variant when a day cycle lands)",
+        "Block break/place SFX per material family (dirt/stone/wood)",
+        "UI: hotbar frame + block icons (rendered from the atlas)",
+        "Ambient loop (wind/birds) + cave tone for below-ground"
+      ]
     }
   ]
 }

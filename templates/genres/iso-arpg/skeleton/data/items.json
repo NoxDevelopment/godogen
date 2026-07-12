@@ -1,0 +1,16 @@
+{
+  "comment": "Pandora-style item database: flat entities with id/name/category plus a base stat block that the rarity roll scales. Extend by adding items and rarities; loot_system.gd reads this file once at boot.",
+  "rarities": [
+    { "id": "common",    "weight": 55, "stat_mult": 1.0, "color": "#c8c8c8" },
+    { "id": "magic",     "weight": 30, "stat_mult": 1.4, "color": "#5a8cff" },
+    { "id": "rare",      "weight": 12, "stat_mult": 1.9, "color": "#ffd24a" },
+    { "id": "legendary", "weight": 3,  "stat_mult": 2.8, "color": "#ff8c2a" }
+  ],
+  "items": [
+    { "id": "short_sword", "name": "Short Sword", "category": "weapon",     "stat": "damage",     "base_value": 6 },
+    { "id": "leather_cap", "name": "Leather Cap", "category": "helm",       "stat": "armor",      "base_value": 4 },
+    { "id": "quick_boots", "name": "Quick Boots", "category": "boots",      "stat": "move_speed", "base_value": 12 },
+    { "id": "iron_ring",   "name": "Iron Ring",   "category": "ring",       "stat": "crit_chance","base_value": 3 },
+    { "id": "heal_flask",  "name": "Healing Flask","category": "consumable","stat": "heal",       "base_value": 20 }
+  ]
+}

@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=3 uid="uid://vsmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="2_pl"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.35, 0.55, 0.8, 1)
+sky_horizon_color = Color(0.72, 0.78, 0.82, 1)
+ground_horizon_color = Color(0.72, 0.78, 0.82, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_mn")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 40, 0)
+shadow_enabled = true
+
+[node name="Player" type="Node3D" parent="." groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 12)
+script = ExtResource("2_pl")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 860.0
+offset_bottom = 80.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="BlocksLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Edits: 0"
+
+[node name="HintLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65098, 0.678431, 0.741176, 1)
+text = "Click: capture mouse   WASD+Space/Shift: fly   LMB: dig   RMB: place   Esc: release"
