@@ -1181,6 +1181,46 @@
         "Title screen key art (1280x720, book-cover composition)",
         "UI SFX: page turn (audio/page_turn slot), dice tumble, success/failure stingers"
       ]
+    },
+    {
+      "id": "top-down-action-unity",
+      "name": "Top-Down Action (Unity)",
+      "engine": "unity",
+      "engineVersion": "6000.0 LTS",
+      "description": "Unity port of the top-down-action archetype (Hotline-Miami-like), pure first-party: Rigidbody2D player with 8-directional movement, mouse aim, hitscan Physics2D raycast shot with LineRenderer tracer, dash with cooldown and health/respawn; three shootable practice targets; a direct-steering chaser enemy with contact damage (Unity has no first-party 2D navmesh — see TEMPLATE.md); code-built demo scene via the NoxBootstrap editor script (no committed .unity files); GameManager singleton with world flags and JSON save/load mirroring the NoxDev ABI save_data() contract via ISaveable.",
+      "status": "validated",
+      "validatedEditor": "6000.0.40f1",
+      "skeleton": "genres/top-down-action-unity/skeleton",
+      "doc": "genres/top-down-action-unity/TEMPLATE.md",
+      "upmPackages": [
+        {
+          "name": "com.unity.inputsystem",
+          "version": "1.11.2"
+        },
+        {
+          "name": "com.unity.nuget.newtonsoft-json",
+          "version": "3.2.1"
+        },
+        {
+          "name": "com.unity.ugui",
+          "version": "2.0.0"
+        }
+      ],
+      "validateMethod": "NoxDev.Editor.NoxBootstrap.BuildDemoScene",
+      "primitives": [],
+      "systems": [],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Player character top-down spritesheet (~32x32 px, idle/run/shoot, 8-direction or rotation-based)",
+        "Enemy top-down spritesheet (~32x32 px, walk cycle; palette-distinct from player)",
+        "Floor tileset (32px grid, tileable: concrete/wood/tile variants)",
+        "Wall tileset (32px grid, top-down with slight top face)",
+        "Muzzle flash + impact spark sprites (small, additive)",
+        "Practice target / destructible prop sprite (~32x32 px)"
+      ]
     }
   ]
 }
