@@ -6,7 +6,7 @@ Works for both fresh projects and incremental changes (adding scenes/scripts, re
 
 ## Genre templates (check BEFORE scaffolding from scratch)
 
-When the user names a genre (metroidvania, point-and-click, ...), check the genre-template registry first — `templates/registry.json` at the repo root (see `templates/README.md` for the schema). If an entry with `status: "validated"` matches, offer it and scaffold from it instead of building the skeleton by hand:
+When the user names a genre (metroidvania, point-and-click, fps-immersive, visual-novel, bullet-hell, deckbuilder, top-down-action, ...), check the genre-template registry first — `templates/registry.json` at the repo root (see `templates/README.md` for the schema). If an entry with `status: "validated"` matches, offer it and scaffold from it instead of building the skeleton by hand:
 
 ```bash
 python <repo>/templates/tools/scaffold.py <genre-id> <target-dir> --name "Game Name"
@@ -16,7 +16,7 @@ That copies a runnable skeleton, vendors the genre's pinned addons (MIT kits, li
 
 - Read the genre's `TEMPLATE.md` (`templates/genres/<id>/TEMPLATE.md`) — it states what already exists (player controller, rooms, GUI, groups, input actions) so STRUCTURE.md extends rather than duplicates.
 - The registry entry's `primitives` lists the godogen skills that pair with the template (with params); `assetPlanHints` seeds the asset planner; `systems` names godotsmith drop-in templates that fit the ABI (buses `Master`/`Music`/`SFX`; groups `player`/`game_manager`/`persistent`).
-- Respect the entry's `engineVersion` pin — addon pins are chosen for it.
+- Respect the entry's `engineVersion` pin — addon pins are chosen for it. Not every template pins the newest engine (e.g. `fps-immersive` pins 4.5.x because COGITO breaks on 4.6): pass the matching executable via `--godot` and run all headless checks with that same binary.
 
 If no registry entry matches (or the user declines), fall back to the from-scratch scaffold below.
 
