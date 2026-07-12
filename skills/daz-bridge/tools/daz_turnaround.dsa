@@ -69,6 +69,9 @@
 	var renderMgr = App.getRenderMgr();
 	var ro = renderMgr.getRenderOptions();
 	ro.renderImgToId = DzRenderOptions.DirectToFile;
+	// KNOWN ITERATION (smoke test 2026-07-11): imageSize below did not take on DS6
+	// (output came out at viewport size). Fix candidates: ro.setImageSize(Size),
+	// or the active DzIrayOptions pixel size properties. Revisit on first figure run.
 	ro.imageSize = new Size(res, res);
 	ro.aspectRatio = new Point(1, 1);
 	ro.isAspectConstrained = true;
@@ -93,7 +96,7 @@
 		cam.getZPosControl().setValue(pz);
 		cam.getYRotControl().setValue(yawDeg);
 
-		var vp = MainViewport.getViewportMgr().getActiveViewport().get3DViewport();
+		var vp = MainWindow.getViewportMgr().getActiveViewport().get3DViewport();
 		vp.setCamera(cam);
 
 		var fname = outDir + "/view_" + ("0" + v).slice(-2) + "_yaw" + ("00" + Math.round(yawDeg)).slice(-3) + ".png";
