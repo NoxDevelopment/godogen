@@ -1021,6 +1021,57 @@
         "Finish gate + end-tower model (defender count readable from afar on the front plate)",
         "SFX: unit-gain pop, unit-loss squish, good/bad gate chimes, clash brawl loop, finish fanfare"
       ]
+    },
+    {
+      "id": "fps-classic",
+      "name": "FPS Classic (arena shooter)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Doom/Quake-style arena shooter base, pure first-party (no vendored kit — deliberately NOT the COGITO stack: fps-immersive/horror-fps are the slow immersive-sim lane on a 4.5 pin, this is the fast run-and-gun lane on 4.6): a Quake-ish first-person controller (WASD + mouselook, sprint, ground friction + Quake accelerate, small air-speed cap for real air control/strafe-jumps, held-jump auto-hop that skips landing friction so bunny-hops keep speed), two arena weapons on ammo pools with switch (Q/1/2) — a pellet-spread hitscan shotgun (seedable RNG) and a projectile rocket launcher whose ray-swept rocket deals distance-falloff splash plus player knockback (self-splash included = rocket jumps) — health/armor with Quake armor absorption, a code-built 40x40m arena (pillars, ramp, raised rocket-perch platform), four walk-over item spawners (health/armor/shells/rockets) on respawn countdowns that refuse pickups the player can't use, two enemy archetypes on a shared chassis with raycast-feeler chase steering (no nav bake, robust headless): a melee rusher and a ranged shooter firing plasma bolts with LOS checks. A wave director spawns escalating waves at ring points (wave n = n+1 rushers + n shooters), tracks kills, and death opens a run summary (kills/wave, best_kills + best_wave flags on GameManager, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "status": "validated",
+      "skeleton": "genres/fps-classic/skeleton",
+      "doc": "genres/fps-classic/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "fps" },
+          "note": "the arena action set (move, jump, sprint, fire, weapon_next/1/2, pause) is baked into the skeleton's project.godot; re-run only for rebinding UI"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook weapons.fired for camera kick, player.took_damage for hurt flash/shake, and waves.enemy_killed for kill pops — the signals are already emitted"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the arena is one code-built room (arena.gd _add_box calls); use world-layout for real arena graybox, keep everything on layer 1 'world' so hitscan/feeler/LOS rays keep working"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "shotgun blast / rocket whoosh+boom / pickup blips on the ABI SFX bus — fire from weapons.fired, projectile.exploded, item picked_up/respawned"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Arena texture set (floor/wall/pillar, tileable PBR, 2m repeat; replaces the flat-color _add_box materials)",
+        "First-person weapon viewmodels (shotgun + rocket launcher, ~5k tris; replace the blockout box in weapons.gd)",
+        "Enemy models (rusher + shooter silhouettes, ~3k tris; one mesh swap per archetype in enemy_base._build_body)",
+        "Projectile + impact VFX (rocket trail, explosion flipbook, plasma bolt glow, shotgun muzzle flash)",
+        "Pickup models (medkit, armor shard, shell box, rocket crate; keep the spinner + color coding readable)",
+        "HUD art (crosshair variants, health/armor/ammo icons) and a stats-bar reskin",
+        "SFX: shotgun blast, rocket launch/explosion, plasma zap, pickup blips, hurt grunts, enemy death gibs"
+      ]
     }
   ]
 }

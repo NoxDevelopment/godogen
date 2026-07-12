@@ -1,0 +1,174 @@
+[gd_scene load_steps=12 format=3 uid="uid://fpsmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Script" path="res://scripts/arena.gd" id="2_ar"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="3_pl"]
+[ext_resource type="Script" path="res://scripts/weapons.gd" id="4_wp"]
+[ext_resource type="Script" path="res://scripts/wave_director.gd" id="5_wd"]
+[ext_resource type="Script" path="res://scripts/item_spawner.gd" id="6_it"]
+[ext_resource type="Script" path="res://scripts/run_summary.gd" id="7_rs"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_horizon_color = Color(0.66, 0.67, 0.69, 1)
+ground_horizon_color = Color(0.66, 0.67, 0.69, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[sub_resource type="CapsuleShape3D" id="player_shape"]
+radius = 0.4
+height = 1.8
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_mn")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 30, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Arena" type="Node3D" parent="."]
+script = ExtResource("2_ar")
+
+[node name="Player" type="CharacterBody3D" parent="." groups=["player", "persistent"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 12)
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("3_pl")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("player_shape")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+
+[node name="Weapons" type="Node3D" parent="Player/Camera3D"]
+script = ExtResource("4_wp")
+
+[node name="Waves" type="Node3D" parent="."]
+script = ExtResource("5_wd")
+
+[node name="Items" type="Node3D" parent="."]
+
+[node name="HealthSpawner" type="Node3D" parent="Items"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 10)
+script = ExtResource("6_it")
+kind = "health"
+amount = 25
+
+[node name="ArmorSpawner" type="Node3D" parent="Items"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 10)
+script = ExtResource("6_it")
+kind = "armor"
+amount = 50
+
+[node name="ShellsSpawner" type="Node3D" parent="Items"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -10)
+script = ExtResource("6_it")
+kind = "shells"
+amount = 8
+
+[node name="RocketsSpawner" type="Node3D" parent="Items"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, -17)
+script = ExtResource("6_it")
+kind = "rockets"
+amount = 3
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Crosshair" type="Label" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -16.0
+offset_right = 12.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 26
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 500.0
+offset_bottom = 160.0
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Health: 100"
+
+[node name="ArmorLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Armor: 0"
+
+[node name="AmmoLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Shotgun: 12 shells"
+
+[node name="ScoreLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Kills: 0   Wave: 0"
+
+[node name="HintLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "WASD: move   Space: jump   Shift: sprint   LMB: fire   Q/1/2: weapons"
+
+[node name="RunSummary" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 11
+visible = false
+script = ExtResource("7_rs")
+
+[node name="Dim" type="ColorRect" parent="RunSummary"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.54902)
+
+[node name="Panel" type="PanelContainer" parent="RunSummary"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -100.0
+offset_right = 220.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="RunSummary/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "YOU DIED"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Kills: 0"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Restart (Enter)"
