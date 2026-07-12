@@ -1072,6 +1072,56 @@
         "HUD art (crosshair variants, health/armor/ammo icons) and a stats-bar reskin",
         "SFX: shotgun blast, rocket launch/explosion, plasma zap, pickup blips, hurt grunts, enemy death gibs"
       ]
+    },
+    {
+      "id": "dungeon-crawler-classic",
+      "name": "Dungeon Crawler Classic (grid-based first-person)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Grid-based first-person dungeon crawler base (Lands of Lore: The Throne of Chaos / Eye of the Beholder structure), pure first-party (per the Wave-3 survey no maintained MIT grid-crawler kit exists and the genre is build-cheap: the whole illusion is grid math + tweens): the camera IS the party — a Node3D stepped cell-by-cell (forward/back/strafe, 90-degree turns, each smoothed with a short tween) through a dungeon built entirely in code from one ASCII map constant (14x13 starter: rooms, corridors, a plain bump-open door, a locked door + key, a lever-opened secret wall, torch-lit fog). NO physics anywhere — movement, door bumps, lever pulls, pickups, combat reach and enemy pathing are all grid queries, which keeps everything headless-robust and deterministic (zero RNG). Party of 3 (two front-row melee + a back-row caster whose 3-cell spark bolt costs MP): per-member HP/MP, per-member attack buttons with cooldowns (portrait click or hotkeys 1-3), front row soaks enemy melee, back row exposed only when both fronts fall. Real-time enemies occupy cells, step toward the party on move timers (greedy axis chase respecting doors/occupancy) and melee when cardinally adjacent. Pickups on walk-over (key; potions drunk via button heal the lowest-HP member); doors/lever/pickups write GameManager flags and self-restore so the dungeon stays solved across reloads. Classic bottom-bar HUD: scrolling message log, 3 portrait panels (ColorRect placeholder + HP/MP bars — Studio-bound art slots for the lol-vga style pack), compass from facing, keys/potions/kills. Party wipe opens a run summary (kills, secret found, best-kills flag, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "status": "validated",
+      "skeleton": "genres/dungeon-crawler-classic/skeleton",
+      "doc": "genres/dungeon-crawler-classic/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the crawler action set (WASD step/strafe, Q/E or arrows turn, 1-3 member attacks, R potion, Space interact, pause) is baked into the skeleton's project.godot; re-run only for rebinding UI"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the bottom bar is the genre's face — theme the log panel, portrait frames and HP/MP bars from the game palette (the lol-ui-frame-v2 bench ref is the target anatomy)"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the dungeon is one ASCII constant in dungeon.gd — layout work means editing/generating MAP strings (rooms, corridors, D/d/S/L/K/P/E markers), not placing meshes"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook party.took-a-hit via member_changed / take_enemy_hit messages for screen shake, and dungeon.door_opened / secret_opened for rumble — step/turn tweens are exports to tune"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Wall/floor/ceiling texture set (VGA-256 Westwood look, 2m repeat — bench/lol-corridor-v2 is the style ref; nxdv_vga256 LoRA lane for scene-level art)",
+        "3 party portraits (~128x128, painted VGA style — bench/lol-portrait-v2 ref; replaces the ColorRect placeholder slots in the HUD)",
+        "Bottom-bar UI frame (parchment/stone chrome with portrait windows, log panel and compass — bench/lol-ui-frame-v2 ref)",
+        "Enemy billboard sprites or low-poly models (2-3 silhouettes; replaces the capsule in enemy.gd _build_body)",
+        "Door/lever/pickup props (wooden door leaf, locked variant, wall lever, key, potion flask; GLB or billboards)",
+        "SFX: footstep thud per step, door creak/unlock, lever clunk, stone grinding (secret), sword hit, spark cast, potion gulp, party-member hurt/fall"
+      ]
     }
   ]
 }

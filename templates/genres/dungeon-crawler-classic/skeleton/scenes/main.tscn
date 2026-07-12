@@ -1,0 +1,281 @@
+[gd_scene load_steps=10 format=3 uid="uid://dcrmain000001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
+[ext_resource type="Script" path="res://scripts/dungeon.gd" id="2_dg"]
+[ext_resource type="Script" path="res://scripts/party.gd" id="3_pt"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="4_hd"]
+[ext_resource type="Script" path="res://scripts/run_summary.gd" id="5_rs"]
+
+[sub_resource type="Environment" id="env"]
+background_mode = 1
+background_color = Color(0.02, 0.02, 0.03, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.47, 0.42, 1)
+ambient_light_energy = 0.35
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.03, 0.03, 0.04, 1)
+fog_density = 0.06
+
+[sub_resource type="StyleBoxFlat" id="sb_bar_bg"]
+bg_color = Color(0.12, 0.12, 0.14, 1)
+
+[sub_resource type="StyleBoxFlat" id="sb_hp"]
+bg_color = Color(0.72, 0.2, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="sb_mp"]
+bg_color = Color(0.25, 0.4, 0.75, 1)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_mn")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Dungeon" type="Node3D" parent="."]
+script = ExtResource("2_dg")
+
+[node name="Party" type="Node3D" parent="." groups=["player", "persistent"]]
+script = ExtResource("3_pt")
+
+[node name="Camera3D" type="Camera3D" parent="Party"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+fov = 72.0
+
+[node name="Torch" type="OmniLight3D" parent="Party"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0.2)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 1.6
+omni_range = 8.0
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("4_hd")
+
+[node name="BottomBar" type="PanelContainer" parent="HUD"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -190.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Margin" type="MarginContainer" parent="HUD/BottomBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Cols" type="HBoxContainer" parent="HUD/BottomBar/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LogPanel" type="PanelContainer" parent="HUD/BottomBar/Margin/Cols"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LogMargin" type="MarginContainer" parent="HUD/BottomBar/Margin/Cols/LogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="Log" type="RichTextLabel" parent="HUD/BottomBar/Margin/Cols/LogPanel/LogMargin" groups=["scalable_text"]]
+layout_mode = 2
+scroll_following = true
+
+[node name="Portraits" type="HBoxContainer" parent="HUD/BottomBar/Margin/Cols"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Member1" type="PanelContainer" parent="HUD/BottomBar/Margin/Cols/Portraits"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="HUD/BottomBar/Margin/Cols/Portraits/Member1"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Portrait" type="ColorRect" parent="HUD/BottomBar/Margin/Cols/Portraits/Member1/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+color = Color(0.75, 0.45, 0.3, 1)
+
+[node name="NameLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/Portraits/Member1/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Aiden"
+horizontal_alignment = 1
+
+[node name="HPBar" type="ProgressBar" parent="HUD/BottomBar/Margin/Cols/Portraits/Member1/Rows"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_hp")
+value = 100.0
+show_percentage = false
+
+[node name="MPBar" type="ProgressBar" parent="HUD/BottomBar/Margin/Cols/Portraits/Member1/Rows"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_mp")
+value = 100.0
+show_percentage = false
+
+[node name="AttackButton" type="Button" parent="HUD/BottomBar/Margin/Cols/Portraits/Member1/Rows" groups=["scalable_text"]]
+layout_mode = 2
+focus_mode = 0
+text = "Attack [1]"
+
+[node name="Member2" type="PanelContainer" parent="HUD/BottomBar/Margin/Cols/Portraits"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="HUD/BottomBar/Margin/Cols/Portraits/Member2"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Portrait" type="ColorRect" parent="HUD/BottomBar/Margin/Cols/Portraits/Member2/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+color = Color(0.4, 0.55, 0.75, 1)
+
+[node name="NameLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/Portraits/Member2/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Brona"
+horizontal_alignment = 1
+
+[node name="HPBar" type="ProgressBar" parent="HUD/BottomBar/Margin/Cols/Portraits/Member2/Rows"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_hp")
+value = 100.0
+show_percentage = false
+
+[node name="MPBar" type="ProgressBar" parent="HUD/BottomBar/Margin/Cols/Portraits/Member2/Rows"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_mp")
+value = 100.0
+show_percentage = false
+
+[node name="AttackButton" type="Button" parent="HUD/BottomBar/Margin/Cols/Portraits/Member2/Rows" groups=["scalable_text"]]
+layout_mode = 2
+focus_mode = 0
+text = "Attack [2]"
+
+[node name="Member3" type="PanelContainer" parent="HUD/BottomBar/Margin/Cols/Portraits"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="HUD/BottomBar/Margin/Cols/Portraits/Member3"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Portrait" type="ColorRect" parent="HUD/BottomBar/Margin/Cols/Portraits/Member3/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+color = Color(0.5, 0.7, 0.45, 1)
+
+[node name="NameLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/Portraits/Member3/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Cael"
+horizontal_alignment = 1
+
+[node name="HPBar" type="ProgressBar" parent="HUD/BottomBar/Margin/Cols/Portraits/Member3/Rows"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_hp")
+value = 100.0
+show_percentage = false
+
+[node name="MPBar" type="ProgressBar" parent="HUD/BottomBar/Margin/Cols/Portraits/Member3/Rows"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("sb_bar_bg")
+theme_override_styles/fill = SubResource("sb_mp")
+value = 100.0
+show_percentage = false
+
+[node name="AttackButton" type="Button" parent="HUD/BottomBar/Margin/Cols/Portraits/Member3/Rows" groups=["scalable_text"]]
+layout_mode = 2
+focus_mode = 0
+text = "Attack [3]"
+
+[node name="SidePanel" type="VBoxContainer" parent="HUD/BottomBar/Margin/Cols"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CompassLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/SidePanel" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "N"
+horizontal_alignment = 1
+
+[node name="KeysLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/SidePanel" groups=["scalable_text"]]
+layout_mode = 2
+text = "Keys: 0"
+
+[node name="PotionsLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/SidePanel" groups=["scalable_text"]]
+layout_mode = 2
+text = "Potions: 0"
+
+[node name="PotionButton" type="Button" parent="HUD/BottomBar/Margin/Cols/SidePanel" groups=["scalable_text"]]
+layout_mode = 2
+focus_mode = 0
+text = "Drink [R]"
+
+[node name="KillsLabel" type="Label" parent="HUD/BottomBar/Margin/Cols/SidePanel" groups=["scalable_text"]]
+layout_mode = 2
+text = "Kills: 0"
+
+[node name="RunSummary" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 11
+visible = false
+script = ExtResource("5_rs")
+
+[node name="Dim" type="ColorRect" parent="RunSummary"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.54902)
+
+[node name="Panel" type="PanelContainer" parent="RunSummary"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -100.0
+offset_right = 220.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="RunSummary/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "THE PARTY HAS FALLEN"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Kills: 0"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="RunSummary/Panel/Rows" groups=["scalable_text"]]
+layout_mode = 2
+focus_mode = 0
+text = "Restart (Enter)"
