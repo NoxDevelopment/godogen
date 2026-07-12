@@ -1,0 +1,119 @@
+[gd_scene load_steps=13 format=3 uid="uid://fpstestroom1"]
+
+[ext_resource type="Script" path="res://scripts/test_room.gd" id="1_tr"]
+[ext_resource type="PackedScene" uid="uid://kicjwmh02uwf" path="res://addons/cogito/PackedScenes/cogito_player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://bdyukj85qkut0" path="res://addons/cogito/PackedScenes/door.tscn" id="3_dr"]
+[ext_resource type="PackedScene" uid="uid://0fj068bj0csc" path="res://addons/cogito/PackedScenes/Pickups/pickup_health_potion.tscn" id="4_hp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.25098, 0.34902, 0.501961, 1)
+sky_horizon_color = Color(0.6, 0.596078, 0.560784, 1)
+ground_bottom_color = Color(0.14902, 0.14902, 0.156863, 1)
+ground_horizon_color = Color(0.6, 0.596078, 0.560784, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_mode = 2
+
+[sub_resource type="BoxShape3D" id="shape_floor"]
+size = Vector3(24, 0.5, 24)
+
+[sub_resource type="BoxShape3D" id="shape_wall_ns"]
+size = Vector3(24, 3, 0.4)
+
+[sub_resource type="BoxShape3D" id="shape_wall_ew"]
+size = Vector3(0.4, 3, 24)
+
+[sub_resource type="StandardMaterial3D" id="mat_blockout"]
+albedo_color = Color(0.427451, 0.439216, 0.470588, 1)
+
+[sub_resource type="BoxMesh" id="mesh_floor"]
+material = SubResource("mat_blockout")
+size = Vector3(24, 0.5, 24)
+
+[node name="TestRoom" type="Node3D"]
+script = ExtResource("1_tr")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 8, 0)
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+shape = SubResource("shape_floor")
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("mesh_floor")
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallNorth"]
+shape = SubResource("shape_wall_ns")
+
+[node name="Mesh" type="MeshInstance3D" parent="Walls/WallNorth"]
+mesh = SubResource("mesh_floor")
+transform = Transform3D(1, 0, 0, 0, 6, 0, 0, 0, 0.0166, 0, 0, 0)
+
+[node name="WallSouth" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallSouth"]
+shape = SubResource("shape_wall_ns")
+
+[node name="Mesh" type="MeshInstance3D" parent="Walls/WallSouth"]
+mesh = SubResource("mesh_floor")
+transform = Transform3D(1, 0, 0, 0, 6, 0, 0, 0, 0.0166, 0, 0, 0)
+
+[node name="WallEast" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallEast"]
+shape = SubResource("shape_wall_ew")
+
+[node name="Mesh" type="MeshInstance3D" parent="Walls/WallEast"]
+mesh = SubResource("mesh_floor")
+transform = Transform3D(0.0166, 0, 0, 0, 6, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="WallWest" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallWest"]
+shape = SubResource("shape_wall_ew")
+
+[node name="Mesh" type="MeshInstance3D" parent="Walls/WallWest"]
+mesh = SubResource("mesh_floor")
+transform = Transform3D(0.0166, 0, 0, 0, 6, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_pl") groups=["Player", "player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 5)
+
+[node name="Door" parent="." instance=ExtResource("3_dr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -6)
+
+[node name="HealthPotion" parent="." instance=ExtResource("4_hp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 0)

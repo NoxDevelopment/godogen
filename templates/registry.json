@@ -135,6 +135,103 @@
       ]
     },
     {
+      "id": "fps-immersive",
+      "name": "FPS / Immersive Sim (3D)",
+      "engine": "godot",
+      "engineVersion": "4.5.1-stable",
+      "description": "First-person immersive-sim base on COGITO: full player controller (sprint/crouch/slide/stairs/ladders, attributes: health/stamina/visibility-stealth, grid inventory, quick slots, wieldables), component-based interaction system, quest system, EasyMenus main/pause menus with save slots — plus one blockout test room with the COGITO player, an openable door and a carryable health-potion pickup wired as live interactables. Engine pin note (tested 2026-07-11): COGITO v1.1.6 targets Godot 4.5.1 and imports clean there; on 4.6.1 its scene manager fails to parse (GDScript analyzer cannot resolve CogitoQuestManager.active/completed/failed typed members, breaking SaveSlotButton.gd) — so this template pins 4.5 and must be scaffolded/validated with a 4.5.x Godot. Standard NoxDev ABI on top (Master/Music/SFX buses by name, player/game_manager groups, save_data() contract on GameManager, pause action alongside COGITO's menu action).",
+      "status": "validated",
+      "skeleton": "genres/fps-immersive/skeleton",
+      "doc": "genres/fps-immersive/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "COGITO",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "1.1.6 (Codeberg is the live upstream — GitHub mirror's tags stop at v1.1.5; targets Godot 4.5.1-stable)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/cogito",
+          "targetDir": "addons/cogito",
+          "enablePlugins": [
+            "res://addons/cogito/plugin.cfg"
+          ],
+          "patches": [
+            {
+              "file": "InventoryPD/UiScenes/Slot.tscn",
+              "find": "[ext_resource type=\"Texture2D\" uid=\"uid://cxrlavhscbsem\" path=\"res://addons/cogito/InventoryPD/UiScenes/SlotBorder.png\" id=\"4_303ij\"]",
+              "replace": "[ext_resource type=\"Texture2D\" path=\"res://addons/cogito/InventoryPD/UiScenes/SlotBorder.png\" id=\"4_303ij\"]",
+              "reason": "upstream ships no .import for SlotBorder.png, so fresh imports mint a new UID and the committed one warns on every boot; drop the stale UID and load by path"
+            }
+          ]
+        },
+        {
+          "name": "Input Helper (bundled with COGITO)",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 — same pin so versions can never skew)",
+          "license": "MIT",
+          "licenseFile": "addons/input_helper/LICENSE",
+          "payload": "addons/input_helper",
+          "targetDir": "addons/input_helper",
+          "enablePlugins": [
+            "res://addons/input_helper/plugin.cfg"
+          ]
+        },
+        {
+          "name": "Quick Audio (bundled with COGITO)",
+          "repo": "https://codeberg.org/Phazorknight/Cogito.git",
+          "ref": "v1.1.6",
+          "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
+          "version": "1.0 (bryceahn/quick_audio as vendored inside COGITO v1.1.6)",
+          "license": "MIT",
+          "licenseFile": "addons/quick_audio/LICENSE",
+          "payload": "addons/quick_audio",
+          "targetDir": "addons/quick_audio",
+          "enablePlugins": [
+            "res://addons/quick_audio/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "fps" },
+          "note": "COGITO's full action set (32 actions, keyboard + gamepad) is baked into the skeleton's project.godot and Input Helper provides runtime rebinding — do not re-emit the fps template over it; use this skill only for reference when adding new actions"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the test room is a hand-built blockout; use world-layout for level graybox passes, keep layer 1 Environment / layer 2 Interactables"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "COGITO ships headbob/fall-damage; use game-feel for hit feedback and camera kick when combat wieldables are added"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "COGITO's dynamic footstep system reads surface types — feed it material-tagged surfaces; buses are ABI-standard Master/Music/SFX"
+        }
+      ],
+      "systems": [],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Environment texture set (walls/floor/ceiling, tileable PBR, 2m repeat)",
+        "Interactable prop models (door frame + leaf, containers, switches; GLB with collision)",
+        "Pickup/inventory item models + 64x64 inventory icons (COGITO items pair a 3D pickup with an icon)",
+        "First-person wieldable models (hands + tool/weapon, ~5k tris)",
+        "UI substitutions for the COGITO HUD theme (crosshair/reticle, attribute bar styling)",
+        "Ambience loops + surface-tagged footstep sets (concrete/metal/wood)"
+      ]
+    },
+    {
       "id": "visual-novel",
       "name": "Visual Novel (with dice checks)",
       "engine": "godot",
