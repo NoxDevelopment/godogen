@@ -818,6 +818,66 @@
         "Flashlight / lantern first-person model (~5k tris)",
         "UI: sanity-themed HUD accents (COGITO attribute bar reskin), scrawled-note font"
       ]
+    },
+    {
+      "id": "voxel-sandbox",
+      "name": "Voxel Sandbox (Minecraft-like, 3D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Blocky voxel sandbox on Zylann/godot_voxel, GDExtension edition (vendored from the sha256-pinned v1.6x release zip — 'Voxel Tools 1.6 GDExtension for Godot 4.5+', prebuilt Windows/Linux/macOS/iOS/Android binaries, self-registering, works on the official engine build; validated on official 4.6.1). The terrain is built entirely in code (scripts/main.gd) so the scene stays parseable without the extension and the setup is diffable: a 2-model VoxelBlockyLibrary (air + colored cube) on VoxelMesherBlocky over a flat TYPE-channel VoxelGeneratorFlat, streamed around a VoxelViewer attached to the player. First-person fly controller (mouse capture/look, WASD + Space/Shift) with dig (LMB) and place (RMB) through VoxelToolTerrain raycasts; edits counted into GameManager flags + HUD. GDExtension notes: no FastNoise2 in the extension edition; exports work out of the box on official templates. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/voxel-sandbox/skeleton",
+      "doc": "genres/voxel-sandbox/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Voxel Tools (godot_voxel GDExtension)",
+          "repo": "https://github.com/Zylann/godot_voxel.git",
+          "archive": {
+            "url": "https://github.com/Zylann/godot_voxel/releases/download/v1.6x/GodotVoxelExtension.zip",
+            "sha256": "dfee985a0cff7059a31ada665e88a634fdcc3eab51f83fe5f6dd48939dd5372a"
+          },
+          "version": "1.6 GDExtension (release tag v1.6x @ 595f52ee; the plain v1.6 release is the module edition — a full custom engine build — do not confuse them)",
+          "license": "MIT",
+          "licenseFile": "addons/zylann.voxel/LICENSE.md",
+          "payload": "addons/zylann.voxel",
+          "targetDir": "addons/zylann.voxel",
+          "enablePlugins": []
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "fps" },
+          "note": "the fly/dig/place action set is baked into the skeleton's project.godot; re-run only for rebinding UI when a walking controller lands"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "terrain is generator-driven — layout work means swapping VoxelGeneratorFlat for VoxelGeneratorNoise2D/Graph, not placing meshes"
+        },
+        {
+          "skill": "image-pipeline",
+          "params": {},
+          "note": "block textures: a texture atlas + VoxelBlockyModelCube tiles per block type replaces the flat-color cube"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Block texture atlas (16x16 px tiles: grass top/side, dirt, stone, wood, leaves)",
+        "First-person arm/tool models (~2k tris, swing animation)",
+        "Skybox gradient or panorama (day; night variant when a day cycle lands)",
+        "Block break/place SFX per material family (dirt/stone/wood)",
+        "UI: hotbar frame + block icons (rendered from the atlas)",
+        "Ambient loop (wind/birds) + cave tone for below-ground"
+      ]
     }
   ]
 }
