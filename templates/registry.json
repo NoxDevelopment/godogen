@@ -485,6 +485,51 @@
         "Muzzle flash + impact spark sprites (small, additive)",
         "Practice target / destructible prop sprite (~32x32 px)"
       ]
+    },
+    {
+      "id": "iso-arpg",
+      "name": "Isometric ARPG (Diablo-like)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Isometric action-RPG base, pure first-party (per the Wave-2 survey the genre's core loop is build-cheap): click-to-move player (NavigationAgent2D, hold-to-repath Diablo style) on an isometric TileMapLayer (diamond-down 128x64 tileset, floor painted in code from a 2-tile atlas), an ability bar with a melee swing and a cooldown AoE nova, three chasing enemies (the top-down-action chaser archetype), and a loot system: Pandora-style item database in data/items.json, weighted rarity roll (common/magic/rare/legendary) scaling the item's base stat, rarity-tinted ground pickups collected on walk-over into a run inventory. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, pause action).",
+      "status": "validated",
+      "skeleton": "genres/iso-arpg/skeleton",
+      "doc": "genres/iso-arpg/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hitstop on melee connects and shake on nova — hook player.ability_used and enemy take_hit flashes"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the diamond arena is one hand-authored NavigationPolygon; use world-layout for dungeon floors, then re-author each floor's nav polygon around its walls"
+        },
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "town NPCs / vendors import as Pandora entities — the same JSON style items.json already uses"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Isometric floor tileset (128x64 diamond tiles: ground variants, cracked/decorated; replaces assets/tiles/iso_tiles.png)",
+        "Player character isometric spritesheet (~64x96 px, idle/walk/attack in 4 or 8 directions)",
+        "Enemy isometric spritesheets (~64x64 px, walk/attack; one silhouette per enemy family)",
+        "Loot pickup sprites (small item icons on the ground + 32x32 inventory icons per items.json entry)",
+        "Ability bar icons (melee swing, nova burst; 48x48 px)",
+        "Impact/nova VFX flipbooks (additive, short)"
+      ]
     }
   ]
 }

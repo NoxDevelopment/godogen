@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://ialoot000001"]
+
+[ext_resource type="Script" path="res://scripts/loot_pickup.gd" id="1_lp"]
+
+[sub_resource type="CircleShape2D" id="shape_loot"]
+radius = 22.0
+
+[node name="LootPickup" type="Area2D"]
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("1_lp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_loot")
+
+[node name="Gem" type="Polygon2D" parent="."]
+color = Color(0.784314, 0.784314, 0.784314, 1)
+polygon = PackedVector2Array(0, -10, 8, 0, 0, 10, -8, 0)
+
+[node name="Label" type="Label" parent="." groups=["scalable_text"]]
+offset_left = -70.0
+offset_top = -36.0
+offset_right = 70.0
+offset_bottom = -14.0
+horizontal_alignment = 1
+text = "Loot"
