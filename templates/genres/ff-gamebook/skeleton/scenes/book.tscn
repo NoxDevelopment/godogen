@@ -1,0 +1,119 @@
+[gd_scene load_steps=5 format=3 uid="uid://ffgbbook0001"]
+
+[ext_resource type="Script" path="res://scripts/book.gd" id="1_bk"]
+[ext_resource type="PackedScene" path="res://scenes/illustration_plate.tscn" id="2_pl"]
+[ext_resource type="PackedScene" path="res://addons/dialogue_manager/dialogue_label.tscn" id="3_dl"]
+[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_responses_menu.gd" id="4_rm"]
+
+[node name="Book" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_bk")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0862745, 0.0784314, 0.0666667, 1)
+
+[node name="Page" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 140.0
+offset_top = 14.0
+offset_right = -140.0
+offset_bottom = -58.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Page"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 16
+
+[node name="Rows" type="VBoxContainer" parent="Page/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Plate" parent="Page/Margin/Rows" instance=ExtResource("2_pl")]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+
+[node name="CharacterLabel" type="Label" parent="Page/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+text = "Character"
+
+[node name="DialogueLabel" parent="Page/Margin/Rows" instance=ExtResource("3_dl")]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Responses" type="VBoxContainer" parent="Page/Margin/Rows" node_paths=PackedStringArray("response_template")]
+layout_mode = 2
+theme_override_constants/separation = 6
+script = ExtResource("4_rm")
+response_template = NodePath("ResponseTemplate")
+
+[node name="ResponseTemplate" type="Button" parent="Page/Margin/Rows/Responses"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Turn to..."
+
+[node name="SheetBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 140.0
+offset_top = -48.0
+offset_right = -140.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="SheetBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
+
+[node name="Columns" type="HBoxContainer" parent="SheetBar/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="StatsLabel" type="Label" parent="SheetBar/Margin/Columns" groups=["scalable_text"]]
+layout_mode = 2
+text = "SKILL 9/9   STAMINA 19/19   LUCK 9/9   Provisions 4"
+
+[node name="InventoryLabel" type="Label" parent="SheetBar/Margin/Columns" groups=["scalable_text"]]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.65098, 0.678431, 0.741176, 1)
+text = "Inventory: (empty)"
+horizontal_alignment = 2
+
+[node name="PageTurnPlayer" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"

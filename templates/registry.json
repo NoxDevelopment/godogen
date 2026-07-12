@@ -1122,6 +1122,65 @@
         "Door/lever/pickup props (wooden door leaf, locked variant, wall lever, key, potion flask; GLB or billboards)",
         "SFX: footstep thud per step, door creak/unlock, lever clunk, stone grinding (secret), sword hit, spark cast, potion gulp, party-member hurt/fall"
       ]
+    },
+    {
+      "id": "ff-gamebook",
+      "name": "FF Gamebook (illustrated Fighting-Fantasy book)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Illustrated Fighting-Fantasy gamebook — the gamebook template's presentation evolution (Veritas Tales / classic FF book plates), same Dialogue Manager 3 pin, adventure sheet and 2d6 roll-under dice layer underneath: every passage is an ILLUSTRATED PAGE — large illustration plate on top, passage text + 'turn to N' choice buttons below, adventure-sheet bar, dice tray rolling over the page for tests. NEW core system: the asset-binding manifest (assets.manifest.json in the project root) — per-slot entries {slotId, kind: illustration|ui|audio, policy: static|generated|rule, workflowId (zit-txt2img), stylePack (veritas-ink), promptTemplate ({passage_summary}-templated for rule slots), source (dialogue+passage+summary), file, provenance {seed, params, generatedAt}} covering one slot per passage plate plus UI chrome (ui/page_frame, ui/dice_tray) and audio/page_turn; the AssetBinder autoload reads it and the page binds each passage's slot on entry — deterministic ColorRect placeholders until the Studio asset board generates real plates and writes file+provenance back (zero code changes to adopt them). Single-player core, multiplayer-READY architecture: ALL passage state, choices and dice results route through the SessionState autoload — advance_passage() (first mutation of every passage), choose() (the response buttons' route), roll()/roll_luck() (awaits the dice layer, records to roll_log) — documented as the future ENet sync point, with DM-seat hooks (dm_push_passage, dm_override_roll) shipped as documented no-ops. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups — GameManager, Sheet, Dice and SessionState all persist — save_data() contracts, scalable_text, pause action).",
+      "status": "validated",
+      "skeleton": "genres/ff-gamebook/skeleton",
+      "doc": "genres/ff-gamebook/TEMPLATE.md",
+      "vendoredAddons": [
+        {
+          "name": "Dialogue Manager",
+          "repo": "https://github.com/nathanhoad/godot_dialogue_manager.git",
+          "ref": "v3.10.4",
+          "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
+          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ — same pin as the gamebook and visual-novel templates)",
+          "license": "MIT",
+          "licenseFile": "LICENSE",
+          "payload": "addons/dialogue_manager",
+          "targetDir": "addons/dialogue_manager",
+          "enablePlugins": [
+            "res://addons/dialogue_manager/plugin.cfg"
+          ]
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "narrative",
+          "params": {},
+          "note": "the book lives in dialogue/book.dialogue — every passage starts with `do SessionState.advance_passage(\"passage_N\")` (that line is what binds the plate); when you add a passage, add its illustration/passage_N slot to assets.manifest.json with a source.summary for the prompt rule"
+        },
+        {
+          "skill": "image-pipeline",
+          "params": {},
+          "note": "do NOT hand-wire art paths into scenes — fill manifest slots instead: generate with each slot's workflowId + stylePack (veritas-ink) + promptTemplate, write the asset into the project and set the slot's file + provenance; AssetBinder picks it up on next boot"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "generate a theme.tres from the game palette for buttons/labels/sheet bar; the page frame and dice tray ART come from their manifest ui/* slots, so theme the widgets, not the chrome"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Passage illustration plates (16:9, ~1100x620; veritas-ink style pack: hand-drawn traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plates) — one per illustration/* manifest slot, generated from each slot's promptTemplate + source.summary; write file+provenance back into assets.manifest.json",
+        "Page frame / parchment page background (ui/page_frame slot: aged parchment, ornate ink filigree border, empty center)",
+        "Dice tray panel art (ui/dice_tray slot: worn leather tray seen from above, empty center)",
+        "2d6 dice faces or spritesheet for the tray (replaces the number labels)",
+        "Title screen key art (1280x720, book-cover composition)",
+        "UI SFX: page turn (audio/page_turn slot), dice tumble, success/failure stingers"
+      ]
     }
   ]
 }

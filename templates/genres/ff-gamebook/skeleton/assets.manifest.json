@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "stylePack": "veritas-ink",
+  "updated": "2026-07-12",
+  "slots": [
+    {
+      "slotId": "illustration/passage_1",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
+      "source": {
+        "dialogue": "res://dialogue/book.dialogue",
+        "passage": "passage_1",
+        "summary": "a squat stone toll bridge over a river of black water, a hulking troll with a ledger squatting beside the near post, a sign demanding ten gold pieces"
+      },
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "illustration/passage_2",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
+      "source": {
+        "dialogue": "res://dialogue/book.dialogue",
+        "passage": "passage_2",
+        "summary": "an adventurer pushing into thorny bramble thickets beside a road, arms raked by thorns, a small brass key half-buried in the mud"
+      },
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "illustration/passage_3",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
+      "source": {
+        "dialogue": "res://dialogue/book.dialogue",
+        "passage": "passage_3",
+        "summary": "a towering troll unfolding to full height before a stone bridge, snapping a ledger shut, a small toll-house with a side gate behind it"
+      },
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "illustration/passage_5",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
+      "source": {
+        "dialogue": "res://dialogue/book.dialogue",
+        "passage": "passage_5",
+        "summary": "an adventurer creeping along the wet stone wall of a toll-house, boots on slick slates, a troll absorbed in its ledger in the background"
+      },
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "illustration/passage_6",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
+      "source": {
+        "dialogue": "res://dialogue/book.dialogue",
+        "passage": "passage_6",
+        "summary": "a line of rotten planks fording a black flooded river, an adventurer balancing midway over the rushing water"
+      },
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "illustration/passage_7",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
+      "source": {
+        "dialogue": "res://dialogue/book.dialogue",
+        "passage": "passage_7",
+        "summary": "the far bank of a dark river, a road running east toward distant mountains, a stone bridge and a bellowing troll left behind"
+      },
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "ui/page_frame",
+      "kind": "ui",
+      "policy": "generated",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "aged parchment gamebook page background, ornate ink filigree border, empty center for text and plate, 1980s Fighting Fantasy book interior style",
+      "placeholderColor": "#221d17",
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "ui/dice_tray",
+      "kind": "ui",
+      "policy": "generated",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "worn leather dice tray panel seen from above, hand-drawn ink linework with muted watercolor, empty center, 1980s Fighting Fantasy book style",
+      "placeholderColor": "#2a2119",
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    },
+    {
+      "slotId": "audio/page_turn",
+      "kind": "audio",
+      "policy": "static",
+      "workflowId": null,
+      "stylePack": null,
+      "promptTemplate": null,
+      "file": null,
+      "provenance": { "seed": null, "params": {}, "generatedAt": null }
+    }
+  ]
+}

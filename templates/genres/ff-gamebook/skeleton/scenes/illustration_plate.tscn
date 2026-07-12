@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://ffgbplate001"]
+
+[ext_resource type="Script" path="res://scripts/illustration_plate.gd" id="1_pl"]
+
+[node name="Plate" type="PanelContainer"]
+mouse_filter = 2
+script = ExtResource("1_pl")
+
+[node name="PlaceholderRect" type="ColorRect" parent="."]
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.164706, 0.180392, 0.211765, 1)
+
+[node name="PlateTexture" type="TextureRect" parent="."]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CaptionLabel" type="Label" parent="." groups=["scalable_text"]]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.65098, 0.678431, 0.741176, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ plate ]"
+horizontal_alignment = 1
+vertical_alignment = 1
