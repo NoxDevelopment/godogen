@@ -17,7 +17,9 @@ Per `noxdev-daz-licensing/ADR-001` (2026-06-27):
 - When in doubt: render to 2D.
 
 Setup status (2026-07): **Daz Studio is NOT installed** — only DIM at
-`D:\DAZ 3D\DAZ3DIM1\`. Install Daz Studio + content via DIM first.
+`D:\DAZ 3D\DAZ3DIM1\`. Install Daz Studio + content via DIM first —
+**follow [SETUP.md](SETUP.md)** (exact DIM steps, Autodazzler .dsa, scene prep,
+batch command).
 
 ## Render-to-2D pipeline (default)
 
@@ -58,6 +60,12 @@ LoRA training (see ml-workbench/training) → infinite consistent 2D art.
   Godot (glTF morph animations) / Unity (BlendShapes) — the full chain is
   Phase 6 in the roadmap; landscape research on lipsync alternatives pending.
 
-Status notes: dzscript batch renderer not yet built (fork of Autodazzler is the
-plan of record); Diffeomorphic path documented from research, validation spike
-pending (ADR lists it as a ~1-day task).
+Status notes (2026-07-11): **Autodazzler cloned** (reference) at
+`C:\code\ai\_vendor\Autodazzler` (v0.2.0, GPL — build-time tool only, renders
+unencumbered). **[SETUP.md](SETUP.md) has the full manual install path**
+(DIM → Daz Studio + Genesis 8/8.1 essentials — interactive, Jesus does this)
+plus the one-time turnaround scene/preset prep and the exact batch command;
+[`configs/turnaround-g81-8angle.json`](configs/turnaround-g81-8angle.json) is
+the ready 8-angle config (8 named cameras, render-settings preset on entry 1).
+Diffeomorphic path documented from research, validation spike pending
+(ADR lists it as a ~1-day task).

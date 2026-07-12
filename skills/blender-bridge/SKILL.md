@@ -7,9 +7,23 @@ description: Blender as a headless asset factory — import/normalize purchased 
 
 Install of record: **Blender 4.3** at `D:\Blender Foundation\Blender 4.3\`.
 Purchased addons/assets: NAS `\\DXP4800PLUS-A79\NoxDev\` (`blender-tools-and-assets\`,
-`superhive-creature-character-bundle\` — includes **Faceit** (ARKit-52 facial rigging)
-and **Blaze Puppeteer** (posing/animation); NOT yet installed into 4.3 — install from
-the NAS zips before relying on them).
+`superhive-creature-character-bundle\`).
+
+Installed into 4.3 (2026-07-11, verified enabled on fresh boot):
+- **Faceit 2.3.71** (ARKit-52 facial rigging) — legacy addon, module `faceit`.
+  Known quirk: headless file-loads fire a benign `load_pre` handler error
+  (`bpy.ops.faceit.receiver_cancel not found`) — harmless; use
+  `--factory-startup` for batch work to silence it.
+- **RetopoFlow 4.1.9** — extension `bl_ext.user_default.retopoflow`
+  (RF4 is the right variant for 4.2+; the NAS RF 3.4.4 zip targets ≤4.2).
+- **Blaze Puppeteer 1.2.0** — extension `bl_ext.user_default.blaze_puppeteer`
+  (use the `windows-blender-4.2-5.0` zip; 4 GB — bundles torch cu128 wheels).
+
+Extension zips (blender_manifest.toml at root) install headless via
+`bpy.ops.extensions.package_install_files(filepath=..., repo="user_default",
+enable_on_install=True)`; legacy zips (bl_info) via
+`bpy.ops.preferences.addon_install` + `addon_enable`. Save prefs with
+`bpy.ops.wm.save_userpref()` or the enable won't persist.
 
 ## Headless batch pattern (the workhorse)
 
@@ -73,5 +87,28 @@ T-pose; blendshapes arrive as BlendShapes on SkinnedMeshRenderer.
   img2img with project style → 2D sprite set (see daz-bridge for the Daz leg,
   asset-reuse rung 3 for when to do this).
 
-Status notes (2026-07): no bpy worker service exists yet (Phase 6 roadmap item);
-recipes above are the validated-in-community patterns to build it from.
+## bpy worker (SHIPPED 2026-07-11)
+
+[`tools/blender_worker.py`](tools/blender_worker.py) — validated on a NAS
+base-mesh (FBX in → normalized GLB out → 8×768² turnaround PNGs + manifest.json):
+
+```
+blender -b --factory-startup -P tools/blender_worker.py -- \
+    import-normalize <in.(fbx|obj|gltf|glb)> <out.glb>
+blender -b --factory-startup -P tools/blender_worker.py -- \
+    turnaround <in> <outdir> [--views 8] [--res 1024] [--samples 16] [--clay]
+```
+
+`import-normalize`: import → apply rot/scale → power-of-ten rescale-to-meters
+heuristic (plausible band 0.05–30 m, target ~1.7 m) → bottom-center origin →
+GLB export per the rules above (exporter params are filtered against the
+running Blender's signature, so it survives version drift).
+`turnaround`: same normalize, then a pivot-parented camera + 3-point light rig
+(lights orbit WITH the camera → identical lighting every view, what LoRA sets
+want), EEVEE, film_transparent, RGBA PNGs + `manifest.json` (yaw/bbox/files).
+`--clay` forces neutral gray clay; material-less meshes get clay automatically
+(white/absent basecolor blows out otherwise).
+
+Status notes (2026-07-11): addons installed + worker shipped/validated (above).
+Remaining Phase 6 items: NAS asset-library indexing, Blender MCP wiring,
+Faceit→Audio2Face chain.

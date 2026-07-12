@@ -1,0 +1,24 @@
+{
+    "interactive": false,
+    "quitAutomatically": true,
+    "scenes": [{
+        "scenePath": "D:/Daz/NoxDev/scenes/turnaround-g81.duf",
+        "renderDirectoryPath": "D:/Daz/NoxDev/renders/turnaround-g81",
+        "abortOnError": false,
+        "overwrite": true,
+        "renderConfigurations": [
+            {
+                "cameraName": "cam_yaw000",
+                "renderFilename": "view_00_yaw000.png",
+                "presets": ["D:/Daz/NoxDev/presets/NoxDev_Turnaround_RenderSettings.duf"]
+            },
+            { "cameraName": "cam_yaw045", "renderFilename": "view_01_yaw045.png" },
+            { "cameraName": "cam_yaw090", "renderFilename": "view_02_yaw090.png" },
+            { "cameraName": "cam_yaw135", "renderFilename": "view_03_yaw135.png" },
+            { "cameraName": "cam_yaw180", "renderFilename": "view_04_yaw180.png" },
+            { "cameraName": "cam_yaw225", "renderFilename": "view_05_yaw225.png" },
+            { "cameraName": "cam_yaw270", "renderFilename": "view_06_yaw270.png" },
+            { "cameraName": "cam_yaw315", "renderFilename": "view_07_yaw315.png" }
+        ]
+    }]
+}
