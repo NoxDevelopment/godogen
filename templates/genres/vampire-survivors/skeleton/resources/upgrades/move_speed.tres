@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Upgrade" load_steps=2 format=3 uid="uid://vsupspeed001"]
+
+[ext_resource type="Script" path="res://scripts/upgrade.gd" id="1_up"]
+
+[resource]
+script = ExtResource("1_up")
+id = "move_speed"
+display_name = "Swift Boots"
+description = "+30 move speed"
+stat = "move_speed"
+amount = 30.0

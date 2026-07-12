@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-07-11",
+  "updated": "2026-07-12",
   "templates": [
     {
       "id": "metroidvania",
@@ -877,6 +877,52 @@
         "Block break/place SFX per material family (dirt/stone/wood)",
         "UI: hotbar frame + block icons (rendered from the atlas)",
         "Ambient loop (wind/birds) + cave tone for below-ground"
+      ]
+    },
+    {
+      "id": "vampire-survivors",
+      "name": "Vampire Survivors-like (auto-attack swarm roguelite)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Auto-attack swarm roguelite base, pure first-party (per the Wave-3 survey no clearly-maintained MIT swarm kit exists — BulletUpHell covers dense projectile patterns, not enemy swarms, and the genre's loop is build-cheap): WASD survivor whose weapon fires on a timer at the nearest enemy (pooled first-party projectiles), an enemy-swarm director spawning timed off-screen ring waves that scale in count/speed/health — all active enemies moved by ONE loop with pooling and no physics bodies, comfortably 200+ — with contact damage on a per-enemy cooldown, XP gems on kill with magnet pickup (same pooled single-loop pattern), and a level-up flow: data-driven Upgrade resources (res://resources/upgrades/*.tres — damage/fire rate/move speed/magnet radius/max HP) offered 3 at a time in a pausing choice UI (click or keys 1-3, level-ups queue). Survival timer + kill counter HUD; death opens a run summary (time/kills/level, best-kills + best-time recorded to GameManager flags, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "status": "validated",
+      "skeleton": "genres/vampire-survivors/skeleton",
+      "doc": "genres/vampire-survivors/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": { "template": "topdown" },
+          "note": "movement actions are baked into the skeleton's project.godot (the weapon aims itself — no aim/attack actions needed); re-run only for rebinding UI"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook player.weapon_fired / take_hit flashes and spawner.enemy_killed for shake, hitstop, and kill pops — the signals are already emitted"
+        },
+        {
+          "skill": "vfx-particles",
+          "params": {},
+          "note": "enemy death bursts and gem sparkles at spawner.enemy_killed / gems.gem_collected; keep them pooled like everything else in the swarm"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Survivor spritesheet (~32x32 px, idle/run 4-direction or side-flip)",
+        "Enemy swarm spritesheets (2-3 silhouette families, ~24-32 px walk cycles; palette-distinct from player)",
+        "XP gem sprite (8-12 px, readable at speed; tier tints for bigger values)",
+        "Projectile sprites (8-16 px, high-contrast) + muzzle/impact flashes (small, additive)",
+        "Ground tile texture (tileable 64px, low-contrast so the swarm stays readable)",
+        "Upgrade icons (48x48 px, one per resources/upgrades entry) + level-up/death UI panel art",
+        "SFX: shot, enemy death squish, gem pickup chime, level-up sting, player hurt"
       ]
     }
   ]

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Upgrade" load_steps=2 format=3 uid="uid://vsupdmg00001"]
+
+[ext_resource type="Script" path="res://scripts/upgrade.gd" id="1_up"]
+
+[resource]
+script = ExtResource("1_up")
+id = "damage"
+display_name = "Sharper Rounds"
+description = "+1 weapon damage"
+stat = "damage"
+amount = 1.0

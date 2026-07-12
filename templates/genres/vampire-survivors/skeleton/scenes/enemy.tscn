@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://vsenem000001"]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_en"]
+
+[node name="Enemy" type="Node2D"]
+z_index = 5
+script = ExtResource("1_en")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.85098, 0.301961, 0.321569, 1)
+polygon = PackedVector2Array(0, -12, 11, 0, 0, 12, -11, 0)
