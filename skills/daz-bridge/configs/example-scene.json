@@ -1,0 +1,15 @@
+{
+  "figures": [
+    {
+      "asset": "People/Genesis 8 Female/Genesis 8.1 Basic Female.duf",
+      "id": "g81f",
+      "position": [0, 0, 0],
+      "rotationY": 0
+    }
+  ],
+  "cameras": [
+    { "name": "front", "focalMM": 65, "orbit": { "yawDeg": 0, "pitchDeg": 12, "distanceCM": 300 } },
+    { "name": "three_quarter", "focalMM": 65, "orbit": { "yawDeg": 45, "pitchDeg": 12, "distanceCM": 300 } }
+  ],
+  "render": { "width": 512, "height": 512, "outDir": "D:/Daz/NoxDev/renders/compose-test" }
+}

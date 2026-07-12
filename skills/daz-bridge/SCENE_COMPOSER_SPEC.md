@@ -99,8 +99,32 @@ generation before calling a generation supported.
   renderer (loads a figure, builds N orbit cameras + 3-point light,
   transparent Iray renders, manifest.json) parameterized via `-scriptArg`.
   No scene prep needed. Validates the whole headless loop on DS6.
-- **P1:** `tools/daz_compose.py` — spec JSON → .dsa generator + runner +
-  output manifest; CLI mirror of the pixeltool pattern.
+- **P1 (DONE, validated 2026-07-12):** `tools/daz_compose.py` — spec JSON →
+  generated .dsa → headless DS6 render → manifest.json; CLI mirror of the
+  pixeltool pattern. Validated end-to-end on DS6: G8.1 Basic Female,
+  2 cameras (front + 3/4 at chest height), exact 512×512 PNGs + manifest in
+  `D:/Daz/NoxDev/renders/compose-test` (~12 s/view CPU Iray).
+  `python tools/daz_compose.py configs/example-scene.json` (`--dry-run`
+  generates the .dsa only; `--timeout`, `--content-dir`, `--daz-exe`).
+  - **Implemented spec subset:** `figures[{asset,id,pose?,position,rotationY}]`,
+    `environment?`, `cameras[{name,focalMM,orbit{yawDeg,pitchDeg,distanceCM}}]`,
+    `lighting?` (.duf presets; `hdri:*` warns → default headlamp),
+    `render{width,height,outDir}`. Missing pose/env/lighting refs are
+    generation-tagged **warnings in the manifest, not hard fails**.
+  - **Not yet (P2/P3):** `expression`, `wardrobe`, `aimAt`, `transparent`,
+    `engine`/`samples`, `frames`.
+  - **DS6 findings (beyond the turnaround's validated patterns):**
+    `DzImageRenderHandler` + `renderer.render()` honors an explicit `Size`
+    — this FIXES the turnaround's imageSize-not-applied issue (doRender path
+    kept as fallback). `contentMgr.findFile()` can return empty in a fresh
+    `-instanceName` instance right after `addContentDirectory` — resolve by
+    joining the content dir directly. After `openFile`, the **first** new
+    skeleton is the body; later ones are followers (G8.1F "Tear"/eyelashes),
+    so transforms/bbox must target `Scene.getSkeleton(nBefore)`. G8.1 Basic
+    Female's real library path is `People/Genesis 8 Female/…` (folder says
+    "Genesis 8", not "8.1"). `MainWindow.close()` does not always terminate
+    the process — the Python runner kills the instance if it lingers >60 s
+    after the manifest lands.
 - **P2:** godotsmith endpoint `POST /api/daz/compose` (spec in, render paths
   out) → Studio "Daz Scene" form (with guides/tooltips per the UX pass) +
   ml-workbench tab + MCP tool.

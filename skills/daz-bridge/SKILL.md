@@ -16,10 +16,28 @@ Per `noxdev-daz-licensing/ADR-001` (2026-06-27):
   Sales is drafted in that repo — send before shipping any live-3D Daz asset.
 - When in doubt: render to 2D.
 
-Setup status (2026-07): **Daz Studio is NOT installed** — only DIM at
-`D:\DAZ 3D\DAZ3DIM1\`. Install Daz Studio + content via DIM first —
-**follow [SETUP.md](SETUP.md)** (exact DIM steps, Autodazzler .dsa, scene prep,
-batch command).
+Setup status (2026-07-12): **Daz Studio 6 installed** at
+`C:\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio6\DAZStudio.exe`; content at
+`C:\Daz 3D\Applications\Data\DAZ 3D\My DAZ 3D Library` (G3F→G9 + poses/
+wardrobe/environments/aniBlocks). [SETUP.md](SETUP.md) keeps the DIM install
+steps for reference.
+
+## Scene composer (P1, validated 2026-07-12) — the default way to render
+
+`tools/daz_compose.py` — JSON scene spec → generated DazScript → headless DS6
+render → PNGs + `manifest.json`. See [SCENE_COMPOSER_SPEC.md](SCENE_COMPOSER_SPEC.md)
+for the spec schema and DS6 API findings.
+
+```bash
+python tools/daz_compose.py configs/example-scene.json          # render
+python tools/daz_compose.py scene.json --dry-run                # generate .dsa only
+```
+
+Figures (with optional pose + placement), optional environment/lighting .duf,
+orbit cameras (yaw/pitch/distance around the figure bbox), exact pixel sizes
+(DzImageRenderHandler path — fixes the turnaround's imageSize issue). Missing
+pose/env/lighting refs are warnings in the manifest, not hard fails. Script
+errors: grep `Script Error` in `%APPDATA%/DAZ 3D/Studio6 [noxcompose]/log.txt`.
 
 ## Render-to-2D pipeline (default)
 
