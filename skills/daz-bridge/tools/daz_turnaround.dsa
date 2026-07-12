@@ -31,8 +31,22 @@
 	var nViews     = oArgs.cfgViews  !== undefined ? Number(oArgs.cfgViews)  : 8;
 	var res        = oArgs.cfgRes    !== undefined ? Number(oArgs.cfgRes)    : 1024;
 	var smokeTest  = String(oArgs.cfgSmokeTest) == "true";
+	// content root: fresh -instanceName instances have NO registered content
+	// dirs, so .duf payload refs (/data/...) fail to resolve — self-register.
+	var contentDir = oArgs.cfgContentDir !== undefined ? String(oArgs.cfgContentDir)
+		: "C:/Daz 3D/Applications/Data/DAZ 3D/My DAZ 3D Library";
 
 	function log(msg) { print("[daz_turnaround] " + msg); }
+
+	var cMgr = App.getContentMgr();
+	var haveDir = false;
+	for (var d = 0; d < cMgr.getNumContentDirectories(); d++) {
+		if (String(cMgr.getContentDirectoryPath(d)).toLowerCase() == contentDir.toLowerCase()) haveDir = true;
+	}
+	if (!haveDir) {
+		cMgr.addContentDirectory(contentDir);
+		log("registered content dir: " + contentDir);
+	}
 
 	var dir = new DzDir(outDir);
 	if (!dir.exists()) dir.mkpath(outDir);
@@ -55,13 +69,25 @@
 		log("figure loaded: " + target.getLabel());
 	}
 
-	// ---- framing: bounding box (or default human envelope in smoke test) ----
+	// ---- framing: bounding box when available, else G8 standing envelope ----
 	var cx = 0, cy = 155, cz = 0, sizeY = 170; // cm defaults ~ G8 standing
 	if (target) {
-		var box = target.getWorldBox();
-		var mn = box.min, mx = box.max;
-		cx = (mn.x + mx.x) / 2; cy = (mn.y + mx.y) / 2; cz = (mn.z + mx.z) / 2;
-		sizeY = mx.y - mn.y;
+		try {
+			var box = null;
+			if (typeof target.getWorldBox == "function") box = target.getWorldBox();
+			else if (target.getObject() && typeof target.getObject().getGeometryBoundingBox == "function")
+				box = target.getObject().getGeometryBoundingBox();
+			if (box) {
+				var mn = box.min, mx = box.max;
+				cx = (mn.x + mx.x) / 2; cy = (mn.y + mx.y) / 2; cz = (mn.z + mx.z) / 2;
+				sizeY = mx.y - mn.y;
+				log("bbox framing: center y=" + cy + " height=" + sizeY);
+			} else {
+				log("no bbox API — using G8 default envelope");
+			}
+		} catch (e) {
+			log("bbox failed (" + e + ") — using G8 default envelope");
+		}
 	}
 	var distance = sizeY * 1.9; // full body + margin at ~65mm
 
