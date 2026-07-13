@@ -1,0 +1,105 @@
+{
+  "_comment": "Semantic backbone for scene-populate. biome -> feature list + slot templates + kit_tag_sources. kit_tag_sources map a tag to its preferred owned source: cc0 (godotsmith /api/catalog kit id), nas (path under \\\\DXP4800PLUS-A79\\NoxDev\\blender-tools-and-assets\\, Blender-normalize first), or gen (rung-6 generation recipe). null means fall through to the next rung / greybox. Verified against godotsmith /api/catalog Kenney kits + the NAS README at authoring time (2026-07-12).",
+  "forest": {
+    "features": ["clearing", "path", "grove", "camp", "ruins"],
+    "slots": {
+      "canopy": { "tags": ["conifer_tree", "broadleaf_tree", "dead_tree"], "rule": "poisson" },
+      "understory": { "tags": ["fern", "bush", "grass_tuft"], "rule": "poisson_multimesh" },
+      "ground": { "tags": ["rock_small", "log", "mushroom"], "rule": "cluster" },
+      "hero": { "tags": ["shrine", "well", "statue"], "rule": "single" }
+    },
+    "kit_tag_sources": {
+      "conifer_tree": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "broadleaf_tree": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "dead_tree": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "fern": { "cc0": null, "nas": "asset-packs/tVFX-Undergrowth", "gen": null },
+      "grass_tuft": { "cc0": null, "nas": "asset-packs/tVFX-Undergrowth", "gen": null },
+      "bush": { "cc0": "kenney-nature-kit", "nas": "asset-packs/tVFX-Undergrowth", "gen": null },
+      "rock_small": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "rock_flat": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "log": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "mushroom": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "lantern": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "shrine": { "cc0": null, "nas": null, "gen": "3d-asset-pipeline prop 'mossy stone forest shrine, low-poly'" },
+      "well": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "statue": { "cc0": null, "nas": null, "gen": "3d-asset-pipeline prop 'weathered stone statue, low-poly'" }
+    }
+  },
+  "city": {
+    "features": ["street", "plaza", "market", "alley"],
+    "slots": {
+      "structures": { "tags": ["building", "shop"], "rule": "grid" },
+      "props": { "tags": ["sign", "lantern", "crate", "barrel"], "rule": "scatter_along" },
+      "greenery": { "tags": ["broadleaf_tree", "bush"], "rule": "poisson" }
+    },
+    "kit_tag_sources": {
+      "building": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "shop": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "alley": { "cc0": null, "nas": "asset-packs/ProceduralAlleys", "gen": null },
+      "sign": { "cc0": "kenney-fantasy-town-kit", "nas": "asset-packs/ProceduralSigns", "gen": null },
+      "lantern": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "crate": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "barrel": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "broadleaf_tree": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "bush": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "citizen": { "cc0": null, "nas": "asset-packs/SummerPackPeopleSet", "gen": null }
+    }
+  },
+  "dungeon": {
+    "features": ["room", "corridor", "arena", "crypt"],
+    "slots": {
+      "structure": { "tags": ["wall", "pillar"], "rule": "grid" },
+      "props": { "tags": ["crate", "barrel", "lantern"], "rule": "cluster" },
+      "hero": { "tags": ["statue", "shrine"], "rule": "single" }
+    },
+    "kit_tag_sources": {
+      "wall": { "cc0": "kenney-modular-dungeon-kit", "nas": null, "gen": null },
+      "pillar": { "cc0": "kenney-modular-dungeon-kit", "nas": null, "gen": null },
+      "crate": { "cc0": "kenney-modular-dungeon-kit", "nas": null, "gen": null },
+      "barrel": { "cc0": "kenney-modular-dungeon-kit", "nas": null, "gen": null },
+      "lantern": { "cc0": "kenney-modular-dungeon-kit", "nas": null, "gen": null },
+      "statue": { "cc0": null, "nas": null, "gen": "3d-asset-pipeline prop 'broken stone statue, dungeon'" },
+      "shrine": { "cc0": null, "nas": null, "gen": "3d-asset-pipeline prop 'dark altar shrine, low-poly'" }
+    }
+  },
+  "desert": {
+    "features": ["dunes", "oasis", "canyon", "camp"],
+    "slots": {
+      "flora": { "tags": ["cactus", "dead_tree"], "rule": "poisson" },
+      "ground": { "tags": ["rock_small", "boulder"], "rule": "cluster" },
+      "camp": { "tags": ["tent", "crate", "barrel"], "rule": "cluster" }
+    },
+    "kit_tag_sources": {
+      "cactus": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "dead_tree": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "rock_small": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "boulder": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "tent": { "cc0": null, "nas": null, "gen": "3d-asset-pipeline prop 'desert canvas tent, low-poly'" },
+      "crate": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "barrel": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null }
+    }
+  },
+  "cave": {
+    "features": ["cavern", "tunnel", "grotto"],
+    "slots": {
+      "structure": { "tags": ["boulder", "pillar"], "rule": "cluster" },
+      "ground": { "tags": ["rock_small", "mushroom"], "rule": "cluster" }
+    },
+    "kit_tag_sources": {
+      "boulder": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "rock_small": { "cc0": "kenney-nature-kit", "nas": null, "gen": null },
+      "pillar": { "cc0": "kenney-modular-dungeon-kit", "nas": null, "gen": null },
+      "mushroom": { "cc0": "kenney-nature-kit", "nas": null, "gen": null }
+    }
+  },
+  "interior": {
+    "features": ["room", "hall", "shop"],
+    "slots": {
+      "furniture": { "tags": ["crate", "barrel"], "rule": "grid" }
+    },
+    "kit_tag_sources": {
+      "crate": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null },
+      "barrel": { "cc0": "kenney-fantasy-town-kit", "nas": null, "gen": null }
+    }
+  }
+}

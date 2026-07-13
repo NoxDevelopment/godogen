@@ -1132,6 +1132,22 @@
       "status": "validated",
       "skeleton": "genres/ff-gamebook/skeleton",
       "doc": "genres/ff-gamebook/TEMPLATE.md",
+      "multiplayer": {
+        "status": "opt-in",
+        "profile": "authority-turn",
+        "transport": "enet",
+        "transportNote": "ENet for LAN (default, validated). Switch transport to 'websocket' for one desktop+web code path (spec Phase 3, web-shippable); WebRTC for web realtime is spec Phase 5 (not bundled).",
+        "arbitration": "leader",
+        "arbitrationNote": "'leader' resolves party choices immediately and works with the UNMODIFIED book scene (validated). 'vote' and 'dm-confirm' are fully implemented but defer the commit until a majority/DM approves — their deferred-commit UX needs a small MP-aware book hook (connect NetBridge.choice_committed/remote_advance and skip the optimistic walk), a Phase-2 finish. DM push/override work in every mode.",
+        "skill": "netcode",
+        "addon": "nox_netcode",
+        "autoloads": ["Net", "NetBridge"],
+        "note": "Opt-in: NOT applied by default scaffolding. Advertises 'Playable together' to the Studio genre picker; run the netcode primitive to inject it. Offline play is untouched (the SessionState guard is inert when Net.active is false).",
+        "validated": {
+          "engineVersion": "4.6.1-stable",
+          "note": "Injected into a fresh 4.6.1 scaffold: editor import clean (zero parse errors), nox_netcode API self-probe OK (host/seats/DM-authority/seed/teardown), single-player boot probe byte-identical (guard inert offline). True two-peer sync needs two running instances — see addons/nox_netcode/README.md manual steps; not validatable headless."
+        }
+      },
       "vendoredAddons": [
         {
           "name": "Dialogue Manager",
@@ -1163,6 +1179,15 @@
           "skill": "ui-theme",
           "params": {},
           "note": "generate a theme.tres from the game palette for buttons/labels/sheet bar; the page frame and dice tray ART come from their manifest ui/* slots, so theme the widgets, not the chrome"
+        },
+        {
+          "skill": "netcode",
+          "params": {
+            "profile": "authority-turn",
+            "transport": "enet",
+            "arbitration": "leader"
+          },
+          "note": "OPT-IN multiplayer (build-order #12). Run `skills/netcode/tools/netcode_gen.py inject --project <dir> --profile authority-turn --transport enet` to make the book playable together: copies the nox_netcode addon into addons/, registers the Net + NetBridge autoloads, writes the [nox_netcode] settings block, and applies the pinned SessionState guard patch — advance_passage/choose/roll route through the host (host validates + broadcasts, clients render off signals) and the two DM-seat no-op hooks become real host-side dm_push_passage/dm_override_roll (require_dm). Idempotent. No netfox vendoring needed (native @rpc suffices for authority-turn). Single-player stays byte-identical because the guard is inert when Net.active is false."
         }
       ],
       "systems": [

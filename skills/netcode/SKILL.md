@@ -5,9 +5,10 @@ description: |
   needs to become playable together — a lobby, peer connect, spawn/sync, and a
   host-authoritative authority model — without hand-rolling networking. Two
   profiles: `authority-turn` (turn-based shared state + a DM seat, e.g. the FF
-  gamebook) and `realtime` (per-peer avatar sync, e.g. an obby). Skeleton stage:
-  the shared-core generator and file plan are defined; profile emitters are being
-  built per the phased plan. Full design: Noxdev-Studio/docs/specs/MULTIPLAYER_TEMPLATE_SPEC.md
+  gamebook) and `realtime` (per-peer avatar sync, e.g. an obby). Ships the
+  reusable `nox_netcode` Godot addon + an idempotent generator that injects it,
+  registers autoloads, patches project.godot, and (authority-turn) applies the
+  SessionState guard patch. Full design: Noxdev-Studio/docs/specs/MULTIPLAYER_TEMPLATE_SPEC.md
 ---
 
 # Netcode — multiplayer drop-in
@@ -17,27 +18,44 @@ a host-authoritative model, and a transport chosen for the profile. Scenes never
 change — the layer intercepts at the autoload/signal boundary, the same promise the
 asset-binding manifest makes for art.
 
-> **Status: skeleton.** Phase 0 of the build plan. `list` and `plan` are working;
-> the shared-core (`session`, `lobby`) and profile emitters (`authority-turn`,
-> `realtime`) are being filled in per the spec's phased plan and validated headless
-> before a template flips to `multiplayer: validated`. The authoritative design is
-> `Noxdev-Studio/docs/specs/MULTIPLAYER_TEMPLATE_SPEC.md` — read it before implementing.
+> **Status: implemented (Phase 1–2 + realtime contract).** The reusable
+> `nox_netcode` addon ships under `skills/netcode/addon/nox_netcode/` and
+> `netcode_gen.py inject` wires it into a target project idempotently. Validated
+> headless on Godot 4.6.1: editor import clean, the addon API self-probe passes,
+> and an opted-in `ff-gamebook`'s single-player boot probe stays byte-identical
+> (the guard is inert offline). True two-peer sync needs two running instances
+> (see `addon/nox_netcode/README.md`) — it is not validatable headless. WebRTC
+> (web realtime) is the one deferred transport (spec Phase 5, not bundled).
+> Authoritative design: `Noxdev-Studio/docs/specs/MULTIPLAYER_TEMPLATE_SPEC.md`.
 
 ## TL;DR
 
 ```bash
-# What this skill can emit and the two profiles:
-python3 .claude/skills/netcode/tools/netcode_gen.py list
+SKILL=skills/netcode/tools/netcode_gen.py   # (.claude/skills/... when installed)
 
-# See exactly which files a profile would write into a project (no writes):
-python3 .claude/skills/netcode/tools/netcode_gen.py plan --profile authority-turn
+# Profiles, transports, arbitration modes:
+python3 $SKILL list
 
-# Emit the shared core (autoload + lobby) into a project:
-python3 .claude/skills/netcode/tools/netcode_gen.py session --output res://scripts/net/
-python3 .claude/skills/netcode/tools/netcode_gen.py lobby   --output res://scenes/net/
+# Dry-run the exact files/patch a profile would write (no writes):
+python3 $SKILL plan --profile authority-turn
+python3 $SKILL inject --project <dir> --profile authority-turn --dry-run
 
-# Everything for a profile at once:
-python3 .claude/skills/netcode/tools/netcode_gen.py all --profile authority-turn --project <dir>
+# Make the FF gamebook playable together (inject addon + autoloads + patch):
+python3 $SKILL inject --project <dir> --profile authority-turn --transport enet \
+    --arbitration leader   # leader works with the unmodified book; vote/dm-confirm need an MP-aware book hook
+
+# Make a realtime (obby/platformer) project multiplayer:
+python3 $SKILL inject --project <dir> --profile realtime --transport enet
+
+# Shared core only (Net autoload, no profile layer):
+python3 $SKILL session --project <dir>
+```
+
+Every write is **idempotent** — re-running only confirms state. Verify with:
+
+```bash
+Godot --headless --editor --path <dir> --quit                       # import (parse check)
+Godot --headless --path <dir> res://addons/nox_netcode/net_probe.tscn   # API self-probe
 ```
 
 ## Profiles
@@ -51,17 +69,30 @@ Both profiles share the **`Net` autoload** (host/join, transport, peer lifecycle
 lobby state, authority helpers) and the **lobby scene**. Profiles add only their
 layer on top.
 
-## What this emits
+## The `nox_netcode` addon (what gets injected)
 
-| Subcommand | Files | Profile | Purpose |
-|------------|-------|---------|---------|
-| `session` | `net_session.gd` (autoload `Net`) | both | Host/join, transport selection (ENet/WebSocket/WebRTC), peer lifecycle → clean signals, lobby state, authority helpers (`is_host`/`is_dm`/`require_host`/`require_dm`), disconnect policy. |
-| `lobby` | `lobby.tscn` + `lobby.gd` | both | Host/Join screen: session code or IP, peer list + ready, host-only Start, seat picker (DM seat in `authority-turn`). NoxDev UI ABI so `ui-theme` re-skins it. |
-| `authority-turn` | `session_bridge.gd` + a pinned `session_state.gd` guard patch | authority-turn | Wraps the template's `SessionState`: host-authoritative `advance_passage`/`choose`/`roll`, seeded dice broadcast, arbitration (`leader`/`vote`/`dm-confirm`), and the real `dm_push_passage`/`dm_override_roll` (host-side, `require_dm`). |
-| `realtime` | `net_player.gd` + spawner/synchronizer wiring | realtime | Authority-at-spawn avatars, transform/state sync (unreliable-ordered), spawn points, host-validated event RPCs (checkpoint/finish), netfox `NetworkTime` clock. |
-| `all` | the shared core + one profile | — | One-shot for a template opt-in. |
-| `list` | *(none)* | — | Print profiles, transports, and emit plan. |
-| `plan` | *(none)* | — | Print the exact file list a profile writes (dry run). |
+The reusable addon lives at `skills/netcode/addon/nox_netcode/` and is copied
+wholesale into a target project's `addons/nox_netcode/`:
+
+| File | Profile | Autoload | Role |
+|------|---------|----------|------|
+| `net_session.gd` | both | **`Net`** | Host/join, transport (ENet/WebSocket; WebRTC = clear not-bundled error), peer lifecycle → clean signals, lobby roster, seats + DM seat, shared-seed broadcast, `is_host`/`local_id`/`is_dm`/`require_host`/`require_dm`, disconnect policy. |
+| `lobby.tscn` + `lobby.gd` | both | — | Host/Join screen: name + host/IP, peer list + ready, host-only Start, DM-seat picker. `scalable_text` labels → `ui-theme` re-skins it, no code change. |
+| `session_bridge.gd` | authority-turn | **`NetBridge`** | Wraps `SessionState`: host-authoritative `advance_passage`/`choose`/`roll`, arbitration (`leader`/`vote`/`dm-confirm`), seeded dice broadcast, real `dm_push_passage`/`dm_override_roll` (`require_dm`). |
+| `net_player.gd` | realtime | — | Authority-at-spawn `CharacterBody2D` avatar; code-built `MultiplayerSynchronizer` (position/velocity always, facing/moving on-change). |
+| `net_spawner.gd` | realtime | — | `MultiplayerSpawner` wiring: one avatar per peer, spawn points from the `net_spawn_point` group, despawn on leave. |
+| `net_events.gd` | realtime | — | Host-validated checkpoint/respawn/finish RPCs + shared race clock (netfox `NetworkTime` if present, else host-owned float). |
+| `net_probe.tscn/.gd` | both | — | Headless self-test: drives the API, prints one `DEBUG:` line, quits. |
+
+## Subcommands
+
+| Subcommand | Does | Profile |
+|------------|------|---------|
+| `inject` (= `all`) | Copy the addon, register autoloads (`Net`; +`NetBridge` for authority-turn), write `[nox_netcode]` settings, and (authority-turn) apply the `session_state.gd` guard patch. Idempotent. `--dry-run` prints the plan. | both |
+| `authority-turn` / `realtime` | Thin wrappers → `inject` with that profile. | one |
+| `session` / `lobby` | Shared core only: copy the addon + register just the `Net` autoload (no profile layer, no patch). | both |
+| `list` | Print profiles, transports, arbitration modes. | — |
+| `plan` | Print the exact files a profile writes (dry run). | — |
 
 ## Authority model (why host-authoritative)
 
@@ -81,18 +112,36 @@ posture and the only model in which a **DM seat** is meaningful.
 
 Registry-only + one skill invocation (no bespoke networking per template):
 
-1. Add the netcode addon (**netfox**, pinned SHA, MIT) to the template's
-   `vendoredAddons`. `authority-turn`-only templates may skip it (native `@rpc`
-   suffices) or pin just `NetworkTime`.
-2. Add `{skill: "netcode", params: {profile: "...", transport: "...", ...}}` to the
-   template's `primitives`.
-3. Scaffold runs the skill → emits the shared core + profile files, registers the
-   `Net` autoload, and (authority-turn) applies the `SessionState` guard patch.
-4. ABI is automatic — the autoload joins `persistent`, uses the standard buses /
-   `pause` action, lobby labels are `scalable_text`; `menu_system` / `save_system` /
-   `settings_system` / `ui-theme` drop in unchanged.
-5. Validate headless (two peers), then flip the template's `multiplayer` status to
-   `validated` for the pinned engine + addon SHA.
+1. Add `{skill: "netcode", params: {profile, transport, arbitration}}` to the
+   template's `primitives`, and a `multiplayer: {profile, transport, ...}` field on
+   the registry entry so the Studio picker shows a "Playable together" badge. The
+   `ff-gamebook` entry is the worked example. `authority-turn` needs **no**
+   `vendoredAddons` (native `@rpc` suffices); a `realtime` template that wants the
+   netfox shared clock / rollback pins netfox separately (MIT, per the kit survey).
+2. Run `netcode_gen.py inject --project <dir> --profile <p>` (opt-in — it is not
+   auto-applied by scaffolding because authority-turn edits `session_state.gd`).
+3. The skill copies the addon, registers autoloads, writes settings, and applies
+   the guard patch (authority-turn). All idempotent.
+4. ABI is automatic — `Net` joins `persistent`, the lobby uses standard widgets and
+   `scalable_text`; `menu_system` / `save_system` / `settings_system` / `ui-theme`
+   drop in unchanged.
+5. Validate headless (import clean + API self-probe + single-player probe
+   byte-identical), do the manual two-instance sync check, then flip the entry's
+   `multiplayer.status` to `validated` for the pinned engine version.
+
+### The obby (realtime) opts in the same way
+
+When the Wave-3 obby template is built it adds
+`{skill: "netcode", params: {profile: "realtime", transport: "enet"}}` and a
+`multiplayer: {profile: "realtime", transport: "enet"}` field, then its level
+provides what the `realtime` profile consumes (spec "Obby integration points"):
+a level root holding a `net_spawner.gd` node (its `player_scene` = a
+`net_player.gd`-rooted avatar) and a `NetEvents` child; spawn points tagged into
+the `net_spawn_point` group; checkpoints/finish calling
+`NetEvents.report_checkpoint(i)` / `report_finish()` so the host owns the order.
+No scene code changes for the netcode itself — same intercept-at-the-boundary
+promise. Until the template exists, `realtime` is validated against a scratch
+`CharacterBody2D` platformer (the addon self-probe already runs under it).
 
 ## Transport choice
 
@@ -100,17 +149,37 @@ Registry-only + one skill invocation (no bespoke networking per template):
 |-----------|-----|---------|---------|----------|
 | ENet (UDP) | ❌ | ✅ built-in | lowest | realtime obby, desktop/LAN |
 | WebSocket (TCP) | ✅ | ✅ built-in | higher (HOL) | authority-turn gamebook everywhere, low-rate |
-| WebRTC (UDP P2P) | ✅ | ⚠️ GDExtension | low | realtime obby on web (needs signaling + STUN/TURN) |
+| WebRTC (UDP P2P) | ✅ | ⚠️ GDExtension | low | realtime obby on web — **not bundled** (spec Phase 5) |
 
-Default: gamebook → WebSocket (one path, web-shippable day one); obby → ENet first,
-WebRTC for web later. Overridable via the `transport` param / `Net` config.
+**ENet is the LAN default and the validated path** for both profiles here — it is
+built-in, lowest-latency, and what the two-instance test uses. **WebSocket is
+implemented** and is the spec's web-shippable authority-turn default (spec
+Phase 3): pass `--transport websocket` for one desktop+web code path. **WebRTC is
+deferred** — selecting it raises a clear `connection_error` (it needs the
+`webrtc-native` GDExtension + a signaling server + STUN/TURN). Transport is a
+`[nox_netcode]` project setting, overridable per invocation via `--transport` or
+at runtime via the `Net.host()/join()` config.
 
 ## Validation
 
-Two `--headless` peers on loopback; a boot probe drives the scripted flow and prints
-a deterministic line (ff-gamebook probe convention). The single-player boot probe of
-any opted-in template must stay byte-identical — the network guard is inert offline.
-A template is `validated` only for the exact engine version **and** netcode-addon SHA.
+Three gates, all headless + CI-friendly:
+
+1. **Import clean** — `Godot --headless --editor --path <dir> --quit`: zero parse /
+   script errors across the injected addon (all profiles).
+2. **API self-probe** — `res://addons/nox_netcode/net_probe.tscn`: one process hosts
+   on loopback ENet and drives the API, printing e.g.
+   `DEBUG: nox_netcode probe … host=true is_dm=true … seed=true teardown=true => OK`.
+   Proves the drop-in loads and the transport/authority/DM-seat/seed API is sound.
+3. **Regression** — the opted-in template's single-player boot probe must stay
+   **byte-identical** (the guard is inert when `Net.active` is false). Verified on
+   `ff-gamebook` @ 4.6.1: identical to the pre-injection line, `dm_noop=true` and all.
+
+**Honest limitation:** true two-peer sync (a client choice routing through the
+host, the DM steering both books, avatars moving on the other screen) needs **two
+running instances** and cannot be validated headless — the boot-probe proves it
+loads and the API is sound, not that packets flow between two peers. Run the manual
+two-instance steps in `addon/nox_netcode/README.md` to confirm live sync. A template
+is `validated` only for the exact engine version it was checked against.
 
 ## Do not
 

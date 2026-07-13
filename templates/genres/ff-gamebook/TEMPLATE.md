@@ -100,19 +100,42 @@ When you add a passage, add its `illustration/passage_N` slot with a
 `source.summary`; when you export, make sure `assets.manifest.json` ships
 (add `*.manifest.json` to the export include filters if you change presets).
 
-## Multiplayer-readiness (architecture only — no netcode yet)
+## Multiplayer (opt-in — the netcode drop-in now exists)
 
 All passage state, dice results and party flow route through **one**
 autoload with a clean interface: `SessionState.advance_passage()`,
 `choose()`, `roll()`/`roll_luck()`. Scenes react to its signals
 (`passage_changed`, `choice_made`, `roll_resolved`) and never own story
-state. That makes SessionState the future ENet sync point: the host
-validates + broadcasts these three calls, clients render off the same
-signals, and no scene changes. The DM seat's reserved entry points ship as
-documented no-ops returning `false`: `dm_push_passage(id)` (force the
-party's book to a passage) and `dm_override_roll(result)` (fudge a roll).
-Implement them host-side when the ENet layer lands; nothing calls them
-expecting work today.
+state. That makes SessionState the sync point, and the **`netcode` godogen
+skill** (`skills/netcode`, profile `authority-turn`) turns it into real
+multiplayer **without touching a single scene**:
+
+```bash
+python skills/netcode/tools/netcode_gen.py inject \
+    --project <this-project> --profile authority-turn --transport enet
+```
+
+This copies the reusable **`nox_netcode`** addon into `addons/`, registers
+the `Net` (session/lobby/transport/authority) and `NetBridge`
+(SessionState bridge + DM seat) autoloads, writes a `[nox_netcode]` settings
+block, and applies a **pinned guard patch** to `scripts/session_state.gd`:
+`advance_passage`/`choose`/`roll` route through the **host** (host validates +
+broadcasts; clients render off the same three signals), and the two DM-seat
+no-op hooks flip from `return false` to **real host-side implementations** —
+`dm_push_passage(id)` (force the party's book, `require_dm`) and
+`dm_override_roll(result)` (fudge a roll, `require_dm`). The host rolls with a
+broadcast shared seed so dice replay identically on every peer; party choices
+resolve via `leader` / `vote` / `dm-confirm` arbitration.
+
+Everything is **opt-in and non-destructive**: the guard is inert when
+`Net.active` is false, so single-player play is byte-identical (the boot probe
+above is unchanged after injection). Transport is **ENet for LAN** by default;
+switch `--transport websocket` for one desktop **and** web code path (spec
+Phase 3), or see the addon README for the WebRTC-for-web note (Phase 5). Play
+together by running `res://addons/nox_netcode/lobby.tscn` in two instances —
+host in one, join `127.0.0.1` in the other (`addons/nox_netcode/README.md` has
+the full two-instance and LAN/web steps). Full design:
+`Noxdev-Studio/docs/specs/MULTIPLAYER_TEMPLATE_SPEC.md`.
 
 ## How to extend
 
