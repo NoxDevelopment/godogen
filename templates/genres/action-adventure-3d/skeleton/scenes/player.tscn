@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://aa3dplayer01"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_p"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.5
+height = 2.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.5
+height = 2.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_1"]
+albedo_color = Color(0.45, 0.72, 0.95, 1)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_p")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_1")
+surface_material_override/0 = SubResource("Mat_1")

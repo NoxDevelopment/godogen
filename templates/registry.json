@@ -1520,6 +1520,45 @@
         "Banner splash / summon backdrop via zit-txt2img",
         "Summon whoosh + 5★ reveal stinger SFX"
       ]
+    },
+    {
+      "id": "action-adventure-3d",
+      "name": "Action Adventure 3D (Zelda-like dungeon, 3D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A third-person 3D action-adventure (Zelda-3D lineage): a CharacterBody3D hero with world-relative movement under a fixed follow camera, a jump, a SWORD swing (a short-lived Area3D hitbox that damages enemies), and LOCK-ON (face + strafe the nearest foe); enemies that chase and deal contact damage; and a gated DUNGEON quest — clear the room, find the KEY, touch the locked DOOR to unlock it, then defeat the BOSS. The quest + combat STATE lives in a GameManager autoload as pure, headless-testable logic with the ordering rules enforced (no door without the key, the boss can't be hit until the door is open, defeating the boss wins). The dungeon (floor, walls, doorway divider, key, door, room + boss chamber) is built in code from that state; player/enemy are their own CharacterBody3D scenes. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (hearts/key/door/boss/progress persist), pause + restart input, scalable_text HUD (hearts + objective). The 3D-quest genre — engine pin Godot 4.6 Forward+.",
+      "status": "validated",
+      "skeleton": "genres/action-adventure-3d/skeleton",
+      "doc": "genres/action-adventure-3d/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give the boss / dungeon NPCs a persona + voice via companion-npcs + Dialogue Manager for pre-boss taunts / quest-giver lines"
+        },
+        {
+          "skill": "3d-asset-pipeline",
+          "params": {},
+          "note": "swap the capsule player/enemy + box dungeon for real 3D models (blender-bridge normalize → GLB) and dungeon materials via the dungeon-tile texture preset"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Seamless dungeon wall / floor materials via dungeon-tile (zit-seamless-tile)",
+        "Hero + enemy + boss character models (concept via card-creature-art / qwen-char-turnaround → blender-bridge for GLB)",
+        "Key / heart / objective HUD icons via qwen-icon",
+        "A skybox / environment via viz-skybox-panorama",
+        "Sword swing / hit / door-unlock / boss-defeat SFX"
+      ]
     }
   ]
 }
