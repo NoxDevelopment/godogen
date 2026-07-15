@@ -60,6 +60,35 @@ Autoloads are addressable by name in dialogue (`GameManager.set_flag(...)`
 works the same way); add autoload names to Dialogue Manager's *State Autoload
 Shortcuts* project setting to drop the prefix.
 
+## Play a Studio-authored VN (Immersion Engine)
+
+Besides the hand-written `.dialogue` demo, this template ships a **JSON runtime**
+that plays a visual novel exported from the NoxDev **Studio VN Maker**
+(`/p/<slug>/vn-maker` → *Export Godot*, which writes `res://vn/story.vn.json`,
+format `noxdev-vn`):
+
+- `scripts/vn_runtime.gd` (`class_name VnRuntime`) — the pure Godot mirror of the
+  Studio helpers: `canonical_emotion()`, `resolve_sprite()` (the emotion
+  **portrait swap**: exact key → canonical emotion → neutral/default → first),
+  and `voice_instruction()` (base voiceStyle + per-emotion delivery).
+- `scenes/vn_player.tscn` + `scripts/vn_player.gd` — a self-contained runtime
+  (UI built in code) that reads the exported story and drives background,
+  portrait (swapped by each line's **expression**), dialogue, choices with flag
+  gating (`sets`/`requires`), and fall-through `next`.
+- **Voice (P2)**: each character carries `voice` / `voiceProvider` / `voiceStyle`;
+  per line the runtime resolves the emotion delivery and hands it to `_speak()`
+  (which logs `[VN voice] <name> | <provider>/<voice> | <instruction>` by
+  default). Override `_speak()` to synthesize with your TTS of choice or play a
+  pre-rendered clip — the fields are already parsed and resolved.
+- **Wiring**: `story.gd` auto-detects `res://vn/story.vn.json`; when present it
+  switches to `vn_player.tscn`, otherwise it runs the built-in dice demo. So a
+  fresh scaffold shows the demo; a Studio export makes it play your story with
+  zero code.
+
+Headless-verified (Godot 4.6.1): the runtime parses a sample export, resolves
+sprites/emotions/voice, renders the first line, gates + takes a flag-setting
+choice, and navigates — all assertions green.
+
 ## How to extend
 
 1. **Story**: add `.dialogue` files under `dialogue/` (DM's editor dock edits

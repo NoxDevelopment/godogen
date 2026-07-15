@@ -10,6 +10,11 @@ const INTRO_DIALOGUE := preload("res://dialogue/intro.dialogue")
 
 
 func _ready() -> void:
+	# If a VN was exported from the Studio VN Maker (Immersion Engine), play that
+	# JSON story instead of the built-in Dialogue Manager demo.
+	if FileAccess.file_exists("res://vn/story.vn.json"):
+		get_tree().change_scene_to_file.call_deferred("res://scenes/vn_player.tscn")
+		return
 	_start_story.call_deferred()
 
 
