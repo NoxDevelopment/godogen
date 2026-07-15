@@ -1,9 +1,17 @@
 extends Control
 ## res://scripts/main.gd
-## Deckbuilder combat controller: builds the starting deck from JSON card
-## definitions, runs the draw/play/discard loop (energy, block, hand refill,
-## discard-reshuffle), resolves card effects, and runs a minimal enemy that
-## attacks every turn. Win by emptying the enemy's HP, lose at 0 HP.
+## Deckbuilder COMBAT controller. Builds the hand deck, runs the draw/play/
+## discard loop (energy, block, hand refill, discard-reshuffle), resolves card
+## effects, and runs a minimal enemy that attacks every turn. Win by emptying
+## the enemy's HP, lose at 0 HP.
+##
+## When a ROGUELIKE RUN is active (GameManager.has_run), combat reads the run:
+## your persisted HP, your grown deck, the encounter the current map node
+## fields, and your relics (bonus energy / starting block / heal-on-kill). On
+## win it reports the result back (HP + gold + relic persist), offers a card
+## reward, and returns to the map; on loss it ends the run. With NO active run
+## the scene still plays standalone against the default Cog-Golem — so the base
+## template and its boot probe are unchanged.
 
 const STARTING_DECK: Array[String] = [
 	"strike", "strike", "strike",
@@ -11,18 +19,27 @@ const STARTING_DECK: Array[String] = [
 	"cleave", "insight", "insight", "surge",
 ]
 const HAND_SIZE := 5
-const MAX_ENERGY := 3
-const ENEMY_NAME := "Cog-Golem"
-const ENEMY_MAX_HP := 30
-const ENEMY_ATTACK := 8
-const PLAYER_MAX_HP := 40
+const BASE_ENERGY := 3
+const DEFAULT_ENEMY_NAME := "Cog-Golem"
+const DEFAULT_ENEMY_HP := 30
+const DEFAULT_ENEMY_ATTACK := 8
+const DEFAULT_PLAYER_HP := 40
 
 var turn := 0
 var energy := 0
 var block := 0
-var player_hp := PLAYER_MAX_HP
-var enemy_hp := ENEMY_MAX_HP
+var player_hp := DEFAULT_PLAYER_HP
+var player_max_hp := DEFAULT_PLAYER_HP
+var enemy_hp := DEFAULT_ENEMY_HP
 var combat_over := false
+
+# run-driven combat parameters (snapshotted at new_combat)
+var _run_active := false
+var _max_energy := BASE_ENERGY
+var _enemy_name := DEFAULT_ENEMY_NAME
+var _enemy_max_hp := DEFAULT_ENEMY_HP
+var _enemy_attack := DEFAULT_ENEMY_ATTACK
+var _is_boss := false
 
 var _probe_emitted := false
 
@@ -43,6 +60,7 @@ var _probe_emitted := false
 @onready var _banner_box: CenterContainer = $HUD/BannerBox
 @onready var _banner_label: Label = $HUD/BannerBox/Rows/BannerLabel
 @onready var _reset_button: Button = $HUD/BannerBox/Rows/ResetButton
+@onready var _banner_rows: VBoxContainer = $HUD/BannerBox/Rows
 
 
 func _ready() -> void:
@@ -59,9 +77,29 @@ func _process(_delta: float) -> void:
 
 
 func new_combat() -> void:
+	_run_active = GameManager.has_run and not GameManager.is_run_over()
+	_clear_reward_buttons()
+
+	if _run_active:
+		player_max_hp = GameManager.max_hp
+		player_hp = GameManager.hp
+		_max_energy = BASE_ENERGY + GameManager.relic_bonus_energy()
+		var enc: Dictionary = GameManager.current_encounter()
+		_enemy_name = String(enc.get("name", DEFAULT_ENEMY_NAME))
+		_enemy_max_hp = int(enc.get("max_hp", DEFAULT_ENEMY_HP))
+		_enemy_attack = int(enc.get("attack", DEFAULT_ENEMY_ATTACK))
+		_is_boss = String(enc.get("kind", "")) == "boss"
+	else:
+		player_max_hp = DEFAULT_PLAYER_HP
+		player_hp = DEFAULT_PLAYER_HP
+		_max_energy = BASE_ENERGY
+		_enemy_name = DEFAULT_ENEMY_NAME
+		_enemy_max_hp = DEFAULT_ENEMY_HP
+		_enemy_attack = DEFAULT_ENEMY_ATTACK
+		_is_boss = false
+
 	turn = 0
-	player_hp = PLAYER_MAX_HP
-	enemy_hp = ENEMY_MAX_HP
+	enemy_hp = _enemy_max_hp
 	block = 0
 	combat_over = false
 	_banner_box.visible = false
@@ -69,7 +107,7 @@ func new_combat() -> void:
 	_hand.clear_cards()
 	_discard.clear_cards()
 	_deck.clear_cards()
-	var order := STARTING_DECK.duplicate()
+	var order: Array[String] = (GameManager.deck.duplicate() if _run_active else STARTING_DECK.duplicate())
 	order.shuffle()
 	for card_name in order:
 		_factory.create_card(card_name, _deck)
@@ -83,8 +121,9 @@ func new_combat() -> void:
 
 func start_turn() -> void:
 	turn += 1
-	energy = MAX_ENERGY
-	block = 0
+	energy = _max_energy
+	# a relic can plate you with block at the top of every turn.
+	block = GameManager.relic_start_block() if _run_active else 0
 	draw_cards(HAND_SIZE - _hand.get_card_count())
 
 
@@ -111,7 +150,7 @@ func end_turn() -> void:
 	while _hand.get_card_count() > 0:
 		_discard.move_cards(_hand.get_random_cards(1), -1, false)
 	# Enemy acts: block soaks its attack, the rest hits the player.
-	player_hp -= maxi(ENEMY_ATTACK - block, 0)
+	player_hp -= maxi(_enemy_attack - block, 0)
 	if player_hp <= 0:
 		player_hp = 0
 		_finish_combat("DEFEAT")
@@ -150,6 +189,8 @@ func _on_card_played(card: Card) -> void:
 	_discard.move_cards([card], -1, false)
 	GameManager.set_flag("cards_played", int(GameManager.get_flag("cards_played", 0)) + 1)
 	if enemy_hp <= 0:
+		if _run_active:
+			player_hp = mini(player_max_hp, player_hp + GameManager.relic_heal_on_kill())
 		_finish_combat("VICTORY")
 
 
@@ -157,23 +198,72 @@ func _finish_combat(verdict: String) -> void:
 	combat_over = true
 	_banner_label.text = verdict
 	_banner_box.visible = true
-	if verdict == "VICTORY":
-		GameManager.set_flag("battles_won", int(GameManager.get_flag("battles_won", 0)) + 1)
+
+	if not _run_active:
+		# standalone: the classic reset-to-fight-again button (unchanged).
+		if verdict == "VICTORY":
+			GameManager.set_flag("battles_won", int(GameManager.get_flag("battles_won", 0)) + 1)
+		_reset_button.visible = true
+		return
+
+	# roguelike: feed the result back into the run, then route the player.
+	_reset_button.visible = false
+	GameManager.resolve_combat(verdict == "VICTORY", player_hp)
+	if verdict != "VICTORY":
+		_banner_label.text = "DEFEAT — the run ends."
+		_add_reward_button("Return to map", _return_to_map)
+		return
+	if _is_boss:
+		_banner_label.text = "The Archivist falls — you win the run!"
+		_add_reward_button("Return to map", _return_to_map)
+		return
+	# a normal/elite win: offer a card to add to the deck (or skip).
+	_banner_label.text = "Victory! Add a card to your deck:"
+	for card_id in GameManager.roll_rewards():
+		var cid := card_id
+		_add_reward_button(_reward_label(cid), func() -> void:
+			GameManager.add_card(cid)
+			_return_to_map())
+	_add_reward_button("Skip", _return_to_map)
+
+
+func _reward_label(card_id: String) -> String:
+	return "Take: %s" % card_id.capitalize()
+
+
+func _add_reward_button(text: String, cb: Callable) -> void:
+	var b := Button.new()
+	b.text = text
+	b.add_to_group(&"scalable_text")
+	b.add_to_group(&"reward_button")
+	b.pressed.connect(cb)
+	_banner_rows.add_child(b)
+
+
+func _clear_reward_buttons() -> void:
+	for b in get_tree().get_nodes_in_group(&"reward_button"):
+		if is_instance_valid(b):
+			b.queue_free()
+	_reset_button.visible = true
+
+
+func _return_to_map() -> void:
+	get_tree().change_scene_to_file("res://scenes/map.tscn")
 
 
 func _refresh_hud() -> void:
 	_turn_label.text = "Turn %d" % turn
-	_energy_label.text = "Energy %d/%d" % [energy, MAX_ENERGY]
+	_energy_label.text = "Energy %d/%d" % [energy, _max_energy]
 	_block_label.text = "Block %d" % block
-	_player_hp_label.text = "HP %d/%d" % [player_hp, PLAYER_MAX_HP]
+	_player_hp_label.text = "HP %d/%d" % [player_hp, player_max_hp]
 	_deck_label.text = "Deck: %d" % _deck.get_card_count()
 	_discard_label.text = "Discard: %d" % _discard.get_card_count()
-	_enemy_hp_label.text = "%s  %d/%d" % [ENEMY_NAME, enemy_hp, ENEMY_MAX_HP]
-	_intent_label.text = "Intent: Attack %d" % ENEMY_ATTACK
+	_enemy_hp_label.text = "%s  %d/%d" % [_enemy_name, enemy_hp, _enemy_max_hp]
+	_intent_label.text = "Intent: Attack %d" % _enemy_attack
 
 
 func _emit_boot_probe() -> void:
-	print("DEBUG: deckbuilder core loop ready — deck=%d hand=%d discard=%d energy=%d/%d enemy_hp=%d turn=%d" % [
+	print("DEBUG: deckbuilder core loop ready — deck=%d hand=%d discard=%d energy=%d/%d enemy_hp=%d turn=%d run=%s" % [
 		_deck.get_card_count(), _hand.get_card_count(), _discard.get_card_count(),
-		energy, MAX_ENERGY, enemy_hp, turn,
+		energy, _max_energy, enemy_hp, turn, str(_run_active),
 	])
