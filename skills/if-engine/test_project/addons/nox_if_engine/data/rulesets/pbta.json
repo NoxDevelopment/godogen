@@ -1,0 +1,42 @@
+{
+  "id": "pbta",
+  "name": "PbtA-style (2d6 + stat, threshold bands)",
+  "meta": {
+    "family": "threshold-bands",
+    "license": "genericised — NoxDev reimplementation of the 2d6 move-with-stat threshold structure (miss / partial / full); no third-party text or trademarks.",
+    "degreesOfSuccess": ["miss", "partial", "full"],
+    "status": "P0 FAMILY-EXPRESSIBILITY FIXTURE — proves the generic resolver expresses threshold-bands (no per-check target; the total maps into numeric outcome ranges) as data. The full builtin (playbooks, moves, advancement) lands in P2 alongside the Ruleset Builder."
+  },
+  "dice": { "default": "2d6" },
+  "attributes": [
+    { "key": "cool",  "label": "Cool",  "gen": "0", "min": -3, "max": 3, "default": 0 },
+    { "key": "hard",  "label": "Hard",  "gen": "0", "min": -3, "max": 3, "default": 0 },
+    { "key": "hot",   "label": "Hot",   "gen": "0", "min": -3, "max": 3, "default": 0 },
+    { "key": "sharp", "label": "Sharp", "gen": "0", "min": -3, "max": 3, "default": 0 },
+    { "key": "weird", "label": "Weird", "gen": "0", "min": -3, "max": 3, "default": 0 }
+  ],
+  "resources": [
+    { "key": "harm", "label": "Harm", "default": 0, "min": 0, "max": 6 }
+  ],
+  "sheetTemplate": {
+    "attributes": ["cool", "hard", "hot", "sharp", "weird"],
+    "resources": ["harm"],
+    "inventory": true
+  },
+  "resolutionRules": [
+    {
+      "id": "move",
+      "label": "Make a move (2d6 + stat)",
+      "dice": "2d6",
+      "operands": [
+        { "type": "attributeArg", "ref": "stat", "role": "modifier" }
+      ],
+      "compare": "threshold-bands",
+      "bands": [
+        { "id": "miss",    "max": 6,          "label": "Miss (the GM makes a move)" },
+        { "id": "partial", "min": 7, "max": 9, "label": "Partial success (success at a cost)" },
+        { "id": "full",    "min": 10,         "label": "Full success" }
+      ]
+    }
+  ]
+}

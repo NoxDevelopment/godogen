@@ -1,0 +1,46 @@
+{
+  "id": "srd-d20",
+  "name": "d20 SRD-style (1d20 + modifier vs DC)",
+  "meta": {
+    "family": "meet-or-beat",
+    "license": "genericised — NoxDev reimplementation of the open d20 check math (roll + ability modifier vs a Difficulty Class); no third-party text or trademarks.",
+    "degreesOfSuccess": ["critFailure", "failure", "success", "critSuccess"],
+    "status": "P0 FAMILY-EXPRESSIBILITY FIXTURE — proves the generic resolver expresses meet-or-beat + natural-crit + ability-modifier as data. The full builtin (skills, saves, advancement, full sheet) lands in P2 alongside the Ruleset Builder."
+  },
+  "dice": { "default": "1d20" },
+  "attributes": [
+    { "key": "STR", "label": "Strength",     "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "DEX", "label": "Dexterity",    "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "CON", "label": "Constitution", "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "INT", "label": "Intelligence", "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "WIS", "label": "Wisdom",       "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "CHA", "label": "Charisma",     "gen": "3d6", "min": 1, "max": 30, "default": 10 }
+  ],
+  "resources": [
+    { "key": "HP", "label": "Hit Points", "default": 10, "min": 0, "trackMax": true }
+  ],
+  "sheetTemplate": {
+    "attributes": ["STR", "DEX", "CON", "INT", "WIS", "CHA"],
+    "resources": ["HP"],
+    "inventory": true
+  },
+  "resolutionRules": [
+    {
+      "id": "ability-check",
+      "label": "Ability check vs DC",
+      "dice": "1d20",
+      "operands": [
+        { "type": "attributeArg", "ref": "ability", "role": "modifier", "transform": "abilityMod" },
+        { "type": "param",        "ref": "dc",      "role": "target",   "default": 10 }
+      ],
+      "compare": "meet-or-beat",
+      "crit": { "mode": "natural", "low": "fail", "high": "success" },
+      "bands": [
+        { "id": "critSuccess", "when": "critSuccess", "label": "Critical success" },
+        { "id": "success",     "when": "success",     "label": "Success" },
+        { "id": "failure",     "when": "fail",        "label": "Failure" },
+        { "id": "critFailure", "when": "critFail",    "label": "Critical failure" }
+      ]
+    }
+  ]
+}
