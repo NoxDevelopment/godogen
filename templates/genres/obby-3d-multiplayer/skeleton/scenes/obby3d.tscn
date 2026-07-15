@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://obby3dmain001"]
+
+[ext_resource type="Script" path="res://scripts/obby3d.gd" id="1_obby3d"]
+[ext_resource type="Script" path="res://addons/nox_netcode/net_spawner_3d.gd" id="2_spawn3"]
+[ext_resource type="Script" path="res://addons/nox_netcode/net_events.gd" id="3_evt"]
+
+[node name="Obby3D" type="Node3D"]
+script = ExtResource("1_obby3d")
+
+[node name="Avatars" type="Node3D" parent="."]
+
+[node name="NetSpawner" type="Node" parent="."]
+script = ExtResource("2_spawn3")
+avatar_parent_path = NodePath("../Avatars")
+
+[node name="NetEvents" type="Node" parent="."]
+script = ExtResource("3_evt")

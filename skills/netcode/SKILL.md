@@ -81,7 +81,9 @@ wholesale into a target project's `addons/nox_netcode/`:
 | `session_bridge.gd` | authority-turn | **`NetBridge`** | Wraps `SessionState`: host-authoritative `advance_passage`/`choose`/`roll`, arbitration (`leader`/`vote`/`dm-confirm`), seeded dice broadcast, real `dm_push_passage`/`dm_override_roll` (`require_dm`). |
 | `net_player.gd` | realtime | — | Authority-at-spawn `CharacterBody2D` avatar; code-built `MultiplayerSynchronizer` (position/velocity always, facing/moving on-change). |
 | `net_spawner.gd` | realtime | — | `MultiplayerSpawner` wiring: one avatar per peer, spawn points from the `net_spawn_point` group, despawn on leave. |
-| `net_events.gd` | realtime | — | Host-validated checkpoint/respawn/finish RPCs + shared race clock (netfox `NetworkTime` if present, else host-owned float). |
+| `net_player_3d.gd` | realtime | — | **3D twin** of `net_player.gd` — a `CharacterBody3D` authority avatar, `Vector3` position/velocity synced, yaw (`facing`) applied on both owner and remote. For 3D obbies / co-op / party games. |
+| `net_spawner_3d.gd` | realtime | — | **3D twin** of `net_spawner.gd` — spawns `Node3D`-rooted avatars from the `net_spawn_point` group (`Node3D`/`Marker3D`) with `Vector3` positions. |
+| `net_events.gd` | realtime | — | Host-validated checkpoint/respawn/finish RPCs + shared race clock (netfox `NetworkTime` if present, else host-owned float). **Dimension-agnostic** — the same file drives 2D and 3D obbies unchanged. |
 | `net_probe.tscn/.gd` | both | — | Headless self-test: drives the API, prints one `DEBUG:` line, quits. |
 
 ## Subcommands
@@ -140,8 +142,12 @@ a level root holding a `net_spawner.gd` node (its `player_scene` = a
 the `net_spawn_point` group; checkpoints/finish calling
 `NetEvents.report_checkpoint(i)` / `report_finish()` so the host owns the order.
 No scene code changes for the netcode itself — same intercept-at-the-boundary
-promise. Until the template exists, `realtime` is validated against a scratch
-`CharacterBody2D` platformer (the addon self-probe already runs under it).
+promise. **Both obby templates now ship this pre-wired:** `obby-multiplayer`
+(2D, `net_player.gd`/`net_spawner.gd`) and `obby-3d-multiplayer` (3D,
+`net_player_3d.gd`/`net_spawner_3d.gd`) — same `Net`, same `NetEvents`, same
+offline↔online seam, only the avatar dimension differs. Each is boot-verified
+headless (import clean + the addon self-probe + a run-engine/integration probe
+`fails=0`); true 2-peer avatar sync still needs two live instances.
 
 ## Transport choice
 

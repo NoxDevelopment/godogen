@@ -50,12 +50,16 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "platformer" },
+          "params": {
+            "template": "platformer"
+          },
           "note": "the platformer action set is already baked into the skeleton's project.godot; re-run only to add gamepad rebinding UI"
         },
         {
           "skill": "camera-rigs",
-          "params": { "kind": "sidescroller" },
+          "params": {
+            "kind": "sidescroller"
+          },
           "note": "the player carries a Camera2D whose limits are clamped to the current MetSys room; swap in the sidescroller rig for deadzone/look-ahead"
         },
         {
@@ -198,7 +202,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "fps" },
+          "params": {
+            "template": "fps"
+          },
           "note": "COGITO's full action set (32 actions, keyboard + gamepad) is baked into the skeleton's project.godot and Input Helper provides runtime rebinding — do not re-emit the fps template over it; use this skill only for reference when adding new actions"
         },
         {
@@ -344,7 +350,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "topdown" },
+          "params": {
+            "template": "topdown"
+          },
           "note": "the topdown action set is baked into the skeleton's project.godot ('dash' doubles as shmup focus-slowdown); re-run only for rebinding UI"
         },
         {
@@ -454,7 +462,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "topdown" },
+          "params": {
+            "template": "topdown"
+          },
           "note": "the topdown action set is already baked into the skeleton's project.godot; re-run only to add gamepad rebinding UI (right-stick aim is the main gamepad gap)"
         },
         {
@@ -676,7 +686,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "topdown" },
+          "params": {
+            "template": "topdown"
+          },
           "note": "the movement action set is baked into the skeleton's project.godot; re-run only for rebinding UI"
         },
         {
@@ -847,7 +859,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "fps" },
+          "params": {
+            "template": "fps"
+          },
           "note": "the fly/dig/place action set is baked into the skeleton's project.godot; re-run only for rebinding UI when a walking controller lands"
         },
         {
@@ -892,7 +906,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "topdown" },
+          "params": {
+            "template": "topdown"
+          },
           "note": "movement actions are baked into the skeleton's project.godot (the weapon aims itself — no aim/attack actions needed); re-run only for rebinding UI"
         },
         {
@@ -938,7 +954,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "topdown" },
+          "params": {
+            "template": "topdown"
+          },
           "note": "the adventure action set (move, attack=Space, item=Shift, interact=E) is baked into the skeleton's project.godot; re-run only for rebinding UI"
         },
         {
@@ -1035,7 +1053,9 @@
       "primitives": [
         {
           "skill": "input-handling",
-          "params": { "template": "fps" },
+          "params": {
+            "template": "fps"
+          },
           "note": "the arena action set (move, jump, sprint, fire, weapon_next/1/2, pause) is baked into the skeleton's project.godot; re-run only for rebinding UI"
         },
         {
@@ -1141,7 +1161,10 @@
         "arbitrationNote": "'leader' resolves party choices immediately and works with the UNMODIFIED book scene (validated). 'vote' and 'dm-confirm' are fully implemented but defer the commit until a majority/DM approves — their deferred-commit UX needs a small MP-aware book hook (connect NetBridge.choice_committed/remote_advance and skip the optimistic walk), a Phase-2 finish. DM push/override work in every mode.",
         "skill": "netcode",
         "addon": "nox_netcode",
-        "autoloads": ["Net", "NetBridge"],
+        "autoloads": [
+          "Net",
+          "NetBridge"
+        ],
         "note": "Opt-in: NOT applied by default scaffolding. Advertises 'Playable together' to the Studio genre picker; run the netcode primitive to inject it. Offline play is untouched (the SessionState guard is inert when Net.active is false).",
         "validated": {
           "engineVersion": "4.6.1-stable",
@@ -1497,6 +1520,48 @@
         "Player avatar sprite + run/jump/fall cycles via zit-pixel-art / wan22-sprite-animate",
         "Checkpoint flag + finish banner art via zit-txt2img/qwen-icon",
         "Parallax course backdrop via image-parallax-depthflow / zit-txt2img",
+        "Jump / checkpoint / death / finish SFX"
+      ]
+    },
+    {
+      "id": "obby-3d-multiplayer",
+      "name": "Obby 3D Multiplayer (3D obstacle course, netcode drop-in)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A 3D obstacle-course platformer (obby, Roblox-obby style) that ships the nox_netcode realtime drop-in pre-wired — the 3D twin of obby-multiplayer. Avatars are CharacterBody3D with world-relative WASD + jump; the COURSE is built entirely in code from data (StaticBody3D+BoxShape3D platforms, ordered Area3D checkpoint gates, Area3D hazards, a finish Area3D, a KILL_Y fall line) under a fixed follow Camera3D. GameManager (reused verbatim from the 2D obby — it is dimension-agnostic) holds the run as pure, headless-testable logic (monotonic checkpoint progress with anti-skip, deaths, a live/best time, save/load). It runs two ways from one codebase: OFFLINE it spawns one local CharacterBody3D avatar and handles checkpoint/respawn/finish itself (a complete single-player obby, no multiplayer dependency); ONLINE (a nox_netcode session running) the NetSpawner3D spawns one avatar per peer via MultiplayerSpawner+MultiplayerSynchronizer (Vector3 sync) and checkpoint/respawn/finish route through NetEvents so the host arbitrates an authoritative, cheat-resistant race. Vendored addon: nox_netcode (Net autoload, realtime profile, ENet transport; ships net_player_3d.gd + net_spawner_3d.gd alongside the 2D avatar/spawner). NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (best time persists), pause input, scalable_text.",
+      "status": "validated",
+      "skeleton": "genres/obby-3d-multiplayer/skeleton",
+      "doc": "genres/obby-3d-multiplayer/TEMPLATE.md",
+      "vendoredAddons": [],
+      "bundledAddons": [
+        {
+          "name": "nox_netcode",
+          "source": "godogen skills/netcode/addon/nox_netcode",
+          "license": "MIT",
+          "note": "The NoxDev realtime multiplayer drop-in (Net autoload + host-validated NetEvents), shipped IN the skeleton because the obby is its reference realtime consumer. 3D note: this template drives the CharacterBody3D avatar net_player_3d.gd + the Node3D-positioned net_spawner_3d.gd (both added additively to the addon); the dimension-agnostic core (net_session.gd, net_events.gd) is shared unchanged with the 2D obby. Keep it in sync with the skill's copy. True 2-peer sync needs two running instances (see TEMPLATE.md)."
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "hunyuan3d",
+          "params": {},
+          "note": "swap the BoxMesh platforms/capsule avatar for real 3D meshes: course props + a rigged character (.glb), materials/normal maps, a skybox on the WorldEnvironment"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Modular platform + hazard meshes (.glb) via hunyuan3d / trellis",
+        "Rigged runner character + run/jump/fall anims via meshy / mixamo-style retarget",
+        "Checkpoint flag + finish banner props via hunyuan3d",
+        "Skybox / HDRI for the WorldEnvironment",
         "Jump / checkpoint / death / finish SFX"
       ]
     },
