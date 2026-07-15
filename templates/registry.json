@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-07-12",
+  "updated": "2026-07-14",
   "templates": [
     {
       "id": "metroidvania",
@@ -1245,6 +1245,44 @@
         "Wall tileset (32px grid, top-down with slight top face)",
         "Muzzle flash + impact spark sprites (small, additive)",
         "Practice target / destructible prop sprite (~32x32 px)"
+      ]
+    },
+    {
+      "id": "city-builder",
+      "name": "City Builder (grid economy, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Grid-based city-builder base (pure first-party Godot, no addons): a GameManager autoload owns the economy - gold/food/population + a data-driven building catalogue (House +2 pop/-1 food, Farm +3 food, Market +4 gold, needs population) - with place()/demolish()/tick() as headless-testable logic; a 16x9 build grid drawn in code (blockout colours) with left-click place / right-click demolish / Esc pause, a resource HUD, and an affordability-gated building palette. NoxDev ABI: Master/Music/SFX buses, GameManager in game_manager+persistent groups with save_data/load_data (the whole city serialises), pause input, scalable_text HUD. Economy loop: farms feed houses, houses make population, population powers markets, markets make gold.",
+      "status": "validated",
+      "skeleton": "genres/city-builder/skeleton",
+      "doc": "genres/city-builder/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the grid is drawn in code; use world-layout if you swap to a TileMapLayer for zones/districts"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "replace the _draw() blockout rects with building sprites/tiles (genre-workflow recipes: tiles via zit-seamless-tile, icons via qwen-icon)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Building sprites/tiles keyed by type_id (house/farm/market, ~48px) to replace the _draw() blockout colours",
+        "A ground tileset (grass/dirt/road) for the grid via zit-seamless-tile",
+        "Resource + building icons (gold/food/population; house/farm/market) via qwen-icon",
+        "Ambient city loop + a soft placement SFX"
       ]
     }
   ]
