@@ -1443,6 +1443,44 @@
         "Casebook / notebook UI chrome via qwen-txt2img",
         "Rain / jazz / gunshot ambience + SFX"
       ]
+    },
+    {
+      "id": "match-three",
+      "name": "Match Three (grid puzzle / minigame, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A match-3 grid puzzle (Bejeweled/Candy-Crush lineage) — the classic dating-sim/gacha minigame — with the whole BOARD engine in a GameManager autoload as pure, seedable, headless-testable logic: an 8x8 grid of gem types generated with NO pre-made matches and a guaranteed legal move; try_swap validates an adjacent swap (only a swap that makes a line of 3+ commits, else it reverts), then resolves the full cascade — clear matched runs (score = gems x 10 x the chain step, so deeper cascades pay more), gravity pulls gems down, new gems refill from the top, repeat until stable; find_matches scans H+V runs; has_legal_move probes every adjacent swap and auto-reshuffles a dead board. match3.gd renders the gem grid in code, click a gem then an adjacent gem to swap, with a score/moves HUD + chain banner. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (the exact board + score persist), pause + restart input, scalable_text. Drops in as a standalone game or a minigame inside a larger title.",
+      "status": "validated",
+      "skeleton": "genres/match-three/skeleton",
+      "doc": "genres/match-three/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat-color gem buttons for real gem/candy sprites (recipes: gem icons via qwen-icon, board backdrop via zit-txt2img)"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook swap/clear/cascade for juice — pop/scale on clear, screen shake on big chains, particle bursts"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "6 gem / candy icons (one per type id) via qwen-icon",
+        "Board frame + background via zit-txt2img",
+        "Score / combo / chain HUD chrome via qwen-txt2img",
+        "Match / cascade / reshuffle SFX + a stinger for big chains"
+      ]
     }
   ]
 }
