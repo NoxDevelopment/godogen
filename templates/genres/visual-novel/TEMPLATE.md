@@ -79,7 +79,9 @@ format `noxdev-vn`):
   `requireVars` (numeric conditions ≥ ≤ = > < ≠); `VnRuntime.apply_var_ops` +
   `var_conditions_met` mirror the Studio helpers, so affection/gold/… gate
   choices identically in the exported game (unset vars read as 0). The
-  dating-sim/RPG backbone.
+  dating-sim/RPG backbone. **Inventory** is just variables under the `item.`
+  prefix — `give a key` = `item.key+1`, `needs a key` = `item.key>=1` — so the
+  same engine drives it; render `item.*` vars as an inventory list in your UI.
 - **Voice (P2)**: each character carries `voice` / `voiceProvider` / `voiceStyle`;
   per line the runtime resolves the emotion delivery and hands it to `_speak()`
   (which logs `[VN voice] <name> | <provider>/<voice> | <instruction>` by
