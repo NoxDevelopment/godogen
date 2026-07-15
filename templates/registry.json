@@ -1404,6 +1404,45 @@
         "Parallax course backdrop via image-parallax-depthflow / zit-txt2img",
         "Jump / checkpoint / death / finish SFX"
       ]
+    },
+    {
+      "id": "noir-detective",
+      "name": "Noir Detective (investigation + deduction, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A film-noir detective game where the play IS deduction (Lacuna / Snatcher lineage), not twitch. The whole CASE is a data-driven catalogue in a GameManager autoload as pure, headless-testable logic: suspects, locations, clues (staged per location), and deductions (each unlocked by the right clue set). You investigate locations to surface clues, combine the right clues into deductions (motive / means / opportunity), and only once the deduction chain is complete may you accuse — noir plays fair, no naming a name on a hunch; accuse the real culprit and the case closes solved, accuse wrong and they walk. The investigation scene (noir.gd) builds a three-column casebook in code in a noir palette (Investigate / Casebook / Deductions + Accuse) and only reads the engine. Ships a complete sample case, 'The Neon Alibi'. Swap the SUSPECTS/LOCATIONS/CLUES/DEDUCTIONS/CULPRIT consts to author a new case with zero UI changes. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (an in-progress case — clues found, deductions made — persists), pause + restart input, scalable_text.",
+      "status": "validated",
+      "skeleton": "genres/noir-detective/skeleton",
+      "doc": "genres/noir-detective/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give each suspect a persona/voice via companion-npcs + Dialogue Manager for interrogation scenes between deductions"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the code UI for real location art + suspect portraits (recipes: noir scene + noir portrait presets via zit-txt2img)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Moody chiaroscuro location backdrops (office / club / alley / docks) via a noir scene preset over zit-txt2img",
+        "Film-noir suspect portraits via a noir portrait preset over zit-txt2img / qwen-char-turnaround",
+        "Clue / evidence item icons via qwen-icon",
+        "Casebook / notebook UI chrome via qwen-txt2img",
+        "Rain / jazz / gunshot ambience + SFX"
+      ]
     }
   ]
 }
