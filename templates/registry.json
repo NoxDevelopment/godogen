@@ -1208,6 +1208,61 @@
       ]
     },
     {
+      "id": "gamebook-if",
+      "name": "Gamebook IF (playable computed if-engine gamebook)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "The PLAYABLE standard single-player gamebook on the computed Nox Loom if-engine (nox_if_engine, spec P0-P2) -- a data-driven text-RPG that plays 100% WITHOUT any AI or networking. The nox_if_engine addon is VENDORED into addons/ (self-contained: the seedable dice roller, the generic data-driven resolver, the narrative-graph scenario model, dual-tier characters, one-off + campaign runners, and save/load), and this template is the playable UI that DRIVES it. A PlaySession autoload owns the active runner (IFOneOffRunner or IFCampaignRunner) and is the single bridge the UI talks to (the if-engine analogue of ff-gamebook's SessionState). The play scene renders the current passage (illustrated plate + title + text), builds CHOICE BUTTONS gated by the engine's conditions (effects applied on choose), surfaces the resolver's rolls in a dice tray (roll-under / meet-or-beat / threshold-bands, ruleset-agnostic), and shows a live adventure sheet + item.* inventory HUD built from the chosen ruleset's sheetTemplate. Supports BOTH a one-off adventure (Thornwood Crypt, reusing the engine's thornwood-crypt scenario + ff-2d6 ruleset) AND a linked multi-module campaign (Crown of Embers) with carried world state, dual-tier characters, and save/resume between modules via IFSaveGame. AI is an OPTIONAL, DISABLED-BY-DEFAULT, documented-inert seam (the AiDm autoload -- the place the future P4 AI-DM layer plugs in): there is NO LLM and NO fake AI; every call site is guarded by 'if AiDm.enabled' so the computed game is byte-identical with it off. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contracts, scalable_text, pause action) plus the asset-binding manifest (assets.manifest.json + AssetBinder) shared with ff-gamebook for illustrated plates. Does NOT modify the if-engine addon -- it consumes it.",
+      "status": "validated",
+      "skeleton": "genres/gamebook-if/skeleton",
+      "doc": "genres/gamebook-if/TEMPLATE.md",
+      "bundledAddons": [
+        {
+          "name": "nox_if_engine",
+          "source": "godogen skills/if-engine/addon/nox_if_engine",
+          "license": "MIT",
+          "note": "The computed IF/gamebook engine core (P0+P1+P2): seedable dice, the generic data-driven resolver, the narrative-graph scenario model, rulesets-as-data (ff-2d6/srd-d20/pbta/nox-2d10), modules, dual-tier characters, one-off + campaign runners, and two-half (short/long-term) save/load. Shipped IN the skeleton (not cloned at scaffold) so the template is self-contained. Consume-only: keep it in sync with skills/if-engine's copy; do not edit it here."
+        }
+      ],
+      "vendoredAddons": [],
+      "aiOptional": {
+        "status": "disabled-by-default",
+        "seam": "AiDm autoload (scripts/ai_dm.gd)",
+        "note": "The game plays 100% computed. AiDm.enabled is false and its hooks (narrate_passage, gloss_roll, review_choices, dm_intervene) are documented-inert pass-throughs -- NO LLM, NO networking, no fake AI. Every PlaySession call site is guarded by 'if AiDm.enabled', so the future P4 AI-DM layer fills this seam without the computed core depending on it."
+      },
+      "primitives": [
+        {
+          "skill": "if-engine",
+          "params": {},
+          "note": "the computed core is VENDORED under addons/nox_if_engine; author scenarios (passages/choices/conditions/effects/checks), rulesets-as-data, modules, one-offs and campaigns as JSON -- the play scene drives them unchanged"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "generate a theme.tres from the game palette and set it on the page panel, sheet bar, title screen, choice buttons and dice tray"
+        },
+        {
+          "skill": "image-pipeline",
+          "params": {},
+          "note": "per-passage illustration plates -- add an 'illustration/<passageId>' slot to assets.manifest.json; the plate binds real art with zero code changes (falls back to a titled placeholder)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Passage illustration plates (1280x720 or framed 800x500, ink/engraving look; one 'illustration/<passageId>' manifest slot per illustrated passage)",
+        "Adventure-sheet panel art (parchment 9-patch + stat glyphs; the sheet is ruleset-driven so glyphs should suit the chosen system's attributes/resources)",
+        "Dice-tray art for the 'ui/dice_tray' slot (leather tray + die faces; the tray renders any ruleset's roll -- 2d6 roll-under, d20 meet-or-beat, PbtA bands)",
+        "Title screen key art (1280x720, book-cover composition)"
+      ]
+    },
+    {
       "id": "top-down-action-unity",
       "name": "Top-Down Action (Unity)",
       "engine": "unity",

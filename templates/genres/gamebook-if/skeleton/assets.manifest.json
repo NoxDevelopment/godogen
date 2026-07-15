@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "stylePack": "veritas-ink",
+  "note": "Asset-board contract for gamebook-if. The if-engine plays entirely without art (deterministic titled placeholders). Passages need NO manifest entry — the plate falls back to a titled placeholder. Add an 'illustration/<passageId>' slot only for passages you want illustrated. UI chrome + two thornwood-crypt plates ship as examples of the Studio-board contract.",
+  "slots": [
+    {
+      "slotId": "ui/page_frame",
+      "kind": "ui",
+      "policy": "generated",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "An aged parchment page frame with a hand-drawn ink border, muted watercolor wash, 1980s Fighting-Fantasy gamebook plate styling, empty center.",
+      "file": null,
+      "provenance": null
+    },
+    {
+      "slotId": "ui/dice_tray",
+      "kind": "ui",
+      "policy": "generated",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "A worn leather dice tray, top-down, hand-drawn ink linework with muted watercolor, felt interior, old gamebook plate styling.",
+      "file": null,
+      "provenance": null
+    },
+    {
+      "slotId": "audio/page_turn",
+      "kind": "audio",
+      "policy": "static",
+      "workflowId": null,
+      "file": null,
+      "provenance": null
+    },
+    {
+      "slotId": "illustration/crypt_gate",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "Hand-drawn ink and muted watercolor gamebook plate: {passage_summary}",
+      "source": {
+        "adventure": "thornwood-crypt",
+        "passage": "crypt_gate",
+        "summary": "A bramble-choked sunken stair descends to an open iron crypt gate; cold air breathes from the dark below."
+      },
+      "file": null,
+      "provenance": null
+    },
+    {
+      "slotId": "illustration/antechamber",
+      "kind": "illustration",
+      "policy": "rule",
+      "workflowId": "zit-txt2img",
+      "stylePack": "veritas-ink",
+      "promptTemplate": "Hand-drawn ink and muted watercolor gamebook plate: {passage_summary}",
+      "source": {
+        "adventure": "thornwood-crypt",
+        "passage": "antechamber",
+        "summary": "A low vaulted crypt antechamber lit by torchlight; old gold coins glint in the grave-dust before a stone sarcophagus."
+      },
+      "file": null,
+      "provenance": null
+    }
+  ]
+}

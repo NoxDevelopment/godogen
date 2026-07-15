@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://gbifprobe01"]
+
+[ext_resource type="Script" path="res://scenes/boot_probe.gd" id="1_pr"]
+
+[node name="BootProbe" type="Node"]
+script = ExtResource("1_pr")

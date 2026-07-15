@@ -1,0 +1,98 @@
+{
+  "id": "sunken-market",
+  "name": "The Sunken Market",
+  "version": "1.0.0",
+  "kind": "module",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "Campaign module 2. Gated behind module 1 (requires world.vault_opened). The companion-bound artisan takes the ember to a drowned bazaar; her ff-2d6 sheet is DERIVED from her companion interchange. Proves a second character tier + carried world/character state."
+  },
+  "ruleset": "ff-2d6",
+  "slots": [
+    { "id": "artisan", "role": "protagonist", "tier": "companion", "required": true }
+  ],
+  "entry": {
+    "start": "market_pier",
+    "requires": [
+      { "kind": "var", "key": "world.vault_opened", "cmp": ">=", "value": 1 }
+    ],
+    "onEntry": [
+      { "kind": "flag", "key": "world.reached_market", "value": true }
+    ]
+  },
+  "exit": {
+    "endings": {
+      "market-won": {
+        "outcome": "complete",
+        "effects": [
+          { "kind": "var", "key": "world.bargain_struck", "op": "set", "value": 1 }
+        ]
+      },
+      "market-lost": { "outcome": "fail" }
+    },
+    "default": { "outcome": "fail" }
+  },
+  "scenario": {
+    "id": "sunken-market-graph",
+    "name": "The Sunken Market",
+    "ruleset": "ff-2d6",
+    "start": "market_pier",
+    "passages": [
+      {
+        "id": "market_pier",
+        "title": "The Drowned Pier",
+        "text": "Lantern-boats crowd a flooded arcade where a whole bazaar sank and refused to close. The ember-amulet at your throat draws eyes the moment you step onto the pier — everyone here knows what an unspent ember is worth.",
+        "onEnter": [
+          { "kind": "flag", "key": "reached_pier", "value": true }
+        ],
+        "choices": [
+          { "id": "enter_market", "text": "Wade in to find the ember-broker.", "goto": "haggler" }
+        ]
+      },
+      {
+        "id": "haggler",
+        "title": "The Ember-Broker",
+        "text": "The broker is a heron-thin woman who prices you before she prices the ember. A good bargain here is a duel of nerve and patience. Test your Skill.",
+        "check": {
+          "rule": "test",
+          "args": { "attr": "SKILL" },
+          "outcomes": {
+            "success": {
+              "effects": [ { "kind": "var", "key": "char.coin", "op": "add", "value": 2 } ],
+              "goto": "market_deal"
+            },
+            "failure": {
+              "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -1 } ],
+              "goto": "market_deal"
+            }
+          }
+        }
+      },
+      {
+        "id": "market_deal",
+        "title": "The Terms",
+        "text": "The broker lays out her offer: a black PEARL that opens the tidewrights' quarter, in trade for a promise against the ember — not the ember itself, not yet. It is a fair, dangerous deal.",
+        "onEnter": [
+          { "kind": "item", "key": "pearl", "op": "grant", "value": 1 },
+          { "kind": "var", "key": "world.embers", "op": "add", "value": 1 }
+        ],
+        "choices": [
+          { "id": "seal_bargain", "text": "Seal the bargain and take the pearl.", "goto": "market_won" },
+          { "id": "walk_away", "text": "Refuse and keep the ember whole.", "goto": "market_lost" }
+        ]
+      },
+      {
+        "id": "market_won",
+        "title": "A Promise Against the Ember",
+        "text": "You press your thumb to the broker's ledger and the pearl is yours. The tidewrights' quarter opens ahead — and a debt, ember-shaped, follows you in.",
+        "ending": { "id": "market-won", "kind": "victory", "label": "The Black Pearl" }
+      },
+      {
+        "id": "market_lost",
+        "title": "The Ember Kept",
+        "text": "You close your hand over the ember and step back from the ledger. The broker only smiles; the quarter stays shut, and you leave the market as you came, one relic richer and one door poorer.",
+        "ending": { "id": "market-lost", "kind": "retreat", "label": "The Shut Quarter" }
+      }
+    ]
+  }
+}

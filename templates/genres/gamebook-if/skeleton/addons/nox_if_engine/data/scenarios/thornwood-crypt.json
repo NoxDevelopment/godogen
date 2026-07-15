@@ -1,0 +1,125 @@
+{
+  "id": "thornwood-crypt",
+  "name": "The Thornwood Crypt",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "A one-passage-at-a-time descent that exercises the whole P0 engine: passage traversal, a LUCK test with attrition, an item gate, a SKILL check that branches to an ending, and variable/attribute effects.",
+    "estimatedPassages": 9
+  },
+  "ruleset": "ff-2d6",
+  "start": "crypt_gate",
+  "sheet": { "SKILL": 9, "STAMINA": 20, "LUCK": 11, "provisions": 4 },
+  "init": {
+    "vars": { "gold": 0 },
+    "items": {},
+    "flags": {}
+  },
+  "passages": [
+    {
+      "id": "crypt_gate",
+      "title": "The Thornwood Crypt",
+      "text": "Bramble chokes the sunken stair. Cold air breathes from the dark below, carrying the smell of old stone and older silver. The iron gate hangs open, just wide enough.",
+      "onEnter": [
+        { "kind": "flag", "key": "entered_crypt", "value": true }
+      ],
+      "choices": [
+        { "id": "descend", "text": "Descend into the crypt.", "goto": "antechamber" }
+      ]
+    },
+    {
+      "id": "antechamber",
+      "title": "Antechamber",
+      "text": "Your torch gutters to life against a low vaulted room. Coins glint in the grave-dust — a handful of old gold — and a resined torch lies fresh in a wall bracket. A stone sarcophagus dominates the far wall.",
+      "onEnter": [
+        { "kind": "var",  "key": "gold",  "op": "add", "value": 5 },
+        { "kind": "item", "key": "torch", "op": "grant", "value": 1 }
+      ],
+      "choices": [
+        { "id": "search_sarcophagus", "text": "Search the sarcophagus.", "goto": "sarcophagus" }
+      ]
+    },
+    {
+      "id": "sarcophagus",
+      "title": "The Sarcophagus",
+      "text": "The lid is carved with a sleeping knight. Wedged in the effigy's stone fist is a heavy IRON KEY, green with age. As your fingers close on it, a mechanism clicks somewhere in the wall.",
+      "onEnter": [
+        { "kind": "item", "key": "iron_key", "op": "grant", "value": 1 }
+      ],
+      "choices": [
+        { "id": "pry_open", "text": "Pull the key free and step back.", "goto": "dart_trap" }
+      ]
+    },
+    {
+      "id": "dart_trap",
+      "title": "A Whisper of Darts",
+      "text": "The wall sighs. Slots open. Darts leap for your throat — Test your Luck.",
+      "check": {
+        "rule": "test-luck",
+        "args": {},
+        "outcomes": {
+          "success": { "goto": "iron_door" },
+          "failure": {
+            "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -2 } ],
+            "goto": "iron_door"
+          }
+        }
+      }
+    },
+    {
+      "id": "iron_door",
+      "title": "The Iron Door",
+      "text": "Beyond the antechamber stands a banded iron door with a single keyhole. To its side, the mortar is cracked — perhaps a hidden lever, if you had the patience and no key.",
+      "choices": [
+        {
+          "id": "unlock",
+          "text": "Turn the iron key in the lock.",
+          "conditions": [ { "kind": "item", "key": "iron_key" } ],
+          "effects": [ { "kind": "item", "key": "iron_key", "op": "consume", "value": 1 } ],
+          "goto": "guardian"
+        },
+        {
+          "id": "hidden_lever",
+          "text": "Pry at the cracked mortar for a hidden lever.",
+          "goto": "dead_end"
+        }
+      ]
+    },
+    {
+      "id": "guardian",
+      "title": "The Silver Guardian",
+      "text": "The door swings to a treasury — and the tarnished silver statue guarding it grinds awake, raising a cold blade. You must strike true. Test your Skill.",
+      "check": {
+        "rule": "test",
+        "args": { "attr": "SKILL" },
+        "outcomes": {
+          "success": {
+            "effects": [ { "kind": "var", "key": "gold", "op": "add", "value": 10 } ],
+            "goto": "treasure"
+          },
+          "failure": {
+            "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -2 } ],
+            "goto": "flee"
+          }
+        }
+      }
+    },
+    {
+      "id": "treasure",
+      "title": "The Treasury",
+      "text": "The guardian topples in a ring of falling silver. Behind it, the hoard of the Thornwood knights is yours. You leave the crypt richer, and alive.",
+      "ending": { "id": "treasure", "kind": "victory", "label": "The Hoard of Thornwood" }
+    },
+    {
+      "id": "dead_end",
+      "title": "A Blank Wall",
+      "text": "The mortar gives onto nothing but more stone. Without the key, the iron door will not yield, and the crypt keeps its secret.",
+      "ending": { "id": "dead_end", "kind": "dead-end", "label": "The Sealed Door" }
+    },
+    {
+      "id": "flee",
+      "title": "A Bleeding Retreat",
+      "text": "The blade bites deep. You reel back through the iron door and haul it shut, the guardian's fists booming after you. You escape the crypt with your life, and nothing else.",
+      "ending": { "id": "flee", "kind": "retreat", "label": "Empty-Handed" }
+    }
+  ]
+}
