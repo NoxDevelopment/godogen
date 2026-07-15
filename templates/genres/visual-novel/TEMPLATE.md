@@ -75,6 +75,11 @@ format `noxdev-vn`):
   (UI built in code) that reads the exported story and drives background,
   portrait (swapped by each line's **expression**), dialogue, choices with flag
   gating (`sets`/`requires`), and fall-through `next`.
+- **Runtime variables (stats/meters)**: choices carry `setVars` (op set/add) +
+  `requireVars` (numeric conditions ≥ ≤ = > < ≠); `VnRuntime.apply_var_ops` +
+  `var_conditions_met` mirror the Studio helpers, so affection/gold/… gate
+  choices identically in the exported game (unset vars read as 0). The
+  dating-sim/RPG backbone.
 - **Voice (P2)**: each character carries `voice` / `voiceProvider` / `voiceStyle`;
   per line the runtime resolves the emotion delivery and hands it to `_speak()`
   (which logs `[VN voice] <name> | <provider>/<voice> | <instruction>` by

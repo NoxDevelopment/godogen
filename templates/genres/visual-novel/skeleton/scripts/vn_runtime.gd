@@ -94,3 +94,48 @@ static func voice_instruction(character: Dictionary, expression: String) -> Stri
 	if base != "":
 		return base
 	return emo_style
+
+
+## Apply a choice's numeric variable mutations (stats/meters; unset = 0). Mirrors
+## applyVarOps in the Studio helpers.
+static func apply_var_ops(vars: Dictionary, ops) -> Dictionary:
+	if ops == null:
+		return vars
+	var next := vars.duplicate()
+	for o in ops:
+		var key := str(o.get("key", ""))
+		if key == "":
+			continue
+		var cur := float(next.get(key, 0))
+		var val := float(o.get("value", 0))
+		next[key] = (cur + val) if str(o.get("op", "")) == "add" else val
+	return next
+
+
+## True when every numeric condition holds against the variables (unset = 0).
+static func var_conditions_met(vars: Dictionary, conds) -> bool:
+	if conds == null:
+		return true
+	for c in conds:
+		var v := float(vars.get(str(c.get("key", "")), 0))
+		var target := float(c.get("value", 0))
+		match str(c.get("cmp", "")):
+			">=":
+				if not (v >= target):
+					return false
+			"<=":
+				if not (v <= target):
+					return false
+			"==":
+				if not (v == target):
+					return false
+			">":
+				if not (v > target):
+					return false
+			"<":
+				if not (v < target):
+					return false
+			"!=":
+				if not (v != target):
+					return false
+	return true

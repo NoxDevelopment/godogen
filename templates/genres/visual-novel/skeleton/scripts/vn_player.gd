@@ -18,6 +18,7 @@ var _order := []       # scene ids in author order (for last-scene detection)
 var _scene_id := ""
 var _line_idx := 0
 var _flags := {}
+var _vars := {}  # numeric stats/meters (Immersion P4)
 
 var _bg_color: ColorRect
 var _bg: TextureRect
@@ -112,7 +113,10 @@ func _speak(character: Dictionary, expression: String) -> void:
 
 
 func _render_choices(sc: Dictionary) -> void:
+	# remove_child detaches immediately (queue_free alone is deferred, so a
+	# same-frame re-render would briefly stack stale buttons).
 	for c in _choices.get_children():
+		_choices.remove_child(c)
 		c.queue_free()
 	var lines: Array = sc.get("lines", [])
 	var at_last := _line_idx >= lines.size() - 1
@@ -123,6 +127,8 @@ func _render_choices(sc: Dictionary) -> void:
 			if not _flags.get(str(r), false):
 				ok = false
 				break
+		if ok and not VnRuntime.var_conditions_met(_vars, ch.get("requireVars", [])):
+			ok = false
 		if ok:
 			visible.append(ch)
 	if at_last and not visible.is_empty():
@@ -140,6 +146,7 @@ func _render_choices(sc: Dictionary) -> void:
 func _on_choice(ch: Dictionary) -> void:
 	for f in ch.get("sets", []):
 		_flags[str(f)] = true
+	_vars = VnRuntime.apply_var_ops(_vars, ch.get("setVars", []))
 	var goto := str(ch.get("goto", ""))
 	if goto != "" and _scenes.has(goto):
 		_scene_id = goto
