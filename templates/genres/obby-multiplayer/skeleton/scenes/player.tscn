@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://obbyplayer01"]
+
+[ext_resource type="Script" path="res://addons/nox_netcode/net_player.gd" id="1_np"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(28, 40)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_np")
+left_action = &"move_left"
+right_action = &"move_right"
+jump_action = &"jump"
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Body" type="ColorRect" parent="."]
+offset_left = -14.0
+offset_top = -20.0
+offset_right = 14.0
+offset_bottom = 20.0
+color = Color(0.45, 0.72, 0.95, 1)
