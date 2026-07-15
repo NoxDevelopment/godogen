@@ -42,10 +42,15 @@ func _init() -> void:
 	pass
 
 
-## Load system + content + seed. `sheet_override` (optional) forces a fixed sheet
-## for a fully deterministic play; otherwise the sheet is generated from the
-## ruleset's attribute `gen` expressions (also seeded, so still deterministic).
-func load(ruleset_in: IFRuleset, scenario_in: IFScenario, seed_in: int) -> void:
+## Load system + content + seed. The sheet is chosen in precedence order:
+##   1. `sheet_in` — an EXPLICIT sheet injected by the caller (P1: a campaign
+##      injecting a carried character's sheet into the slot). Highest priority.
+##   2. `scenario.sheet_override` — a fixed sheet authored on the scenario.
+##   3. generated from the ruleset's attribute `gen` expressions (seeded).
+## `sheet_in` is a small, additive P1 seam: it lets IFCharacter fill the slot
+## without the scenario having to hardcode a sheet. When omitted the P0 behaviour
+## is byte-for-byte unchanged.
+func load(ruleset_in: IFRuleset, scenario_in: IFScenario, seed_in: int, sheet_in: Variant = null) -> void:
 	ruleset = ruleset_in
 	scenario = scenario_in
 	_seed = seed_in
@@ -54,9 +59,11 @@ func load(ruleset_in: IFRuleset, scenario_in: IFScenario, seed_in: int) -> void:
 	resolver = IFResolver.new(ruleset, dice)
 	state = IFState.new(ruleset)
 
-	# Sheet: fixed override from the scenario, else generated.
+	# Sheet: explicit injection > scenario override > generated.
 	var sheet: Dictionary
-	if typeof(scenario.sheet_override) == TYPE_DICTIONARY:
+	if typeof(sheet_in) == TYPE_DICTIONARY:
+		sheet = _normalize_sheet_override(sheet_in)
+	elif typeof(scenario.sheet_override) == TYPE_DICTIONARY:
 		sheet = _normalize_sheet_override(scenario.sheet_override)
 	else:
 		sheet = ruleset.generate_sheet(dice)
@@ -238,10 +245,31 @@ func _run_check(check: Dictionary) -> String:
 	return route
 
 
-## Snapshot for save/replay (P1 will extend this into the persistence stores).
+## Snapshot for save/replay — the SHORT-TERM store's payload (P1). Captures the
+## seed, the live RNG position and the full IFState so a session can be resumed
+## byte-for-byte with restore().
 func snapshot() -> Dictionary:
 	return {
 		"seed": _seed,
 		"dice_state": dice.get_state(),
 		"state": state.save_data(),
 	}
+
+
+## Rehydrate a runner from a snapshot() — the inverse of load()+play. Rebuilds the
+## dice at its exact mid-stream position (seed + saved RNG state) and reloads the
+## IFState, so continuing to play produces the identical sequence a non-interrupted
+## run would have. The caller supplies the same ruleset + scenario the snapshot was
+## taken against (content is not stored in the save — only mutable state is). This
+## is the P1 resume seam for short-term (mid-module) saves.
+func restore(ruleset_in: IFRuleset, scenario_in: IFScenario, snapshot_in: Dictionary) -> void:
+	ruleset = ruleset_in
+	scenario = scenario_in
+	_seed = int(snapshot_in.get("seed", 0))
+	dice = IFDice.new()
+	dice.set_seed(_seed)
+	dice.set_state(int(snapshot_in.get("dice_state", 0)))
+	resolver = IFResolver.new(ruleset, dice)
+	state = IFState.new(ruleset)
+	state.load_data(snapshot_in.get("state", {}))
+	trace.clear()

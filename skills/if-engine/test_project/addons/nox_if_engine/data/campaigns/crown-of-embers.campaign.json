@@ -1,0 +1,35 @@
+{
+  "id": "crown-of-embers",
+  "name": "The Crown of Embers",
+  "type": "campaign",
+  "version": "1.0.0",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "A two-module campaign proving the P1 persistence + dual-tier character carry: module 1 runs on a lightweight SHEET character (Sir Alden), module 2 on a COMPANION-bound character (Naomi). Long-term world state (world.vault_opened, world.embers) and both characters carry across the module boundary; module 2 is gated on module-1 completion."
+  },
+  "ruleset": "ff-2d6",
+  "seed": 20260715,
+  "campaignVars": { "world.embers": 0, "world.vault_opened": 0 },
+  "campaignFlags": {},
+  "roster": [
+    { "slot": "knight",  "characterRef": "res://addons/nox_if_engine/data/characters/sir-alden.character.json" },
+    { "slot": "artisan", "characterRef": "res://addons/nox_if_engine/data/characters/naomi-companion.character.json" }
+  ],
+  "start": "whispering-vault",
+  "modules": [
+    {
+      "moduleId": "whispering-vault",
+      "order": 1,
+      "protagonist": "knight",
+      "moduleRef": "res://addons/nox_if_engine/data/modules/whispering-vault.module.json",
+      "next": { "onComplete": "sunken-market" }
+    },
+    {
+      "moduleId": "sunken-market",
+      "order": 2,
+      "protagonist": "artisan",
+      "moduleRef": "res://addons/nox_if_engine/data/modules/sunken-market.module.json",
+      "next": {}
+    }
+  ]
+}

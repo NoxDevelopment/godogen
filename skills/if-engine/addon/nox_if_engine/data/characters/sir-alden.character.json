@@ -1,0 +1,17 @@
+{
+  "id": "sir-alden",
+  "name": "Sir Alden of the Ninth Gate",
+  "tier": "sheet",
+  "ruleset": "ff-2d6",
+  "meta": {
+    "summary": "A lightweight persistent character (tier 'sheet'): his own hand-rolled adventure sheet + a carried oath ring + a personal 'valor' tally. He drives the engine directly and carries his mutated sheet from module to module."
+  },
+  "sheet": {
+    "attributes": { "SKILL": 10, "STAMINA": 22, "LUCK": 9 },
+    "resources": { "STAMINA": 22, "provisions": 4 }
+  },
+  "vars": { "char.valor": 2 },
+  "items": { "oath_ring": 1 },
+  "flags": {},
+  "history": []
+}

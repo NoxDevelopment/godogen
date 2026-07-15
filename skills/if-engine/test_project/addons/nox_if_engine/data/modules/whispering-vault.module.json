@@ -1,0 +1,108 @@
+{
+  "id": "whispering-vault",
+  "name": "The Whispering Vault",
+  "version": "1.0.0",
+  "kind": "module",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "Campaign module 1. The knight breaches a sealed vault: a deterministic thorn-wound, a SKILL check, a relic taken, and campaign progress written to the world store (world.vault_opened, world.embers)."
+  },
+  "ruleset": "ff-2d6",
+  "slots": [
+    { "id": "knight", "role": "protagonist", "tier": "sheet", "required": true }
+  ],
+  "entry": {
+    "start": "vault_mouth",
+    "onEntry": [
+      { "kind": "flag", "key": "world.entered_vault", "value": true }
+    ]
+  },
+  "exit": {
+    "endings": {
+      "vault-cleared": {
+        "outcome": "complete",
+        "effects": [
+          { "kind": "var", "key": "world.vault_opened", "op": "set", "value": 1 }
+        ],
+        "goto": "sunken-market"
+      },
+      "vault-collapse": { "outcome": "fail" }
+    },
+    "default": { "outcome": "fail" }
+  },
+  "scenario": {
+    "id": "whispering-vault-graph",
+    "name": "The Whispering Vault",
+    "ruleset": "ff-2d6",
+    "start": "vault_mouth",
+    "passages": [
+      {
+        "id": "vault_mouth",
+        "title": "The Vault Mouth",
+        "text": "A slab of black basalt yawns where the hill was cracked open. Old wards flicker and die as you cross the threshold, and your torch flares up bright in the dead air.",
+        "onEnter": [
+          { "kind": "flag", "key": "world.entered_vault", "value": true },
+          { "kind": "var", "key": "vault_torch_lit", "op": "set", "value": 1 }
+        ],
+        "choices": [
+          { "id": "descend", "text": "Descend into the vault.", "goto": "thorn_gap" }
+        ]
+      },
+      {
+        "id": "thorn_gap",
+        "title": "The Thorn Gap",
+        "text": "The stair narrows to a knife-slot choked with iron thorns grown through the stone. There is no way down but through them; you go through them, and they take their toll of blood.",
+        "onEnter": [
+          { "kind": "attr", "key": "STAMINA", "op": "add", "value": -4 }
+        ],
+        "choices": [
+          { "id": "press_on", "text": "Press on, bleeding, to the door below.", "goto": "sealed_door" }
+        ]
+      },
+      {
+        "id": "sealed_door",
+        "title": "The Sealed Door",
+        "text": "A vault door of green bronze, no handle, no keyhole — only a pressure seal that must be forced at exactly the right moment. Test your Skill.",
+        "check": {
+          "rule": "test",
+          "args": { "attr": "SKILL" },
+          "outcomes": {
+            "success": {
+              "effects": [ { "kind": "var", "key": "char.glory", "op": "add", "value": 1 } ],
+              "goto": "vault_heart"
+            },
+            "failure": {
+              "effects": [ { "kind": "flag", "key": "char.strained_shoulder", "value": true } ],
+              "goto": "vault_heart"
+            }
+          }
+        }
+      },
+      {
+        "id": "vault_heart",
+        "title": "The Heart of the Vault",
+        "text": "The door grinds wide onto a low reliquary. On a bier of salt lies a SILVER AMULET, and set in its face a single ember that has not gone cold in a thousand years. Behind it, a cracked seal weeps cold light.",
+        "onEnter": [
+          { "kind": "item", "key": "silver_amulet", "op": "grant", "value": 1 },
+          { "kind": "var", "key": "world.embers", "op": "add", "value": 1 }
+        ],
+        "choices": [
+          { "id": "take_relic", "text": "Take the amulet and withdraw.", "goto": "vault_cleared" },
+          { "id": "leave_seal", "text": "Pry at the weeping seal instead.", "goto": "vault_collapse" }
+        ]
+      },
+      {
+        "id": "vault_cleared",
+        "title": "Out With the Ember",
+        "text": "You climb back into daylight with the ember-amulet warm against your chest. The vault is opened; whatever it was holding shut, you carry a piece of it now.",
+        "ending": { "id": "vault-cleared", "kind": "victory", "label": "The Ember Amulet" }
+      },
+      {
+        "id": "vault_collapse",
+        "title": "The Seal Breaks",
+        "text": "The seal splits and the reliquary drops into the dark, taking the amulet and very nearly you. You crawl out with nothing but the story.",
+        "ending": { "id": "vault-collapse", "kind": "dead-end", "label": "The Fallen Reliquary" }
+      }
+    ]
+  }
+}

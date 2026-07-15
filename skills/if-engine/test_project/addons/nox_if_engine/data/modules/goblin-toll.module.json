@@ -1,0 +1,77 @@
+{
+  "id": "goblin-toll",
+  "name": "The Goblin Toll",
+  "version": "1.0.0",
+  "kind": "module",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "A tiny self-contained module for the ONE-OFF front door: cross a bridge by paying a toll (or fighting). Minimal setup, played straight to an ending — no campaign, no long-term store."
+  },
+  "ruleset": "ff-2d6",
+  "slots": [
+    { "id": "traveller", "role": "protagonist", "tier": "any", "required": false }
+  ],
+  "entry": { "start": "bridge" },
+  "exit": {
+    "endings": {
+      "crossed": { "outcome": "complete" },
+      "toll-fight-win": { "outcome": "complete" },
+      "toll-fight-lose": { "outcome": "fail" }
+    },
+    "default": { "outcome": "fail" }
+  },
+  "scenario": {
+    "id": "goblin-toll-graph",
+    "name": "The Goblin Toll",
+    "ruleset": "ff-2d6",
+    "start": "bridge",
+    "passages": [
+      {
+        "id": "bridge",
+        "title": "The Toll Bridge",
+        "text": "A rope bridge sways over a gorge, and squatting at its head is a goblin with a ledger and a rusty halberd. 'Toll,' it says, 'or trial.'",
+        "onEnter": [
+          { "kind": "flag", "key": "met_goblin", "value": true }
+        ],
+        "choices": [
+          { "id": "pay_toll", "text": "Pay the toll and cross in peace.", "goto": "crossing" },
+          { "id": "fight", "text": "Refuse, and take the trial by arms.", "goto": "skirmish" }
+        ]
+      },
+      {
+        "id": "skirmish",
+        "title": "Trial by Arms",
+        "text": "The goblin is quicker than it looks. Test your Skill.",
+        "check": {
+          "rule": "test",
+          "args": { "attr": "SKILL" },
+          "outcomes": {
+            "success": { "goto": "fight_win" },
+            "failure": {
+              "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -2 } ],
+              "goto": "fight_lose"
+            }
+          }
+        }
+      },
+      {
+        "id": "crossing",
+        "title": "Across",
+        "text": "Coin changes hands. The goblin waves you over its bridge with a bored flourish, and the far side is yours.",
+        "ending": { "id": "crossed", "kind": "victory", "label": "Paid and Passed" }
+      },
+      {
+        "id": "fight_win",
+        "title": "The Bridge Won",
+        "text": "The goblin yields its halberd and its bridge, grumbling about the paperwork. You cross as victor.",
+        "ending": { "id": "toll-fight-win", "kind": "victory", "label": "Trial Passed" }
+      },
+      {
+        "id": "fight_lose",
+        "title": "Thrown Back",
+        "text": "The halberd catches you and you reel back off the bridge-head, bleeding, the gorge uncrossed.",
+        "ending": { "id": "toll-fight-lose", "kind": "retreat", "label": "Turned Away" }
+      }
+    ]
+  }
+}
