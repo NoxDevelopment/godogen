@@ -1323,6 +1323,45 @@
         "Gold / lives / wave HUD icons via qwen-icon",
         "Shoot + hit + leak SFX"
       ]
+    },
+    {
+      "id": "tcg-duel",
+      "name": "TCG Duel (turn-based card game, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Collectible-card duel base (pure first-party Godot, no addons): the whole rules engine in a GameManager autoload as pure, seedable, headless-testable logic - two players with life/mana curves, shuffled decks, hands, and boards; a data-driven card catalogue (Recruit/Archer/Knight/Golem creatures + a Bolt spell) shuffled by a seeded RNG; turn flow (mana +1 to 10, refill, draw, ready board), can_play/play_card (summoning sickness; spell hits hero or a creature), attack (hero or a trade, dead cleared), end_turn, win detection, fatigue, and a greedy AI opponent. duel.gd renders both boards + your hand + life/mana + end-turn/new-duel, click a card to play, click a ready creature then a target to attack. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole board persists), pause input, scalable_text.",
+      "status": "validated",
+      "skeleton": "genres/tcg-duel/skeleton",
+      "doc": "genres/tcg-duel/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give the AI opponent a persona/voice via companion-npcs + Dialogue Manager for taunts between turns"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the card/creature buttons for real card art (recipes: card frames + creature art via zit-txt2img / qwen-icon)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Card frames per cost/type (creature vs spell) via zit-txt2img/qwen-icon",
+        "Creature + spell art keyed by card id",
+        "A board/mat background + hero portraits (you vs opponent)",
+        "Mana/heart/attack icons via qwen-icon",
+        "Card-play / attack / draw SFX"
+      ]
     }
   ]
 }
