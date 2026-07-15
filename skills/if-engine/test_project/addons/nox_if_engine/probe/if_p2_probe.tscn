@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://noxifenginep2probe01"]
+
+[ext_resource type="Script" path="res://addons/nox_if_engine/probe/if_p2_probe.gd" id="1_p2probe"]
+
+[node name="IFP2Probe" type="Node"]
+script = ExtResource("1_p2probe")

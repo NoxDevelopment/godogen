@@ -55,5 +55,32 @@
         { "kind": "attr", "key": "LUCK", "op": "add", "value": -1 }
       ]
     }
-  ]
+  ],
+  "portability": {
+    "attributeMap": {
+      "prowess": "SKILL",
+      "agility": "SKILL",
+      "might": "STAMINA",
+      "wits": "SKILL",
+      "presence": "SKILL",
+      "resolve": "LUCK"
+    },
+    "outcomeMap": {
+      "success": "success",
+      "failure": "failure"
+    },
+    "semantics": {
+      "skill-test": {
+        "rule": "test",
+        "attrArg": "attr",
+        "difficulty": {
+          "mode": "targetDelta",
+          "ladder": {
+            "trivial": 4, "easy": 2, "standard": 0,
+            "hard": -2, "formidable": -4, "heroic": -6
+          }
+        }
+      }
+    }
+  }
 }

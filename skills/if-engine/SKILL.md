@@ -7,19 +7,21 @@ description: |
   GENERIC rule engine where a ruleset is DATA, not code. Use when a template
   needs deterministic text-RPG / gamebook resolution with NO LLM and NO
   networking: attribute/dice checks, item gates, variable & flag effects,
-  branching to endings — and now (P1) reusable MODULES, one-off AND campaign
+  branching to endings — with (P1) reusable MODULES, one-off AND campaign
   adventures, save/load with separated short-term (session) + long-term
   (campaign/world/character) stores, and DUAL-TIER characters (a lightweight
-  persistent sheet OR a consume-only binding to a full companion_ai_core entity).
-  Ships the reusable `nox_if_engine` addon + the proven `ff-2d6` ruleset as data
-  (2d6 roll-under SKILL/STAMINA/LUCK, reusing the ff-gamebook dice mechanic) +
-  `srd-d20` and `pbta` family fixtures proving the same engine expresses d20-vs-DC
-  and PbtA threshold bands. Extends ff-gamebook SessionState + the VN
-  runtime-variables/inventory model + the companion-interchange projection. Full
-  design: Noxdev-Studio/docs/GAMEBOOK_ENGINE_SPEC_2026-07.md (§2, §2.5, P0+P1).
+  persistent sheet OR a consume-only binding to a full companion_ai_core entity);
+  and (P2) THREE full genericised ruleset builtins as data (`ff-2d6`, `srd-d20`,
+  `pbta`), a ruleset VALIDATOR/IMPORTER (the engine half the future Ruleset
+  Builder UI writes to), and ruleset-PORTABILITY — a canonical check abstraction
+  (a semantic + a canonical attribute + a canonical difficulty + canonical outcome
+  bands) that lets ONE scenario run under EVERY system. Extends ff-gamebook
+  SessionState + the VN runtime-variables/inventory model + the companion-
+  interchange projection. Full design:
+  Noxdev-Studio/docs/GAMEBOOK_ENGINE_SPEC_2026-07.md (§2, §2.5, P0+P1+P2).
 ---
 
-# if-engine — the computed IF / gamebook core (P0)
+# if-engine — the computed IF / gamebook core (P0 + P1 + P2)
 
 The deterministic foundation the whole gamebook expansion layers onto:
 **computed-core first, AI as a layer.** Every mechanic runs without an LLM and
@@ -27,19 +29,24 @@ without networking — a classic text-RPG driven by branching narrative graphs,
 rule tables, dice and condition/effect logic. AI (P4) and multiplayer (P5) are
 enhancement layers *over* this core, never dependencies of it.
 
-> **Status: P0 + P1 implemented + headless-proven (Godot 4.6.1).** The
+> **Status: P0 + P1 + P2 implemented + headless-proven (Godot 4.6.1).** The
 > `nox_if_engine` addon ships under `skills/if-engine/addon/nox_if_engine/`.
 > **P0:** plays the sample scenario `thornwood-crypt` end-to-end under the
-> `ff-2d6` ruleset, deterministically; the generic resolver also expresses the
-> `srd-d20` (meet-or-beat) and `pbta` (threshold-band) families as pure data.
+> `ff-2d6` ruleset, deterministically.
 > **P1:** adds reusable **modules**, **one-off** and **campaign** adventures
 > (separate flows, shared engine), save/load with separated **short-term**
 > (session) and **long-term** (campaign/world/character) stores, and **dual-tier
 > characters** (a lightweight persistent sheet, or a consume-only binding to a
-> full `companion_ai_core` entity via its interchange projection). Validated
-> headless: editor import clean (0 script errors), P0 self-probe `fails=0`, P1
-> self-probe `fails=0` and byte-identical across runs. Full `srd-d20`/`pbta`
-> builtins + a Ruleset Builder (P2), worldbuilder (P3), AI (P4), multiplayer
+> full `companion_ai_core` entity via its interchange projection).
+> **P2:** promotes `srd-d20` and `pbta` to **full genericised builtins** (data
+> alongside `ff-2d6`), adds a **ruleset validator/importer** (the engine half the
+> future Ruleset Builder UI writes to), and **ruleset-portability** — a canonical
+> check abstraction that lets ONE scenario run under every system (proven: the
+> same `portable-trial` scenario at one seed resolves to three DIFFERENT outcomes
+> across ff-2d6, srd-d20 and pbta, plus a hand-authored `nox-2d10` user system).
+> Validated headless: editor import clean (0 script errors); P0, P1 **and** P2
+> self-probes `fails=0`, each byte-identical across runs. The Ruleset Builder
+> *UI* (P2b, a separate Studio surface), worldbuilder (P3), AI (P4), multiplayer
 > (P5) follow. Design: `Noxdev-Studio/docs/GAMEBOOK_ENGINE_SPEC_2026-07.md`.
 
 ## TL;DR
@@ -58,6 +65,11 @@ PROJ="skills/if-engine/test_project"     # minimal project carrying the addon
 # P1 self-test (one-off + campaign + save/resume + dual-tier characters):
 "$GODOT" --headless --path "$PROJ" res://addons/nox_if_engine/probe/if_p1_probe.tscn
 # => DEBUG: if-engine-p1 — oneoff=victory campaign=crown-of-embers modules=2 … fails=0 … => OK
+
+# P2 self-test (3 builtins + validator + ONE portable scenario under all systems):
+"$GODOT" --headless --path "$PROJ" res://addons/nox_if_engine/probe/if_p2_probe.tscn
+# => DEBUG: if-engine-p2 — builtins=3 custom=nox-2d10 scenario=portable-trial
+#    div_seed=4 bands=[ff:failure,d20:success,pbta:partial] endings=[…] … fails=0 … => OK
 ```
 
 To reuse the engine, copy `addon/nox_if_engine/` into any Godot 4 project. No
@@ -129,21 +141,127 @@ stat; double-1 always succeeds, double-6 always fails) as pure data:
 The scenario's check node supplies the story meaning: `{"rule":"test",
 "args":{"attr":"SKILL"}, "outcomes":{"success":{…goto…}, "failure":{…goto…}}}`.
 
-## How srd-d20 and pbta slot in as DATA (no engine change)
+## The three FULL builtins (P2) — one resolver, three families
 
-Both ship as fixtures (`data/rulesets/srd-d20.json`, `pbta.json`) and the same
-resolver runs them — proven in the probe. Making them *full* P2 builtins is pure
-data authoring:
+All three ship as complete `ruleset.json` data (attributes · resources ·
+sheetTemplate · resolutionRules · dice · meta · **portability**) and the SAME
+`if_resolver.gd` runs every one — no engine branch per system. Genericised /
+license-safe: resolution math only, no third-party text or trademarks.
 
-| Family | `dice` | operands | `compare` | `crit` | `bands` |
-|--------|--------|----------|-----------|--------|---------|
-| **ff-2d6** (proven) | `2d6` | attribute as **target** | `roll-under` | `doubles` (1-1 win / 6-6 fail) | success / failure |
-| **srd-d20** (fixture) | `1d20` | ability-mod as **modifier** (`transform:abilityMod`) + DC as **target** (`param`) | `meet-or-beat` | `natural` (nat-1 fail / nat-20 win) | crit/plain success/failure |
-| **pbta** (fixture) | `2d6` | stat as **modifier** (no target) | `threshold-bands` | — | miss (≤6) / partial (7–9) / full (≥10) |
+| Family | `dice` | operands | `compare` | `crit` | native bands |
+|--------|--------|----------|-----------|--------|--------------|
+| **ff-2d6** | `2d6` | attribute as **target** | `roll-under` | `doubles` (1-1 win / 6-6 fail) | success / failure |
+| **srd-d20** | `1d20` | ability-mod **modifier** (`transform:abilityMod`) + DC **target** (`param`) | `meet-or-beat` | `natural` (nat-1 fail / nat-20 win) | crit/plain success/failure |
+| **pbta** | `2d6` | stat as **modifier** (no target) | `threshold-bands` | — | miss (≤6) / partial (7–9) / full (≥10) |
 
-The **Ruleset Builder** (P2) is a form/JSON editor over exactly this
-`ruleset.json` shape: clone a builtin, edit attributes/resolution/sheet, or import
-a user system and map it in. The engine never hardcodes a system.
+`srd-d20` carries ability-check / saving-throw / attack-roll rules; `pbta` the
+2d6+stat move with harm/hold/xp resources. A hand-authored **`nox-2d10`** user
+system (a 2d10 threshold homebrew) ships as a fourth sample proving arbitrary
+user rulesets validate + run the same content.
+
+## Ruleset portability (P2) — ONE scenario, every system
+
+The crux of "a ruleset is data": a scenario's checks are made **ruleset-agnostic**
+so ONE scenario runs under any system. `if_portable_check.gd` (`IFPortableCheck`)
+is the abstraction; it is the counterpart to the resolver — the resolver runs a
+system's OWN rule, this compiles a system-agnostic check onto whichever system is
+loaded. A check node now comes in two shapes and the Runner dispatches on which:
+
+- **native** (P0/P1, unchanged) — `{ rule:"test", args:{attr:"SKILL"}, outcomes:{ <nativeBand>:… } }`
+  — bound to one ruleset's rule id, native attributes, native band ids.
+- **portable** (P2) — names a **semantic** + a **canonical attribute** + a
+  **canonical difficulty**, routes on **canonical bands**, carries **no ruleset**:
+
+```jsonc
+"check": {
+  "semantic":   "skill-test",     // a canonical semantic every ruleset maps
+  "attribute":  "prowess",        // a CANONICAL attribute, not a native key
+  "difficulty": "hard",           // a CANONICAL difficulty rung
+  "outcomes": { "success":{…}, "partial":{…}, "failure":{…}, "_default":{…} }
+}
+```
+
+The engine fixes three **canonical vocabularies** (the interlingua):
+
+- **attributes** — `prowess · agility · might · wits · presence · resolve`
+- **difficulty** — `trivial · easy · standard · hard · formidable · heroic`
+- **outcome bands** — `critSuccess · success · partial · failure · critFailure`
+
+Each ruleset's **`portability`** block maps that interlingua onto its own math:
+
+```jsonc
+"portability": {
+  "attributeMap": { "prowess":"SKILL", … },      // canonical -> native attribute
+  "outcomeMap":   { "success":"success", … },    // native band -> canonical band
+  "semantics": {
+    "skill-test": {
+      "rule": "test",              // which resolutionRule expresses this semantic
+      "attrArg": "attr",           // the rule arg the mapped native attr goes into
+      "difficulty": {
+        "mode": "dc"|"targetDelta"|"rollModifier",   // HOW difficulty is applied
+        "arg?": "dc",              // (mode dc) the rule's target param
+        "ladder": { "standard":0, "hard":-2, … }     // canonical rung -> number
+      }
+    }
+  }
+}
+```
+
+**How each system maps `skill-test` at difficulty `hard`** (the difficulty↔system
+mapping — a deliberate design decision):
+
+| System | native attr | difficulty mode | `hard` value → effect |
+|--------|-------------|-----------------|------------------------|
+| **ff-2d6** | `prowess→SKILL` | `targetDelta` | `-2` → roll-under (SKILL − 2) |
+| **srd-d20** | `prowess→STR` | `dc` | DC `20` → d20 + STR-mod ≥ 20 |
+| **pbta** | `prowess→hard` | `rollModifier` | `-1` → 2d6 + stat − 1, then bands |
+| **nox-2d10** | `prowess→grit` | `rollModifier` | `-2` → 2d10 + stat − 2, then bands |
+
+`compile()` turns the portable check into a concrete `{ rule, args }` the ordinary
+resolver runs (difficulty becomes a `dc` param, a reserved `_targetDelta`, or a
+reserved `_rollModifier` arg — both default 0, so native checks are byte-for-byte
+unchanged). The native result band is mapped back to a canonical band via
+`outcomeMap`, and story routing stays on the scenario's `outcomes{ band → {effects,
+goto} }` exactly as for native checks.
+
+**Partial-success across systems** (the other design call): PbtA/nox produce a
+native `partial`; binary systems (ff, d20) never do — so a scenario that authors a
+`partial` branch simply won't reach it under a binary system (the honest behaviour
+of a system with no mixed result). Conversely a coarse scenario that authors only
+`success`/`failure` routes a produced `partial` via the fallback ladder to
+`success` (success-at-a-cost = forward progress); `critSuccess/critFailure` fall
+back to `success/failure`. The proof: the SAME `portable-trial` scenario at seed 4
+resolves to **failure under ff-2d6, success under srd-d20, partial under pbta** —
+three different outcomes, three different endings, from one file.
+
+## Ruleset validation + import (P2) — the Builder UI's engine half
+
+`if_ruleset_validator.gd` (`IFRulesetValidator`) accepts an ARBITRARY user
+`ruleset.json` and checks it field-by-field against the §2.5 schema, returning
+either clear errors or a runnable ruleset. It hardcodes no system — only the
+shape the resolver/reader/portability layer require. This is the contract the
+future **Ruleset Builder UI (P2b)** writes to: the form/JSON editor emits a
+`ruleset.json`, calls the validator, and shows `errors`/`warnings` or plays the
+returned `ruleset`.
+
+```gdscript
+var res := IFRulesetValidator.validate(user_ruleset_dict)   # or .validate_file(path)
+# res = { ok:bool, errors:[String], warnings:[String], ruleset:IFRuleset|null }
+if res.ok:  play_with(res.ruleset)
+else:       show(res.errors)          # e.g. "rule 'r1' has unknown compare mode 'nonsense'"
+var rs := IFRulesetValidator.import_ruleset(dict)            # thin: IFRuleset or null
+```
+
+It validates identity + `dice.default`, attributes (unique keys, valid `gen`,
+`min≤max`, in-range `default`), resources (`from` references a real attribute),
+`sheetTemplate` key references, every resolution rule (`compare` ∈ the three
+modes; operand `type`/`role`/`transform`; a target where the mode needs one;
+`crit` mode + fields; bands — binary `when` ∈ {success,fail,critSuccess,critFail}
+or numeric ranges for threshold-bands; `postEffects` kinds), and the optional
+`portability` block (attributeMap → real attributes, outcomeMap → canonical
+bands, semantics → real rules + a valid difficulty mode/ladder). **Errors** block
+import; **warnings** (missing name, an undeclared operand ref, a ladder missing a
+rung) do not.
 
 ## State model (what a play tracks)
 
@@ -289,11 +407,13 @@ long-term record so it carries into the next module.
 | File | Role |
 |------|------|
 | `addon/nox_if_engine/if_dice.gd` | Seedable `NdM+K` roller — faces + total. |
-| `addon/nox_if_engine/if_ruleset.gd` | Typed ruleset reader + sheet generation. |
+| `addon/nox_if_engine/if_ruleset.gd` | Typed ruleset reader + sheet generation (P2: `portability` accessors). |
 | `addon/nox_if_engine/if_state.gd` | Runtime state + condition/effect interpreters + `persistent` save. |
-| `addon/nox_if_engine/if_resolver.gd` | **The generic rule engine (§2.5).** |
-| `addon/nox_if_engine/if_scenario.gd` | Shared narrative-graph model + `validate()`. |
-| `addon/nox_if_engine/if_runner.gd` | Deterministic play orchestrator (P1: `+sheet_in` inject, `+restore()`). |
+| `addon/nox_if_engine/if_resolver.gd` | **The generic rule engine (§2.5)** (P2: `_targetDelta`/`_rollModifier` difficulty seams). |
+| `addon/nox_if_engine/if_portable_check.gd` | **P2** the ruleset-portability layer — canonical check → per-system `{rule,args}` + band mapping. |
+| `addon/nox_if_engine/if_ruleset_validator.gd` | **P2** ruleset validator/importer — the Builder UI's engine half. |
+| `addon/nox_if_engine/if_scenario.gd` | Shared narrative-graph model + `validate()` (P2: portable-check validation). |
+| `addon/nox_if_engine/if_runner.gd` | Deterministic play orchestrator (P1: `+sheet_in` inject, `+restore()`; P2: native/portable check dispatch). |
 | `addon/nox_if_engine/if_module.gd` | **P1** module reader — scenario + entry/exit contract. |
 | `addon/nox_if_engine/if_character.gd` | **P1** dual-tier character (sheet ∥ companion-bound). |
 | `addon/nox_if_engine/if_companion_projection.gd` | **P1** consume-only interchange → ruleset-sheet projection. |
@@ -303,19 +423,21 @@ long-term record so it carries into the next module.
 | `addon/nox_if_engine/if_campaign_store.gd` | **P1** long-term store (progress, world vars/flags, roster). |
 | `addon/nox_if_engine/if_campaign_runner.gd` | **P1** campaign entry point — start/play/capture/advance + save/resume. |
 | `addon/nox_if_engine/if_savegame.gd` | **P1** save contract (short+long halves) + canonical JSON + SHA-256. |
-| `addon/nox_if_engine/data/rulesets/*.json` | `ff-2d6` (proven) + `srd-d20`, `pbta` (fixtures). |
+| `addon/nox_if_engine/data/rulesets/*.json` | **P2** full builtins `ff-2d6` · `srd-d20` · `pbta` + the `nox-2d10` user-system sample. |
 | `addon/nox_if_engine/data/scenarios/thornwood-crypt.json` | Sample P0 scenario. |
+| `addon/nox_if_engine/data/scenarios/portable-trial.json` | **P2** portable scenario (one canonical skill-test, runs under every system). |
 | `addon/nox_if_engine/data/modules/*.json` | **P1** sample modules (`whispering-vault`, `sunken-market`, `goblin-toll`). |
 | `addon/nox_if_engine/data/characters/*.json` | **P1** `sir-alden` (sheet) + `naomi-companion` (companion-bound). |
 | `addon/nox_if_engine/data/campaigns/*.json` | **P1** `crown-of-embers` sample campaign. |
 | `addon/nox_if_engine/data/adventures/*.json` | **P1** `goblin-toll` sample one-off. |
 | `addon/nox_if_engine/probe/if_probe.*` | P0 headless self-test. |
 | `addon/nox_if_engine/probe/if_p1_probe.*` | **P1** headless self-test. |
+| `addon/nox_if_engine/probe/if_p2_probe.*` | **P2** headless self-test (builtins + validator + portability). |
 | `test_project/` | Minimal Godot project carrying the addon — the runnable proof. |
 
 ## Validation
 
-Two gates, both headless + CI-friendly:
+Four gates, all headless + CI-friendly:
 
 1. **Import clean** — `Godot --headless --path <test_project> --import`: zero parse
    / script errors across the addon.
@@ -347,6 +469,20 @@ Two gates, both headless + CI-friendly:
    resumed into a fresh runner reaches a SHA-256-identical long-term save as the
    uninterrupted run.
 
+4. **P2 self-probe** — `res://addons/nox_if_engine/probe/if_p2_probe.tscn`: one
+   deterministic process prints one line, e.g.
+   `DEBUG: if-engine-p2 — builtins=3 custom=nox-2d10 scenario=portable-trial div_seed=4 bands=[ff:failure,d20:success,pbta:partial] endings=[ff:repelled,d20:triumph,pbta:scraped,nox:triumph] malformed_errors=9 sig=… fails=0 … => OK`.
+   It proves: **(a)** all three builtins load + pass the §2.5 **validator** (a
+   runnable ruleset, 0 errors); **(b)** **portability** — the SAME `portable-trial`
+   scenario is played under ff-2d6, srd-d20 AND pbta; the three `compare` modes
+   differ (roll-under / meet-or-beat / threshold-bands) and a deterministically-
+   found **seed (4)** yields **three distinct canonical bands** (failure / success
+   / partial) routing to three distinct endings — one file, one seed, three
+   systems, three outcomes; **(c)** a hand-authored **custom user ruleset**
+   (`nox-2d10`) validates + runs the same scenario; **(d)** an intentionally-
+   malformed ruleset is **rejected** with 9 clear, specific errors (no runnable
+   ruleset). Byte-identical across runs (a SHA-256 `sig`, verified by a re-run).
+
 Determinism: a fixed seed replays byte-for-byte (the roller owns one seeded RNG;
 a resumed session restores the exact RNG position via `IFRunner.restore()`; the
 sheet is a fixed override, an injected character sheet, or seeded `gen`). P1 saves
@@ -366,3 +502,14 @@ campaign save is provably identical across runs (verified: two runs print the sa
   ink authoring, the node-graph view, and the VN engine all converge on one model.
 - Do **not** put story routing inside a ruleset rule — rules are pure/reusable;
   the scenario's check-node `outcomes` map bands → routes + effects (content).
+- Do **not** name a native attribute/rule id in a **portable** check — name a
+  canonical `semantic` + `attribute` + `difficulty` and let each ruleset's
+  `portability` block map it. A portable scenario's effects stay on the universal
+  `var`/`item`/`flag` vocabulary (native attr/resource effects are system-specific
+  and belong in a native, single-ruleset scenario).
+- Do **not** extend the canonical vocabularies (attributes / difficulties /
+  outcome bands) ad hoc — they are the fixed interlingua in `if_portable_check.gd`;
+  a new one is an engine-level decision, not a per-scenario one.
+- Do **not** invent a fourth `compare` mode or hand-edit a ruleset past the
+  **validator** — run `IFRulesetValidator.validate()` (what the Builder UI does)
+  so a bad datum is a clear error, not a silent mis-resolution.

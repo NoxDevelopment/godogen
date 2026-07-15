@@ -50,8 +50,13 @@ func _init(rs: IFRuleset, d: IFDice) -> void:
 ## Resolve `rule` against `state`, with optional `args` from the scenario's check
 ## node (e.g. {attr:"SKILL"} or {dc:14}). Records the result into state.roll_log
 ## and applies the rule's postEffects. Returns the full result dict:
-##   { rule, label, dice, faces, sum, modifier, total, target, compare,
-##     success (bool|null), crit ("" | "success" | "fail"), band, band_label }
+##   { rule, label, dice, faces, sum, modifier, target_delta, roll_modifier,
+##     total, target, compare, success (bool|null), crit ("" | "success" | "fail"),
+##     band, band_label }
+## Two reserved args are the portability difficulty seam (see IFPortableCheck):
+##   _targetDelta  (float, default 0) — added to the compared-against target.
+##   _rollModifier (float, default 0) — added to the total before banding.
+## Absent in native P0/P1 checks, so those resolve unchanged.
 func resolve(rule: Dictionary, state: IFState, args: Dictionary = {}) -> Dictionary:
 	var expr := str(args.get("dice", rule.get("dice", ruleset.dice_default)))
 	var roll := dice.roll(expr)
@@ -66,7 +71,20 @@ func resolve(rule: Dictionary, state: IFState, args: Dictionary = {}) -> Diction
 		else:
 			target = v
 
-	var total := float(roll.total) + modifier
+	# Portability difficulty seams (P2). Both default to 0, so a native P0/P1 check
+	# (no `_targetDelta`/`_rollModifier` args) resolves byte-for-byte as before.
+	# IFPortableCheck compiles a canonical difficulty into exactly ONE of these:
+	#   * _targetDelta   -> shifts the compared-against target (FF roll-under: a
+	#                       harder test lowers the effective attribute to roll under).
+	#   * _rollModifier  -> shifts the total (PbtA-style forward/ongoing: a harder
+	#                       move subtracts from 2d6+stat before the bands are read).
+	# A d20-style system needs neither — its difficulty IS the DC (a `param` target).
+	var target_delta := float(args.get("_targetDelta", 0.0))
+	var roll_modifier := float(args.get("_rollModifier", 0.0))
+	if target != null:
+		target = float(target) + target_delta
+
+	var total := float(roll.total) + modifier + roll_modifier
 	var compare := str(rule.get("compare", "meet-or-beat"))
 
 	# Critical override (evaluated on the raw faces, before/over the arithmetic).
@@ -99,6 +117,8 @@ func resolve(rule: Dictionary, state: IFState, args: Dictionary = {}) -> Diction
 		"faces": roll.faces,
 		"sum": roll.sum,
 		"modifier": modifier,
+		"target_delta": target_delta,
+		"roll_modifier": roll_modifier,
 		"total": total,
 		"target": target,
 		"compare": compare,

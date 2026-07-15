@@ -3,9 +3,10 @@
   "name": "PbtA-style (2d6 + stat, threshold bands)",
   "meta": {
     "family": "threshold-bands",
-    "license": "genericised — NoxDev reimplementation of the 2d6 move-with-stat threshold structure (miss / partial / full); no third-party text or trademarks.",
+    "license": "genericised — NoxDev reimplementation of the 2d6 move-with-stat threshold structure (miss / partial / full). Resolution math only: no playbooks, move text, or trademarks.",
     "degreesOfSuccess": ["miss", "partial", "full"],
-    "status": "P0 FAMILY-EXPRESSIBILITY FIXTURE — proves the generic resolver expresses threshold-bands (no per-check target; the total maps into numeric outcome ranges) as data. The full builtin (playbooks, moves, advancement) lands in P2 alongside the Ruleset Builder."
+    "advancement": "Marking experience on a miss and levelling a playbook is campaign content; the engine interprets only the 2d6 + stat -> band math. `forward` and `ongoing` are one-shot / standing roll modifiers supplied by the scene.",
+    "notes": "Full P2 builtin. Every move is 2d6 + a stat: 10+ is full success, 7-9 a partial (success at a cost — the mixed result that binary systems lack), 6- a miss. There is no per-check target; the total maps straight into the numeric bands."
   },
   "dice": { "default": "2d6" },
   "attributes": [
@@ -16,11 +17,13 @@
     { "key": "weird", "label": "Weird", "gen": "0", "min": -3, "max": 3, "default": 0 }
   ],
   "resources": [
-    { "key": "harm", "label": "Harm", "default": 0, "min": 0, "max": 6 }
+    { "key": "harm", "label": "Harm", "default": 0, "min": 0, "max": 6 },
+    { "key": "hold", "label": "Hold", "default": 0, "min": 0 },
+    { "key": "xp",   "label": "Experience", "default": 0, "min": 0, "max": 5 }
   ],
   "sheetTemplate": {
     "attributes": ["cool", "hard", "hot", "sharp", "weird"],
-    "resources": ["harm"],
+    "resources": ["harm", "hold", "xp"],
     "inventory": true
   },
   "resolutionRules": [
@@ -33,10 +36,38 @@
       ],
       "compare": "threshold-bands",
       "bands": [
-        { "id": "miss",    "max": 6,          "label": "Miss (the GM makes a move)" },
-        { "id": "partial", "min": 7, "max": 9, "label": "Partial success (success at a cost)" },
-        { "id": "full",    "min": 10,         "label": "Full success" }
+        { "id": "miss",    "max": 6,           "label": "Miss (the GM makes a move)" },
+        { "id": "partial", "min": 7, "max": 9,  "label": "Partial success (success at a cost)" },
+        { "id": "full",    "min": 10,           "label": "Full success" }
       ]
     }
-  ]
+  ],
+  "portability": {
+    "attributeMap": {
+      "prowess": "hard",
+      "agility": "cool",
+      "might": "hard",
+      "wits": "sharp",
+      "presence": "hot",
+      "resolve": "weird"
+    },
+    "outcomeMap": {
+      "full": "success",
+      "partial": "partial",
+      "miss": "failure"
+    },
+    "semantics": {
+      "skill-test": {
+        "rule": "move",
+        "attrArg": "stat",
+        "difficulty": {
+          "mode": "rollModifier",
+          "ladder": {
+            "trivial": 2, "easy": 1, "standard": 0,
+            "hard": -1, "formidable": -2, "heroic": -3
+          }
+        }
+      }
+    }
+  }
 }

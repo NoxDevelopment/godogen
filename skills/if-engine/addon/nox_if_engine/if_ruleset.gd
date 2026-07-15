@@ -42,6 +42,29 @@ var sheet_template: Dictionary = {}
 ## id -> resolution rule dict.
 var rules: Dictionary = {}
 
+## The PORTABILITY block (spec §2.5, P2) — how this system maps the engine's
+## canonical, ruleset-agnostic check vocabulary (a SEMANTIC + a canonical
+## attribute + a canonical difficulty + canonical outcome bands) onto its OWN
+## resolution rules. This is what lets ONE scenario run under every system. Shape:
+##   portability: {
+##     attributeMap: { <canonicalAttr>: "<nativeAttrKey>", ... },
+##     outcomeMap:   { <nativeBandId>: "<canonicalBand>", ... },
+##     semantics: {
+##       "<semanticId>": {
+##         rule: "<resolutionRuleId>",
+##         attrArg: "<argName the rule reads the mapped native attribute from>",
+##         difficulty: {
+##           mode: "dc"|"targetDelta"|"rollModifier",
+##           arg?: "<argName>",            # for mode "dc": the rule's target param
+##           ladder: { <canonicalDifficulty>: <number>, ... }
+##         },
+##         args?: { <extra static args merged into the call> }
+##       }, ...
+##     }
+##   }
+## Empty for a system that opts out of portability (native checks still run).
+var portability: Dictionary = {}
+
 var _raw: Dictionary = {}
 
 
@@ -101,6 +124,8 @@ func load_from(data: Dictionary) -> void:
 			continue
 		rules[rid] = rule
 
+	portability = data.get("portability", {})
+
 
 func has_attribute(key: String) -> bool:
 	return attributes.has(key)
@@ -127,6 +152,36 @@ func rule(rule_id: String) -> Dictionary:
 		push_error("IFRuleset '%s': no resolution rule '%s'" % [id, rule_id])
 		return {}
 	return rules[rule_id]
+
+
+# --- Portability accessors (P2) ---------------------------------------------
+
+
+## Does this system declare a mapping for the given canonical SEMANTIC (e.g.
+## "skill-test")? If false, a portable check cannot be compiled for this ruleset.
+func has_semantic(semantic_id: String) -> bool:
+	var sems: Dictionary = portability.get("semantics", {})
+	return sems.has(semantic_id)
+
+
+## The semantic mapping dict ({rule, attrArg, difficulty, args?}) — see the
+## `portability` doc above. Returns {} when unmapped.
+func semantic_def(semantic_id: String) -> Dictionary:
+	return portability.get("semantics", {}).get(semantic_id, {})
+
+
+## Map a canonical attribute (prowess/wits/...) to this system's native attribute
+## key (SKILL / STR / cool / ...). Returns "" when the canonical attr is unmapped.
+func native_attribute_for(canonical_attr: String) -> String:
+	return str(portability.get("attributeMap", {}).get(canonical_attr, ""))
+
+
+## Map a native band id this system produces (success/miss/full/...) to a
+## canonical outcome band (success/partial/failure/critSuccess/critFailure).
+## Falls back to the native id unchanged when unmapped (a system whose band ids
+## are already canonical needs no map).
+func canonical_band_for(native_band: String) -> String:
+	return str(portability.get("outcomeMap", {}).get(native_band, native_band))
 
 
 ## Roll a fresh sheet from the attribute `gen` expressions + resource defaults —

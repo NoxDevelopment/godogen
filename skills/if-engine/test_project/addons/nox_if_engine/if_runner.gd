@@ -214,23 +214,56 @@ func _enter_passage(passage_id: String, depth: int) -> void:
 
 ## Resolve a check node against a ruleset rule, apply the matched outcome's
 ## effects, and return its route ("" if none). Records into trace + roll_log.
+##
+## Dispatches on the check SHAPE (P2):
+##   * PORTABLE (has `semantic`) — compiled by IFPortableCheck into a concrete
+##     { rule, args } for THIS ruleset, resolved, and the native band mapped back
+##     to a CANONICAL band that the scenario's `outcomes` route on (with the
+##     canonical fallback ladder). This is what lets ONE scenario run under every
+##     system. The scenario carries no ruleset; the runner supplies it.
+##   * NATIVE (has `rule`) — the P0/P1 path, unchanged: the check names a ruleset
+##     rule id + native args and routes on native band ids.
 func _run_check(check: Dictionary) -> String:
-	var rule_id := str(check.get("rule", ""))
+	var portable := IFPortableCheck.is_portable(check)
+
+	var rule_id: String
+	var args: Dictionary
+	if portable:
+		var compiled := IFPortableCheck.compile(check, ruleset)
+		if not compiled.get("ok", false):
+			push_error("IFRunner: portable check could not compile — %s" % compiled.get("error", ""))
+			return ""
+		rule_id = str(compiled.get("rule", ""))
+		args = compiled.get("args", {})
+	else:
+		rule_id = str(check.get("rule", ""))
+		args = check.get("args", {})
+
 	var rule := ruleset.rule(rule_id)
 	if rule.is_empty():
 		return ""
-	var args: Dictionary = check.get("args", {})
 	var result := resolver.resolve(rule, state, args)
-	var band := str(result.get("band", ""))
+	var native_band := str(result.get("band", ""))
 
+	# Route on the canonical band for portable checks; on the native band for
+	# native checks (byte-for-byte the P0/P1 behaviour).
+	var band := native_band
 	var outcomes: Dictionary = check.get("outcomes", {})
-	var outcome: Dictionary = outcomes.get(band, outcomes.get("_default", {}))
+	var outcome: Dictionary
+	if portable:
+		band = IFPortableCheck.canonical_band(native_band, ruleset)
+		outcome = IFPortableCheck.resolve_outcome(outcomes, band)
+	else:
+		outcome = outcomes.get(native_band, outcomes.get("_default", {}))
 
 	trace.append({
 		"type": "check",
 		"passage": state.current_passage,
+		"portable": portable,
+		"semantic": str(check.get("semantic", "")),
 		"rule": rule_id,
 		"band": band,
+		"native_band": native_band,
 		"total": result.total,
 		"faces": result.faces,
 		"target": result.target,

@@ -36,17 +36,31 @@ extends RefCounted
 ##     goto:       "<passage id>"?      # route (a check outcome may override)
 ##   }
 ##
-## Check node (binds a system resolution rule to story outcomes — this is where
-## CONTENT meets the pure ruleset rule):
+## Check node (binds a resolution to story outcomes — where CONTENT meets a rule).
+## TWO shapes; the Runner dispatches on which (see if_portable_check.gd):
+##
+##   NATIVE (P0/P1) — bound to ONE ruleset's rule + native attributes/bands:
 ##   {
 ##     rule: "test",                    # id of a ruleset resolutionRule
 ##     args: { attr: "SKILL" } | {...}, # operands the rule reads (attr/dc/dice)
-##     outcomes: {                      # band id -> what that outcome DOES
+##     outcomes: {                      # NATIVE band id -> what that outcome DOES
 ##        success: { effects:[...], goto:"..." },
 ##        failure: { effects:[...], goto:"..." },
 ##        _default: { goto:"..." }      # fallback for any unlisted band
 ##     }
 ##   }
+##
+##   PORTABLE (P2) — ruleset-AGNOSTIC; the SAME node runs under every system:
+##   {
+##     semantic:   "skill-test",        # a canonical semantic every ruleset maps
+##     attribute:  "prowess",           # a CANONICAL attribute (not a native key)
+##     difficulty: "hard",              # a CANONICAL difficulty rung
+##     outcomes: {                      # CANONICAL band -> what that outcome DOES
+##        success: {...}, partial: {...}, failure: {...}, _default: {...}
+##     }
+##   }
+## A portable scenario declares `"ruleset": "*"` (any/portable) — the runtime
+## ruleset is supplied by the campaign/one-off/probe, not the scenario.
 
 var id: String = ""
 var name: String = ""
@@ -141,9 +155,19 @@ func validate(ruleset: IFRuleset = null) -> Array[String]:
 func _validate_check(check: Variant, pid: String, ruleset: IFRuleset, problems: Array[String]) -> void:
 	if check == null:
 		return
-	var rule_id := str(check.get("rule", ""))
-	if ruleset != null and rule_id != "" and not ruleset.rules.has(rule_id):
-		problems.append("passage '%s' check -> unknown rule '%s'" % [pid, rule_id])
+	if IFPortableCheck.is_portable(check):
+		# PORTABLE (P2): validated against the canonical vocabularies + (if a
+		# ruleset is supplied) the ruleset's ability to express the semantic.
+		for p in IFPortableCheck.validate(check, pid, ruleset):
+			problems.append(p)
+	else:
+		# NATIVE (P0/P1): the check names a ruleset rule id directly.
+		var rule_id := str(check.get("rule", ""))
+		if rule_id == "" and not check.get("outcomes", {}).is_empty():
+			problems.append("passage '%s' check has neither 'rule' nor 'semantic'" % pid)
+		if ruleset != null and rule_id != "" and not ruleset.rules.has(rule_id):
+			problems.append("passage '%s' check -> unknown rule '%s'" % [pid, rule_id])
+	# Outcome routes exist — shared by both shapes.
 	for band in check.get("outcomes", {}).keys():
 		var oc: Dictionary = check["outcomes"][band]
 		var goto := str(oc.get("goto", ""))

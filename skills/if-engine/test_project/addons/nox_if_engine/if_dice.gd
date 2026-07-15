@@ -53,6 +53,51 @@ func parse(expr: String) -> Dictionary:
 	return parsed
 
 
+## Pure, side-effect-free validation of a dice expression for the ruleset
+## validator/importer (P2) — mirrors `_parse` grammar but pushes NO errors and
+## never returns a "safe default"; it reports precisely what is wrong. Accepts
+## `NdM`, `NdM+K`, `NdM-K` and a bare integer constant `K` (a gen like "0").
+## Returns { ok: bool, error: String }.
+static func validate_expr(expr: String) -> Dictionary:
+	var s := str(expr).strip_edges().to_lower().replace(" ", "")
+	if s == "":
+		return {"ok": false, "error": "empty dice expression"}
+	var modifier_str := ""
+	var body := s
+	var plus := s.find("+")
+	var minus := s.find("-")
+	var sign_at := -1
+	if plus >= 0:
+		sign_at = plus
+	if minus >= 0 and (sign_at < 0 or minus < sign_at):
+		sign_at = minus
+	if sign_at == 0:
+		return {"ok": false, "error": "expression '%s' starts with a sign" % expr}
+	if sign_at > 0:
+		body = s.substr(0, sign_at)
+		modifier_str = s.substr(sign_at)
+		if not modifier_str.is_valid_int():
+			return {"ok": false, "error": "bad modifier '%s' in '%s'" % [modifier_str, expr]}
+	if not body.contains("d"):
+		if body.is_valid_int():
+			return {"ok": true, "error": ""}
+		return {"ok": false, "error": "malformed expression '%s'" % expr}
+	var halves := body.split("d")
+	if halves.size() != 2:
+		return {"ok": false, "error": "malformed dice body '%s'" % body}
+	if halves[0] != "" and not halves[0].is_valid_int():
+		return {"ok": false, "error": "bad dice count in '%s'" % expr}
+	if not halves[1].is_valid_int():
+		return {"ok": false, "error": "bad dice sides in '%s'" % expr}
+	var count := 1 if halves[0] == "" else halves[0].to_int()
+	var sides := halves[1].to_int()
+	if count < 1:
+		return {"ok": false, "error": "non-positive dice count in '%s'" % expr}
+	if sides < 1:
+		return {"ok": false, "error": "non-positive dice sides in '%s'" % expr}
+	return {"ok": true, "error": ""}
+
+
 func _parse(expr: String) -> Dictionary:
 	var s := expr.strip_edges().to_lower().replace(" ", "")
 	if s == "":
