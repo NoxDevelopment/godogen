@@ -2,11 +2,13 @@
 
 A competitive **Euro-style engine-builder** board game in the Scythe / Wingspan /
 Wyrmspan lineage: every player grows a **resource → production → victory-point
-engine**, and the **best engine wins**. 1 human + up to 4 heuristic-AI opponents,
-a shared action board, a development-card deck, objective tokens, end-game
-majorities, and a hard end trigger — the entire rules engine is **pure, seedable,
-headless-testable GDScript** that replays byte-identically from a seed. Scaffold
-with:
+engine**, and the **best engine wins**. 2–5 seats, each driven by a
+**seat controller** — a local human or a heuristic AI — so the same build plays
+**single-player (1 human vs heuristic AI)**, **all-AI**, or **local hotseat
+(pass-and-play, 2+ humans on one machine)**. A shared action board, a
+development-card deck, objective tokens, end-game majorities, and a hard end
+trigger — the entire rules engine is **pure, seedable, headless-testable
+GDScript** that replays byte-identically from a seed. Scaffold with:
 
 ```bash
 python templates/tools/scaffold.py euro-engine-builder <target-dir> --name "Game Name"
@@ -49,10 +51,28 @@ no addons.
     stalls (PRODUCE is always available).
   - `to_dict()`/`from_dict()` round-trip the **entire game** (banks, tableaus,
     hands, stars, deck, objectives, cursor, RNG state) — JSON-safe.
-- **`GameManager` autoload** (`scripts/game_manager.gd`) — owns one `EuroEngine`
-  and adds the NoxDev template ABI: `"game_manager"` + `"persistent"` groups,
-  `save_data()/load_data()` (the whole game persists), and `human_action()` which
-  applies the human's seat-0 action then auto-runs every AI seat back to the human.
+- **Seat controllers + the play-mode matrix (STAGE 1)** — every seat carries a
+  `ControllerKind` (`EuroEngine.ControllerKind`): **`HUMAN_LOCAL`** (the turn
+  dispatcher blocks for local UI input) or **`AI_HEURISTIC`** (auto-resolves via
+  `ai_choose()`). `configure_seats(kinds, names)` assigns them; the default preset
+  is unchanged (seat 0 human, the rest AI). This changes only **who** produces a
+  seat's action — the rules, RNG, and AI determinism are untouched, because a turn
+  is always *"produce one legal action; `apply_action()` validates it."* Seat
+  controllers + names round-trip through `to_dict()/from_dict()`.
+- **`GameManager` autoload** (`scripts/game_manager.gd`) — owns one `EuroEngine`,
+  adds the NoxDev template ABI (`"game_manager"` + `"persistent"` groups,
+  `save_data()/load_data()`), and is the **turn dispatcher**: `_advance_dispatch()`
+  walks the cursor, auto-resolving AI seats and **blocking** on human seats.
+  `submit_action()` applies the active human seat's action then resolves following
+  seats to the next human (or game end); `human_action()` is kept as the legacy
+  1-human alias.
+- **Local hotseat (pass-and-play)** — when more than one seat is `HUMAN_LOCAL`,
+  the dispatcher raises a **`handoff_requested`** signal before **every human turn
+  after the first**; `board.gd` shows a *"pass the device — &lt;name&gt;'s turn"*
+  overlay with a **Ready** button (`acknowledge_handoff()`), then reveals/accepts
+  that human's input. AI turns in between auto-resolve into the log with no banner.
+  One machine, one input — no networking. Presets: `new_game()` (1 human vs AI),
+  `new_hotseat_game(humans, ais)`, or `configure_game(kinds, names)`.
 - **Board screen** (`scenes/board.tscn` + `scripts/board.gd`) — built in code:
   the shared action board, your hand as **BUILD** buttons, a per-player panel
   (resources, VP, stars, production summary, tableau), the objective tokens, a
@@ -83,14 +103,38 @@ seed**, and why it **drops into a larger game**: keep the engine, call
    discount in `_new_player` for faction variety.
 4. **Harder AI**: extend `ai_choose` with a true 1-ply lookahead (clone via
    `to_dict()`/`from_dict()`, apply each action, evaluate the resulting position).
-5. **Art**: swap the card buttons for real card art + a board mat (recipes below).
-6. **Menus/saving**: godotsmith `menu_system` / `save_system` / `settings_system`
+5. **More play modes (LLM-assist / networked-remote)**: the seat-controller
+   dispatch is an **open seam**. Add a value to `EuroEngine.ControllerKind` and a
+   matching `case` in `GameManager._advance_dispatch()`, then one hook:
+   **`AI_LLM`** → call an LLM provider (e.g. `companion_ai_ml`) that picks from
+   `legal_actions()`, validated by `is_legal()/apply_action()` like any action;
+   **`REMOTE`** → `await` a transport that delivers the seat's chosen action, then
+   `apply_action()`. These are deliberately **not present** in Stage 1 (no stubs);
+   the dispatcher's default branch asserts a clear error on any unwired kind, so a
+   half-added mode fails loud instead of silently passing.
+7. **Art**: swap the card buttons for real card art + a board mat (recipes below).
+8. **Menus/saving**: godotsmith `menu_system` / `save_system` / `settings_system`
    drop in unchanged; the whole game already serialises.
+
+## Play modes
+
+| Mode | Setup call | Seats | Turn flow |
+|------|-----------|-------|-----------|
+| **Single-player** (default) | `new_game()` | seat 0 human, rest `AI_HEURISTIC` | human acts, AIs auto-resolve back to the human |
+| **All-AI** | `configure_game([AI, AI, …])` | every seat `AI_HEURISTIC` | the whole game auto-plays |
+| **Local hotseat** | `new_hotseat_game(humans, ais)` or `configure_game([HUMAN, HUMAN, …])` | 2+ `HUMAN_LOCAL` | pass-and-play: a "pass the device" hand-off banner before every human turn after the first |
+
+**Extension point (Stage 2+):** `AI_LLM` (LLM-assisted seat) and `REMOTE`
+(networked seat) slot into the same dispatch as one new `ControllerKind` value +
+one `case` in `GameManager._advance_dispatch()` + a provider/network hook — they
+are **not present** in Stage 1 and the dispatcher asserts a clear error on any
+unwired kind (never silently passes). See *How to extend #5*.
 
 ## Validation status
 
 `status: "validated"` — scaffolded, `--headless --editor --import` exit 0 with
-zero script errors, and five headless probes (all `fails=0`):
+zero script errors, and headless probes (all `fails=0`) covering both the core
+engine and the play-mode matrix (seat controllers + local hotseat):
 
 - **Full-game engine probe**: plays a COMPLETE all-AI game from a fixed seed to
   the end trigger — a single legal winner, every VP total equals the sum of its
@@ -106,3 +150,17 @@ zero script errors, and five headless probes (all `fails=0`):
   updates the tableau / resources.
 - **Save/load probe**: mid-game save → mutate → JSON round-trip → load → restored
   state equals the saved snapshot, and the loaded game resumes to completion.
+- **Hotseat probe (mixed)**: a 4-seat `HUMAN, AI, HUMAN, AI` game played in full
+  via the real dispatcher — the correct controller resolved each seat (humans via
+  scripted legal input, AIs via `ai_choose`, proven by equality with an
+  independent oracle replay), a legal winner, conservation held, no illegal action.
+- **All-human hotseat probe**: a 2-seat all-human game completes with a legal
+  winner and a hand-off is signalled before **every** human turn after the first.
+- **Play-mode determinism probe**: fixed human inputs + a fixed seed replay
+  byte-identically (mixed hotseat, all-human, all-AI); a different seed diverges.
+- **Regression probe**: the pre-existing all-AI game and the default
+  1-human-vs-AI game still complete with all core invariants intact and the AI-seat
+  behaviour unchanged (dispatcher output equals an `ai_choose` oracle).
+- **Play-mode UI-build probe**: `board.tscn` builds, a `HUMAN_LOCAL` legal action
+  resolves through the new dispatch and updates state, and the hand-off banner
+  appears for a hotseat config then clears on Ready.

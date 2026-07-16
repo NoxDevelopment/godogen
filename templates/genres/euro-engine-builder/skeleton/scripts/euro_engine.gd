@@ -125,11 +125,44 @@ const DECK_COPIES := 3
 const ACTIONS: Array[String] = ["PRODUCE", "BUILD", "TRADE", "RESEARCH", "DEPLOY"]
 
 # =====================================================================
+#  Seat controllers — the play-mode matrix (STAGE 1)
+# =====================================================================
+## Every seat has a CONTROLLER KIND that decides HOW its turn is produced — WHO
+## chooses the action, never WHAT the rules are. A turn is ALWAYS "produce one
+## legal action; apply_action() validates it", so the kind is a pure input seam:
+## it changes nothing about the engine, its determinism, or its scoring.
+##
+## Two kinds are FULLY IMPLEMENTED now:
+##   * HUMAN_LOCAL  — a local human. The turn dispatcher (GameManager) BLOCKS on
+##                    this seat and waits for UI input (see board.gd).
+##   * AI_HEURISTIC — the built-in weighted evaluator ai_choose(); auto-resolves.
+##
+## EXTENSION POINT — Stage 2+ (deliberately NOT present here, no stubs): two
+## further kinds slot in WITHOUT a rewrite, each as ONE new enum value + ONE new
+## dispatch case in GameManager._advance_dispatch() + ONE hook, nothing else:
+##   * AI_LLM  — an LLM picks from legal_actions(): the new case calls a provider
+##               (e.g. companion_ai_ml) that returns a chosen action, which the
+##               engine validates through is_legal()/apply_action() like any other.
+##   * REMOTE  — a networked human/agent: the new case awaits a transport that
+##               delivers the seat's chosen action, then apply_action() applies it.
+## The dispatcher's default branch fails LOUD on any kind it does not handle, so
+## an unwired kind can never silently pass — it asserts a clear error instead.
+enum ControllerKind { HUMAN_LOCAL, AI_HEURISTIC }
+
+## Human-readable tag per implemented kind (used in seat names / the HUD).
+const CONTROLLER_LABEL := {
+	ControllerKind.HUMAN_LOCAL: "human",
+	ControllerKind.AI_HEURISTIC: "ai",
+}
+
+# =====================================================================
 #  Live state
 # =====================================================================
 
 var num_players := 4
 var players: Array = []          ## each: player dict (see _new_player)
+var controllers: Array[int] = [] ## per-seat ControllerKind (source of truth).
+var seat_names: Array[String] = [] ## per-seat display name (UI + hotseat banner).
 var deck: Array = []             ## shared draw deck (card ids)
 var round_index := 0             ## full rounds completed.
 var current := 0                 ## whose turn it is (0 == the human in the UI).
@@ -162,6 +195,15 @@ func setup(seed_value: int = 0, player_count: int = 4) -> void:
 	players = []
 	for i in num_players:
 		players.append(_new_player(i))
+	# Default preset (unchanged behaviour): seat 0 is the local human, every other
+	# seat is a heuristic AI. configure_seats() overrides this for hotseat / all-AI.
+	controllers = []
+	seat_names = []
+	for i in num_players:
+		var kind := ControllerKind.HUMAN_LOCAL if i == 0 else ControllerKind.AI_HEURISTIC
+		controllers.append(kind)
+		seat_names.append(_default_seat_name(i, kind))
+	_sync_is_ai()
 	_build_deck()
 	round_index = 0
 	current = 0
@@ -200,6 +242,78 @@ func _new_player(index: int) -> Dictionary:
 		"hand": ([] as Array),     # card ids in hand.
 		"stars": 0,
 	}
+
+
+# =====================================================================
+#  Seat-controller configuration + queries (the play-mode seam)
+# =====================================================================
+
+## Assign every seat a controller kind (and, optionally, a display name). Must be
+## called AFTER setup(); `kinds` length must equal num_players and each kind must
+## be a valid, IMPLEMENTED ControllerKind. This only changes WHO acts on a seat —
+## the rules, RNG and AI determinism are untouched.
+func configure_seats(kinds: Array, names: Array = []) -> void:
+	assert(kinds.size() == num_players,
+		"configure_seats: expected %d kinds, got %d" % [num_players, kinds.size()])
+	var new_controllers: Array[int] = []
+	var new_names: Array[String] = []
+	for i in num_players:
+		var kind := int(kinds[i])
+		assert(is_supported_kind(kind),
+			"configure_seats: seat %d has invalid/unsupported ControllerKind %d" % [i, kind])
+		new_controllers.append(kind)
+		if i < names.size() and String(names[i]) != "":
+			new_names.append(String(names[i]))
+		else:
+			new_names.append(_default_seat_name(i, kind))
+	controllers = new_controllers
+	seat_names = new_names
+	_sync_is_ai()
+
+
+## True iff `kind` is a controller kind this Stage-1 engine actually implements.
+## AI_LLM / REMOTE are intentionally NOT supported here (extension point).
+func is_supported_kind(kind: int) -> bool:
+	return kind == ControllerKind.HUMAN_LOCAL or kind == ControllerKind.AI_HEURISTIC
+
+
+func controller_of(seat: int) -> int:
+	return int(controllers[seat]) if seat >= 0 and seat < controllers.size() else ControllerKind.AI_HEURISTIC
+
+
+func seat_name(seat: int) -> String:
+	return seat_names[seat] if seat >= 0 and seat < seat_names.size() else "P%d" % (seat + 1)
+
+
+func is_human_seat(seat: int) -> bool:
+	return controller_of(seat) == ControllerKind.HUMAN_LOCAL
+
+
+func is_ai_seat(seat: int) -> bool:
+	return controller_of(seat) == ControllerKind.AI_HEURISTIC
+
+
+## How many seats are local humans — drives the hotseat pass-the-device flow.
+func human_seat_count() -> int:
+	var n := 0
+	for k in controllers:
+		if int(k) == ControllerKind.HUMAN_LOCAL:
+			n += 1
+	return n
+
+
+func _default_seat_name(seat: int, kind: int) -> String:
+	if kind == ControllerKind.HUMAN_LOCAL:
+		return "P%d You" % (seat + 1) if seat == 0 else "P%d Human" % (seat + 1)
+	return "P%d AI" % (seat + 1)
+
+
+## Mirror the controller assignment onto each player's `is_ai` flag so existing
+## readers stay correct; `controllers` remains the single source of truth.
+func _sync_is_ai() -> void:
+	for i in num_players:
+		if i < players.size():
+			(players[i] as Dictionary)["is_ai"] = int(controllers[i]) == ControllerKind.AI_HEURISTIC
 
 
 func _build_deck() -> void:
@@ -677,6 +791,8 @@ func to_dict() -> Dictionary:
 		"seed": _seed,
 		# uint64 RNG state as a String so it survives JSON without float rounding.
 		"rng_state": str(_rng.state),
+		"controllers": controllers.duplicate(),
+		"seat_names": seat_names.duplicate(),
 		"players": players.duplicate(true),
 		"deck": deck.duplicate(),
 		"round_index": round_index,
@@ -698,6 +814,22 @@ func from_dict(data: Dictionary) -> void:
 	players = []
 	for p_variant in data.get("players", []):
 		players.append(_coerce_player(p_variant as Dictionary))
+	# Seat controllers + names round-trip so a loaded hotseat/all-AI game keeps
+	# its exact lineup. Fall back to the default preset for pre-controller saves.
+	controllers = []
+	seat_names = []
+	var saved_ctrl: Array = data.get("controllers", [])
+	var saved_names: Array = data.get("seat_names", [])
+	for i in num_players:
+		if i < saved_ctrl.size():
+			controllers.append(int(saved_ctrl[i]))
+		else:
+			controllers.append(ControllerKind.HUMAN_LOCAL if i == 0 else ControllerKind.AI_HEURISTIC)
+		if i < saved_names.size():
+			seat_names.append(String(saved_names[i]))
+		else:
+			seat_names.append(_default_seat_name(i, int(controllers[i])))
+	_sync_is_ai()
 	deck = []
 	for c in data.get("deck", []):
 		deck.append(String(c))
