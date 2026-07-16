@@ -1837,6 +1837,39 @@
         "A trail board mat + per-player field-journal backdrop via zit-txt2img",
         "Hike / document-shutter / season-change / expedition-complete SFX stingers + a light outdoor ambience"
       ]
+    },
+    {
+      "id": "falling-sand",
+      "name": "Falling Sand (cellular-automata physics sandbox, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A falling-sand physics SANDBOX (Noita / The Powder Toy / Sandspiel lineage) - a cellular-automata world where every cell is a MATERIAL that obeys deterministic physics rules and the player paints materials with a brush and watches emergent chemistry. The whole simulation is SandWorld (a pure, seedable, RefCounted GDScript engine, no scene deps): a WxH grid in packed arrays (_cells material ids + _aux per-cell state), 14 MATERIALS with distinct behaviour (empty, sand/ash powders, water/oil/acid/lava liquids with a density model so fluids separate, stone/wood/plant/ice solids, fire, smoke, steam), and 11 real REACTIONS (water+lava->stone+steam; fire ignites wood/oil/plant, fuel consumed; lava ignites flammables and cools to stone; fire burns out->ash/empty+smoke; acid dissolves a solid, both consumed; watered plant grows; steam condenses->water; ice melts near heat->water). The step() is a pure function of (grid, tick, seeded RNG): a bottom->top scan with per-tick parity direction + a _moved mask means every cell updates at most once (bounded O(W*H), no infinite loops), and all randomness comes from a seeded RNG whose state is saved - so the same seed + same scripted brush inputs give a BYTE-IDENTICAL grid after N steps. paint(material,x,y,radius) stamps a disc; snapshot()/restore() round-trip the whole grid + RNG state. main.gd renders the grid one-pixel-per-cell to an ImageTexture on a TextureRect, stepped on the physics tick, with a material palette, mouse-drag painting, a brush-size stepper, and pause/step/clear. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole grid + RNG persist), pause + restart input, scalable_text. Drops in standalone or as the physics layer of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/falling-sand/skeleton",
+      "doc": "genres/falling-sand/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat material colours for a palette texture / per-material shaders - glow for lava & fire, translucency for water & steam, grain for sand & ash"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Per-material colour palette / gradient LUT (14 materials) via qwen-icon or a hand-authored palette",
+        "Glow + emissive shader for lava / fire / acid via pixel-perfect",
+        "Ambient loop (crackle for fire, hiss for steam, trickle for water) + brush/paint SFX",
+        "Optional background / vignette framing the sandbox viewport via zit-txt2img"
+      ]
     }
   ]
 }

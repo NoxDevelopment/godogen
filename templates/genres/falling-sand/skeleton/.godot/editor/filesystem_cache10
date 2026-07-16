@@ -1,0 +1,9 @@
+63f7b34db8d8cdea90c76aacccf841ec
+::res://::1784172596
+default_bus_layout.tres::AudioBusLayout::-1::1784171332::0::1::::<><><>0<>0<><>::
+::res://scenes/::1784171327
+main.tscn::PackedScene::3940261342030267240::1784171327::0::1::::<><><>0<>0<><>::res://scripts/main.gd
+::res://scripts/::1784172596
+game_manager.gd::GDScript::4616177474565522357::1784171279::0::1::::<>Node<><>0<>0<><>::
+main.gd::GDScript::7562943370668446384::1784171927::0::1::::<>Control<><>0<>0<><>::
+sand_world.gd::GDScript::8360309597146149207::1784171576::0::1::::SandWorld<>RefCounted<><>0<>0<><>::
