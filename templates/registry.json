@@ -1870,6 +1870,40 @@
         "Ambient loop (crackle for fire, hiss for steam, trickle for water) + brush/paint SFX",
         "Optional background / vignette framing the sandbox viewport via zit-txt2img"
       ]
+    },
+    {
+      "id": "god-game",
+      "name": "God Game (top-down deity strategy sim, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A top-down DEITY strategy sim (Populous / Black & White lineage) - shape the terrain and wield divine powers to grow your tribe of autonomous followers and outgrow, convert, or drown a rival god's tribe. The whole game is GodWorld (a pure, seedable, RefCounted GDScript engine, no scene deps): a 64x64 terrain grid in packed arrays (_height per cell - water below sea level, walkable/buildable land above - plus a resource flag: forest=wood, food source=food), deterministically generated from the seed (noise -> box-blur hills -> scattered resources) with two founding settlements. Two TRIBES (you + a rival) each have villagers, huts, a belief/mana pool and a wood pool; belief accrues each tick from congregation size. A real autonomous populace AI (deterministic): followers seek the nearest resource, fell forests for wood + forage food back to the hut, huts BREED new followers when fed, the tribe BUILDS new huts on free buildable land near resources (funded expansion - it gathers wood first then raises one hut at a time), and followers FLEE flooded cells (and drown if stranded). 5 divine POWERS with real effects: RAISE_LAND (water -> buildable land / land-bridges), LOWER_LAND (flood land, drown/scatter followers, wash away huts), GROW_FOOD (bless food sources + a bounty to your hut -> attracts + breeds your tribe), INSPIRE (boost your followers' gather -> faster building + breeding), MIRACLE (convert nearby rival followers to your tribe); each costs belief and is_legal() rejects a cast with no belief or on an invalid target. A rival god AI (deterministic heuristic, non-LLM) accrues belief and spends it on a fixed priority ladder (convert a stray follower of yours, grow itself with food, flood your nearest settlement) with deterministic tie-breaks. tick_world() is a pure function of (state, tick, seeded RNG): accrue belief -> apply queued player powers -> rival decides+casts -> advance every villager one cell in index order -> advance huts (flood+breed) -> compact the dead -> judge; no unbounded rescans (bounded-radius resource search only when idle), so a tick is O(V*R^2 + W*H) and always terminates. Win/loss is genuinely reachable both ways: WIN by hitting the population goal while leading or eliminating the rival; LOSE by being wiped out or letting the rival hit the goal first; the tick cap awards the larger tribe - the same seed + same scripted divine commands give a BYTE-IDENTICAL world after N ticks. snapshot()/restore() round-trip the ENTIRE world (terrain + both tribes + belief/wood + pending powers + RNG state); checksum() proves determinism. main.gd renders the grid top-down (height->colour, water, forests/food, per-tribe villager+hut markers, inspired followers glow), with a power palette (pick a power, click the map to cast on a cell), a belief+wood meter, both populations, a tick counter and a log. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole world + RNG persist), pause + restart input, scalable_text. Drops in standalone or as the strategy layer of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/god-game/skeleton",
+      "doc": "genres/god-game/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat terrain-height colours for a real terrain tileset + water/coast autotiling, and add per-tribe villager/hut sprites"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Terrain tileset (water / sand / grass / rock elevation bands) + forest & food-source tiles via pixel-perfect or qwen-icon",
+        "Per-tribe villager + hut sprites (two colourways) via qwen-icon",
+        "Divine-power icons (raise / lower land, grow food, inspire, miracle) for the palette via qwen-icon",
+        "A divine ambience loop + per-power SFX stingers (earth rumble for raise/lower, chime for miracle, chorus for inspire)",
+        "Optional sky / cloud vignette framing the world via zit-txt2img"
+      ]
     }
   ]
 }
