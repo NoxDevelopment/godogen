@@ -33,12 +33,23 @@ var _busy := false
 ## rebind it each time the interstitial is shown for a different transition).
 var _interstitial_handler: Callable = Callable()
 
+## AI-DM (slice 2) DISPLAY-ONLY narration. A separate label under the computed
+## passage text that shows async LLM flavour prose ALONGSIDE (never instead of)
+## `passage.text`. Built in code so the scene file and the computed render path
+## are untouched; stays hidden/empty unless AiDm.enabled AND prose arrives. The
+## id of the passage currently on screen, so a late/stale narration for a passage
+## the player already left is discarded.
+var _ai_narration: RichTextLabel
+var _current_passage_id: String = ""
+
 
 func _ready() -> void:
 	_save_button.pressed.connect(_on_save_pressed)
 	_menu_button.pressed.connect(_on_menu_pressed)
 	_toast.hide()
 	_interstitial.hide()
+	_build_ai_narration_label()
+	AiDm.narration_ready.connect(_on_narration_ready)
 	# Run-scene-directly convenience: if nothing launched us, start the sample.
 	if PlaySession.mode == "":
 		PlaySession.begin_oneoff_scenario(PlaySession.SCENARIO_THORNWOOD, 20260715)
@@ -53,6 +64,7 @@ func render() -> void:
 	if passage.is_empty():
 		# A loaded between-modules campaign save: no live passage — offer to
 		# start the next chapter.
+		_reset_ai_narration("")
 		_show_body("Chapter Complete", "The next chapter of your campaign awaits.")
 		_plate.bind_passage("_boundary", "Next Chapter")
 		_refresh_sheet()
@@ -65,6 +77,13 @@ func render() -> void:
 	_show_body(str(passage.get("title", "")), str(passage.get("text", "")))
 	_plate.bind_passage(str(passage.get("id", "")), str(passage.get("title", "")))
 	_refresh_sheet()
+	# AI-DM (slice 2): DISPLAY-ONLY. The computed passage above is already fully
+	# rendered; if the optional AI layer is enabled, ask for async flavour prose to
+	# append underneath (arrives later via `narration_ready`). Off by default => no
+	# request, no network, byte-identical render.
+	_reset_ai_narration(str(passage.get("id", "")))
+	if AiDm.enabled:
+		AiDm.request_narration(passage, PlaySession.active_state())
 
 	if PlaySession.is_ended():
 		# Terminal: render the ending prose, then a return button.
@@ -82,6 +101,45 @@ func _show_body(title: String, text: String) -> void:
 	_title_label.text = title
 	_title_label.visible = not title.is_empty()
 	_passage_text.text = text
+
+
+# --- AI-DM narration (slice 2, DISPLAY-ONLY) --------------------------------
+
+
+## Build the AI flavour label in code, directly under the computed PassageText, so
+## the scene file and the computed render path are never edited. Starts hidden.
+func _build_ai_narration_label() -> void:
+	_ai_narration = RichTextLabel.new()
+	_ai_narration.name = "AiNarration"
+	_ai_narration.bbcode_enabled = true
+	_ai_narration.fit_content = true
+	_ai_narration.scroll_active = false
+	_ai_narration.add_to_group(&"scalable_text")
+	_ai_narration.hide()
+	var rows := $Page/Margin/Rows
+	rows.add_child(_ai_narration)
+	rows.move_child(_ai_narration, _passage_text.get_index() + 1)
+
+
+## Clear + hide the AI prose and record which passage is on screen now, so a stale
+## async narration for a passage the player already left is discarded on arrival.
+func _reset_ai_narration(passage_id: String) -> void:
+	_current_passage_id = passage_id
+	if _ai_narration != null:
+		_ai_narration.text = ""
+		_ai_narration.hide()
+
+
+## Async arrival of AI flavour prose. Purely additive: append it UNDER the computed
+## passage text, clearly marked as AI flavour. Ignore empty prose (the inert /
+## failure result) and any narration whose passage the player already left.
+func _on_narration_ready(passage_id: String, text: String) -> void:
+	if _ai_narration == null or not AiDm.enabled:
+		return
+	if text.is_empty() or passage_id != _current_passage_id:
+		return
+	_ai_narration.text = "[i][color=#9a8f7a]%s[/color][/i]" % text
+	_ai_narration.show()
 
 
 func _end_line_for(passage: Dictionary) -> void:

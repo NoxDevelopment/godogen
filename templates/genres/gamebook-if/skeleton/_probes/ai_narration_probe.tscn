@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://gbifainarrprobe01"]
+
+[ext_resource type="Script" path="res://_probes/ai_narration_probe.gd" id="1_anp"]
+
+[node name="AiNarrationProbe" type="Node"]
+script = ExtResource("1_anp")
