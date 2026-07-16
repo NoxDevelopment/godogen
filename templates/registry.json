@@ -2010,6 +2010,41 @@
         "Zone-designation icons (dig / forage / attack) for the palette via qwen-icon",
         "Ambient loop (skittering + underground rumble) + forage/dig/battle SFX stingers"
       ]
+    },
+    {
+      "id": "peg-roguelike",
+      "name": "Peg Roguelike (Peglin-style pachinko roguelike, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Peglin-lineage PACHINKO ROGUELIKE: aim + fire ORBS that bounce down a PEG board, accumulate damage from every peg they touch, dump it onto an enemy, and -- between fights -- run a roguelike map of combat / elite / shop / event / rest / boss nodes with RELICS, gold, and orb upgrades. OUR OWN engine, generic content (no trademarks). KEY DESIGN DECISION: the ball-vs-peg physics is a DETERMINISTIC custom fixed-timestep circle sim, NOT Godot's RigidBody2D (whose solver is not identical across runs/builds and would break byte-identical replays). A ball is a circle (position, velocity) advanced at a fixed dt under gravity, colliding with circular PEGS + the four WALLS by pure geometry (circle-circle / circle-wall overlap -> push out + reflect the velocity about the contact normal with a restitution factor) until it exits the bottom or hits a MAX_STEPS cap -- so given (aim angle, board layout, seed) the trajectory + accumulated damage are 100% reproducible; the only randomness (board/map gen, deck shuffle, shop rolls, enemy stats, events) is one seeded RNG saved with the run, the physics has zero randomness. PegEngine is a pure RefCounted class (no Godot-node dependency) so a whole run replays byte-identically + drives headlessly. 4 peg types (normal / crit / bomb-AoE / refresh); a DECK of 14 distinct orbs (crit-boost, multiball, poison, per-remaining-peg, momentum, echo x2, bomb-boost, pierce, heal, gold, refresh-synergy, plain) drawn/discarded with reshuffle; combat vs an enemy with HP + a cycling attack pattern + status effects (poison ticks); a seeded connected node MAP with 10 RELICS, gold, orb rewards + a shop. is_legal rejects illegal actions; to_dict/from_dict save the whole run incl. the peg board + RNG; a deterministic auto-play (best_aim / auto_take_turn) drives a full run to WIN (clear the boss) or LOSE (HP to 0). GameManager autoload adds the NoxDev ABI (buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text). board.gd renders the play surface in code -- the peg board + ball path + aim indicator (via _draw), your HP + enemy HP, the current orb + deck/discard counts, gold + relics, an aim/fire control, and the map/shop screens. Drops in standalone or as the combat core of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/peg-roguelike/skeleton",
+      "doc": "genres/peg-roguelike/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat peg/ball circles for real sprites + a board backdrop (recipes: peg/orb/gem icons via qwen-icon, enemy art via card-creature-art, board splash via zit-txt2img)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Peg sprites (normal / crit / bomb / refresh) + the ball via qwen-icon or pixel-perfect",
+        "Orb icons (14 distinct orbs) via qwen-icon",
+        "Relic icons (10 relics) via qwen-icon",
+        "Enemy + boss art via card-creature-art",
+        "Board backdrop / node-map splash via zit-txt2img",
+        "Peg-plink, crit-ding, bomb-blast, and win/lose stinger SFX"
+      ]
     }
   ]
 }
