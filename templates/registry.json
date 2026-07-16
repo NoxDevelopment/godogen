@@ -2319,6 +2319,44 @@
         "Role / need (food / rest / morale) / decision icons for the HUD + decision bar via qwen-icon",
         "Ambient loop (meadow wind + distant road) + forage / raid / birth / desertion / arrival SFX stingers"
       ]
+    },
+    {
+      "id": "farm-management-sim",
+      "name": "Farm Management Sim (whole-farm operation & commodity economy sim, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A deeper redo of Maxis's SIMFARM: you run a whole farm BUSINESS from a top-down desk - fields, crop rotation, soil chemistry, irrigation, weather, livestock, commodity markets and machinery - as a deterministic integer-money economy sim. Sibling of dept-store-sim and mall-tycoon (sharing their money-conservation discipline and seasonal wrapped-Gaussian curves) but DISTINCT: an agronomy + commodity operation, not a retailer; and DISTINCT from the existing farming-sim (a hands-on 2D top-down crop-tending game) - this is the top-down MANAGEMENT/economy sim of the whole farm operation. The whole sim is a pure, seedable, headless-testable FarmEngine (RefCounted): 9 FIELDS (a 3x3 grid) each with soil quality + a live soil NITROGEN level; 6 CROPS (corn/wheat/soybeans/cotton/hay/vegetables) each with a growth duration, water need, plantable seasons, a nitrogen DRAW (or, for the soybean legume, a nitrogen FIX), a seed cost and a yield curve. THREE DISTINCTIVE SYSTEMS: (1) SOIL + CROP ROTATION as a real per-field NITROGEN BALANCE - harvesting a heavy-feeder DRAWS nitrogen down so a MONOCULTURE measurably DEPLETES the field and its yields DECLINE, while rotating in the nitrogen-FIXING legume, applying FERTILIZER or resting the field REPLENISHES it and yields recover (nutrient_factor(N) folds straight into yield); (2) DETERMINISTIC WEATHER + four SEASONS as a PURE HASH of (seed,day) independent of the livestock RNG stream - rain/drought/frost/heat/pest events reproducible and testable, weather modulating each field's daily growth condition and DAMAGING crops (frost hits warm-season crops, pests cut yield), with IRRIGATION (a per-field daily cost) buying back the water a drought takes; (3) a COMMODITY MARKET as a real COMPUTED price curve base*(1+sum amp*sin(2pi*day/period+phase)) with a seed-derived phase per commodity - a genuine multi-frequency wave, not a table, so a commodity's price VARIES over the year and sell-timing changes revenue. LIVESTOCK: three herds (cattle->milk, pigs->meat, chickens->eggs) that eat FEED (hay you grow or feed you buy), produce daily goods into commodity stock, BREED when well-fed (bounded by a per-type cap) and face daily MORTALITY (higher when underfed) resolved by the seeded RNG. MACHINERY: tractors + harvesters raise field THROUGHPUT and HARVEST EFFICIENCY and trim labour at a purchase + maintenance + DEPRECIATION cost. A cash-flow ECONOMY with strict INTEGER MONEY CONSERVATION (cash == start + sum of a named-flow ledger via _apply_cash) verified EVERY day, tracking CASH + NET WORTH (cash + land + depreciated machinery + stock + herds - debt); is_legal-gated ACTIONS (plant/harvest/fertilize/set_irrigation/buy+sell_livestock/buy_feed/sell_commodity/buy_machinery/loan/repay) reject illegal moves with byte-identical state; days->months with loan interest; a WIN (net-worth goal) and a LOSS (bankruptcy/foreclosure) both genuinely reachable by a deterministic auto-play, with a MAX (max_years*360) cap that guarantees termination; and full save/load incl. RNG (byte-identical replays, FNV-1a state checksum stable across processes). farm.gd renders the 3x3 FIELD GRID via _draw (each cell coloured by crop with a nitrogen-shaded soil tint, irrigation border, maturity ring, projected-yield text), a HUD (cash/net worth/day-season-year/weather/work capacity), a commodity-market panel, a herds+machinery+finance readout and an action panel (field/crop/animal/commodity pickers, a quantity slider, plant/harvest/fertilize/irrigate/buy+sell/machinery/loan + next-day + auto-play) - all in code. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole farm persists), pause + restart input, scalable_text. A deterministic agronomy/commodity engine mirroring dept-store-sim's and mall-tycoon's money-conservation discipline - swap the CROP + LIVESTOCK + MACHINERY + COMMODITY catalogues and the weather/season/price-wave parameters for your own.",
+      "status": "validated",
+      "skeleton": "genres/farm-management-sim/skeleton",
+      "doc": "genres/farm-management-sim/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the 3x3 field grid + panels are built in code; use world-layout if you swap to a TileMapLayer of walkable fields / barn / market-office with per-field soil tiles"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "replace the _draw() field-grid blockout with crop / field / livestock sprites keyed by crop + growth stage (recipes: crop + field art via zit-txt2img / zit-seamless-tile, livestock + machinery + commodity + weather icons via qwen-icon)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Crop sprites keyed by crop + growth stage (corn / wheat / soybeans / cotton / hay / vegetables, ~64x64 field-patch tiles) to replace the _draw() field-grid blockout",
+        "A field / soil / irrigation-furrow tileset (tilled, planted, mature, fallow, irrigated) via zit-seamless-tile",
+        "Livestock (cattle / pigs / chickens), machinery (tractor / harvester), commodity, weather and currency icons via qwen-icon",
+        "A rural farm-ambience / barnyard loop + tractor-engine / auction-bell / weather SFX bed"
+      ]
     }
   ]
 }
