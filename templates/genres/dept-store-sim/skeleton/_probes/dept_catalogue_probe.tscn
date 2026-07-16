@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dssdeptcatprobe"]
+
+[ext_resource type="Script" path="res://_probes/dept_catalogue_probe.gd" id="1"]
+
+[node name="Probe" type="Node"]
+script = ExtResource("1")

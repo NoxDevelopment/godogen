@@ -2203,6 +2203,44 @@
         "Crowd / stadium parallax via image-parallax-depthflow",
         "Footstep, stumble, thud/wipeout, and goal-cheer SFX"
       ]
+    },
+    {
+      "id": "dept-store-sim",
+      "name": "Department Store Sim (80s big-box department-store & mail-order sim, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "An 80s BIG-BOX DEPARTMENT-STORE management sim (Kmart / Sears-of-the-catalog-era; sibling of mall-tycoon and video-store-sim, sharing their deterministic integer-money economy and money-conservation discipline, but DISTINCT: a multi-department retailer with a MAIL-ORDER CATALOGUE channel and SEASONAL demand - not a mall of leased units, not a single-category rental shop). You OWN the store - EIGHT DEPARTMENTS (apparel/electronics/toys/appliances/home&garden/automotive/jewelry/sporting-goods), 4 PRODUCT LINES each (32 lines), each line with a per-unit cost + shelf price (margin) + baseline demand, each department with its own STAFFING, FLOOR-SPACE allocation and SEASONAL profile. The whole sim is a pure, seedable, headless-testable DeptStoreEngine (RefCounted) owned by a GameManager autoload. TWO DISTINCTIVE SYSTEMS: (1) SEASONAL DEMAND as a real COMPUTED curve (not a table) - each department's demand is a pure function of the day-of-year, a sum of wrapped-Gaussian season bumps season(dept,day)=1+sum amp*e^(-dist(doy,center)^2/(2*width^2)): toys/electronics SPIKE at Christmas, home&garden peaks in spring, jewelry at Valentine/Christmas, automotive/sporting in summer; (2) the MAIL-ORDER CATALOGUE (the Sears book) - PUBLISH a seasonal catalogue (an up-front print cost) to open a SECOND demand stream that reaches buyers the physical floor never sees (rural/remote - NOT gated by store foot traffic or floor staff), drawing from the SAME shared inventory, RESERVING stock into transit and SHIPPING after a LEAD TIME (cash lands later) with a per-order fulfillment fee - a real trade-off of print+fulfillment vs incremental reach. A real CUSTOMER ECONOMY: each day seeded FOOT TRAFFIC = base x reputation x marketing x overall-season x staff-presence x noise; each customer visits a DEPARTMENT (weighted by its lines' demand x its floor space), per-department STAFF THROUGHPUT caps how many are served (rest TURNED AWAY), a served customer BUYS if the line has stock (-> revenue, on-hand consumed) or MISSES on a STOCKOUT (lost sale + goodwill). MARKDOWNS/CLEARANCE: unsold seasonal stock AGES; a per-line markdown cuts price (recovering cash but slashing margin) AND lifts demand pull, clearing aging inventory (plus a liquidate-to-jobber salvage lever). A cash-flow ECONOMY with strict INTEGER MONEY CONSERVATION (cash == start + sum of a named-flow ledger) verified EVERY day, tracking CASH + NET WORTH (cash + depreciated inventory - debt), with a UNIT INVENTORY INVARIANT purchased == on_hand + in_transit + consumed holding per line every day; reputation moves with in-stock rate, service (staffing) and fair pricing. is_legal-gated ACTIONS (restock/liquidate/set_markdown/set_dept_staff/hire/set_dept_space/publish_catalogue/marketing/loan/repay) reject illegal moves with byte-identical state; days->months with loan interest; a WIN (net-worth goal) and a LOSS (bankruptcy) both genuinely reachable by a deterministic auto-play, with a MAX_DAYS cap that guarantees termination; and full save/load incl. RNG (byte-identical replays, FNV-1a state checksum stable across processes). store_floor.gd renders a HUD (cash/net worth/reputation/day-month+season/traffic+income), a per-department panel, a per-line list of the selected department, an action panel (department+line pickers, restock quantity slider, markdown slider, hire/space +/-, publish-catalogue/marketing/loan, next-day + auto-play) and a finance readout - all in code. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole store persists), pause + restart input, scalable_text. A deterministic economy/inventory engine mirroring mall-tycoon's and video-store-sim's money-conservation discipline - swap the DEPARTMENT + PRODUCT-LINE catalogues and SEASON_BUMPS for your own.",
+      "status": "validated",
+      "skeleton": "genres/dept-store-sim/skeleton",
+      "doc": "genres/dept-store-sim/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the department + line panels and action panel are built in code; use world-layout if you swap to a TileMapLayer store floor with walkable department aisles and a catalogue-counter"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "replace the department/line text rows with department-front sprites keyed by department + a catalogue-page backdrop (recipes: department fronts / product art via card-creature-art or zit-txt2img, department + currency icons via qwen-icon, carpet/aisle tiles via zit-seamless-tile)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Department-front sprites keyed by department (apparel / electronics / toys / appliances / home&garden / automotive / jewelry / sporting-goods, ~128x64 storefront tiles) to replace the _refresh_depts() text rows",
+        "A department-store aisle / carpet / shelf tileset via zit-seamless-tile",
+        "Department + season + catalogue + markdown + currency icons via qwen-icon",
+        "80s in-store PA / muzak loop + register-beep / page-turn (catalogue) / crowd-murmur SFX bed"
+      ]
     }
   ]
 }
