@@ -46,12 +46,26 @@ var _handoff_label: Label
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	if GameManager.engine == null or GameManager.engine.players.is_empty():
+	# ONLINE: the EuroNet bridge has already built the engine from the shared seed +
+	# lobby lineup, so do NOT reset it. OFFLINE: start the default preset as before.
+	if not _online() and (GameManager.engine == null or GameManager.engine.players.is_empty()):
 		GameManager.new_game(SEED, PLAYERS)
 	_build_ui()
 	GameManager.changed.connect(_refresh)
 	GameManager.handoff_requested.connect(_on_handoff_requested)
+	# The board also refreshes off the bridge's per-action signals when online.
+	var eb := get_node_or_null(^"/root/EuroNet")
+	if eb != null:
+		eb.action_applied.connect(func(_seat: int, _action: Dictionary) -> void: _refresh())
+		eb.turn_changed.connect(func(_seat: int) -> void: _refresh())
+		eb.game_over.connect(func(_winner: int) -> void: _refresh())
 	_refresh()
+
+
+## True when a live host-authoritative Net session owns the current game.
+func _online() -> bool:
+	var eb := get_node_or_null(^"/root/EuroNet")
+	return eb != null and eb.is_online()
 
 
 func _unhandled_input(e: InputEvent) -> void:
@@ -110,6 +124,18 @@ func _build_ui() -> void:
 	llmbtn.tooltip_text = "Seat 2 is LLM-assisted (Ollama). Needs [euro_llm] enabled + a running model; falls back to the heuristic AI otherwise."
 	llmbtn.pressed.connect(func() -> void: GameManager.new_game_with_llm(SEED, PLAYERS))
 	_layer.add_child(llmbtn)
+
+	# STAGE 3: LAN / internet multiplayer. Opens the vendored nox_netcode lobby
+	# (Host/Join → ready → Start). On Start the host broadcasts the shared seed +
+	# seat lineup and every peer returns here to play the SAME game host-
+	# authoritatively (this peer's seat is a local human; the others are REMOTE).
+	# Offline this button is the only new surface — the presets above are unchanged.
+	var netbtn := _mk_button("Host / Join (LAN)")
+	netbtn.position = Vector2(1010, 124)
+	netbtn.tooltip_text = "Networked multiplayer over LAN/internet (host-authoritative, turn-based). Opens the lobby."
+	netbtn.pressed.connect(func() -> void:
+		get_tree().change_scene_to_file("res://addons/nox_netcode/lobby.tscn"))
+	_layer.add_child(netbtn)
 
 	_build_handoff_overlay()
 
@@ -207,6 +233,10 @@ func _column(pos: Vector2) -> VBoxContainer:
 
 func _refresh() -> void:
 	var e: EuroEngine = GameManager.engine
+	# Defensive: never render a half-built engine (e.g. a stray refresh before the
+	# online lineup lands). Offline this is never hit (the engine is set up in _ready).
+	if e == null or e.players.is_empty():
+		return
 	if e.game_over:
 		var w := e.winner
 		_status.text = "GAME OVER — Winner: %s with %d VP  ·  round %d" % [
@@ -218,6 +248,8 @@ func _refresh() -> void:
 		var who: String
 		if e.is_human_seat(e.current):
 			who = "%s — YOUR TURN" % e.seat_name(e.current)
+		elif e.is_remote_seat(e.current):
+			who = "%s (networked) — waiting…" % e.seat_name(e.current)
 		else:
 			who = "%s (AI) thinking…" % e.seat_name(e.current)
 		_status.text = "%s   ·   round %d/%d   ·   deck %d" % [
@@ -301,6 +333,8 @@ func _player_panel(e: EuroEngine, pi: int) -> Control:
 	var kind_tag := "HUMAN"
 	if e.is_llm_seat(pi):
 		kind_tag = "LLM"
+	elif e.is_remote_seat(pi):
+		kind_tag = "NET"
 	elif not e.is_human_seat(pi):
 		kind_tag = "AI"
 	var head := Label.new()

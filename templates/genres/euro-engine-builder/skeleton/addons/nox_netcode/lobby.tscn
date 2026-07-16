@@ -1,0 +1,143 @@
+[gd_scene load_steps=2 format=3 uid="uid://noxnetlobby01"]
+
+[ext_resource type="Script" path="res://addons/nox_netcode/lobby.gd" id="1_lobby"]
+
+[node name="Lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0862745, 0.0784314, 0.0666667, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Rows" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="Center/Panel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Multiplayer Lobby"
+horizontal_alignment = 1
+
+[node name="NameRow" type="HBoxContainer" parent="Center/Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="Center/Panel/Margin/Rows/NameRow" groups=["scalable_text"]]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "Name"
+vertical_alignment = 1
+
+[node name="NameEdit" type="LineEdit" parent="Center/Panel/Margin/Rows/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Player"
+
+[node name="AddressRow" type="HBoxContainer" parent="Center/Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AddressLabel" type="Label" parent="Center/Panel/Margin/Rows/AddressRow" groups=["scalable_text"]]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+text = "Host / IP"
+vertical_alignment = 1
+
+[node name="AddressEdit" type="LineEdit" parent="Center/Panel/Margin/Rows/AddressRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "127.0.0.1"
+placeholder_text = "127.0.0.1"
+
+[node name="ButtonsRow" type="HBoxContainer" parent="Center/Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="HostButton" type="Button" parent="Center/Panel/Margin/Rows/ButtonsRow"]
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+text = "Host"
+
+[node name="JoinButton" type="Button" parent="Center/Panel/Margin/Rows/ButtonsRow"]
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+text = "Join"
+
+[node name="Sep1" type="HSeparator" parent="Center/Panel/Margin/Rows"]
+layout_mode = 2
+
+[node name="PeersLabel" type="Label" parent="Center/Panel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+text = "Players"
+
+[node name="PeerList" type="VBoxContainer" parent="Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ControlsRow" type="HBoxContainer" parent="Center/Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ReadyToggle" type="CheckButton" parent="Center/Panel/Margin/Rows/ControlsRow"]
+layout_mode = 2
+disabled = true
+text = "Ready"
+
+[node name="DMSeatButton" type="Button" parent="Center/Panel/Margin/Rows/ControlsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+text = "Take DM seat"
+
+[node name="StartButton" type="Button" parent="Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+disabled = true
+text = "Start"
+
+[node name="StatusLabel" type="Label" parent="Center/Panel/Margin/Rows" groups=["scalable_text"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.741176, 0.694118, 0.596078, 1)
+text = "Host a session or join one."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="LeaveButton" type="Button" parent="Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+disabled = true
+text = "Leave"

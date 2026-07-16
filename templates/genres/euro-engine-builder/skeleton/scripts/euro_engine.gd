@@ -149,19 +149,32 @@ const ACTIONS: Array[String] = ["PRODUCE", "BUILD", "TRADE", "RESEARCH", "DEPLOY
 ##                    no provider plays EXACTLY like an AI_HEURISTIC seat and the
 ##                    game can never stall. It is inert unless a seat opts in.
 ##
-## EXTENSION POINT — one more kind slots in WITHOUT a rewrite, as ONE new enum
-## value + ONE new dispatch case in GameManager._advance_dispatch() + ONE hook:
-##   * REMOTE  — a networked human/agent: the new case awaits a transport that
-##               delivers the seat's chosen action, then apply_action() applies it.
-## The dispatcher's default branch fails LOUD on any kind it does not handle, so
-## an unwired kind can never silently pass — it asserts a clear error instead.
-enum ControllerKind { HUMAN_LOCAL, AI_HEURISTIC, AI_LLM }
+## FOUR kinds are now FULLY IMPLEMENTED — REMOTE is the STAGE 3 (final) networked
+## seat that fills the play-mode matrix:
+##   * REMOTE  — a networked human/agent on ANOTHER peer (LAN / internet). The turn
+##               dispatcher STOPS at a REMOTE seat and waits for the host-authoritative
+##               network bridge (EuroNet, addons/nox_netcode/euro_net_bridge.gd) to
+##               DELIVER that seat's applied action; apply_action() validates it like
+##               any other. The engine itself is UNCHANGED — REMOTE, like every other
+##               kind, is a pure input seam: it only changes WHO produces the action,
+##               never the rules, RNG or scoring. Because the engine is deterministic +
+##               seeded and the host broadcasts the APPLIED action, every peer's engine
+##               stays in lockstep. REMOTE is INERT offline: no seat is ever REMOTE
+##               unless a live Net session assigns it, so single-player / hotseat / LLM
+##               lineups play byte-identically (the network layer intercepts only at
+##               the GameManager/EuroNet boundary — see MULTIPLAYER notes below).
+##
+## The play-mode matrix is COMPLETE: HUMAN_LOCAL, AI_HEURISTIC, AI_LLM, REMOTE. The
+## dispatcher's default branch still fails LOUD on any UNKNOWN kind (corrupt value),
+## so nothing can ever silently pass.
+enum ControllerKind { HUMAN_LOCAL, AI_HEURISTIC, AI_LLM, REMOTE }
 
 ## Human-readable tag per implemented kind (used in seat names / the HUD).
 const CONTROLLER_LABEL := {
 	ControllerKind.HUMAN_LOCAL: "human",
 	ControllerKind.AI_HEURISTIC: "ai",
 	ControllerKind.AI_LLM: "llm",
+	ControllerKind.REMOTE: "net",
 }
 
 # =====================================================================
@@ -281,11 +294,13 @@ func configure_seats(kinds: Array, names: Array = []) -> void:
 
 
 ## True iff `kind` is a controller kind this engine actually implements.
-## HUMAN_LOCAL, AI_HEURISTIC and AI_LLM are supported; REMOTE is the open seam.
+## HUMAN_LOCAL, AI_HEURISTIC, AI_LLM and REMOTE are ALL supported (the play-mode
+## matrix is complete). REMOTE seats are driven by the networked EuroNet bridge.
 func is_supported_kind(kind: int) -> bool:
 	return kind == ControllerKind.HUMAN_LOCAL \
 		or kind == ControllerKind.AI_HEURISTIC \
-		or kind == ControllerKind.AI_LLM
+		or kind == ControllerKind.AI_LLM \
+		or kind == ControllerKind.REMOTE
 
 
 func controller_of(seat: int) -> int:
@@ -309,6 +324,12 @@ func is_llm_seat(seat: int) -> bool:
 	return controller_of(seat) == ControllerKind.AI_LLM
 
 
+## A networked seat owned by ANOTHER peer (STAGE 3). Its action arrives over the
+## wire via the EuroNet host-authoritative bridge; the dispatcher waits for it.
+func is_remote_seat(seat: int) -> bool:
+	return controller_of(seat) == ControllerKind.REMOTE
+
+
 ## How many seats are local humans — drives the hotseat pass-the-device flow.
 func human_seat_count() -> int:
 	var n := 0
@@ -321,6 +342,8 @@ func human_seat_count() -> int:
 func _default_seat_name(seat: int, kind: int) -> String:
 	if kind == ControllerKind.HUMAN_LOCAL:
 		return "P%d You" % (seat + 1) if seat == 0 else "P%d Human" % (seat + 1)
+	if kind == ControllerKind.REMOTE:
+		return "P%d Net" % (seat + 1)
 	return "P%d AI" % (seat + 1)
 
 

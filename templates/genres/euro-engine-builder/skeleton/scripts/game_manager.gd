@@ -15,11 +15,19 @@ extends Node
 ## machine) it raises a "pass the device" hand-off before every human turn AFTER
 ## the first, so the next player is prompted to take the seat before input opens.
 ##
-## Adding AI_LLM (an LLM provider picks a legal action) or REMOTE (a networked
-## action arrives) is a NEW match case in _advance_dispatch() + one hook — NOT a
-## rewrite. The default branch fails loud on any unhandled kind (never silently
-## passes). All rules stay in EuroEngine; board.gd only reads state + forwards a
-## click; this file only decides WHO acts next.
+## STAGE 3 (final) wires REMOTE: a networked seat on another peer. When a live Net
+## session is active (LAN / internet), the host is the single source of truth. The
+## dispatcher STOPS at a REMOTE seat and waits for the EuroNet bridge (autoload
+## "EuroNet", addons/nox_netcode/euro_net_bridge.gd) to deliver that seat's applied
+## action; the host validates + broadcasts every applied action so all engines stay
+## in lockstep. A LOCAL human's action is routed through the bridge (host validates
+## + broadcasts) instead of applied directly. OFFLINE the bridge is inert
+## (_net_active() == false): no seat is ever REMOTE and every AI/human path is
+## byte-identical to Stages 1-2 — the netcode intercepts ONLY at this boundary.
+##
+## All rules stay in EuroEngine; board.gd only reads state + forwards a click; this
+## file only decides WHO acts next. The default branch STILL fails loud on any
+## UNKNOWN kind (corrupt value) — the play-mode matrix is complete.
 
 signal changed  ## any state change — the board redraws on this.
 signal handoff_requested(seat: int, seat_name: String)  ## hotseat: prompt the pass-the-device banner.
@@ -89,6 +97,27 @@ func new_hotseat_game(human_count: int, ai_count: int, seed_value: int = 0) -> v
 ## `enabled` is true AND a local endpoint answers; otherwise it plays exactly like
 ## a heuristic AI (see LlmSeat). Nothing here touches the network by itself — this
 ## just assigns the seat kind; the default new_game() preset is untouched.
+## STAGE 3: begin a HOST-AUTHORITATIVE networked game. Called ONLY by the EuroNet
+## bridge (autoload "EuroNet") on the shared-seed handshake, once per peer, with a
+## lineup already resolved from the lobby roster: `kinds` is one ControllerKind per
+## seat FROM THIS PEER'S PERSPECTIVE — this peer's own seat is HUMAN_LOCAL, every
+## other peer's seat is REMOTE, and (host only) AI-filled seats are AI_HEURISTIC.
+## All peers pass the SAME `seed_value` (broadcast by the host via Net), so every
+## engine builds an identical deck/board and the broadcast of each APPLIED action
+## keeps them in lockstep. Never call this offline — new_game/configure_game own
+## the single-player and hotseat flows and are untouched.
+func begin_networked_game(kinds: Array, names: Array, seed_value: int, player_count: int) -> void:
+	engine.setup(seed_value, player_count)
+	engine.configure_seats(kinds, names)
+	# A networked game is never "before the first human turn" in the hotseat sense —
+	# there is at most ONE local human here, so no pass-the-device banner applies.
+	awaiting_input = false
+	pending_handoff = false
+	_first_human_seen = true
+	_advance_dispatch()
+	changed.emit()
+
+
 func new_game_with_llm(seed_value: int = 0, player_count: int = 4) -> void:
 	var total := clampi(player_count, 2, 5)
 	var kinds: Array = []
@@ -164,27 +193,53 @@ func _advance_dispatch() -> void:
 				# an async AI_LLM turn resolved (the original caller already returned).
 				changed.emit()
 				return
+			EuroEngine.ControllerKind.REMOTE:
+				# A networked seat owned by ANOTHER peer. STOP and wait: the EuroNet
+				# bridge delivers this seat's host-authoritative APPLIED action
+				# (host: the owning client's validated request; client: the host's
+				# broadcast), applies it to the engine, advances, and re-enters this
+				# dispatcher. Exactly like HUMAN_LOCAL, but the resume trigger is a
+				# network event, not a UI click. Never reached offline (no REMOTE
+				# seats exist unless a live Net session assigns them).
+				awaiting_input = false
+				pending_handoff = false
+				_dispatching = false
+				changed.emit()
+				return
 			EuroEngine.ControllerKind.AI_HEURISTIC:
-				engine.ai_take_turn(seat)
+				# ai_take_turn == ai_choose + apply_action; it RETURNS the applied
+				# action. Offline this is byte-identical to the prior call (the return
+				# was ignored). Online (host only — clients carry no AI seats, they are
+				# REMOTE there) the host broadcasts the applied action so every client
+				# replays it in lockstep.
+				var ai_action: Dictionary = engine.ai_take_turn(seat)
 				engine.advance_turn()
+				if _net_active():
+					_bridge().host_broadcast_and_notify(seat, ai_action)
 			EuroEngine.ControllerKind.AI_LLM:
 				# OPTIONAL local-LLM seat. choose_action_async ALWAYS returns a
 				# legal action (heuristic fallback on any provider failure) and its
 				# HARD HTTP timeout guarantees this await resolves — headless runs
 				# never hang. apply_action() re-validates before mutating state.
 				var chosen: Dictionary = await _llm_seat.choose_action_async(engine, seat, self)
-				var applied := engine.apply_action(seat, chosen["action"])
+				var llm_action: Dictionary = chosen["action"]
+				var applied := engine.apply_action(seat, llm_action)
 				if not applied:
 					# Belt-and-braces: an unexpected reject still cannot stall the
 					# game — take the guaranteed-legal heuristic action instead.
-					engine.apply_action(seat, engine.ai_choose(seat))
+					llm_action = engine.ai_choose(seat)
+					engine.apply_action(seat, llm_action)
 				engine.advance_turn()
+				if _net_active():
+					# Online, the host broadcasts the ACTUAL applied action (LLM
+					# lineups are host-side only). Keeps every peer in lockstep.
+					_bridge().host_broadcast_and_notify(seat, llm_action)
 			_:
-				# Unwired controller kind (REMOTE / corrupt value): fail loud, never
-				# silently pass. This is where a network transport case drops in
-				# (see EuroEngine.ControllerKind). Add the case ABOVE.
-				push_error("GameManager: unhandled ControllerKind %d at seat %d — REMOTE not wired." % [kind, seat])
-				assert(false, "Unhandled ControllerKind %d — extension point for REMOTE." % kind)
+				# UNKNOWN controller kind (a corrupt value): fail loud, never silently
+				# pass. The play-mode matrix is complete (HUMAN_LOCAL / AI_HEURISTIC /
+				# AI_LLM / REMOTE all handled above) — reaching here means bad data.
+				push_error("GameManager: unhandled ControllerKind %d at seat %d — corrupt lineup." % [kind, seat])
+				assert(false, "Unhandled ControllerKind %d — corrupt lineup." % kind)
 				_dispatching = false
 				return
 	awaiting_input = false
@@ -211,6 +266,12 @@ func submit_action(action: Dictionary) -> bool:
 		return false
 	if pending_handoff or not awaiting_input:
 		return false
+	# ONLINE: route the LOCAL human's action through the host-authoritative bridge.
+	# The host validates + applies + broadcasts; a client sends a request and waits
+	# for the host's broadcast to apply it (never mutates shared state directly).
+	if _net_active():
+		return _bridge().submit_local(seat, action)
+	# OFFLINE — unchanged single-player / hotseat path (byte-identical).
 	if not engine.apply_action(seat, action):
 		return false
 	awaiting_input = false
@@ -218,6 +279,33 @@ func submit_action(action: Dictionary) -> bool:
 	_advance_dispatch()
 	changed.emit()
 	return true
+
+
+# =====================================================================
+#  Networked-play boundary (STAGE 3) — the ONLY hooks into the bridge
+# =====================================================================
+
+## The EuroNet bridge autoload, or null when the netcode is not present. Cached
+## lazily; the bridge is inert until a Net session is live, so a null bridge or an
+## offline bridge both mean "play locally".
+func _bridge() -> Node:
+	return get_node_or_null(^"/root/EuroNet")
+
+
+## True only when a live, host-authoritative Net session owns the current game.
+## When false EVERY network branch above is skipped and the game plays exactly as
+## it did in Stages 1-2 (the mandatory offline-inertness guarantee).
+func _net_active() -> bool:
+	var b := _bridge()
+	return b != null and b.is_online()
+
+
+## Re-enter the turn dispatcher after the bridge applied a networked action. Public
+## so EuroNet can drive progression from an RPC callback (host: after a client's
+## request resolves; client: after the host's broadcast lands).
+func resume_after_network() -> void:
+	_advance_dispatch()
+	changed.emit()
 
 
 ## Legacy alias for the classic 1-human flow (board.gd used this name). Forwards

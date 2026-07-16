@@ -19,6 +19,8 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 [autoload]
 
 GameManager="*res://scripts/game_manager.gd"
+Net="*res://addons/nox_netcode/net_session.gd"
+EuroNet="*res://addons/nox_netcode/euro_net_bridge.gd"
 
 [euro_llm]
 
@@ -39,6 +41,21 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[nox_netcode]
+
+; STAGE 3 networked multiplayer (nox_netcode authority-turn profile, VENDORED into
+; addons/nox_netcode/). Host-authoritative, turn-based: the host validates + applies
+; + broadcasts every action; clients request. ENet is the LAN default (lowest
+; latency, built-in); websocket is the web-shippable alternative. The game touches
+; NO network until you Host/Join from the board's "Host / Join (LAN)" button — with
+; no session the EuroNet bridge is inert and SP / hotseat / LLM play byte-identically.
+profile="authority-turn"
+transport="enet"
+arbitration="leader"
+default_port=24567
+max_peers=8
+disconnect_policy="pause-and-wait"
 
 [input]
 
