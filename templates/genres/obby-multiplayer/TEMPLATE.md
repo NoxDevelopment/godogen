@@ -21,12 +21,34 @@ scaffold-time clone.
   gate counts — the same anti-skip rule the host enforces online), death count,
   a live clock + a persisted **best time**, and `save_data()/load_data()` of the
   whole run. The course and the network layer only read + drive this.
-- **The course, built entirely in code** (`scripts/obby.gd`) from the `PLATFORMS`
-  / `CHECKPOINTS` / `HAZARDS` / `FINISH` / `KILL_Y` data at the top of the file —
-  static platforms, ordered checkpoint gates, hazard kill-zones, a finish, a fall
-  line, spawn points (the `net_spawn_point` group), a trailing camera, and a HUD
-  (checkpoint x/N · time · deaths · best). The scene (`scenes/obby.tscn`) stays a
-  bare `Node2D` + the netcode nodes.
+- **A DATA-DRIVEN course** — `scripts/obby.gd` builds the level (static platforms,
+  ordered checkpoint gates, hazard kill-zones, a finish, a fall line, spawn points
+  in the `net_spawn_point` group, a trailing camera, a HUD of checkpoint x/N · time
+  · deaths · best) from a **`CourseData`** instance (`scripts/course_data.gd`), not
+  hardcoded consts. `CourseData` is the ONE course format — `{name, author, created,
+  start_spawn, platforms:[Rect2], checkpoints:[Vector2] (ordered), hazards:[Rect2],
+  finish:Rect2, kill_y}` — with lossless `to_dict`/`from_dict` (in-memory) and
+  `to_json`/`from_json` (files + the wire; `Vector2`→`[x,y]`, `Rect2`→`[x,y,w,h]`).
+  The scene (`scenes/obby.tscn`) stays a bare `Node2D` + the netcode nodes + one
+  `CourseSync` child.
+- **Course library + designer + share** (all `CourseData`, no divergence):
+  - **`CourseLibrary` autoload** (`scripts/course_library.gd`) unifies **built-in**
+    courses (the original obby as `Starter Climb`, plus a harder `Sky Gauntlet`),
+    **user** courses saved to `user://courses/<slug>.json`, and **imported** shared
+    files. `list_courses()` / `load_course(id)` / `save_course()` / `export_course()`
+    / `import_course()`. `pending_course` is the one-slot hand-off obby.gd plays
+    (null → the built-in default, so running the level directly is unchanged).
+  - **In-game designer** (`scenes/course_editor.tscn` + `course_editor.gd`): place/
+    delete platforms & hazards (drag-rect), drop auto-numbered ordered checkpoints,
+    set start & finish, on a 20px snap grid, via a `scalable_text` palette. Save-as
+    writes to the library; **Test** loads the just-built course into the play level.
+    Everything routes through one authoring API (`set_tool` / `place_platform` /
+    `add_checkpoint` / `add_hazard` / `set_start` / `set_finish` / `build_course_data`)
+    that mouse and code share.
+  - **Course-SELECT screen** (`scenes/course_select.tscn`): list built-in + user +
+    imported, Play / New / Edit / **Export** a portable `.json` / **Import** one from
+    a path. Server publishing is a documented seam (`CourseLibrary` — "Studio
+    course-exchange integration point"), out of template scope.
 - **The avatar** (`scenes/player.tscn`) is `nox_netcode`'s `net_player.gd` — a
   `CharacterBody2D` that drives from local input for its owner and renders synced
   transform for everyone else, mapped to this template's `move_left/move_right/
@@ -57,16 +79,24 @@ The whole level is identical either way; a single seam (`_net_active()` in
   clients request, the **host validates** (monotonic checkpoints, authoritative
   finish order) and broadcasts, and `obby.gd` applies the host's decisions
   (`checkpoint_confirmed` / `player_respawned` / `player_finished`). Host = peer
-  1 = the single source of truth, so the race is cheat-resistant.
+  1 = the single source of truth, so the race is cheat-resistant. The **`CourseSync`**
+  child (`scripts/course_sync.gd`) extends the same host-authoritative philosophy to
+  the COURSE itself: at race start the host publishes its chosen course to every
+  peer (a built-in by id, a custom course as full `CourseData` JSON), and clients
+  build the identical course — so everyone races the host's pick, custom or not.
+  `CourseSync` is game-layer (it never touches the `nox_netcode` addon) and fully
+  inert offline.
 
 Because the offline core never calls the network, the single-player game behaves
 byte-identically whether or not a session is ever started.
 
 ## How to extend
 
-1. **The course**: edit the `PLATFORMS` / `CHECKPOINTS` / `HAZARDS` / `FINISH`
-   data at the top of `obby.gd` — it rebuilds from that. Add moving platforms
-   (an `AnimatableBody2D` + a tween) or one-way platforms as new build helpers.
+1. **The course**: build one in-game with the designer (`course_editor.tscn`) and
+   Save/Test it, or add a new built-in in `CourseLibrary` (`starter_climb()` /
+   `sky_gauntlet()` are the pattern; register it in `_builtin_registry()`). obby.gd
+   rebuilds from any `CourseData`. Add moving platforms (an `AnimatableBody2D` + a
+   tween) or one-way platforms as new build helpers keyed off new `CourseData` fields.
 2. **Feel**: tune `speed` / `jump_velocity` / `gravity` on `player.tscn`
    (net_player exports); add coyote-time / double-jump in `net_player.gd`
    (the authority branch of `_physics_process`).
@@ -85,7 +115,24 @@ byte-identically whether or not a session is ever started.
 ## Validation status
 
 `status: "validated"` — scaffolded, `--headless --import` exit 0 with zero
-script errors, and four headless probes:
+script errors, and headless probes (all `fails=0`) covering the data-driven course
+system + the pre-existing run/offline/netcode/config checks. As with every genre
+template in this repo, probe scenes are **ephemeral** — they are written under
+`res://_probes/`, run during the build, and removed afterward (the committed
+skeleton ships only the game, not its test scaffolds). The checks were:
+
+- **Course round-trip** (`fails=0`): a `CourseData` built in code survives
+  dict, JSON, and file (`save_course`→`load_course`) round-trips deep-equal.
+- **Editor → course** (`fails=0`): driving the designer API (2 platforms + 2
+  ordered checkpoints + a hazard + start + finish) yields a VALID `CourseData`, and
+  the SAME `obby.gd` builds a level from it that an avatar completes end-to-end.
+- **Library** (`fails=0`): both built-ins load + list, and a saved user course
+  appears in the listing and loads back by id and by name.
+- **Regression** (`fails=0`): the default `Starter Climb` is byte-identical to the
+  pre-refactor hardcoded course, the offline avatar still lands + completes, the
+  course-sync codec resolves built-in-by-id and custom-by-json, and `net` stays inert.
+
+Plus the pre-existing checks (still green):
 
 - **Run-engine probe** (pure `GameManager`, `fails=0`): checkpoint progression
   with anti-skip rejection, death counting, the live clock, finish + best time,

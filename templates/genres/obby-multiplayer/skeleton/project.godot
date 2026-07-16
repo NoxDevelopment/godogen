@@ -9,7 +9,7 @@ config_version=5
 [application]
 
 config/name="Obby Multiplayer Template"
-run/main_scene="res://scenes/obby.tscn"
+run/main_scene="res://scenes/course_select.tscn"
 config/features=PackedStringArray("4.6")
 
 [audio]
@@ -19,6 +19,7 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 [autoload]
 
 GameManager="*res://scripts/game_manager.gd"
+CourseLibrary="*res://scripts/course_library.gd"
 Net="*res://addons/nox_netcode/net_session.gd"
 
 [nox_netcode]

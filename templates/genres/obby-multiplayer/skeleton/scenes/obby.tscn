@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://obbymain0001"]
+[gd_scene load_steps=5 format=3 uid="uid://obbymain0001"]
 
 [ext_resource type="Script" path="res://scripts/obby.gd" id="1_obby"]
 [ext_resource type="Script" path="res://addons/nox_netcode/net_spawner.gd" id="2_spawn"]
 [ext_resource type="Script" path="res://addons/nox_netcode/net_events.gd" id="3_evt"]
+[ext_resource type="Script" path="res://scripts/course_sync.gd" id="4_sync"]
 
 [node name="Obby" type="Node2D"]
 script = ExtResource("1_obby")
@@ -22,3 +23,6 @@ avatar_parent_path = NodePath("../Avatars")
 
 [node name="NetEvents" type="Node" parent="."]
 script = ExtResource("3_evt")
+
+[node name="CourseSync" type="Node" parent="."]
+script = ExtResource("4_sync")
