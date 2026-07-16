@@ -1719,6 +1719,45 @@
         "A skybox / environment via viz-skybox-panorama",
         "Sword swing / hit / door-unlock / boss-defeat SFX"
       ]
+    },
+    {
+      "id": "euro-engine-builder",
+      "name": "Euro Engine-Builder (competitive resource→production→VP engine, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "Competitive Euro-style ENGINE-BUILDER board game (Scythe/Wingspan/Wyrmspan lineage): every player grows a resource→production→victory-point engine and the best engine wins. The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (EuroEngine) owned by a GameManager autoload — 1 human + up to 4 heuristic-AI opponents (2–5 total). 5 tracked resources (wood/grain/metal/coin/energy) with a strict conservation ledger (pool == start + produced − spent, proven every turn); a 25-card development deck (5 categories, 3 copies each) with per-card cost/output/VP shuffled by a seeded RNG; a shared action board of 5 action types (PRODUCE/BUILD/TRADE/RESEARCH/DEPLOY) where a turn is exactly ONE legal action (is_legal rejects out-of-turn/unaffordable/malformed); 3 objective-token types (build 3 mining cards / reach 3 stars / bank 12 coin) claimed first-come, plus end-game majorities (most stars/cards/coin), plus VP from built cards and goal-stars; an end trigger (first to 6 goal-stars via DEPLOY, else 18 rounds) → final_scoring with a single deterministic winner. The AI is a genuine NON-LLM heuristic: it enumerates every legal action and scores each by a weighted evaluation (immediate VP + resource-efficiency + engine growth + quadratic progress-to-goal + option/conversion value), deterministic index tie-break, never illegal, never stalls. Full to_dict/from_dict save-load (banks, tableaus, hands, stars, deck, objectives, cursor, RNG state). board.gd renders the action board + per-player panels (resources/VP/stars/production/tableau) + objectives + current-player indicator + turn log, enabling only legal actions for the human and auto-resolving AI turns. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Replays byte-identically from a seed; drops in standalone or as the 4X/board core of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/euro-engine-builder/skeleton",
+      "doc": "genres/euro-engine-builder/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give each AI opponent a persona/voice via companion-npcs + Dialogue Manager for table-talk/taunts as they take actions"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the card/action buttons for real development-card art + a board mat (recipes: card frames per category via card-frame, card art via card-creature-art/zit-txt2img, resource/star icons via qwen-icon)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Development-card art keyed by card id (25 cards across forestry/farm/mining/energy/commerce) via card-creature-art / zit-txt2img",
+        "Card frames per category + cost/VP badges via card-frame",
+        "Resource icons (wood/grain/metal/coin/energy) + goal-star + objective-token icons via qwen-icon",
+        "A board mat / player-tableau backdrop via zit-txt2img",
+        "Build / produce / deploy-star / trade SFX stingers"
+      ]
     }
   ]
 }
