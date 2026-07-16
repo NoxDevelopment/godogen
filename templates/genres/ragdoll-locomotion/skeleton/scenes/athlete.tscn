@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://ragdollathlete01"]
+
+[ext_resource type="Script" path="res://addons/nox_netcode/net_athlete.gd" id="1_ath"]
+
+[node name="Athlete" type="Node2D"]
+script = ExtResource("1_ath")
+preset = "normal"

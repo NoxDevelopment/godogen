@@ -2123,6 +2123,48 @@
         "Rival captain + governor portraits via card-creature-art",
         "Cannon-broadside, boarding-clash, wind, coin, and win/lose stinger SFX"
       ]
+    },
+    {
+      "id": "ragdoll-locomotion",
+      "name": "Ragdoll Locomotion (QWOP-style physics-comedy walker + MP)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A QWOP-lineage RAGDOLL LOCOMOTION game: actuate an athlete's individual muscles (four groups mapped to Q/W/O/P, each an antagonistic joint pair) to stagger an articulated body FORWARD as far as possible before it topples. Reach the goal distance to WIN; faceplant (head/shoulder hits the floor, or the torso tips past a threshold) or time out to LOSE. KEY DESIGN DECISION: the articulated-body physics is a DETERMINISTIC custom fixed-timestep sim, NOT Godot's RigidBody2D (whose solver is not identical across runs/builds and would break byte-identical replays + probes). RagdollEngine is a pure RefCounted class (no Godot-node dependency): the athlete is 11 point masses wired by 10 rigid BONE distance-constraints (>=7 rigid segments -- head, torso, thighL/shinL/footL, thighR/shinR/footR, upperArm, lowerArm); each fixed step (DT=1/120) integrates velocities under gravity + air drag (semi-implicit Euler), integrates positions, then runs a fixed 10-pass XPBD-style relaxation (rigidify bones -> drive MUSCLE angular-constraints toward the player's target angles -> a torso balance reflex -> resolve GROUND contact + Coulomb friction) and re-derives velocities from the projected motion so a constraint can never inject energy (no NaN, no explosion); a per-node speed clamp + bone-reconciliation pass means the athlete must genuinely WALK, never teleport/slide. A planted foot GRIPS the floor (traction), so a hip that extends against a gripped foot levers the torso forward -- real walking, not skating. The physics has ZERO randomness (the only RNG is a seeded start-jitter saved with the run); MAX_STEPS bounds every run -> a timeout, never an infinite stagger. Given (seed, config, per-frame muscle inputs) the trajectory is 100% reproducible and byte-identical across separate processes. Three difficulty presets (easy walks to a 6 m goal, normal is stable to the full 100 m, hard is a weak-balance teeter); set_muscle(i,on) drives the joint targets for live human control; deterministic policy_walk (advances a positive distance + clears the easy goal) and policy_fall (topples the athlete) prove WIN and LOSS are reachable; to_dict/from_dict + run_checksum save the whole run incl. the RNG and prove determinism. It ships the nox_netcode realtime drop-in PRE-WIRED (same _net_active() seam as obby-multiplayer): OFFLINE it drives one local athlete through GameManager's engine and renders it (a complete single-player QWOP game, byte-identical whether or not the netcode nodes are present); ONLINE (a session running) the NetSpawner spawns one net_athlete per peer via MultiplayerSpawner+MultiplayerSynchronizer (each peer sims its OWN athlete + syncs its body POSE) and NetEvents arbitrates the authoritative finish order -- a ragdoll RACE. Authority is per-peer over its own athlete (the exact obby net_player seam -- authority from the node name at spawn, owner-drives/others-render -- only the replicated payload is an articulated pose, no new protocol). GameManager autoload adds the NoxDev ABI (buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text). track.gd renders the play surface in code -- the athlete (code-drawn bones + joints), the scrolling ground with metre markers + a goal line, and a distance HUD -- with Q/W/O/P muscle input. Drops in standalone or as the locomotion/traversal core of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/ragdoll-locomotion/skeleton",
+      "doc": "genres/ragdoll-locomotion/TEMPLATE.md",
+      "vendoredAddons": [],
+      "bundledAddons": [
+        {
+          "name": "nox_netcode",
+          "source": "godogen skills/netcode/addon/nox_netcode",
+          "license": "MIT",
+          "note": "The NoxDev realtime multiplayer drop-in (Net autoload + MultiplayerSpawner/Synchronizer avatars + host-validated NetEvents), shipped IN the skeleton because the ragdoll race is a realtime consumer. This template drives the articulated-body avatar net_athlete.gd (added additively to the vendored addon alongside the stock net_player.gd/net_spawner.gd/net_events.gd, exactly as obby-3d-multiplayer adds net_player_3d.gd); the shared source addon is never edited. True 2-peer sync needs two running instances (see TEMPLATE.md)."
+        }
+      ],
+      "primitives": [
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the code-drawn bones/joints for a sprite skeleton driven by bone_segments() (recipes: athlete sprite via zit-pixel-art, backdrop via zit-txt2img)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Athlete sprite skeleton (torso/limbs) rigged to bone_segments() via zit-pixel-art",
+        "Scrolling track backdrop + finish banner via zit-txt2img / qwen-icon",
+        "Distance-marker + goal-line UI art via qwen-icon",
+        "Crowd / stadium parallax via image-parallax-depthflow",
+        "Footstep, stumble, thud/wipeout, and goal-cheer SFX"
+      ]
     }
   ]
 }
