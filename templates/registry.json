@@ -1938,6 +1938,44 @@
         "Blind + boss splash art via zit-txt2img",
         "Chip-count tick, joker-trigger, and win/lose stinger SFX"
       ]
+    },
+    {
+      "id": "mall-tycoon",
+      "name": "Mall Tycoon (80s shopping-mall management sim, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "An 80s SHOPPING-MALL management sim (Theme-Park / RollerCoaster-Tycoon / SimTower-of-retail lineage): you OWN the mall - a grid of leasable retail UNITS across floors - and grow your NET WORTH by leasing units to tenants (steady rent) or owner-operating stores yourself (revenue - stock - staff, higher ceiling + risk). The whole tycoon is a pure, seedable, headless-testable MallEngine (RefCounted) owned by a GameManager autoload: 9 generic 80s store types (record store, arcade, video rental, food court, department-store anchor, toy store, electronics, apparel, bookstore) each with appeal/spend/rent/wholesale; a real CUSTOMER ECONOMY where each day seeded FOOT TRAFFIC = base x reputation x amenities x anchors x marketing x noise, customers distribute to stores by appeal x location-desirability and SPEND, a leased tenant pays rent OUT OF its sales (a store starved of traffic defaults - rent is tied to the economy, not free money) and an owner store keeps revenue-costs; a cash-flow ECONOMY with strict MONEY CONSERVATION (cash == start + sum of a named-flow ledger) tracking CASH + NET WORTH (cash + property value - debt); is_legal-gated ACTIONS (lease/operate/buy_stock/hire/set_rent/add_amenity[4]/evict/marketing/loan) that reject illegal moves with byte-identical state; days->months with rent close + loan interest, tenant satisfaction + retention (unhappy tenants quit -> vacancy); a WIN (reach the net-worth goal in time) and a LOSS (bankruptcy) both genuinely reachable; a deterministic auto-play heuristic; and full save/load incl. RNG (byte-identical replays). mall.gd renders the mall grid (units coloured by state/store), a HUD (cash/net worth/reputation/day-month/foot traffic+income/occupancy/debt), an action panel and a tenant+finance readout - all in code. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole mall persists), pause + restart input, scalable_text. A deterministic economy/tycoon engine - swap the STORE + AMENITY catalogues for your own.",
+      "status": "validated",
+      "skeleton": "genres/mall-tycoon/skeleton",
+      "doc": "genres/mall-tycoon/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the mall grid + floors are built in code; use world-layout if you swap to a TileMapLayer for multi-floor concourses / anchor wings"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "replace the Panel blockout colours with store-front sprites keyed by store type + a mall-concourse tileset (recipes: store fronts via card-creature-art or zit-txt2img, floor/concourse tiles via zit-seamless-tile, store/amenity icons via qwen-icon)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Store-front sprites keyed by store type (record store / arcade / food court / department store / electronics / apparel, ~112x48 unit tiles) to replace the _refresh_grid() blockout colours",
+        "A mall-concourse tileset (floor, planters, skylights) via zit-seamless-tile",
+        "Store + amenity + currency icons (restrooms/decor/parking/security; cash/net-worth) via qwen-icon",
+        "80s mall muzak loop + a soft cash-register / crowd-murmur SFX bed"
+      ]
     }
   ]
 }
