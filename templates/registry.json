@@ -1798,6 +1798,45 @@
         "A world-map board mat via zit-txt2img",
         "Doom-tick / gate-tear / monster-spawn / dice-roll / mystery-solved SFX stingers + a low dread ambience"
       ]
+    },
+    {
+      "id": "wildlife-expedition",
+      "name": "Wildlife Expedition (nature-exploration + wildlife-documentation board game, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A competitive NATURE-EXPLORATION + WILDLIFE-DOCUMENTATION board game (National-Geographic flavour — our OWN generic genre engine, no trademarks) that synthesises the SIGNATURE mechanics of three modern classics into one real depth engine: the shared exploration TRAIL + resources + SEASONS (the PARKS lineage), a SPECIES-CARD TABLEAU engine with powers + season goals (the Wingspan lineage), and BIODIVERSITY / set-variety end-game scoring (the Cascadia lineage). The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (WildlifeEngine) owned by a GameManager autoload, replaying byte-identically from a seed; 2–5 players (1 human + heuristic AIs by default). SIX tracked resources (sun/water/forest/mountain/wildlife-sighting/film) with a STRICT conservation ledger (pool == start + produced − spent, proven every turn). The shared TRAIL: 9 site tiles from a Start camp to the Trailhead, each with a biome, a resource yield and sometimes a small action (draw a species / restock gear); 2 pawns per player advance FORWARD only and good interior sites have limited CAPACITY, so the trail is a race. FOUR SEASONS: a season runs until every explorer reaches the Trailhead (or a round cap), and at each boundary season income (species + gear) fires, the active season GOAL scores, the trail RE-SEEDS (sites/bonuses shift) and pawns reset; after 4 seasons → final scoring. 37 unique SPECIES (×2 copies), each a biome, a documentation COST, a POINT value, a CATEGORY (mammal/bird/reptile/aquatic/insect/plant) and a real varied POWER (gain resources now; chain a gain whenever you later document a matching category / any species; per-season income; draw-on-rest; end-game scoring hook) — documenting plays a species to your FIELD JOURNAL (tableau) and fires its power AND any chain powers already in the journal. An OBSERVATION gate ties documenting to where your pawns stand (a pawn must observe the species' biome; sightings are the observation currency, discounted by Binoculars gear). FOUR season goals (one active per season) + SEVEN EXPEDITION contracts (end-game bonus objectives) + 6 developable GEAR/stations (points + an ongoing perk). SET-VARIETY SCORING: escalating tiers for distinct CATEGORIES and distinct BIOMES, a largest-single-category bonus, per-species points, gear, expeditions and accumulated season goals — final_scoring() yields a per-player breakdown whose COMPONENTS SUM to the total, with a single deterministic winner. A turn is exactly ONE legal action from {MOVE, DOCUMENT, REST, DEVELOP}: is_legal() rejects out-of-turn / finished / move-backward / occupied-site / off-biome / unaffordable / malformed actions and apply_action() re-validates. The AI is a genuine NON-LLM heuristic (ai_choose): it enumerates every legal action and scores each by species value + power synergy + progress toward goals & expeditions + resource efficiency + diversity gain + trail-yield value, deterministic index tie-break, never illegal, never stalls. PLAY MODES — a SEAT-CONTROLLER matrix: every 2–5 seats carries a ControllerKind — HUMAN_LOCAL (the dispatcher blocks for local UI input) or AI_HEURISTIC (auto-resolves via ai_choose) — and GameManager is the turn dispatcher. Supported lineups: all-AI (new_all_ai_game), single-player 1-human-vs-AI (the default new_game), and LOCAL HOTSEAT pass-and-play (new_hotseat_game, 2+ HUMAN_LOCAL seats on one machine) with a 'pass the device' hand-off before every human turn after the first. AI_LLM and REMOTE are DOCUMENTED FUTURE SEAMS — present as enum values, NOT wired and NOT stubbed: is_supported_kind is false for them and the dispatcher's default branch FAILS LOUD if one is assigned, each dropping in as one dispatch case + one hook (no netcode addon is vendored). board.gd renders the trail (sites + biomes + yields + pawn markers), the shared species offer + your hand + the gear shop, per-player field journals + resources + live score + pawns, the season/goal/expedition track, a current-player indicator + a pass-the-device hand-off overlay, and a turn log — reads the engine and forwards clicks only. Full to_dict/from_dict save-load (banks, ledger, pawns, journals, hands, gear, trail, offer, gear shop, decks, season, goals, cursor, seat controllers, RNG state). Validated by seven headless probes to fails=0: a full 4-season all-AI game (single winner, components sum to totals, conservation every turn, no illegal action, terminates), determinism (same seed byte-identical / different seed differs), rules+powers, exact set-variety/expedition/goal scoring on a crafted state, hotseat, UI build, and save/load. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Drops in standalone or as the board core of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/wildlife-expedition/skeleton",
+      "doc": "genres/wildlife-expedition/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give each AI_HEURISTIC seat a naturalist persona/voice via companion-npcs + Dialogue Manager for field-guide narration + table-talk as it explores; in LOCAL HOTSEAT the persona/name tags the human seats on the pass-the-device hand-off banner. AI_LLM (a local-LLM-driven opponent) is the carved-but-unwired seat-controller seam."
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the code trail/offer/journal buttons for real species cards + biome frames + a board mat (recipes: species art keyed by id via card-creature-art/zit-txt2img, biome/category frames via card-frame, resource/goal/expedition icons via qwen-icon)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Species card art keyed by species id (37 across mammal/bird/reptile/aquatic/insect/plant) via card-creature-art / zit-txt2img",
+        "Biome + category frames (forest/wetland/grassland/mountain/coast; six categories) + cost/point badges via card-frame",
+        "Resource icons (sun/water/forest/mountain/sighting/film) + season-goal + expedition-contract icons via qwen-icon",
+        "A trail board mat + per-player field-journal backdrop via zit-txt2img",
+        "Hike / document-shutter / season-change / expedition-complete SFX stingers + a light outdoor ambience"
+      ]
     }
   ]
 }
