@@ -2045,6 +2045,45 @@
         "Board backdrop / node-map splash via zit-txt2img",
         "Peg-plink, crit-ding, bomb-blast, and win/lose stinger SFX"
       ]
+    },
+    {
+      "id": "spinning-top-battler",
+      "name": "Spinning Top Battler (Beyblade-style arena, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Beyblade-lineage SPINNING-TOP ARENA BATTLER: build a top from PARTS (an attack ring + a weight disk + a tip), launch it into a circular STADIUM, and collide to drain the opponent's STAMINA (spin-finish), knock it out of the RING (ring-out), or BURST it in one big hit -- across a best-of match and a TOURNAMENT ladder of AI opponents. OUR OWN engine, generic content (no trademarks). KEY DESIGN DECISION: the top-vs-top physics is a DETERMINISTIC custom fixed-timestep circle sim, NOT Godot's RigidBody2D (whose solver is not identical across runs/builds and would break byte-identical replays). A top is a circle (position, velocity, plus WEIGHT and SPIN which encodes STAMINA + a spin DIRECTION) advanced at a fixed dt inside a circular bowl; motion is a pure deterministic sum of a bowl slope (a centre spring), passive friction, an aggression wander (a deterministic sine of the top's age, NOT an RNG), and a seek toward the nearest opponent; collisions are pure circle-circle geometry (overlap -> weighted elastic momentum transfer along the contact normal + an attack knockback + a stamina drain scaled by attacker.attack vs defender.defense and the same-spin/opposite-spin interaction). Given (part builds, launches, seed) the trajectories, stamina curves, and result are 100% reproducible; the only randomness (the tournament ladder + AI launch jitter) is one seeded RNG saved with the run, the physics has zero randomness. TopEngine is a pure RefCounted class (no Godot-node dependency) so a whole tournament replays byte-identically + drives headlessly. 14 parts (6 attack rings / 4 weight disks / 4 tips) form an attack/stamina/defense TRIANGLE with EXACT derived stats (attack, defense, stamina-max, weight, aggression, friction, drain, grip); a best-of match scores spin-finish=1, ring-out=2, burst=2 (timeout=1 stamina tiebreak); a ladder of AI opponents (win -> advance + unlock a part; lose -> eliminated; clear the last rung -> WIN) with a deterministic best-counter auto-play. is_legal rejects illegal actions; to_dict/from_dict + run_checksum save the whole run incl. the RNG and prove determinism. GameManager autoload adds the NoxDev ABI (buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text). arena.gd renders the play surface in code -- the circular stadium + the two spinning tops (markers ringed by a stamina arc) with the last battle's trajectory replayed via _draw(), the part-builder (ring/disk/tip/spin pickers + derived stats), a launch control (power meter + aim slider), the match score + rung roster, an Auto Step demo, and a log. Drops in standalone or as the battle core of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/spinning-top-battler/skeleton",
+      "doc": "genres/spinning-top-battler/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give each AI ladder rung a persona + voice via companion-npcs + Dialogue Manager for pre-match taunts / rival banter"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat top/part circles for real sprites + a stadium backdrop (recipes: top/part icons via qwen-icon, stadium splash via zit-txt2img)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Top / part sprites (6 attack rings, 4 weight disks, 4 tips) via qwen-icon or pixel-perfect",
+        "Spinning-top markers + stamina-ring overlay via qwen-icon",
+        "Circular stadium / bowl backdrop via zit-txt2img",
+        "AI opponent / rival portraits via card-creature-art",
+        "Launch whoosh, metal-clash, ring-out, burst, and win/lose stinger SFX"
+      ]
     }
   ]
 }
