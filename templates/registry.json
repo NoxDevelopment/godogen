@@ -1978,6 +1978,44 @@
       ]
     },
     {
+      "id": "video-store-sim",
+      "name": "Video Store Sim (80s VHS-rental-store management sim, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "An 80s VHS RENTAL-STORE management sim (neon-Blockbuster / retail-tycoon lineage): you OWN the store - a CATALOG of VHS TITLES across six genres (action/comedy/horror/drama/family/scifi) that you BUY COPIES of - and grow your NET WORTH by stocking the right depth of hot NEW RELEASES vs the evergreen catalogue. The whole sim is a pure, seedable, headless-testable VideoStoreEngine (RefCounted) owned by a GameManager autoload: 24 titles (14 evergreen catalogue at baseline demand + 10 new releases that arrive during the run), each with a baseline popularity + genre + per-copy purchase cost. THE HEART is NEW-RELEASE HYPE - a title\u2019s rental DEMAND is a pure time function demand(t,day)=baseline+baseline*gain*e^(-lambda*weeks): a new release SPIKES the week it drops then DECAYS exponentially over the weeks toward its catalogue baseline, so how many copies of a hot release to stock vs catalogue is the core daily decision. A real CUSTOMER ECONOMY: each day seeded FOOT TRAFFIC = base x reputation x marketing x selection-breadth x membership x noise, staff THROUGHPUT caps how many are served, each served customer wants a title (weighted by current demand) and RENTS an available copy (a new-release premium price) - or if every copy is out it is a MISSED rental (lost goodwill). RETURNS after a few days, some LATE (LATE FEES, a real revenue stream, but a harsh late-fee policy CHURNS members), a few DAMAGED (the tape leaves stock). A cash-flow ECONOMY with strict INTEGER MONEY CONSERVATION (cash == start + sum of a named-flow ledger) verified EVERY day, tracking CASH + NET WORTH (cash + depreciated inventory - debt); MEMBERSHIP (happy renters sign up -> members multiply traffic; bad service churns them); is_legal-gated ACTIONS (buy_copies/remove_copy/set_staff/hire/set_late_fee/marketing/loan/repay) that reject illegal moves with byte-identical state; days->months with loan interest; a WIN (reach the net-worth goal) and a LOSS (bankruptcy) both genuinely reachable by a deterministic auto-play, with a MAX_DAYS cap that guarantees termination; and full save/load incl. RNG (byte-identical replays, FNV-1a state checksum stable across processes). store.gd renders a HUD (cash/net worth/reputation/members/day-month/traffic+income), a scrollable CATALOG (title/genre/current demand+new-release flag/copies owned-shelf-out/today rentals vs misses), an action panel (title picker + quantity slider to buy copies, late-fee slider, marketing/hire/fire/loan, next-day + auto-play) and a finance readout - all in code. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole store persists), pause + restart input, scalable_text. A deterministic economy/inventory engine mirroring mall-tycoon\u2019s money-conservation discipline - swap the TITLE catalogue + genres for your own.",
+      "status": "validated",
+      "skeleton": "genres/video-store-sim/skeleton",
+      "doc": "genres/video-store-sim/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the catalog list + action panel are built in code; use world-layout if you swap to a TileMapLayer store floor with browsable genre shelves"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "replace the catalog text rows with VHS box-art cards keyed by genre + a neon-storefront backdrop (recipes: box art via card-creature-art or zit-txt2img, genre/currency icons via qwen-icon, carpet/shelf tiles via zit-seamless-tile)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "VHS box-art cards keyed by title/genre (~120x180 portrait boxes) to replace the _refresh_catalog() text rows",
+        "A neon video-store storefront + carpet/shelf tileset via zit-seamless-tile",
+        "Genre + late-fee + membership-card + currency icons via qwen-icon",
+        "80s synth store-radio loop + a VHS clunk / register-beep / rewind SFX bed"
+      ]
+    },
+    {
       "id": "ant-colony",
       "name": "Ant Colony (colony ecosystem sim, 2D)",
       "engine": "godot",
