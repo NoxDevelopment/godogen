@@ -1,57 +1,50 @@
 extends Node3D
 ## res://scripts/obby3d.gd
-## The obby LEVEL — a 3D obstacle course built entirely in code from the COURSE
-## data below (platforms, ordered checkpoints, hazards, a finish, a kill line).
+## The obby LEVEL — a 3D obstacle course built entirely in code from a
+## CourseData3D instance (scripts/course_data3d.gd): box platforms, ordered
+## checkpoints, hazards, a finish volume, a kill line, a start. The course is
+## DATA-DRIVEN — it comes from CourseLibrary.pending_course (set by the course-
+## select screen or the editor's Test action) and falls back to the built-in
+## 'Skyward Steps' (the original hardcoded obby, verbatim) when nothing is
+## selected, so running this scene directly is byte-identical to the pre-refactor
+## level.
+##
 ## It drives GameManager (the run state) and bridges to nox_netcode when a
 ## session is live:
 ##   • OFFLINE (no Net autoload, or Net.active == false): it spawns ONE local
 ##     avatar and handles checkpoint / respawn / finish itself — a complete
 ##     single-player obby with zero multiplayer dependency.
 ##   • ONLINE (nox_netcode injected + a session running): the NetSpawner3D child
-##     spawns one avatar per peer, and checkpoint/respawn/finish route through
-##     the NetEvents child so the host arbitrates an authoritative race.
+##     spawns one avatar per peer, checkpoint/respawn/finish route through the
+##     NetEvents child so the host arbitrates an authoritative race, AND the
+##     CourseSync child makes every peer build the HOST's chosen course.
 ## The seam is `_net_active()` + `_report_*` — the rest of the level is identical
 ## either way, which is the whole point of the drop-in. It is obby.gd (the 2D
-## template) with Node2D→Node3D, Vector2→Vector3, and Rect2→AABB; the offline↔
-## online seam is byte-identical in spirit.
+## template) with Node2D→Node3D, Vector2→Vector3, Rect2→AABB; the offline↔online
+## seam is byte-identical in spirit.
 
 const PLAYER_SCENE := preload("res://scenes/player.tscn")
-const KILL_Y := -8.0             ## fall below this (Y is up in 3D) → respawn.
-const START_SPAWN := Vector3(0.0, 1.2, 0.0)
-
-## Platforms: AABB(min_corner, size) static floor pieces (X across, Z forward,
-## Y up). The course climbs a staircase of pads along -Z to the finish deck.
-const PLATFORMS: Array[AABB] = [
-	AABB(Vector3(-3.0, -0.5, -3.0), Vector3(6.0, 1.0, 6.0)),      # start deck
-	AABB(Vector3(-1.5, 0.25, -10.0), Vector3(3.0, 0.5, 3.0)),
-	AABB(Vector3(-1.5, 1.25, -15.0), Vector3(3.0, 0.5, 3.0)),
-	AABB(Vector3(-1.5, 2.25, -20.0), Vector3(3.0, 0.5, 3.0)),
-	AABB(Vector3(-1.5, 1.75, -25.0), Vector3(3.0, 0.5, 3.0)),
-	AABB(Vector3(-1.5, 2.25, -30.0), Vector3(3.0, 0.5, 3.0)),
-	AABB(Vector3(-2.0, 2.75, -35.0), Vector3(4.0, 0.5, 4.0)),
-	AABB(Vector3(-3.0, 3.0, -41.0), Vector3(6.0, 1.0, 6.0)),      # finish deck
-]
-## Checkpoints in ORDER — the gate positions (a run must clear them 0,1,2,…).
-const CHECKPOINTS: Array[Vector3] = [
-	Vector3(0.0, 2.5, -15.0),
-	Vector3(0.0, 3.0, -25.0),
-	Vector3(0.0, 3.5, -35.0),
-]
-## Hazards: AABB kill zones (touch → respawn), e.g. a lava patch beside the path.
-const HAZARDS: Array[AABB] = [
-	AABB(Vector3(2.0, 0.0, -19.0), Vector3(2.0, 0.5, 2.0)),
-]
-const FINISH := AABB(Vector3(-2.0, 3.5, -43.0), Vector3(4.0, 2.5, 4.0))
-
-var _avatars: Node
-var _net_spawner: Node
-var _net_events: Node
-var _camera: Camera3D
-var _local_avatar: CharacterBody3D  ## offline: the one avatar we spawned.
-var _respawning := false
 
 ## Fixed follow-camera offset (behind and above the avatar).
 const CAM_OFFSET := Vector3(0.0, 9.0, 11.0)
+## Gate collision + visual sizes (checkpoints are point positions; the gate volume
+## is a fixed box around each so a run can walk through it). Byte-identical to the
+## pre-refactor per-checkpoint construction.
+const CHECKPOINT_COLLISION := Vector3(2.4, 3.0, 2.4)
+const CHECKPOINT_VISUAL := Vector3(0.5, 3.0, 0.5)
+
+## The course this level is currently built from (data-driven). Resolved in
+## _ready(); rebuilt in place when the host's course arrives online.
+var _course: CourseData3D
+
+var _course_root: Node3D            ## container holding all built course nodes.
+var _avatars: Node
+var _net_spawner: Node
+var _net_events: Node
+var _course_sync: Node
+var _camera: Camera3D
+var _local_avatar: CharacterBody3D  ## offline: the one avatar we spawned.
+var _respawning := false
 
 # HUD
 var _hud_progress: Label
@@ -64,28 +57,49 @@ func _ready() -> void:
 	_avatars = $Avatars
 	_net_spawner = get_node_or_null("NetSpawner")
 	_net_events = get_node_or_null("NetEvents")
+	_course_sync = get_node_or_null("CourseSync")
+
+	_course = _resolve_course()
 	_build_environment()
+	_course_root = Node3D.new()
+	_course_root.name = "Course"
+	add_child(_course_root)
 	_build_course()
 	_build_hud()
+
 	_camera = Camera3D.new()
-	_camera.position = START_SPAWN + CAM_OFFSET
+	_camera.position = _course.start_spawn + CAM_OFFSET
 	add_child(_camera)
-	_camera.look_at(START_SPAWN, Vector3.UP)
+	_camera.look_at(_course.start_spawn, Vector3.UP)
 	_camera.make_current()
 
-	GameManager.begin_course(CHECKPOINTS.size())
+	GameManager.begin_course(_course.checkpoints.size())
 	GameManager.course_changed.connect(_refresh_hud)
 
 	if _net_active():
 		_wire_net_events()
+		_wire_course_sync()
 	else:
 		_spawn_local_avatar()
 
 	_refresh_hud()
-	print("DEBUG: obby3d ready — platforms=%d checkpoints=%d hazards=%d net=%s local_avatar=%s" % [
-		PLATFORMS.size(), CHECKPOINTS.size(), HAZARDS.size(), str(_net_active()),
-		str(_current_avatar() != null),
+	print("DEBUG: obby3d ready — course=\"%s\" platforms=%d checkpoints=%d hazards=%d net=%s local_avatar=%s" % [
+		_course.name, _course.platforms.size(), _course.checkpoints.size(),
+		_course.hazards.size(), str(_net_active()), str(_current_avatar() != null),
 	])
+
+
+## Pick the course to build: the pending selection (from the select screen or the
+## editor's Test), else the built-in default. Guards against an invalid pending
+## course so a corrupt hand-off can never brick the level.
+func _resolve_course() -> CourseData3D:
+	var lib := get_node_or_null("/root/CourseLibrary")
+	if lib != null and lib.pending_course != null:
+		var pending: CourseData3D = lib.pending_course
+		if pending.is_valid():
+			return pending
+		push_error("[obby3d] pending course invalid (%s) — using default" % ", ".join(pending.validation_errors()))
+	return CourseLibrary.default_course()
 
 
 func _unhandled_input(e: InputEvent) -> void:
@@ -93,6 +107,10 @@ func _unhandled_input(e: InputEvent) -> void:
 		get_tree().paused = not get_tree().paused
 	elif e.is_action_pressed(&"restart"):
 		_restart()
+	elif e.is_action_pressed(&"ui_cancel") and not _net_active():
+		# Back to the course browser (offline only — never yank out of a live session).
+		get_tree().paused = false
+		get_tree().change_scene_to_file.call_deferred("res://scenes/course_select.tscn")
 
 
 func _physics_process(delta: float) -> void:
@@ -106,7 +124,7 @@ func _physics_process(delta: float) -> void:
 	_camera.global_position = _camera.global_position.lerp(target, 0.15)
 	_camera.look_at(av.global_position, Vector3.UP)
 	# fall line → respawn.
-	if av.global_position.y < KILL_Y and not _respawning:
+	if av.global_position.y < _course.kill_y and not _respawning:
 		_trigger_respawn()
 
 
@@ -136,20 +154,30 @@ func _is_local(body: Node) -> bool:
 	return body != null and body == _current_avatar()
 
 
-# --- course construction (all in code) -------------------------------------
+# --- course construction (all in code, from CourseData3D) ------------------
 
+## Build (or rebuild) every course node from `_course`. Clears any previously
+## built geometry first so an online course-swap rebuilds cleanly in place.
 func _build_course() -> void:
-	for box in PLATFORMS:
+	for child in _course_root.get_children():
+		child.queue_free()
+	# spawn points are children of the level root (the net_spawn_point group);
+	# clear the old ones before laying the new start down.
+	for m in get_tree().get_nodes_in_group(&"net_spawn_point"):
+		if is_instance_valid(m):
+			m.queue_free()
+
+	for box in _course.platforms:
 		_add_platform(box)
-	for i in CHECKPOINTS.size():
-		_add_checkpoint(i, CHECKPOINTS[i])
-	for box in HAZARDS:
+	for i in _course.checkpoints.size():
+		_add_checkpoint(i, _course.checkpoints[i])
+	for box in _course.hazards:
 		_add_hazard(box)
-	_add_finish(FINISH)
+	_add_finish(_course.finish)
 	# one spawn point per potential peer, spread across the start deck.
 	for i in 8:
 		var m := Marker3D.new()
-		m.position = START_SPAWN + Vector3(float(i) * 0.6 - 2.1, 0.0, 0.0)
+		m.position = _course.start_spawn + Vector3(float(i) * 0.6 - 2.1, 0.0, 0.0)
 		m.add_to_group(&"net_spawn_point")
 		add_child(m)
 
@@ -168,7 +196,7 @@ func _add_platform(box: AABB) -> void:
 	mesh.mesh = bm
 	mesh.material_override = _mat(Color(0.36, 0.40, 0.48))
 	body.add_child(mesh)
-	add_child(body)
+	_course_root.add_child(body)
 
 
 func _add_checkpoint(index: int, pos: Vector3) -> void:
@@ -176,17 +204,17 @@ func _add_checkpoint(index: int, pos: Vector3) -> void:
 	area.position = pos
 	var col := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(2.4, 3.0, 2.4)
+	shape.size = CHECKPOINT_COLLISION
 	col.shape = shape
 	area.add_child(col)
 	var mesh := MeshInstance3D.new()
 	var bm := BoxMesh.new()
-	bm.size = Vector3(0.5, 3.0, 0.5)
+	bm.size = CHECKPOINT_VISUAL
 	mesh.mesh = bm
 	mesh.material_override = _mat(Color(0.45, 0.85, 0.55), 0.55)
 	area.add_child(mesh)
 	area.body_entered.connect(_on_checkpoint.bind(index))
-	add_child(area)
+	_course_root.add_child(area)
 
 
 func _add_hazard(box: AABB) -> void:
@@ -204,7 +232,7 @@ func _add_hazard(box: AABB) -> void:
 	mesh.material_override = _mat(Color(0.9, 0.35, 0.35))
 	area.add_child(mesh)
 	area.body_entered.connect(_on_hazard)
-	add_child(area)
+	_course_root.add_child(area)
 
 
 func _add_finish(box: AABB) -> void:
@@ -222,7 +250,7 @@ func _add_finish(box: AABB) -> void:
 	mesh.material_override = _mat(Color(0.95, 0.86, 0.45), 0.7)
 	area.add_child(mesh)
 	area.body_entered.connect(_on_finish)
-	add_child(area)
+	_course_root.add_child(area)
 
 
 func _mat(color: Color, alpha: float = 1.0) -> StandardMaterial3D:
@@ -255,14 +283,14 @@ func _build_environment() -> void:
 func _spawn_local_avatar() -> void:
 	_local_avatar = PLAYER_SCENE.instantiate()
 	_local_avatar.name = "1"
-	_local_avatar.position = START_SPAWN
+	_local_avatar.position = _course.start_spawn
 	_avatars.add_child(_local_avatar)
 
 
 func _checkpoint_position(index: int) -> Vector3:
-	if index < 0 or index >= CHECKPOINTS.size():
-		return START_SPAWN
-	return CHECKPOINTS[index] + Vector3(0.0, 0.3, 0.0)
+	if index < 0 or index >= _course.checkpoints.size():
+		return _course.start_spawn
+	return _course.checkpoints[index] + Vector3(0.0, 0.3, 0.0)
 
 
 # --- events (offline handled here; online routed through NetEvents) ---------
@@ -327,6 +355,50 @@ func _wire_net_events() -> void:
 		_net_events.start_race()
 
 
+# --- course-sync bridge (online only): host's course wins on every peer ------
+
+func _wire_course_sync() -> void:
+	if _course_sync == null:
+		return
+	_course_sync.course_ready.connect(_on_course_synced)
+	var n := get_node_or_null("/root/Net")
+	if n != null and n.has_method("is_host") and bool(n.is_host()):
+		# Host: publish our resolved course so every client builds it. Built-ins
+		# go by id (compact); custom/imported courses go as full JSON.
+		var lib := get_node_or_null("/root/CourseLibrary")
+		var builtin_id := ""
+		if lib != null and _course_is_pending(lib):
+			builtin_id = _pending_builtin_id(lib)
+		_course_sync.publish(_course, builtin_id)
+	else:
+		# Client: build the host's course as soon as it arrives; ask now in case
+		# the host already started before this scene loaded.
+		_course_sync.request_from_host()
+
+
+func _course_is_pending(lib: Node) -> bool:
+	return lib.pending_course != null and lib.pending_course == _course
+
+
+func _pending_builtin_id(lib: Node) -> String:
+	var id := str(lib.pending_course_id)
+	return id if id.begins_with(CourseLibrary.BUILTIN_PREFIX) else ""
+
+
+## The host's course arrived (client) — rebuild the level to match it exactly.
+func _on_course_synced(course: CourseData3D) -> void:
+	if course == null or not course.is_valid():
+		return
+	if _course != null and _course.equals(course):
+		return  # already building this course (e.g. host's call_local echo)
+	_course = course
+	_build_course()
+	_camera.position = _course.start_spawn + CAM_OFFSET
+	_camera.look_at(_course.start_spawn, Vector3.UP)
+	GameManager.begin_course(_course.checkpoints.size())
+	_refresh_hud()
+
+
 func _on_net_checkpoint(peer: int, checkpoint_id: int) -> void:
 	if peer == int(_local_peer_name()):
 		GameManager.reach_checkpoint(checkpoint_id)
@@ -367,7 +439,9 @@ func _mk_label(layer: CanvasLayer, pos: Vector2, size: int) -> Label:
 func _refresh_hud() -> void:
 	if _hud_progress == null:
 		return
-	_hud_progress.text = "Checkpoint %d / %d" % [GameManager.current_checkpoint + 1, GameManager.checkpoint_count]
+	_hud_progress.text = "%s — Checkpoint %d / %d" % [
+		_course.name, GameManager.current_checkpoint + 1, GameManager.checkpoint_count,
+	]
 	var t := GameManager.finish_time if GameManager.finished else GameManager.elapsed
 	_hud_stats.text = "Time %.1fs   Deaths %d   Best %s" % [
 		t, GameManager.deaths,
@@ -380,6 +454,6 @@ func _refresh_hud() -> void:
 
 
 func _restart() -> void:
-	GameManager.begin_course(CHECKPOINTS.size())
-	_teleport(_current_avatar(), START_SPAWN)
+	GameManager.begin_course(_course.checkpoints.size())
+	_teleport(_current_avatar(), _course.start_spawn)
 	_refresh_hud()
