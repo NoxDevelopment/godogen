@@ -2280,6 +2280,45 @@
         "Department + season + catalogue + markdown + currency icons via qwen-icon",
         "80s in-store PA / muzak loop + register-beep / page-turn (catalogue) / crowd-murmur SFX bed"
       ]
+    },
+    {
+      "id": "animal-society-rpg",
+      "name": "Animal Society RPG (survival + migration, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A mature ANIMAL-SOCIETY survival RPG in the WATERSHIP DOWN / SECRET OF NIMH / AMERICAN TAIL lineage - lead a small band of NAMED animals (rabbits / mice) with distinct SOCIAL ROLES across a dangerous seeded landscape to found and grow a THRIVING WARREN, surviving predators, seasons, hunger, and the band's own morale. A deterministic day/tick society + survival sim, sibling to ant-colony + god-game + cosmic-horror-coop. The whole game is WarrenEngine (a pure, seedable, RefCounted GDScript engine, no scene deps) replaying byte-identically from a seed. THE BAND: a colony of named animals, each with a SOCIAL ROLE (Chief/leader, Scout, Seer/lookout, Forager, Fighter/protector, Storyteller/morale, Kit/young), a sex, an age, traits (courage/wisdom/speed) + health, needs (hunger/fatigue), and a bond to the band; roles confer REAL, measurable abilities - a Forager gathers strictly more food, a Scout lowers the ambush rate, a Seer's early-warning improves escape in a raid, a Fighter raises the band's defence, a Storyteller lifts morale on rest, a Chief steadies morale + reduces dissent, and a Kit matures into an adult role. SURVIVAL SIM: seasons cycle over a year and modulate food + danger (lean, dangerous winter vs rich, calm summer); each day the band takes ONE decision, then the day RESOLVES - everyone eats (starvation harms/kills), fatigue + illness accrue, a hazard may strike, morale drifts, and once settled a breeding pair reproduces up to a population cap. PREDATORS + HAZARDS: four threats (Fox / Hawk / Cat / the \u201cMan\u201d and his road and machines) hunt on a deterministic model - a Scout/Seer warning + the band's fighters/speed decide escape vs loss, and a raid can KILL a named member (real stakes). SOCIAL LAYER (the Watership heart): morale/cohesion is driven by leadership, storytelling, losses, and success; low morale -> dissent -> a member may DESERT and splinter the band. MIGRATION QUEST: the band travels a seeded chain of stops (from the old Sandleford warren toward Watership Down); each leg costs days + risks a predator encounter, and you must arrive with a viable founding group (enough survivors + a breeding pair) then GROW the warren to a target size. take_action() applies one decision then advances the day via _end_day() (a MOVE_ON runs one _end_day per travel-day of the leg): eat -> fatigue/illness -> hazard -> morale drift -> reproduction -> aging/maturation -> desertion -> compact the fallen -> judge; no unbounded rescans, so every run terminates under MAX_DAYS. Win/loss is genuinely reachable both ways under a deterministic auto-play policy: WIN by founding the new warren AND growing it to the target (a thriving society); LOSE if the band is wiped out, falls below a viable founding size, or fails to reach the site before the deadline. Forage yield, encounter chance, and rest-morale gain are exposed as pure preview helpers so the role abilities are directly, measurably testable. The balanced policy plays to survive + thrive (forage when lean, rest for morale, scout a dangerous leg, then move on; in growth it keeps a surplus so the pair breeds), the reckless policy charges on and gets the band killed - nothing hardcoded (across 60 seeds balanced won 54 / lost 6, reckless lost all 60). to_dict()/from_dict() round-trip the ENTIRE run (the band + roles/sexes/ages/traits/needs/bonds + morale + food + journey + counters + RNG state); checksum() (FNV-1a) proves determinism within a process AND across two separate processes. warren.gd renders a drawn journey strip (stops, the band's position, danger shaded, the goal, a role-coloured band token), a HUD (season/year/day/food/morale/population/phase/cohesion), a decision bar (Forage/Scout/Rest/Move On/Shelter/Assign Role), and a members panel - reads the engine and forwards a decision only. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole run + RNG persist), pause + restart input, scalable_text. Drops in standalone or as the survival/society layer of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/animal-society-rpg/skeleton",
+      "doc": "genres/animal-society-rpg/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give each named animal (and each predator / the Storyteller narrator) a persona/voice via companion-npcs + Dialogue Manager for encounter flavour + campfire table-talk between band members; the role/name tags the members panel and the raid log. An AI_AUTOPILOT-style balanced policy already plays the band toward the shared objective via the built-in heuristic."
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the drawn journey strip + role dots for real creature portraits + a parchment migration map + season backdrops + predator art (recipes: animal/predator art via card-creature-art + zit-txt2img, role/need/decision icons via qwen-icon, the map mat + season skies via zit-txt2img)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Named-animal portraits per role (chief / scout / seer / forager / fighter / storyteller / kit) in a rabbit or mouse set via card-creature-art / zit-txt2img",
+        "Predator art (fox / hawk / cat / the \u201cMan\u201d and his machines) via card-creature-art / zit-txt2img",
+        "A parchment migration map / journey strip with stop markers via zit-txt2img; season-tinted backdrops (spring/summer/autumn/winter)",
+        "Role / need (food / rest / morale) / decision icons for the HUD + decision bar via qwen-icon",
+        "Ambient loop (meadow wind + distant road) + forage / raid / birth / desertion / arrival SFX stingers"
+      ]
     }
   ]
 }

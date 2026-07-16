@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://animalsocietyrpgproberulesui"]
+
+[ext_resource type="Script" path="res://_probes/rules_ui_probe.gd" id="1"]
+
+[node name="Probe" type="Node"]
+script = ExtResource("1")
