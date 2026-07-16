@@ -102,6 +102,15 @@ func _build_ui() -> void:
 	hotbtn.pressed.connect(func() -> void: GameManager.new_hotseat_game(2, 1, SEED))
 	_layer.add_child(hotbtn)
 
+	# OPTIONAL LLM-assist seat: seat 1 becomes an AI_LLM opponent. It only calls a
+	# local LLM when [euro_llm] enabled=true AND an endpoint answers; otherwise it
+	# plays exactly like a heuristic AI (offline-safe). Default preset is unchanged.
+	var llmbtn := _mk_button("You + LLM AI")
+	llmbtn.position = Vector2(1010, 88)
+	llmbtn.tooltip_text = "Seat 2 is LLM-assisted (Ollama). Needs [euro_llm] enabled + a running model; falls back to the heuristic AI otherwise."
+	llmbtn.pressed.connect(func() -> void: GameManager.new_game_with_llm(SEED, PLAYERS))
+	_layer.add_child(llmbtn)
+
 	_build_handoff_overlay()
 
 
@@ -289,7 +298,11 @@ func _player_panel(e: EuroEngine, pi: int) -> Control:
 	frame.color = Color(0.14, 0.16, 0.20) if pi != e.current else Color(0.20, 0.24, 0.16)
 	box.add_child(frame)
 
-	var kind_tag := "HUMAN" if e.is_human_seat(pi) else "AI"
+	var kind_tag := "HUMAN"
+	if e.is_llm_seat(pi):
+		kind_tag = "LLM"
+	elif not e.is_human_seat(pi):
+		kind_tag = "AI"
 	var head := Label.new()
 	head.text = "%s [%s]%s" % [e.seat_name(pi), kind_tag,
 		"  ◄ turn" if pi == e.current and not e.game_over else ""]

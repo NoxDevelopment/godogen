@@ -137,22 +137,31 @@ const ACTIONS: Array[String] = ["PRODUCE", "BUILD", "TRADE", "RESEARCH", "DEPLOY
 ##                    this seat and waits for UI input (see board.gd).
 ##   * AI_HEURISTIC — the built-in weighted evaluator ai_choose(); auto-resolves.
 ##
-## EXTENSION POINT — Stage 2+ (deliberately NOT present here, no stubs): two
-## further kinds slot in WITHOUT a rewrite, each as ONE new enum value + ONE new
-## dispatch case in GameManager._advance_dispatch() + ONE hook, nothing else:
-##   * AI_LLM  — an LLM picks from legal_actions(): the new case calls a provider
-##               (e.g. companion_ai_ml) that returns a chosen action, which the
-##               engine validates through is_legal()/apply_action() like any other.
+## THREE kinds are FULLY IMPLEMENTED:
+##   * HUMAN_LOCAL  — a local human (dispatcher blocks for UI input).
+##   * AI_HEURISTIC — the built-in weighted evaluator ai_choose(); auto-resolves.
+##   * AI_LLM       — an OPTIONAL local-LLM-assisted seat (STAGE 2): the dispatcher
+##                    asks LlmSeat (scripts/llm_seat.gd) to pick from legal_actions()
+##                    via a local LLM HTTP endpoint (Ollama by default), and the
+##                    engine validates the choice through is_legal()/apply_action()
+##                    like any other. It is fully OFFLINE-SAFE: on ANY provider
+##                    failure it falls back to ai_choose(), so an AI_LLM seat with
+##                    no provider plays EXACTLY like an AI_HEURISTIC seat and the
+##                    game can never stall. It is inert unless a seat opts in.
+##
+## EXTENSION POINT — one more kind slots in WITHOUT a rewrite, as ONE new enum
+## value + ONE new dispatch case in GameManager._advance_dispatch() + ONE hook:
 ##   * REMOTE  — a networked human/agent: the new case awaits a transport that
 ##               delivers the seat's chosen action, then apply_action() applies it.
 ## The dispatcher's default branch fails LOUD on any kind it does not handle, so
 ## an unwired kind can never silently pass — it asserts a clear error instead.
-enum ControllerKind { HUMAN_LOCAL, AI_HEURISTIC }
+enum ControllerKind { HUMAN_LOCAL, AI_HEURISTIC, AI_LLM }
 
 ## Human-readable tag per implemented kind (used in seat names / the HUD).
 const CONTROLLER_LABEL := {
 	ControllerKind.HUMAN_LOCAL: "human",
 	ControllerKind.AI_HEURISTIC: "ai",
+	ControllerKind.AI_LLM: "llm",
 }
 
 # =====================================================================
@@ -271,10 +280,12 @@ func configure_seats(kinds: Array, names: Array = []) -> void:
 	_sync_is_ai()
 
 
-## True iff `kind` is a controller kind this Stage-1 engine actually implements.
-## AI_LLM / REMOTE are intentionally NOT supported here (extension point).
+## True iff `kind` is a controller kind this engine actually implements.
+## HUMAN_LOCAL, AI_HEURISTIC and AI_LLM are supported; REMOTE is the open seam.
 func is_supported_kind(kind: int) -> bool:
-	return kind == ControllerKind.HUMAN_LOCAL or kind == ControllerKind.AI_HEURISTIC
+	return kind == ControllerKind.HUMAN_LOCAL \
+		or kind == ControllerKind.AI_HEURISTIC \
+		or kind == ControllerKind.AI_LLM
 
 
 func controller_of(seat: int) -> int:
@@ -293,6 +304,11 @@ func is_ai_seat(seat: int) -> bool:
 	return controller_of(seat) == ControllerKind.AI_HEURISTIC
 
 
+## An LLM-assisted seat (optional local-LLM provider, heuristic fallback).
+func is_llm_seat(seat: int) -> bool:
+	return controller_of(seat) == ControllerKind.AI_LLM
+
+
 ## How many seats are local humans — drives the hotseat pass-the-device flow.
 func human_seat_count() -> int:
 	var n := 0
@@ -309,11 +325,13 @@ func _default_seat_name(seat: int, kind: int) -> String:
 
 
 ## Mirror the controller assignment onto each player's `is_ai` flag so existing
-## readers stay correct; `controllers` remains the single source of truth.
+## readers stay correct; `controllers` remains the single source of truth. Any
+## non-human seat (heuristic OR llm) reads as AI — for human/heuristic-only
+## lineups this is identical to the prior "== AI_HEURISTIC" test.
 func _sync_is_ai() -> void:
 	for i in num_players:
 		if i < players.size():
-			(players[i] as Dictionary)["is_ai"] = int(controllers[i]) == ControllerKind.AI_HEURISTIC
+			(players[i] as Dictionary)["is_ai"] = int(controllers[i]) != ControllerKind.HUMAN_LOCAL
 
 
 func _build_deck() -> void:

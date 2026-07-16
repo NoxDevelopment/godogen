@@ -28,16 +28,23 @@ const HUMAN := 0  ## the default-preset human seat (seat 0); kept for the classi
 
 var engine: EuroEngine
 
+## The optional local-LLM seat provider (STAGE 2). Stateless adapter; created once.
+## It is only consulted for AI_LLM seats and is fully offline-safe (heuristic
+## fallback), so owning it here costs nothing until a seat opts in.
+var _llm_seat: LlmSeat
+
 ## Dispatcher state (transient — derived from the engine cursor, not persisted).
 var awaiting_input := false     ## the dispatcher is BLOCKED on a local human seat, input open.
 var pending_handoff := false    ## a pass-the-device banner must be acknowledged before input opens.
 var _first_human_seen := false  ## the game's FIRST human turn shows no banner (nobody to pass from).
+var _dispatching := false       ## re-entrancy guard: an AI_LLM turn awaits async HTTP; block overlap.
 
 
 func _enter_tree() -> void:
 	add_to_group(&"game_manager")
 	add_to_group(&"persistent")
 	engine = EuroEngine.new()
+	_llm_seat = LlmSeat.new()
 
 
 # =====================================================================
@@ -77,6 +84,28 @@ func new_hotseat_game(human_count: int, ai_count: int, seed_value: int = 0) -> v
 	configure_game(kinds, names, seed_value)
 
 
+## OPTIONAL LLM-assist preset: seat 0 is you, seat 1 is an AI_LLM opponent, the
+## rest are heuristic AIs. The LLM seat only calls a provider when [euro_llm]
+## `enabled` is true AND a local endpoint answers; otherwise it plays exactly like
+## a heuristic AI (see LlmSeat). Nothing here touches the network by itself — this
+## just assigns the seat kind; the default new_game() preset is untouched.
+func new_game_with_llm(seed_value: int = 0, player_count: int = 4) -> void:
+	var total := clampi(player_count, 2, 5)
+	var kinds: Array = []
+	var names: Array = []
+	for i in total:
+		if i == 0:
+			kinds.append(EuroEngine.ControllerKind.HUMAN_LOCAL)
+			names.append("P1 You")
+		elif i == 1:
+			kinds.append(EuroEngine.ControllerKind.AI_LLM)
+			names.append("P2 LLM")
+		else:
+			kinds.append(EuroEngine.ControllerKind.AI_HEURISTIC)
+			names.append("P%d AI" % (i + 1))
+	configure_game(kinds, names, seed_value)
+
+
 func reset() -> void:
 	new_game(0, engine.num_players if engine != null else 4)
 
@@ -93,15 +122,26 @@ func _restart_dispatch() -> void:
 #  The TURN DISPATCHER — the play-mode seam
 # =====================================================================
 
-## Walk seats from the current cursor: auto-resolve every AI seat, and STOP at a
-## local-human seat (blocking for UI input), raising a pass-the-device hand-off
-## first when this is a hotseat and not the game's first human turn.
+## Walk seats from the current cursor: auto-resolve every AI seat (heuristic OR
+## LLM), and STOP at a local-human seat (blocking for UI input), raising a
+## pass-the-device hand-off first when this is a hotseat and not the game's first
+## human turn.
 ##
-## EXTENSION POINT: adding AI_LLM / REMOTE is a NEW `match` case below plus one
-## hook (an LLM provider call / a network await that yields a chosen action which
-## apply_action() then validates) — NOT a rewrite. The default `_:` branch fails
-## LOUD so an unhandled/unwired kind can never silently pass.
+## AI_LLM seats are resolved by an AWAIT on the LLM provider (LlmSeat) — the only
+## async path in the dispatcher. Because a turn is always "produce one legal
+## action; apply_action() validates it", the LlmSeat ALWAYS yields a legal action
+## (heuristic fallback on any failure), so this stays a pure input seam: the rules,
+## RNG and heuristic determinism are untouched. For any lineup WITHOUT an AI_LLM
+## seat the `await` is never reached, so the loop completes synchronously exactly
+## as before (byte-identical). The default `_:` branch fails LOUD on any unwired
+## kind (REMOTE / corrupt value) — it can never silently pass.
+##
+## EXTENSION POINT: REMOTE (a networked seat) drops in as one more `case` here,
+## awaiting a transport that delivers the seat's chosen action.
 func _advance_dispatch() -> void:
+	if _dispatching:
+		return  # an AI_LLM turn is mid-await; do not overlap coroutines.
+	_dispatching = true
 	var guard := 0
 	while not engine.game_over and guard < 4096:
 		guard += 1
@@ -119,19 +159,40 @@ func _advance_dispatch() -> void:
 					pending_handoff = false
 					awaiting_input = true
 				_first_human_seen = true
+				_dispatching = false
+				# Refresh the view now — matters when we REACH this human seat after
+				# an async AI_LLM turn resolved (the original caller already returned).
+				changed.emit()
 				return
 			EuroEngine.ControllerKind.AI_HEURISTIC:
 				engine.ai_take_turn(seat)
 				engine.advance_turn()
+			EuroEngine.ControllerKind.AI_LLM:
+				# OPTIONAL local-LLM seat. choose_action_async ALWAYS returns a
+				# legal action (heuristic fallback on any provider failure) and its
+				# HARD HTTP timeout guarantees this await resolves — headless runs
+				# never hang. apply_action() re-validates before mutating state.
+				var chosen: Dictionary = await _llm_seat.choose_action_async(engine, seat, self)
+				var applied := engine.apply_action(seat, chosen["action"])
+				if not applied:
+					# Belt-and-braces: an unexpected reject still cannot stall the
+					# game — take the guaranteed-legal heuristic action instead.
+					engine.apply_action(seat, engine.ai_choose(seat))
+				engine.advance_turn()
 			_:
-				# Unwired controller kind (AI_LLM / REMOTE / corrupt value): fail
-				# loud, never silently pass. This is exactly where a new case for
-				# an LLM provider or a network transport drops in (see
-				# EuroEngine.ControllerKind). Add the case ABOVE.
-				push_error("GameManager: unhandled ControllerKind %d at seat %d — AI_LLM/REMOTE not wired in Stage 1." % [kind, seat])
-				assert(false, "Unhandled ControllerKind %d — extension point for AI_LLM/REMOTE." % kind)
+				# Unwired controller kind (REMOTE / corrupt value): fail loud, never
+				# silently pass. This is where a network transport case drops in
+				# (see EuroEngine.ControllerKind). Add the case ABOVE.
+				push_error("GameManager: unhandled ControllerKind %d at seat %d — REMOTE not wired." % [kind, seat])
+				assert(false, "Unhandled ControllerKind %d — extension point for REMOTE." % kind)
+				_dispatching = false
 				return
 	awaiting_input = false
+	_dispatching = false
+	# The loop resolved to game-over or a full auto-play. Emit so the UI refreshes
+	# after an ASYNC (AI_LLM) resolution, whose caller already returned. Harmless
+	# for the synchronous path (an extra idempotent board refresh).
+	changed.emit()
 
 
 # =====================================================================

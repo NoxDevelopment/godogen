@@ -3,9 +3,11 @@
 A competitive **Euro-style engine-builder** board game in the Scythe / Wingspan /
 Wyrmspan lineage: every player grows a **resource → production → victory-point
 engine**, and the **best engine wins**. 2–5 seats, each driven by a
-**seat controller** — a local human or a heuristic AI — so the same build plays
-**single-player (1 human vs heuristic AI)**, **all-AI**, or **local hotseat
-(pass-and-play, 2+ humans on one machine)**. A shared action board, a
+**seat controller** — a local human, a heuristic AI, or an **optional
+local-LLM-assisted AI** — so the same build plays **single-player (1 human vs
+heuristic AI)**, **all-AI**, **local hotseat (pass-and-play, 2+ humans on one
+machine)**, or with an **LLM-driven opponent** (local Ollama, heuristic fallback).
+A shared action board, a
 development-card deck, objective tokens, end-game majorities, and a hard end
 trigger — the entire rules engine is **pure, seedable, headless-testable
 GDScript** that replays byte-identically from a seed. Scaffold with:
@@ -51,14 +53,30 @@ no addons.
     stalls (PRODUCE is always available).
   - `to_dict()`/`from_dict()` round-trip the **entire game** (banks, tableaus,
     hands, stars, deck, objectives, cursor, RNG state) — JSON-safe.
-- **Seat controllers + the play-mode matrix (STAGE 1)** — every seat carries a
+- **Seat controllers + the play-mode matrix (STAGE 1 + 2)** — every seat carries a
   `ControllerKind` (`EuroEngine.ControllerKind`): **`HUMAN_LOCAL`** (the turn
-  dispatcher blocks for local UI input) or **`AI_HEURISTIC`** (auto-resolves via
-  `ai_choose()`). `configure_seats(kinds, names)` assigns them; the default preset
-  is unchanged (seat 0 human, the rest AI). This changes only **who** produces a
+  dispatcher blocks for local UI input), **`AI_HEURISTIC`** (auto-resolves via
+  `ai_choose()`), or **`AI_LLM`** (an **optional** local-LLM-assisted seat, below).
+  `configure_seats(kinds, names)` assigns them; the default preset is unchanged
+  (seat 0 human, the rest heuristic AI). This changes only **who** produces a
   seat's action — the rules, RNG, and AI determinism are untouched, because a turn
   is always *"produce one legal action; `apply_action()` validates it."* Seat
   controllers + names round-trip through `to_dict()/from_dict()`.
+- **Optional LLM-assist seat (STAGE 2)** — `LlmSeat` (`scripts/llm_seat.gd`) is a
+  self-contained adapter that lets a **local LLM** drive an `AI_LLM` seat. Per
+  turn it builds a **compact prompt** (the seat's resources / tableau / VP + the
+  goal + the **legal actions enumerated as a numbered list**), POSTs it to a
+  **configurable local endpoint** (default **Ollama** `http://localhost:11434/api/generate`,
+  host/model/timeout in the `[euro_llm]` project settings) via `HTTPRequest` with a
+  **hard timeout**, parses the reply to a chosen number → a legal-action index, and
+  **re-validates it with `is_legal()`** before applying it. It is **fully
+  offline-safe**: on **any** failure — provider disabled, endpoint unreachable,
+  timeout, non-2xx, unparseable reply, or an out-of-range/illegal choice — it falls
+  back to the deterministic `ai_choose()`. An `AI_LLM` seat with no provider
+  therefore plays **exactly** like an `AI_HEURISTIC` seat; the game **always
+  progresses** and never applies an unvalidated action. **Default: OFF** — nothing
+  touches the network unless you enable `[euro_llm]` **and** assign a seat `AI_LLM`
+  (preset `new_game_with_llm()` / the *"You + LLM AI"* button).
 - **`GameManager` autoload** (`scripts/game_manager.gd`) — owns one `EuroEngine`,
   adds the NoxDev template ABI (`"game_manager"` + `"persistent"` groups,
   `save_data()/load_data()`), and is the **turn dispatcher**: `_advance_dispatch()`
@@ -105,13 +123,17 @@ seed**, and why it **drops into a larger game**: keep the engine, call
    `to_dict()`/`from_dict()`, apply each action, evaluate the resulting position).
 5. **More play modes (LLM-assist / networked-remote)**: the seat-controller
    dispatch is an **open seam**. Add a value to `EuroEngine.ControllerKind` and a
-   matching `case` in `GameManager._advance_dispatch()`, then one hook:
-   **`AI_LLM`** → call an LLM provider (e.g. `companion_ai_ml`) that picks from
-   `legal_actions()`, validated by `is_legal()/apply_action()` like any action;
-   **`REMOTE`** → `await` a transport that delivers the seat's chosen action, then
-   `apply_action()`. These are deliberately **not present** in Stage 1 (no stubs);
-   the dispatcher's default branch asserts a clear error on any unwired kind, so a
-   half-added mode fails loud instead of silently passing.
+   matching `case` in `GameManager._advance_dispatch()`, then one hook.
+   **`AI_LLM`** is **implemented** (STAGE 2): the dispatch case `await`s
+   `LlmSeat.choose_action_async()`, which calls a local LLM that picks from
+   `legal_actions()`, re-validated by `is_legal()/apply_action()`, with a
+   deterministic `ai_choose()` fallback on any failure (swap the endpoint/provider
+   inside `LlmSeat` — e.g. point it at `companion_ai_ml` — without touching the
+   dispatcher). **`REMOTE`** (a networked seat) is the remaining seam: `await` a
+   transport that delivers the seat's chosen action, then `apply_action()`. It is
+   deliberately **not present** (no stubs); the dispatcher's default branch asserts
+   a clear error on any unwired kind, so a half-added mode fails loud instead of
+   silently passing.
 7. **Art**: swap the card buttons for real card art + a board mat (recipes below).
 8. **Menus/saving**: godotsmith `menu_system` / `save_system` / `settings_system`
    drop in unchanged; the whole game already serialises.
@@ -123,12 +145,33 @@ seed**, and why it **drops into a larger game**: keep the engine, call
 | **Single-player** (default) | `new_game()` | seat 0 human, rest `AI_HEURISTIC` | human acts, AIs auto-resolve back to the human |
 | **All-AI** | `configure_game([AI, AI, …])` | every seat `AI_HEURISTIC` | the whole game auto-plays |
 | **Local hotseat** | `new_hotseat_game(humans, ais)` or `configure_game([HUMAN, HUMAN, …])` | 2+ `HUMAN_LOCAL` | pass-and-play: a "pass the device" hand-off banner before every human turn after the first |
+| **LLM-assist** (optional) | `new_game_with_llm()` or `configure_game([…, AI_LLM, …])` | any seat `AI_LLM` | that seat's action comes from a local LLM (Ollama), re-validated; **heuristic fallback** on any failure |
 
-**Extension point (Stage 2+):** `AI_LLM` (LLM-assisted seat) and `REMOTE`
-(networked seat) slot into the same dispatch as one new `ControllerKind` value +
-one `case` in `GameManager._advance_dispatch()` + a provider/network hook — they
-are **not present** in Stage 1 and the dispatcher asserts a clear error on any
-unwired kind (never silently passes). See *How to extend #5*.
+### Running the LLM-assist seat live (manual)
+
+The `AI_LLM` seat is **off by default** and **offline-safe** — it plays as a
+heuristic AI until you point it at a real local model. To watch a live LLM seat:
+
+1. Install [Ollama](https://ollama.com) and pull a small model, e.g.
+   `ollama pull llama3.2` (Ollama serves `http://localhost:11434`).
+2. In the exported/edited project, set the `[euro_llm]` project settings:
+   `enabled=true`, `model="llama3.2"` (and `host` if not the default). A short
+   `timeout_seconds` keeps turns snappy; a failed/slow call just falls back.
+3. Launch the board and press **"You + LLM AI"** (or call
+   `GameManager.new_game_with_llm(seed, players)`). Seat 2 is now LLM-driven —
+   watch the log: it POSTs the enumerated legal actions and applies the model's
+   validated pick. Stop Ollama mid-game and the seat keeps playing (heuristic
+   fallback), proving the game never stalls.
+
+Everything **except** the live model response is covered head-lessly by the probes
+(injected-reply parse/validate + a full offline-fallback game); only the live pick
+needs the manual steps above.
+
+**Extension point (Stage 3+):** `REMOTE` (a networked seat) slots into the same
+dispatch as one new `ControllerKind` value + one `case` in
+`GameManager._advance_dispatch()` + a transport hook — it is **not present** and
+the dispatcher asserts a clear error on any unwired kind (never silently passes).
+`AI_LLM` is already wired (see *How to extend #5* and `scripts/llm_seat.gd`).
 
 ## Validation status
 
@@ -164,3 +207,20 @@ engine and the play-mode matrix (seat controllers + local hotseat):
 - **Play-mode UI-build probe**: `board.tscn` builds, a `HUMAN_LOCAL` legal action
   resolves through the new dispatch and updates state, and the hand-off banner
   appears for a hotseat config then clears on Ready.
+- **LLM offline-fallback probe** (STAGE 2): with the `AI_LLM` provider ENABLED but
+  pointed at an unreachable host, a full game of `AI_LLM` seats played through the
+  real dispatcher (real `HTTPRequest` calls that all fail) **completes** and is
+  **byte-identical** to a pure `ai_choose()` oracle — proving every LLM turn fell
+  back to the heuristic — with conservation held, no illegal action, a single
+  winner, and no hang (finished inside the round/frame cap).
+- **LLM parse/validation probe** (STAGE 2): crafted model replies fed to the parser
+  via a test hook (no live call) — a valid index selects that legal action; an
+  out-of-range index, garbage text, or an index mapping to an **illegal** action
+  are each **rejected** and fall back to the heuristic; an unvalidated/illegal
+  action is **never** applied; a disabled provider short-circuits to a legal
+  fallback with no network touched.
+- **LLM determinism/regression probe** (STAGE 2): with **no** `AI_LLM` seats, all
+  prior modes (all-AI, 1H-vs-AI, hotseat) still complete **byte-identically** under
+  a seed, heuristic determinism is intact, and an all-heuristic game through the
+  (now LLM-aware) dispatcher equals a pure oracle — the new code path is **inert**
+  unless `AI_LLM` is chosen.

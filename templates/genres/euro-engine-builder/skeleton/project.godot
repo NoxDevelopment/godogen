@@ -20,6 +20,19 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 
 GameManager="*res://scripts/game_manager.gd"
 
+[euro_llm]
+
+; OPTIONAL local-LLM-assisted AI seat (AI_LLM ControllerKind). Default DISABLED —
+; the game touches no network unless you set enabled=true AND assign a seat the
+; AI_LLM kind (e.g. GameManager.new_game_with_llm / the "You + LLM AI" button).
+; With a provider unreachable, an AI_LLM seat falls back to the heuristic AI, so
+; the game always progresses. Ollama convention: POST {host}{endpoint_path}.
+enabled=false
+host="http://localhost:11434"
+endpoint_path="/api/generate"
+model="llama3.2"
+timeout_seconds=8.0
+
 [display]
 
 window/size/viewport_width=1280
