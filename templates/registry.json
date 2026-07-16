@@ -2124,6 +2124,45 @@
       ]
     },
     {
+      "id": "martial-arts-brawler",
+      "name": "Martial Arts Brawler (Jade-Empire-style 2D beat-'em-up RPG)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A JADE-EMPIRE-lineage 2D BEAT-'EM-UP MARTIAL-ARTS RPG: learn martial-arts STYLES from masters of different cultures, SWITCH STYLES mid-fight to exploit a rock-paper-scissors matchup triangle, and grow a martial-artist through a bounded CAMPAIGN of escalating encounters ending in a final duel. OUR OWN engine, generic content (no trademarks). KEY DESIGN DECISION: the combat is a DETERMINISTIC custom fixed-timestep 1-D-stage sim, NOT Godot CharacterBody2D/RigidBody2D (whose solver + frame scheduler are not identical across runs/builds and would break byte-identical replays). Each fighter is a POINT on a horizontal stage (x, velocity, facing, HP, CHI, a current STYLE, an action state idle/attacking/block/blockstun/hitstun) advanced at a fixed dt (1/60): resolve each side's input (a human action or an AI policy) -> start an ACTION with real startup/active/recovery FRAME DATA; ACTIVE frames project a HITBOX interval in front of the fighter (a melee reach or a travelling chi projectile); a hitbox overlapping the foe's HURTBOX applies damage scaled by the move + the attacker's attributes + a STYLE MATCHUP multiplier + technique upgrades, plus knockback + hitstun; blocking converts the hit to chip + blockstun. The combat has ZERO randomness; the only RNG is one seeded generator for optional AI decision jitter (config ai_jitter, default 0) saved with the run, so given (seed, config, input/AI script) a fight is 100% reproducible + byte-identical across processes; MAX_STEPS bounds every fight. SIX styles from distinct cultures/archetypes (Drunken Fist=fast, Iron Ox=power, Willow Guard=defensive, Ghost Palm=ranged chi projectile, Steel Crane=weapon reach, Coiling Serpent=grappling throws), each a base-stat modifier + a three-move set (light/heavy/special) of genuine frame data. A STYLE MATCHUP triangle scales damage (advantaged x1.40, disadvantaged x0.70) with the core fast>power>defensive>fast holding exactly and three consistent extra spokes (no mutual contradictions), so switching to the right counter measurably wins faster -- not cosmetic. You start knowing two styles; each master teaches one more (learning unlocks its moves); technique points deepen a known style (+10% move damage each). Three attributes (Body/Mind/Spirit) scale HP/chi/damage; XP -> level -> attribute + technique points; a finite ramping campaign of six encounters ends in a final duel. WIN = clear the final duel; LOSE = burn all continues; BOTH reachable by a deterministic auto-play (run_campaign wins on the base difficulty + loses on a buffed one) and the campaign always terminates. BrawlerEngine is a pure RefCounted class (no Godot-node dependency) so the whole campaign replays byte-identically + drives headlessly. is_legal rejects illegal actions (unlearned move/style, acting mid-recovery); to_dict/from_dict + run_checksum save the whole run incl. learned styles + progression + the RNG and prove determinism. GameManager autoload adds the NoxDev ABI (buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text). arena.gd renders the play surface in code -- the stage + two fighters (markers with HP + chi bars + the active hitbox) via _draw(), a fixed-timestep combat accumulator, the human input (light/heavy/special/guard/walk + a mid-fight style switch), a style/level HUD, a combat log, and a learn/technique mastery panel, plus Auto-Fight + Auto Campaign demos. Drops in standalone or as the combat core of a larger action-RPG.",
+      "status": "validated",
+      "skeleton": "genres/martial-arts-brawler/skeleton",
+      "doc": "genres/martial-arts-brawler/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "companion-npcs",
+          "params": {},
+          "note": "give each master / rival encounter a persona + voice via companion-npcs + Dialogue Manager for pre-fight taunts / master lessons / rival banter"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat fighter markers + stage for real sprites + a dojo backdrop (recipes: fighter / style-icon sprites via qwen-icon, stage splash via zit-txt2img)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Fighter + style-icon sprites (6 styles: fast / power / defensive / ranged / weapon / grappling) via qwen-icon or pixel-perfect",
+        "Fighter markers + HP/chi-bar overlays via qwen-icon",
+        "Dojo / stage backdrop via zit-txt2img",
+        "Master / rival opponent portraits via card-creature-art",
+        "Hit-impact, block, whoosh, projectile, KO, and win/lose stinger SFX"
+      ]
+    },
+    {
       "id": "pirate-sim",
       "name": "Pirate Career Sim (age-of-sail, systemic)",
       "engine": "godot",
