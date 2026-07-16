@@ -1976,6 +1976,40 @@
         "Store + amenity + currency icons (restrooms/decor/parking/security; cash/net-worth) via qwen-icon",
         "80s mall muzak loop + a soft cash-register / crowd-murmur SFX bed"
       ]
+    },
+    {
+      "id": "ant-colony",
+      "name": "Ant Colony (colony ecosystem sim, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A SimAnt-style COLONY ECOSYSTEM sim - grow an ant colony via pheromone-trail foraging, tunnel out a nest, raise castes, and war with a rival colony while dodging a spider predator. A deterministic tick-sim, sibling to falling-sand + god-game. The whole game is AntWorld (a pure, seedable, RefCounted GDScript engine, no scene deps): a 56x40 grid with an open SURFACE band over diggable SOIL (packed arrays: terrain kind + per-cell food), bedrock veins, food sources on the ground line, and two nests carved just below the surface, all generated deterministically from the seed. The SIGNATURE mechanic is TWIN PHEROMONE fields per colony (float grids): a HOME trail emitted by the nest core each tick (and laid weakly by outbound searchers) and a FOOD trail laid by food-carriers back to the nest; both EVAPORATE (x0.94) and DIFFUSE through connected passable cells every tick, so an unused trail fades and a used one is reinforced - a stable nest->food trail EMERGES with no scripting (searchers ascend the food trail to reach food, carriers ascend the home trail to get home). CASTES: a QUEEN (lays eggs, consumes food, never moves - kill her to win), WORKERS (forage + dig, follow/lay pheromones), SOLDIERS (fight rival ants + the predator); ants are a deterministic state machine (search->return->dig, or guard->fight). A real colony ECONOMY: foraged food banks into a stock, the queen turns food into eggs->new ants (every 5 ticks, one egg costs 5 food, pop cap 70, ~1-in-3 soldiers), upkeep drains food and a persistently empty larder starves (and kills) the queen. TUNNELLING: idle workers excavate SOIL->TUNNEL at the frontier nearest the nest (or your Dig zone), expanding the nest (<=3 diggers at once). A RIVAL colony runs the same ant AI plus an aggressive heuristic - its soldiers relentlessly march on YOUR queen, so a passive player is overrun. A spider PREDATOR stalks the surface, bites lone workers, is damaged by adjacent soldiers, and is driven off at zero hp (respawning later). Indirect SimAnt-style player influence: designate DIG / FORAGE / ATTACK zones that bias the colony; is_legal_designation() rejects out-of-bounds/bad-kind. tick_world() is a pure function of (state, tick, seeded RNG): evaporate+diffuse pheromones -> nests emit home scent -> economy -> assign a digger -> advance every ant one cell in index order -> advance predators -> compact the dead -> judge; no unbounded rescans, so a tick is O(A + W*H) and always terminates. Win/loss is genuinely reachable both ways: WIN by killing the rival queen (or wiping their ants, or leading at the pop goal); LOSE if your queen dies or your colony hits zero ants; the tick cap awards the larger colony - the same seed + same designations give a BYTE-IDENTICAL world after N ticks. snapshot()/restore() round-trip the ENTIRE world (terrain + food + both colonies' ants + pools + BOTH pheromone fields + zones + RNG state); checksum() proves determinism. main.gd renders the grid top-down (surface/soil/tunnels/chambers, food, both nests, ants coloured by colony+caste with the queen large and carriers haloed, the spider, an optional food-pheromone heat overlay), with a zone palette (pick Dig/Forage/Attack, click the map to designate), a HUD (your pop by caste, food, foraged total, tunnels, rival pop, tick) and a log. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole world + pheromones + RNG persist), pause + restart input, scalable_text. Drops in standalone or as the colony-sim layer of a larger game.",
+      "status": "validated",
+      "skeleton": "genres/ant-colony/skeleton",
+      "doc": "genres/ant-colony/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat terrain colours for a soil/tunnel/chamber tileset + surface parallax, and add per-colony ant + spider sprites (queen/worker/soldier variants)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Ant sprites per caste (queen / worker / soldier) in two colony colourways via qwen-icon or pixel-perfect",
+        "Soil / tunnel / chamber / bedrock tileset + a surface backdrop via pixel-perfect",
+        "A spider predator sprite (idle / lunge) via qwen-icon",
+        "Zone-designation icons (dig / forage / attack) for the palette via qwen-icon",
+        "Ambient loop (skittering + underground rumble) + forage/dig/battle SFX stingers"
+      ]
     }
   ]
 }
