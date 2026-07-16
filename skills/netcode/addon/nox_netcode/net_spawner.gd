@@ -32,9 +32,12 @@ func _ready() -> void:
 
 	_spawner = MultiplayerSpawner.new()
 	_spawner.name = "PlayerSpawner"
-	_spawner.spawn_path = _spawner.get_path_to(_avatar_parent)
 	_spawner.spawn_function = Callable(self, "_spawn_avatar")
 	add_child(_spawner)
+	# spawn_path must resolve AFTER the spawner is in the tree, else get_path_to
+	# has no common parent and spawn_path is silently left unset (which breaks
+	# online spawn replication). Correct ordering: add_child first.
+	_spawner.spawn_path = _spawner.get_path_to(_avatar_parent)
 
 	# React to the shared-core lobby lifecycle. Only the host spawns; clients
 	# receive the replicated instances.
