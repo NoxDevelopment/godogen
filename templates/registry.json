@@ -3292,6 +3292,61 @@
         "SFX: buy/sell pop, freeze click, roll shuffle, attack thwack, ability cues, faint, trophy/heart gain, run win/lose",
         "Optional: a relic/upgrade set (How-Many-Dudes-style rule-warpers) to bolt onto the roster"
       ]
+    },
+    {
+      "id": "merge-puzzle",
+      "name": "Merge Puzzle (2048-lineage slide-and-merge; a top mobile puzzle, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A 2048-lineage MERGE PUZZLE (the merge mechanic distilled — one of the top mobile puzzle subgenres): slide the 4x4 board in a direction, equal tiles MERGE into the next tier, a new tile spawns, and you climb toward the 2048 tile. OUR OWN engine, generic content (no trademarks). MergeEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG drives the tile spawns, so a whole game replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the grid). Real systems: the canonical 2048 SLIDE-AND-MERGE (per row/column: compact toward the move direction, merge each equal adjacent pair once, accumulate the merged value into score) in all four directions; a seeded SPAWN (a 2, or a 4 at 10%) at a random empty cell after any board-changing move; WIN detection at the 2048 tile (play-on allowed); GAME-OVER detection when the board is full with no adjacent equal pair; and best-tile + move + score tracking. A deterministic corner-heuristic auto-seat (try down, left, right, up in priority — the classic keep-the-big-tile-in-a-corner strategy) plays a full game; auto_step/auto_play_to_end run to the end (validated: the seat plays 138 moves, merges up to the 128 tile for score 1332, to a real game over). save_data/load_data snapshot the whole game incl. RNG state (NoxDev ABI). GameManager applies moves on swipe/keys; merge_view.gd renders the tile grid (coloured by value), the score/best/moves HUD, and a game-over overlay -- arrow keys / WASD / swipe to slide, with an autoplay toggle + restart. The same slide-and-merge core generalises to a Merge-2/3 ITEM board (Gossip Harbor / Merge Dragons) -- see the doc's How-to-extend.",
+      "status": "validated",
+      "skeleton": "genres/merge-puzzle/skeleton",
+      "doc": "genres/merge-puzzle/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the merge controls (arrow keys / WASD / swipe to slide, T autoplay, R restart) are in merge_view.gd; re-run for polished swipe-with-inertia, undo, or gamepad"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the tile grid (per-value colours + numbers), the score/best HUD and the game-over overlay are drawn in code -- theme them (rounded tiles, a slide/merge tween, a value palette or themed icons instead of numbers) from the game palette"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook the slide (a tween of each tile to its target), a merge pop (+score floater + a little bounce), a new-tile fade-in, a milestone tile flourish, and a game-over shade -- MergeEngine already exposes last_merge for the popups"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the number tiles for a themed icon ladder (creatures/food/gems that evolve as they merge) -- the engine is value-based so any per-value art set drops in"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "a slide whoosh, a satisfying merge click that rises in pitch with tier, a new-tile blip, a milestone chime, and a game-over tone"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "A tile set: either numbered tiles (per-value colours) or a themed icon ladder (evolving creatures/food/gems)",
+        "Slide + merge tween/particle VFX + a new-tile spawn pop and a milestone flourish",
+        "HUD chrome: score, best-tile, moves, an undo button, a target/goal banner",
+        "A game-over / win overlay + a restart button",
+        "SFX: slide whoosh, tier-rising merge click, new-tile blip, milestone chime, game-over tone",
+        "Optional Merge-2/3 art: a free-board item ladder + a generator prop for the board-merge variant"
+      ]
     }
   ]
 }
