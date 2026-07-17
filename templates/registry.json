@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-07-16",
+  "updated": "2026-07-17",
   "templates": [
     {
       "id": "metroidvania",
@@ -17,7 +17,7 @@
           "repo": "https://github.com/KoBeWi/Metroidvania-System.git",
           "ref": "4.6",
           "commit": "5b8817361c46766e6b924dce7c8f217ce748aea8",
-          "version": "1.5 (branch 4.6 \u2014 repo has no release tags; master tracks Godot 4.7-dev)",
+          "version": "1.5 (branch 4.6 — repo has no release tags; master tracks Godot 4.7-dev)",
           "license": "MIT",
           "licenseFile": "LICENSE.txt",
           "payload": "addons/MetroidvaniaSystem",
@@ -143,7 +143,7 @@
       "name": "FPS / Immersive Sim (3D)",
       "engine": "godot",
       "engineVersion": "4.5.1-stable",
-      "description": "First-person immersive-sim base on COGITO: full player controller (sprint/crouch/slide/stairs/ladders, attributes: health/stamina/visibility-stealth, grid inventory, quick slots, wieldables), component-based interaction system, quest system, EasyMenus main/pause menus with save slots \u2014 plus one blockout test room with the COGITO player, an openable door and a carryable health-potion pickup wired as live interactables. Engine pin note (tested 2026-07-11): COGITO v1.1.6 targets Godot 4.5.1 and imports clean there; on 4.6.1 its scene manager fails to parse (GDScript analyzer cannot resolve CogitoQuestManager.active/completed/failed typed members, breaking SaveSlotButton.gd) \u2014 so this template pins 4.5 and must be scaffolded/validated with a 4.5.x Godot. Standard NoxDev ABI on top (Master/Music/SFX buses by name, player/game_manager groups, save_data() contract on GameManager, pause action alongside COGITO's menu action).",
+      "description": "First-person immersive-sim base on COGITO: full player controller (sprint/crouch/slide/stairs/ladders, attributes: health/stamina/visibility-stealth, grid inventory, quick slots, wieldables), component-based interaction system, quest system, EasyMenus main/pause menus with save slots — plus one blockout test room with the COGITO player, an openable door and a carryable health-potion pickup wired as live interactables. Engine pin note (tested 2026-07-11): COGITO v1.1.6 targets Godot 4.5.1 and imports clean there; on 4.6.1 its scene manager fails to parse (GDScript analyzer cannot resolve CogitoQuestManager.active/completed/failed typed members, breaking SaveSlotButton.gd) — so this template pins 4.5 and must be scaffolded/validated with a 4.5.x Godot. Standard NoxDev ABI on top (Master/Music/SFX buses by name, player/game_manager groups, save_data() contract on GameManager, pause action alongside COGITO's menu action).",
       "status": "validated",
       "skeleton": "genres/fps-immersive/skeleton",
       "doc": "genres/fps-immersive/TEMPLATE.md",
@@ -153,7 +153,7 @@
           "repo": "https://codeberg.org/Phazorknight/Cogito.git",
           "ref": "v1.1.6",
           "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
-          "version": "1.1.6 (Codeberg is the live upstream \u2014 GitHub mirror's tags stop at v1.1.5; targets Godot 4.5.1-stable)",
+          "version": "1.1.6 (Codeberg is the live upstream — GitHub mirror's tags stop at v1.1.5; targets Godot 4.5.1-stable)",
           "license": "MIT",
           "licenseFile": "LICENSE",
           "payload": "addons/cogito",
@@ -175,7 +175,7 @@
           "repo": "https://codeberg.org/Phazorknight/Cogito.git",
           "ref": "v1.1.6",
           "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
-          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 \u2014 same pin so versions can never skew)",
+          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 — same pin so versions can never skew)",
           "license": "MIT",
           "licenseFile": "addons/input_helper/LICENSE",
           "payload": "addons/input_helper",
@@ -205,7 +205,7 @@
           "params": {
             "template": "fps"
           },
-          "note": "COGITO's full action set (32 actions, keyboard + gamepad) is baked into the skeleton's project.godot and Input Helper provides runtime rebinding \u2014 do not re-emit the fps template over it; use this skill only for reference when adding new actions"
+          "note": "COGITO's full action set (32 actions, keyboard + gamepad) is baked into the skeleton's project.godot and Input Helper provides runtime rebinding — do not re-emit the fps template over it; use this skill only for reference when adding new actions"
         },
         {
           "skill": "world-layout",
@@ -220,7 +220,7 @@
         {
           "skill": "audio-design",
           "params": {},
-          "note": "COGITO's dynamic footstep system reads surface types \u2014 feed it material-tagged surfaces; buses are ABI-standard Master/Music/SFX"
+          "note": "COGITO's dynamic footstep system reads surface types — feed it material-tagged surfaces; buses are ABI-standard Master/Music/SFX"
         }
       ],
       "systems": [],
@@ -266,7 +266,7 @@
         {
           "skill": "narrative",
           "params": {},
-          "note": "story content lives in dialogue/*.dialogue \u2014 Dialogue Manager syntax (titles, responses, conditions, mutations); the skill_check gate in intro.dialogue is the pattern to copy for new checks"
+          "note": "story content lives in dialogue/*.dialogue — Dialogue Manager syntax (titles, responses, conditions, mutations); the skill_check gate in intro.dialogue is the pattern to copy for new checks"
         },
         {
           "skill": "ui-theme",
@@ -311,7 +311,7 @@
           "repo": "https://github.com/Dark-Peace/BulletUpHell.git",
           "ref": "Demo-V4.4",
           "commit": "750d816c3b86655e53ea12d711333f9a8fb69e9b",
-          "version": "4.4 (branch Demo-V4.4 @ pinned SHA \u2014 the default branch and the maintained Godot-4 line; release tags stop at 4.2.3)",
+          "version": "4.4 (branch Demo-V4.4 @ pinned SHA — the default branch and the maintained Godot-4 line; release tags stop at 4.2.3)",
           "license": "MIT",
           "licenseFile": "LICENSE.md",
           "payload": "addons/BulletUpHell",
@@ -363,7 +363,7 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "screen shake on player hit and hitstop on death \u2014 hook player.lives_changed / died"
+          "note": "screen shake on player hit and hitstop on death — hook player.lives_changed / died"
         }
       ],
       "systems": [
@@ -388,7 +388,7 @@
       "name": "Deckbuilder (Slay-the-Spire-like)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Roguelike deckbuilder (Slay-the-Spire-like) on chun92/card-framework. The COMBAT is JSON-defined cards (Strike/Cleave/Defend/Insight/Surge, generated blockout art) + a full draw/play/discard loop (5-card hand refill, 3 energy/turn, drag-to-play resolving damage/block/draw/energy, discard reshuffles when dry, End Turn discards the hand and the enemy attacks through your block). Wrapping it is a full ROGUELIKE RUN engine in GameManager (pure, seedable, headless-testable): the game opens on a MAP hub (scenes/map.tscn) \u2014 a generated, connected floor-by-floor node DAG (combat / elite / event / rest / boss) you route through; your HP, gold, deck and relics PERSIST across fights; wins earn gold + a card reward (pick 1 of 3), elites/boss grant relics (bonus energy / start-block / heal-on-kill, queried by combat), rest nodes heal, the boss ends the run. Combat reads the run when one is active (persisted HP, grown deck, the node's scaled encounter, relic mods) and reports the result back; with no active run the combat scene still plays standalone against the default Cog-Golem, so the base loop + its boot probe are unchanged. Kit decision (2026-07-11): DesirePathGames/Slay-The-Robot was evaluated per the roadmap but it is a complete game (no addon payload) \u2014 kept as an MIT reference; card-framework is the vendorable engine (containers, drag-drop, JSON factory; Godot 4.6 pin).",
+      "description": "Roguelike deckbuilder (Slay-the-Spire-like) on chun92/card-framework. The COMBAT is JSON-defined cards (Strike/Cleave/Defend/Insight/Surge, generated blockout art) + a full draw/play/discard loop (5-card hand refill, 3 energy/turn, drag-to-play resolving damage/block/draw/energy, discard reshuffles when dry, End Turn discards the hand and the enemy attacks through your block). Wrapping it is a full ROGUELIKE RUN engine in GameManager (pure, seedable, headless-testable): the game opens on a MAP hub (scenes/map.tscn) — a generated, connected floor-by-floor node DAG (combat / elite / event / rest / boss) you route through; your HP, gold, deck and relics PERSIST across fights; wins earn gold + a card reward (pick 1 of 3), elites/boss grant relics (bonus energy / start-block / heal-on-kill, queried by combat), rest nodes heal, the boss ends the run. Combat reads the run when one is active (persisted HP, grown deck, the node's scaled encounter, relic mods) and reports the result back; with no active run the combat scene still plays standalone against the default Cog-Golem, so the base loop + its boot probe are unchanged. Kit decision (2026-07-11): DesirePathGames/Slay-The-Robot was evaluated per the roadmap but it is a complete game (no addon payload) — kept as an MIT reference; card-framework is the vendorable engine (containers, drag-drop, JSON factory; Godot 4.6 pin).",
       "status": "validated",
       "skeleton": "genres/deckbuilder/skeleton",
       "doc": "genres/deckbuilder/TEMPLATE.md",
@@ -408,7 +408,7 @@
             {
               "file": "json_card_factory.gd",
               "find": "\t\tprint(\"Preloaded card data:\", preloaded_cards[card_name])",
-              "replace": "\t\tpass # NoxDev: upstream printed every preloaded card here \u2014 one line per card per boot",
+              "replace": "\t\tpass # NoxDev: upstream printed every preloaded card here — one line per card per boot",
               "reason": "silence per-card preload prints that flood the log on every boot"
             }
           ]
@@ -418,17 +418,17 @@
         {
           "skill": "ui-theme",
           "params": {},
-          "note": "theme the table HUD (stats, End Turn, banners) from the game palette; the card faces are textures \u2014 restyle those via image-pipeline"
+          "note": "theme the table HUD (stats, End Turn, banners) from the game palette; the card faces are textures — restyle those via image-pipeline"
         },
         {
           "skill": "image-pipeline",
           "params": {},
-          "note": "replace the generated blockout card art in cards/art/ (150x210 per card + card_back) \u2014 filenames are referenced from cards/data/*.json"
+          "note": "replace the generated blockout card art in cards/art/ (150x210 per card + card_back) — filenames are referenced from cards/data/*.json"
         },
         {
           "skill": "game-feel",
           "params": {},
-          "note": "juice the resolve moments: shake/flash on enemy hit, punch-scale on the banner \u2014 hook play_area.card_played"
+          "note": "juice the resolve moments: shake/flash on enemy hit, punch-scale on the banner — hook play_area.card_played"
         }
       ],
       "systems": [
@@ -454,7 +454,7 @@
       "name": "Top-Down Action (Hotline-Miami-like)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Top-down action base, pure first-party (no vendored kit \u2014 build-cheap per the roadmap survey): CharacterBody2D player with 8-directional movement, mouse aim, hitscan raycast shot with tracer, dash with cooldown and health/respawn; three shootable practice targets; a NavigationAgent2D chaser enemy pathing across the arena's NavigationRegion2D with contact damage; arena with walls, HUD (HP + targets left), and the standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, topdown input action set).",
+      "description": "Top-down action base, pure first-party (no vendored kit — build-cheap per the roadmap survey): CharacterBody2D player with 8-directional movement, mouse aim, hitscan raycast shot with tracer, dash with cooldown and health/respawn; three shootable practice targets; a NavigationAgent2D chaser enemy pathing across the arena's NavigationRegion2D with contact damage; arena with walls, HUD (HP + targets left), and the standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, topdown input action set).",
       "status": "validated",
       "skeleton": "genres/top-down-action/skeleton",
       "doc": "genres/top-down-action/TEMPLATE.md",
@@ -470,7 +470,7 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "wire shake/hitstop into player.shot_fired and take_hit \u2014 the signals are already emitted"
+          "note": "wire shake/hitstop into player.shot_fired and take_hit — the signals are already emitted"
         },
         {
           "skill": "world-layout",
@@ -510,7 +510,7 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hitstop on melee connects and shake on nova \u2014 hook player.ability_used and enemy take_hit flashes"
+          "note": "hitstop on melee connects and shake on nova — hook player.ability_used and enemy take_hit flashes"
         },
         {
           "skill": "world-layout",
@@ -520,7 +520,7 @@
         {
           "skill": "companion-npcs",
           "params": {},
-          "note": "town NPCs / vendors import as Pandora entities \u2014 the same JSON style items.json already uses"
+          "note": "town NPCs / vendors import as Pandora entities — the same JSON style items.json already uses"
         }
       ],
       "systems": [
@@ -546,7 +546,7 @@
       "name": "Arcade Racing (checkpoint laps)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Arcade racing base on Godot-Easy-Vehicle-Physics (raycast vehicle: engine/torque curve, gearbox, per-wheel suspension and slip, arcade handling preset) plus first-party race logic: the addon's arcade car + VehicleController wired to the NoxDev input actions (throttle/brake/steer/handbrake/shift), a chase camera, a flat blockout track with three ordered checkpoint gates and a start/finish line, lap counting (timer armed on first line crossing, lap completed once all gates passed in order), lap/best-lap timing recorded into GameManager flags, and a HUD (lap, time, gate, speed/gear). Kit note (pinned 2026-07-11): upstream has no release tags \u2014 pinned to main @ c392257f (Aug 2025, latest); script-only addon, no editor plugin. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
+      "description": "Arcade racing base on Godot-Easy-Vehicle-Physics (raycast vehicle: engine/torque curve, gearbox, per-wheel suspension and slip, arcade handling preset) plus first-party race logic: the addon's arcade car + VehicleController wired to the NoxDev input actions (throttle/brake/steer/handbrake/shift), a chase camera, a flat blockout track with three ordered checkpoint gates and a start/finish line, lap counting (timer armed on first line crossing, lap completed once all gates passed in order), lap/best-lap timing recorded into GameManager flags, and a HUD (lap, time, gate, speed/gear). Kit note (pinned 2026-07-11): upstream has no release tags — pinned to main @ c392257f (Aug 2025, latest); script-only addon, no editor plugin. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
       "status": "validated",
       "skeleton": "genres/arcade-racing/skeleton",
       "doc": "genres/arcade-racing/TEMPLATE.md",
@@ -556,7 +556,7 @@
           "repo": "https://github.com/DAShoe1/Godot-Easy-Vehicle-Physics.git",
           "ref": "main",
           "commit": "c392257f54f6ca537dc10bc5badad0c060f18982",
-          "version": "main @ c392257f (2025-08-17 \u2014 repo has no release tags; ray-cast vehicle for Godot 4)",
+          "version": "main @ c392257f (2025-08-17 — repo has no release tags; ray-cast vehicle for Godot 4)",
           "license": "MIT",
           "licenseFile": "LICENSE",
           "payload": "addons/gevp",
@@ -573,12 +573,12 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "speed-scaled FOV kick and gate-crossing flashes \u2014 hook race_manager.checkpoint_passed / lap_completed"
+          "note": "speed-scaled FOV kick and gate-crossing flashes — hook race_manager.checkpoint_passed / lap_completed"
         },
         {
           "skill": "audio-design",
           "params": {},
-          "note": "GEVP ships an engine_sound.tscn (pitch-follows-RPM) \u2014 instance it under the car and feed it a loop; buses are ABI-standard"
+          "note": "GEVP ships an engine_sound.tscn (pitch-follows-RPM) — instance it under the car and feed it a loop; buses are ABI-standard"
         }
       ],
       "systems": [
@@ -595,7 +595,7 @@
         "Wheel model (single wheel GLB reused per corner)",
         "Track surface textures (asphalt + kerb, tileable PBR, 4m repeat)",
         "Checkpoint gate arch model or banner (replaces translucent blockout gates)",
-        "Skybox / horizon panorama (360\u00b0, outdoor daytime)",
+        "Skybox / horizon panorama (360°, outdoor daytime)",
         "Engine loop WAV (pitch-shiftable single-RPM sample) + tire screech + gate whoosh SFX"
       ]
     },
@@ -614,7 +614,7 @@
           "repo": "https://github.com/nathanhoad/godot_dialogue_manager.git",
           "ref": "v3.10.4",
           "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
-          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ \u2014 same pin as the visual-novel template)",
+          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ — same pin as the visual-novel template)",
           "license": "MIT",
           "licenseFile": "LICENSE",
           "payload": "addons/dialogue_manager",
@@ -628,7 +628,7 @@
         {
           "skill": "narrative",
           "params": {},
-          "note": "the book lives in dialogue/book.dialogue \u2014 one title per numbered passage; The Toll Bridge shows every mechanic (jump, item gate, skill test, luck test) to copy from"
+          "note": "the book lives in dialogue/book.dialogue — one title per numbered passage; The Toll Bridge shows every mechanic (jump, item gate, skill test, luck test) to copy from"
         },
         {
           "skill": "ui-theme",
@@ -663,7 +663,7 @@
       "name": "Farming Sim (Stardew-like, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "2D farming base on the TimeTick GDExtension (shoyguer/time-tick \u2014 vendored from the sha256-pinned 1.1 release zip; prebuilt binaries for Windows/Linux/macOS/Android/iOS/Web, targets Godot 4.6): a TimeSystem autoload wrapping TimeTick (tick -> minute -> hour -> day at 0.1s/game-minute, derived 28-day seasons, sleep_to_next_day(), save/load of the clock), a first-party day/night CanvasModulate tint sampling a 24-hour gradient off the clock (day_started/night_started at 06:00/19:00), a 20x12 farm TileMapLayer (grass/tilled/watered atlas painted in code) with till/plant/harvest, one data-driven Crop resource (turnip.tres: 4 growth stages, 1 day/stage, blockout stage visuals) whose growth recomputes from day deltas on TimeSystem.day_changed (idempotent), a farmer (top-down movement + one contextual E action: harvest > plant > till on the tile underfoot), and a clock/season/harvest HUD. Kit note (2026-07-11): the survey's day/night pick (maetzemax day-and-night-cycle 0.3.0) was evaluated and is 3D-only (CycleController extends Node3D driving DirectionalLight3D + WorldEnvironment sky) \u2014 it does not fit a 2D TileMap farm, so the 2D tint layer is first-party; use that addon instead if the project goes 3D. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, pause action).",
+      "description": "2D farming base on the TimeTick GDExtension (shoyguer/time-tick — vendored from the sha256-pinned 1.1 release zip; prebuilt binaries for Windows/Linux/macOS/Android/iOS/Web, targets Godot 4.6): a TimeSystem autoload wrapping TimeTick (tick -> minute -> hour -> day at 0.1s/game-minute, derived 28-day seasons, sleep_to_next_day(), save/load of the clock), a first-party day/night CanvasModulate tint sampling a 24-hour gradient off the clock (day_started/night_started at 06:00/19:00), a 20x12 farm TileMapLayer (grass/tilled/watered atlas painted in code) with till/plant/harvest, one data-driven Crop resource (turnip.tres: 4 growth stages, 1 day/stage, blockout stage visuals) whose growth recomputes from day deltas on TimeSystem.day_changed (idempotent), a farmer (top-down movement + one contextual E action: harvest > plant > till on the tile underfoot), and a clock/season/harvest HUD. Kit note (2026-07-11): the survey's day/night pick (maetzemax day-and-night-cycle 0.3.0) was evaluated and is 3D-only (CycleController extends Node3D driving DirectionalLight3D + WorldEnvironment sky) — it does not fit a 2D TileMap farm, so the 2D tint layer is first-party; use that addon instead if the project goes 3D. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, pause action).",
       "status": "validated",
       "skeleton": "genres/farming-sim/skeleton",
       "doc": "genres/farming-sim/TEMPLATE.md",
@@ -675,7 +675,7 @@
             "url": "https://github.com/shoyguer/time-tick/releases/download/1.1/time_tick_1.1.zip",
             "sha256": "e30cd7c1150f47d5523c54972f6fc697344434966f9bfd48247fba245c0bc6b4"
           },
-          "version": "1.1 (GDExtension release zip \u2014 repo tag 1.1 @ 796506ad is the C++ source; binaries only ship in the release asset, hence the archive pin)",
+          "version": "1.1 (GDExtension release zip — repo tag 1.1 @ 796506ad is the C++ source; binaries only ship in the release asset, hence the archive pin)",
           "license": "MIT",
           "licenseFile": "time_tick_1.1/addons/time_tick/LICENSE",
           "payload": "time_tick_1.1/addons/time_tick",
@@ -699,7 +699,7 @@
         {
           "skill": "companion-npcs",
           "params": {},
-          "note": "Stardew's heart is its townsfolk \u2014 import companions as Pandora entities + Dialogue Manager personas for gift/schedule systems"
+          "note": "Stardew's heart is its townsfolk — import companions as Pandora entities + Dialogue Manager personas for gift/schedule systems"
         }
       ],
       "systems": [
@@ -717,7 +717,7 @@
         "Crop growth spritesheets (one row per crop, stage_count frames; replaces the blockout stage colors)",
         "Buildings (farmhouse, shipping bin, barn; 2-3 tile footprints)",
         "Season palette variants or overlay tints (spring/summer/autumn/winter)",
-        "Ambient loops (birdsong day / crickets night \u2014 swap on day_started/night_started) + tool SFX"
+        "Ambient loops (birdsong day / crickets night — swap on day_started/night_started) + tool SFX"
       ]
     },
     {
@@ -725,7 +725,7 @@
       "name": "Horror FPS (first-person horror)",
       "engine": "godot",
       "engineVersion": "4.5.1-stable",
-      "description": "First-person horror base: the COGITO immersive-sim stack (same vendor pins as fps-immersive \u2014 full player controller, component interactions, inventory, quests, menus) plus resonate adaptive music (GitLab continuation of the archived hugemenace repo \u2014 MusicBank with a 2-stem 'ambient' track: calm pad always on, dread drone gated) and a first-party Sanity autoload (0-100 stat, ambient drain, safe-zone restore via Area3D light pools, scare() hits, hysteresis low-sanity thresholds). The room script wires sanity to a vignette overlay shader (intensity = 1 - sanity) and to the dread stem (enable_stem under the low threshold, disable on recovery) \u2014 stat, presentation, and audio stay decoupled. Test room: night-lit blockout with the COGITO player, openable door, carryable pickup, one safe lamp pool, committed placeholder stem WAVs. Engine pin note: inherits fps-immersive's 4.5 pin (COGITO v1.1.6 targets Godot 4.5.1; its quest manager breaks the 4.6 GDScript analyzer) \u2014 scaffold and validate with a 4.5.x Godot. Standard NoxDev ABI on top.",
+      "description": "First-person horror base: the COGITO immersive-sim stack (same vendor pins as fps-immersive — full player controller, component interactions, inventory, quests, menus) plus resonate adaptive music (GitLab continuation of the archived hugemenace repo — MusicBank with a 2-stem 'ambient' track: calm pad always on, dread drone gated) and a first-party Sanity autoload (0-100 stat, ambient drain, safe-zone restore via Area3D light pools, scare() hits, hysteresis low-sanity thresholds). The room script wires sanity to a vignette overlay shader (intensity = 1 - sanity) and to the dread stem (enable_stem under the low threshold, disable on recovery) — stat, presentation, and audio stay decoupled. Test room: night-lit blockout with the COGITO player, openable door, carryable pickup, one safe lamp pool, committed placeholder stem WAVs. Engine pin note: inherits fps-immersive's 4.5 pin (COGITO v1.1.6 targets Godot 4.5.1; its quest manager breaks the 4.6 GDScript analyzer) — scaffold and validate with a 4.5.x Godot. Standard NoxDev ABI on top.",
       "status": "validated",
       "skeleton": "genres/horror-fps/skeleton",
       "doc": "genres/horror-fps/TEMPLATE.md",
@@ -735,7 +735,7 @@
           "repo": "https://codeberg.org/Phazorknight/Cogito.git",
           "ref": "v1.1.6",
           "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
-          "version": "1.1.6 (Codeberg is the live upstream \u2014 same pin as fps-immersive; targets Godot 4.5.1-stable)",
+          "version": "1.1.6 (Codeberg is the live upstream — same pin as fps-immersive; targets Godot 4.5.1-stable)",
           "license": "MIT",
           "licenseFile": "LICENSE",
           "payload": "addons/cogito",
@@ -757,7 +757,7 @@
           "repo": "https://codeberg.org/Phazorknight/Cogito.git",
           "ref": "v1.1.6",
           "commit": "8b38b0bb21fa432155e04655f6e6bcbb13c55d1c",
-          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 \u2014 same pin so versions can never skew)",
+          "version": "4.6.0 (nathanhoad/godot_input_helper as vendored inside COGITO v1.1.6 — same pin so versions can never skew)",
           "license": "MIT",
           "licenseFile": "addons/input_helper/LICENSE",
           "payload": "addons/input_helper",
@@ -785,7 +785,7 @@
           "repo": "https://gitlab.com/widgitgaming/godot/resonate.git",
           "ref": "v2.4.0",
           "commit": "e1cf2cff9b91c2672fa49c8518703e97e8ece5c0",
-          "version": "2.4.0 (GitLab widgitgaming continuation \u2014 official maintainer since Jan 2026; the hugemenace GitHub repo is archived at v2.3.4)",
+          "version": "2.4.0 (GitLab widgitgaming continuation — official maintainer since Jan 2026; the hugemenace GitHub repo is archived at v2.3.4)",
           "license": "MIT",
           "licenseFile": "LICENSE",
           "payload": "addons/resonate",
@@ -799,7 +799,7 @@
         {
           "skill": "audio-design",
           "params": {},
-          "note": "resonate's SoundManager (pooled, spatial) replaces bare AudioStreamPlayers for scare stingers; the stem WAVs in assets/music/ are generated placeholders \u2014 replace with real stems, keep the names calm/dread"
+          "note": "resonate's SoundManager (pooled, spatial) replaces bare AudioStreamPlayers for scare stingers; the stem WAVs in assets/music/ are generated placeholders — replace with real stems, keep the names calm/dread"
         },
         {
           "skill": "world-layout",
@@ -814,7 +814,7 @@
         {
           "skill": "shader-effects",
           "params": {},
-          "note": "shaders/sanity_overlay.gdshader is the single screen-effect hook \u2014 extend it (chromatic aberration, film grain) rather than stacking overlays"
+          "note": "shaders/sanity_overlay.gdshader is the single screen-effect hook — extend it (chromatic aberration, film grain) rather than stacking overlays"
         }
       ],
       "systems": [],
@@ -825,7 +825,7 @@
       "assetPlanHints": [
         "Environment texture set (decayed interior: stained walls, worn wood floor, tileable PBR)",
         "Interactable prop models (doors, drawers, fuse box, notes; GLB with collision)",
-        "Music stems: calm ambient pad + dread drone layers (loopable, same length/BPM \u2014 replace assets/music/*.wav, keep stem names)",
+        "Music stems: calm ambient pad + dread drone layers (loopable, same length/BPM — replace assets/music/*.wav, keep stem names)",
         "Scare stinger SFX set + room-tone ambience loops",
         "Flashlight / lantern first-person model (~5k tris)",
         "UI: sanity-themed HUD accents (COGITO attribute bar reskin), scrawled-note font"
@@ -836,7 +836,7 @@
       "name": "Voxel Sandbox (Minecraft-like, 3D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Blocky voxel sandbox on Zylann/godot_voxel, GDExtension edition (vendored from the sha256-pinned v1.6x release zip \u2014 'Voxel Tools 1.6 GDExtension for Godot 4.5+', prebuilt Windows/Linux/macOS/iOS/Android binaries, self-registering, works on the official engine build; validated on official 4.6.1). The terrain is built entirely in code (scripts/main.gd) so the scene stays parseable without the extension and the setup is diffable: a 2-model VoxelBlockyLibrary (air + colored cube) on VoxelMesherBlocky over a flat TYPE-channel VoxelGeneratorFlat, streamed around a VoxelViewer attached to the player. First-person fly controller (mouse capture/look, WASD + Space/Shift) with dig (LMB) and place (RMB) through VoxelToolTerrain raycasts; edits counted into GameManager flags + HUD. GDExtension notes: no FastNoise2 in the extension edition; exports work out of the box on official templates. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, pause action).",
+      "description": "Blocky voxel sandbox on Zylann/godot_voxel, GDExtension edition (vendored from the sha256-pinned v1.6x release zip — 'Voxel Tools 1.6 GDExtension for Godot 4.5+', prebuilt Windows/Linux/macOS/iOS/Android binaries, self-registering, works on the official engine build; validated on official 4.6.1). The terrain is built entirely in code (scripts/main.gd) so the scene stays parseable without the extension and the setup is diffable: a 2-model VoxelBlockyLibrary (air + colored cube) on VoxelMesherBlocky over a flat TYPE-channel VoxelGeneratorFlat, streamed around a VoxelViewer attached to the player. First-person fly controller (mouse capture/look, WASD + Space/Shift) with dig (LMB) and place (RMB) through VoxelToolTerrain raycasts; edits counted into GameManager flags + HUD. GDExtension notes: no FastNoise2 in the extension edition; exports work out of the box on official templates. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, pause action).",
       "status": "validated",
       "skeleton": "genres/voxel-sandbox/skeleton",
       "doc": "genres/voxel-sandbox/TEMPLATE.md",
@@ -848,7 +848,7 @@
             "url": "https://github.com/Zylann/godot_voxel/releases/download/v1.6x/GodotVoxelExtension.zip",
             "sha256": "dfee985a0cff7059a31ada665e88a634fdcc3eab51f83fe5f6dd48939dd5372a"
           },
-          "version": "1.6 GDExtension (release tag v1.6x @ 595f52ee; the plain v1.6 release is the module edition \u2014 a full custom engine build \u2014 do not confuse them)",
+          "version": "1.6 GDExtension (release tag v1.6x @ 595f52ee; the plain v1.6 release is the module edition — a full custom engine build — do not confuse them)",
           "license": "MIT",
           "licenseFile": "addons/zylann.voxel/LICENSE.md",
           "payload": "addons/zylann.voxel",
@@ -867,7 +867,7 @@
         {
           "skill": "world-layout",
           "params": {},
-          "note": "terrain is generator-driven \u2014 layout work means swapping VoxelGeneratorFlat for VoxelGeneratorNoise2D/Graph, not placing meshes"
+          "note": "terrain is generator-driven — layout work means swapping VoxelGeneratorFlat for VoxelGeneratorNoise2D/Graph, not placing meshes"
         },
         {
           "skill": "image-pipeline",
@@ -898,7 +898,7 @@
       "name": "Vampire Survivors-like (auto-attack swarm roguelite)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Auto-attack swarm roguelite base, pure first-party (per the Wave-3 survey no clearly-maintained MIT swarm kit exists \u2014 BulletUpHell covers dense projectile patterns, not enemy swarms, and the genre's loop is build-cheap): WASD survivor whose weapon fires on a timer at the nearest enemy (pooled first-party projectiles), an enemy-swarm director spawning timed off-screen ring waves that scale in count/speed/health \u2014 all active enemies moved by ONE loop with pooling and no physics bodies, comfortably 200+ \u2014 with contact damage on a per-enemy cooldown, XP gems on kill with magnet pickup (same pooled single-loop pattern), and a level-up flow: data-driven Upgrade resources (res://resources/upgrades/*.tres \u2014 damage/fire rate/move speed/magnet radius/max HP) offered 3 at a time in a pausing choice UI (click or keys 1-3, level-ups queue). Survival timer + kill counter HUD; death opens a run summary (time/kills/level, best-kills + best-time recorded to GameManager flags, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "description": "Auto-attack swarm roguelite base, pure first-party (per the Wave-3 survey no clearly-maintained MIT swarm kit exists — BulletUpHell covers dense projectile patterns, not enemy swarms, and the genre's loop is build-cheap): WASD survivor whose weapon fires on a timer at the nearest enemy (pooled first-party projectiles), an enemy-swarm director spawning timed off-screen ring waves that scale in count/speed/health — all active enemies moved by ONE loop with pooling and no physics bodies, comfortably 200+ — with contact damage on a per-enemy cooldown, XP gems on kill with magnet pickup (same pooled single-loop pattern), and a level-up flow: data-driven Upgrade resources (res://resources/upgrades/*.tres — damage/fire rate/move speed/magnet radius/max HP) offered 3 at a time in a pausing choice UI (click or keys 1-3, level-ups queue). Survival timer + kill counter HUD; death opens a run summary (time/kills/level, best-kills + best-time recorded to GameManager flags, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
       "status": "validated",
       "skeleton": "genres/vampire-survivors/skeleton",
       "doc": "genres/vampire-survivors/TEMPLATE.md",
@@ -909,12 +909,12 @@
           "params": {
             "template": "topdown"
           },
-          "note": "movement actions are baked into the skeleton's project.godot (the weapon aims itself \u2014 no aim/attack actions needed); re-run only for rebinding UI"
+          "note": "movement actions are baked into the skeleton's project.godot (the weapon aims itself — no aim/attack actions needed); re-run only for rebinding UI"
         },
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hook player.weapon_fired / take_hit flashes and spawner.enemy_killed for shake, hitstop, and kill pops \u2014 the signals are already emitted"
+          "note": "hook player.weapon_fired / take_hit flashes and spawner.enemy_killed for shake, hitstop, and kill pops — the signals are already emitted"
         },
         {
           "skill": "vfx-particles",
@@ -946,7 +946,7 @@
       "name": "Zelda-like (top-down action-adventure)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Top-down action-adventure base (classic Zelda structure), pure first-party (per the Wave-3 survey no clearly-maintained MIT Zelda kit exists, and the adventure layer is build-cheap on top of the top-down-action archetype): a 4-directional hero with a sword-arc sweep (distance+angle hit-test against the enemies group), an item button driving the equipped-item slot (ships the boomerang \u2014 out-and-return flight that stuns enemies), and a 3-room world on a screen grid with Zelda-style room transitions: the camera snaps to whichever room the player walks into and each room wakes only its own enemies; rooms build their floor/perimeter walls (with doorway gaps) in code so scenes stay lean. Dungeon fundamentals: a small-key pickup, a locked door that consumes the key on bump, a latching pressure-plate puzzle opening a switch door, and a treasure chest granting + equipping the boomerang via the interact button \u2014 every key/door/plate/chest writes a GameManager flag so world state survives room transitions and scene reloads. Two enemy archetypes on a shared chassis (ping-pong patroller, straight-line chaser) with touch damage on cooldown, sword take_hit, boomerang stun, and chance heart drops; hearts row + key count + equipped-item HUD. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts \u2014 player saves hearts/keys/items, GameManager saves flags \u2014 scalable_text, pause action).",
+      "description": "Top-down action-adventure base (classic Zelda structure), pure first-party (per the Wave-3 survey no clearly-maintained MIT Zelda kit exists, and the adventure layer is build-cheap on top of the top-down-action archetype): a 4-directional hero with a sword-arc sweep (distance+angle hit-test against the enemies group), an item button driving the equipped-item slot (ships the boomerang — out-and-return flight that stuns enemies), and a 3-room world on a screen grid with Zelda-style room transitions: the camera snaps to whichever room the player walks into and each room wakes only its own enemies; rooms build their floor/perimeter walls (with doorway gaps) in code so scenes stay lean. Dungeon fundamentals: a small-key pickup, a locked door that consumes the key on bump, a latching pressure-plate puzzle opening a switch door, and a treasure chest granting + equipping the boomerang via the interact button — every key/door/plate/chest writes a GameManager flag so world state survives room transitions and scene reloads. Two enemy archetypes on a shared chassis (ping-pong patroller, straight-line chaser) with touch damage on cooldown, sword take_hit, boomerang stun, and chance heart drops; hearts row + key count + equipped-item HUD. Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts — player saves hearts/keys/items, GameManager saves flags — scalable_text, pause action).",
       "status": "validated",
       "skeleton": "genres/zelda-like/skeleton",
       "doc": "genres/zelda-like/TEMPLATE.md",
@@ -962,7 +962,7 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hook player.attacked / take_hit flashes and door.opened for hitstop, shake and door-rumble \u2014 the signals are already emitted"
+          "note": "hook player.attacked / take_hit flashes and door.opened for hitstop, shake and door-rumble — the signals are already emitted"
         },
         {
           "skill": "world-layout",
@@ -994,7 +994,7 @@
       "name": "Crowd Rush (hypercasual crowd-runner)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Hypercasual 3D crowd-runner base (Count-Masters-like), pure first-party (per the Wave-3 survey no maintained MIT crowd-runner kit exists and the genre is build-cheap: one MultiMesh, disc-formation math, count arithmetic): an auto-forward crowd of capsule units running a straight track with horizontal steering (A/D-arrows or mouse-x), every unit drawn by ONE MultiMesh in a phyllotaxis disc around the leader \u2014 no per-unit nodes, no physics bodies, 400 slots allocated so 200+ units stay cheap. Multiplier/add gates in choice pairs (\"+10\"/\"-5\", \"-5\"/\"x2\") consumed by the leader's lane on crossing; a spike-strip obstacle that kills the individual units sweeping through its box; a blocking enemy crowd resolved by 1:1 annihilation at a fixed rate (the bigger crowd survives with exactly the difference, a tie wipes the run); and a finish line + end-tower comparison (strictly more survivors than the tower count = win, score = surviving units). Crowd-count/distance HUD plus floating 3D count labels over both crowds; finish or wipe opens a run summary (survivors/tower/distance, best-survivors + best-distance flags on GameManager, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "description": "Hypercasual 3D crowd-runner base (Count-Masters-like), pure first-party (per the Wave-3 survey no maintained MIT crowd-runner kit exists and the genre is build-cheap: one MultiMesh, disc-formation math, count arithmetic): an auto-forward crowd of capsule units running a straight track with horizontal steering (A/D-arrows or mouse-x), every unit drawn by ONE MultiMesh in a phyllotaxis disc around the leader — no per-unit nodes, no physics bodies, 400 slots allocated so 200+ units stay cheap. Multiplier/add gates in choice pairs (\"+10\"/\"-5\", \"-5\"/\"x2\") consumed by the leader's lane on crossing; a spike-strip obstacle that kills the individual units sweeping through its box; a blocking enemy crowd resolved by 1:1 annihilation at a fixed rate (the bigger crowd survives with exactly the difference, a tie wipes the run); and a finish line + end-tower comparison (strictly more survivors than the tower count = win, score = surviving units). Crowd-count/distance HUD plus floating 3D count labels over both crowds; finish or wipe opens a run summary (survivors/tower/distance, best-survivors + best-distance flags on GameManager, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
       "status": "validated",
       "skeleton": "genres/crowd-rush/skeleton",
       "doc": "genres/crowd-rush/TEMPLATE.md",
@@ -1008,12 +1008,12 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hook crowd.gate_applied / units_lost and enemy clash_started for gate pops, clash shake and kill ticks \u2014 the signals are already emitted"
+          "note": "hook crowd.gate_applied / units_lost and enemy clash_started for gate pops, clash shake and kill ticks — the signals are already emitted"
         },
         {
           "skill": "vfx-particles",
           "params": {},
-          "note": "unit poofs on units_lost, gate bursts on gate_applied, confetti on finish_line.finished; keep them pooled \u2014 the crowd itself never allocates in the hot loop"
+          "note": "unit poofs on units_lost, gate bursts on gate_applied, confetti on finish_line.finished; keep them pooled — the crowd itself never allocates in the hot loop"
         },
         {
           "skill": "world-layout",
@@ -1031,7 +1031,7 @@
         "godotsmith:templates/docs/ADR_TEMPLATE.md"
       ],
       "assetPlanHints": [
-        "Runner character model (low-poly ~1-2k tris, run cycle; ONE mesh swapped into the crowd MultiMesh \u2014 every unit shares it)",
+        "Runner character model (low-poly ~1-2k tris, run cycle; ONE mesh swapped into the crowd MultiMesh — every unit shares it)",
         "Enemy runner variant (palette/silhouette swap of the runner, same single-mesh constraint)",
         "Gate arch + panel art (translucent good/bad panels with big readable operation text)",
         "Obstacle set (spike strip, saw blade, gap decals; keep kill AABBs matching the visuals)",
@@ -1045,7 +1045,7 @@
       "name": "FPS Classic (arena shooter)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Doom/Quake-style arena shooter base, pure first-party (no vendored kit \u2014 deliberately NOT the COGITO stack: fps-immersive/horror-fps are the slow immersive-sim lane on a 4.5 pin, this is the fast run-and-gun lane on 4.6): a Quake-ish first-person controller (WASD + mouselook, sprint, ground friction + Quake accelerate, small air-speed cap for real air control/strafe-jumps, held-jump auto-hop that skips landing friction so bunny-hops keep speed), two arena weapons on ammo pools with switch (Q/1/2) \u2014 a pellet-spread hitscan shotgun (seedable RNG) and a projectile rocket launcher whose ray-swept rocket deals distance-falloff splash plus player knockback (self-splash included = rocket jumps) \u2014 health/armor with Quake armor absorption, a code-built 40x40m arena (pillars, ramp, raised rocket-perch platform), four walk-over item spawners (health/armor/shells/rockets) on respawn countdowns that refuse pickups the player can't use, two enemy archetypes on a shared chassis with raycast-feeler chase steering (no nav bake, robust headless): a melee rusher and a ranged shooter firing plasma bolts with LOS checks. A wave director spawns escalating waves at ring points (wave n = n+1 rushers + n shooters), tracks kills, and death opens a run summary (kills/wave, best_kills + best_wave flags on GameManager, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "description": "Doom/Quake-style arena shooter base, pure first-party (no vendored kit — deliberately NOT the COGITO stack: fps-immersive/horror-fps are the slow immersive-sim lane on a 4.5 pin, this is the fast run-and-gun lane on 4.6): a Quake-ish first-person controller (WASD + mouselook, sprint, ground friction + Quake accelerate, small air-speed cap for real air control/strafe-jumps, held-jump auto-hop that skips landing friction so bunny-hops keep speed), two arena weapons on ammo pools with switch (Q/1/2) — a pellet-spread hitscan shotgun (seedable RNG) and a projectile rocket launcher whose ray-swept rocket deals distance-falloff splash plus player knockback (self-splash included = rocket jumps) — health/armor with Quake armor absorption, a code-built 40x40m arena (pillars, ramp, raised rocket-perch platform), four walk-over item spawners (health/armor/shells/rockets) on respawn countdowns that refuse pickups the player can't use, two enemy archetypes on a shared chassis with raycast-feeler chase steering (no nav bake, robust headless): a melee rusher and a ranged shooter firing plasma bolts with LOS checks. A wave director spawns escalating waves at ring points (wave n = n+1 rushers + n shooters), tracks kills, and death opens a run summary (kills/wave, best_kills + best_wave flags on GameManager, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
       "status": "validated",
       "skeleton": "genres/fps-classic/skeleton",
       "doc": "genres/fps-classic/TEMPLATE.md",
@@ -1061,7 +1061,7 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hook weapons.fired for camera kick, player.took_damage for hurt flash/shake, and waves.enemy_killed for kill pops \u2014 the signals are already emitted"
+          "note": "hook weapons.fired for camera kick, player.took_damage for hurt flash/shake, and waves.enemy_killed for kill pops — the signals are already emitted"
         },
         {
           "skill": "world-layout",
@@ -1071,7 +1071,7 @@
         {
           "skill": "audio-design",
           "params": {},
-          "note": "shotgun blast / rocket whoosh+boom / pickup blips on the ABI SFX bus \u2014 fire from weapons.fired, projectile.exploded, item picked_up/respawned"
+          "note": "shotgun blast / rocket whoosh+boom / pickup blips on the ABI SFX bus — fire from weapons.fired, projectile.exploded, item picked_up/respawned"
         }
       ],
       "systems": [
@@ -1098,7 +1098,7 @@
       "name": "Dungeon Crawler Classic (grid-based first-person)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Grid-based first-person dungeon crawler base (Lands of Lore: The Throne of Chaos / Eye of the Beholder structure), pure first-party (per the Wave-3 survey no maintained MIT grid-crawler kit exists and the genre is build-cheap: the whole illusion is grid math + tweens): the camera IS the party \u2014 a Node3D stepped cell-by-cell (forward/back/strafe, 90-degree turns, each smoothed with a short tween) through a dungeon built entirely in code from one ASCII map constant (14x13 starter: rooms, corridors, a plain bump-open door, a locked door + key, a lever-opened secret wall, torch-lit fog). NO physics anywhere \u2014 movement, door bumps, lever pulls, pickups, combat reach and enemy pathing are all grid queries, which keeps everything headless-robust and deterministic (zero RNG). Party of 3 (two front-row melee + a back-row caster whose 3-cell spark bolt costs MP): per-member HP/MP, per-member attack buttons with cooldowns (portrait click or hotkeys 1-3), front row soaks enemy melee, back row exposed only when both fronts fall. Real-time enemies occupy cells, step toward the party on move timers (greedy axis chase respecting doors/occupancy) and melee when cardinally adjacent. Pickups on walk-over (key; potions drunk via button heal the lowest-HP member); doors/lever/pickups write GameManager flags and self-restore so the dungeon stays solved across reloads. Classic bottom-bar HUD: scrolling message log, 3 portrait panels (ColorRect placeholder + HP/MP bars \u2014 Studio-bound art slots for the lol-vga style pack), compass from facing, keys/potions/kills. Party wipe opens a run summary (kills, secret found, best-kills flag, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
+      "description": "Grid-based first-person dungeon crawler base (Lands of Lore: The Throne of Chaos / Eye of the Beholder structure), pure first-party (per the Wave-3 survey no maintained MIT grid-crawler kit exists and the genre is build-cheap: the whole illusion is grid math + tweens): the camera IS the party — a Node3D stepped cell-by-cell (forward/back/strafe, 90-degree turns, each smoothed with a short tween) through a dungeon built entirely in code from one ASCII map constant (14x13 starter: rooms, corridors, a plain bump-open door, a locked door + key, a lever-opened secret wall, torch-lit fog). NO physics anywhere — movement, door bumps, lever pulls, pickups, combat reach and enemy pathing are all grid queries, which keeps everything headless-robust and deterministic (zero RNG). Party of 3 (two front-row melee + a back-row caster whose 3-cell spark bolt costs MP): per-member HP/MP, per-member attack buttons with cooldowns (portrait click or hotkeys 1-3), front row soaks enemy melee, back row exposed only when both fronts fall. Real-time enemies occupy cells, step toward the party on move timers (greedy axis chase respecting doors/occupancy) and melee when cardinally adjacent. Pickups on walk-over (key; potions drunk via button heal the lowest-HP member); doors/lever/pickups write GameManager flags and self-restore so the dungeon stays solved across reloads. Classic bottom-bar HUD: scrolling message log, 3 portrait panels (ColorRect placeholder + HP/MP bars — Studio-bound art slots for the lol-vga style pack), compass from facing, keys/potions/kills. Party wipe opens a run summary (kills, secret found, best-kills flag, Enter restarts). Standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contracts, scalable_text, pause action).",
       "status": "validated",
       "skeleton": "genres/dungeon-crawler-classic/skeleton",
       "doc": "genres/dungeon-crawler-classic/TEMPLATE.md",
@@ -1112,17 +1112,17 @@
         {
           "skill": "ui-theme",
           "params": {},
-          "note": "the bottom bar is the genre's face \u2014 theme the log panel, portrait frames and HP/MP bars from the game palette (the lol-ui-frame-v2 bench ref is the target anatomy)"
+          "note": "the bottom bar is the genre's face — theme the log panel, portrait frames and HP/MP bars from the game palette (the lol-ui-frame-v2 bench ref is the target anatomy)"
         },
         {
           "skill": "world-layout",
           "params": {},
-          "note": "the dungeon is one ASCII constant in dungeon.gd \u2014 layout work means editing/generating MAP strings (rooms, corridors, D/d/S/L/K/P/E markers), not placing meshes"
+          "note": "the dungeon is one ASCII constant in dungeon.gd — layout work means editing/generating MAP strings (rooms, corridors, D/d/S/L/K/P/E markers), not placing meshes"
         },
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hook party.took-a-hit via member_changed / take_enemy_hit messages for screen shake, and dungeon.door_opened / secret_opened for rumble \u2014 step/turn tweens are exports to tune"
+          "note": "hook party.took-a-hit via member_changed / take_enemy_hit messages for screen shake, and dungeon.door_opened / secret_opened for rumble — step/turn tweens are exports to tune"
         }
       ],
       "systems": [
@@ -1135,9 +1135,9 @@
         "godotsmith:templates/docs/ADR_TEMPLATE.md"
       ],
       "assetPlanHints": [
-        "Wall/floor/ceiling texture set (VGA-256 Westwood look, 2m repeat \u2014 bench/lol-corridor-v2 is the style ref; nxdv_vga256 LoRA lane for scene-level art)",
-        "3 party portraits (~128x128, painted VGA style \u2014 bench/lol-portrait-v2 ref; replaces the ColorRect placeholder slots in the HUD)",
-        "Bottom-bar UI frame (parchment/stone chrome with portrait windows, log panel and compass \u2014 bench/lol-ui-frame-v2 ref)",
+        "Wall/floor/ceiling texture set (VGA-256 Westwood look, 2m repeat — bench/lol-corridor-v2 is the style ref; nxdv_vga256 LoRA lane for scene-level art)",
+        "3 party portraits (~128x128, painted VGA style — bench/lol-portrait-v2 ref; replaces the ColorRect placeholder slots in the HUD)",
+        "Bottom-bar UI frame (parchment/stone chrome with portrait windows, log panel and compass — bench/lol-ui-frame-v2 ref)",
         "Enemy billboard sprites or low-poly models (2-3 silhouettes; replaces the capsule in enemy.gd _build_body)",
         "Door/lever/pickup props (wooden door leaf, locked variant, wall lever, key, potion flask; GLB or billboards)",
         "SFX: footstep thud per step, door creak/unlock, lever clunk, stone grinding (secret), sword hit, spark cast, potion gulp, party-member hurt/fall"
@@ -1148,7 +1148,7 @@
       "name": "FF Gamebook (illustrated Fighting-Fantasy book)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Illustrated Fighting-Fantasy gamebook \u2014 the gamebook template's presentation evolution (Veritas Tales / classic FF book plates), same Dialogue Manager 3 pin, adventure sheet and 2d6 roll-under dice layer underneath: every passage is an ILLUSTRATED PAGE \u2014 large illustration plate on top, passage text + 'turn to N' choice buttons below, adventure-sheet bar, dice tray rolling over the page for tests. NEW core system: the asset-binding manifest (assets.manifest.json in the project root) \u2014 per-slot entries {slotId, kind: illustration|ui|audio, policy: static|generated|rule, workflowId (zit-txt2img), stylePack (veritas-ink), promptTemplate ({passage_summary}-templated for rule slots), source (dialogue+passage+summary), file, provenance {seed, params, generatedAt}} covering one slot per passage plate plus UI chrome (ui/page_frame, ui/dice_tray) and audio/page_turn; the AssetBinder autoload reads it and the page binds each passage's slot on entry \u2014 deterministic ColorRect placeholders until the Studio asset board generates real plates and writes file+provenance back (zero code changes to adopt them). Single-player core, multiplayer-READY architecture: ALL passage state, choices and dice results route through the SessionState autoload \u2014 advance_passage() (first mutation of every passage), choose() (the response buttons' route), roll()/roll_luck() (awaits the dice layer, records to roll_log) \u2014 documented as the future ENet sync point, with DM-seat hooks (dm_push_passage, dm_override_roll) shipped as documented no-ops. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups \u2014 GameManager, Sheet, Dice and SessionState all persist \u2014 save_data() contracts, scalable_text, pause action).",
+      "description": "Illustrated Fighting-Fantasy gamebook — the gamebook template's presentation evolution (Veritas Tales / classic FF book plates), same Dialogue Manager 3 pin, adventure sheet and 2d6 roll-under dice layer underneath: every passage is an ILLUSTRATED PAGE — large illustration plate on top, passage text + 'turn to N' choice buttons below, adventure-sheet bar, dice tray rolling over the page for tests. NEW core system: the asset-binding manifest (assets.manifest.json in the project root) — per-slot entries {slotId, kind: illustration|ui|audio, policy: static|generated|rule, workflowId (zit-txt2img), stylePack (veritas-ink), promptTemplate ({passage_summary}-templated for rule slots), source (dialogue+passage+summary), file, provenance {seed, params, generatedAt}} covering one slot per passage plate plus UI chrome (ui/page_frame, ui/dice_tray) and audio/page_turn; the AssetBinder autoload reads it and the page binds each passage's slot on entry — deterministic ColorRect placeholders until the Studio asset board generates real plates and writes file+provenance back (zero code changes to adopt them). Single-player core, multiplayer-READY architecture: ALL passage state, choices and dice results route through the SessionState autoload — advance_passage() (first mutation of every passage), choose() (the response buttons' route), roll()/roll_luck() (awaits the dice layer, records to roll_log) — documented as the future ENet sync point, with DM-seat hooks (dm_push_passage, dm_override_roll) shipped as documented no-ops. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups — GameManager, Sheet, Dice and SessionState all persist — save_data() contracts, scalable_text, pause action).",
       "status": "validated",
       "skeleton": "genres/ff-gamebook/skeleton",
       "doc": "genres/ff-gamebook/TEMPLATE.md",
@@ -1158,7 +1158,7 @@
         "transport": "enet",
         "transportNote": "ENet for LAN (default, validated). Switch transport to 'websocket' for one desktop+web code path (spec Phase 3, web-shippable); WebRTC for web realtime is spec Phase 5 (not bundled).",
         "arbitration": "leader",
-        "arbitrationNote": "'leader' resolves party choices immediately and works with the UNMODIFIED book scene (validated). 'vote' and 'dm-confirm' are fully implemented but defer the commit until a majority/DM approves \u2014 their deferred-commit UX needs a small MP-aware book hook (connect NetBridge.choice_committed/remote_advance and skip the optimistic walk), a Phase-2 finish. DM push/override work in every mode.",
+        "arbitrationNote": "'leader' resolves party choices immediately and works with the UNMODIFIED book scene (validated). 'vote' and 'dm-confirm' are fully implemented but defer the commit until a majority/DM approves — their deferred-commit UX needs a small MP-aware book hook (connect NetBridge.choice_committed/remote_advance and skip the optimistic walk), a Phase-2 finish. DM push/override work in every mode.",
         "skill": "netcode",
         "addon": "nox_netcode",
         "autoloads": [
@@ -1168,7 +1168,7 @@
         "note": "Opt-in: NOT applied by default scaffolding. Advertises 'Playable together' to the Studio genre picker; run the netcode primitive to inject it. Offline play is untouched (the SessionState guard is inert when Net.active is false).",
         "validated": {
           "engineVersion": "4.6.1-stable",
-          "note": "Injected into a fresh 4.6.1 scaffold: editor import clean (zero parse errors), nox_netcode API self-probe OK (host/seats/DM-authority/seed/teardown), single-player boot probe byte-identical (guard inert offline). True two-peer sync needs two running instances \u2014 see addons/nox_netcode/README.md manual steps; not validatable headless."
+          "note": "Injected into a fresh 4.6.1 scaffold: editor import clean (zero parse errors), nox_netcode API self-probe OK (host/seats/DM-authority/seed/teardown), single-player boot probe byte-identical (guard inert offline). True two-peer sync needs two running instances — see addons/nox_netcode/README.md manual steps; not validatable headless."
         }
       },
       "vendoredAddons": [
@@ -1177,7 +1177,7 @@
           "repo": "https://github.com/nathanhoad/godot_dialogue_manager.git",
           "ref": "v3.10.4",
           "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
-          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ \u2014 same pin as the gamebook and visual-novel templates)",
+          "version": "3.10.4 (DM 3.x line, requires Godot 4.4+ — same pin as the gamebook and visual-novel templates)",
           "license": "MIT",
           "licenseFile": "LICENSE",
           "payload": "addons/dialogue_manager",
@@ -1191,12 +1191,12 @@
         {
           "skill": "narrative",
           "params": {},
-          "note": "the book lives in dialogue/book.dialogue \u2014 every passage starts with `do SessionState.advance_passage(\"passage_N\")` (that line is what binds the plate); when you add a passage, add its illustration/passage_N slot to assets.manifest.json with a source.summary for the prompt rule"
+          "note": "the book lives in dialogue/book.dialogue — every passage starts with `do SessionState.advance_passage(\"passage_N\")` (that line is what binds the plate); when you add a passage, add its illustration/passage_N slot to assets.manifest.json with a source.summary for the prompt rule"
         },
         {
           "skill": "image-pipeline",
           "params": {},
-          "note": "do NOT hand-wire art paths into scenes \u2014 fill manifest slots instead: generate with each slot's workflowId + stylePack (veritas-ink) + promptTemplate, write the asset into the project and set the slot's file + provenance; AssetBinder picks it up on next boot"
+          "note": "do NOT hand-wire art paths into scenes — fill manifest slots instead: generate with each slot's workflowId + stylePack (veritas-ink) + promptTemplate, write the asset into the project and set the slot's file + provenance; AssetBinder picks it up on next boot"
         },
         {
           "skill": "ui-theme",
@@ -1210,7 +1210,7 @@
             "transport": "enet",
             "arbitration": "leader"
           },
-          "note": "OPT-IN multiplayer (build-order #12). Run `skills/netcode/tools/netcode_gen.py inject --project <dir> --profile authority-turn --transport enet` to make the book playable together: copies the nox_netcode addon into addons/, registers the Net + NetBridge autoloads, writes the [nox_netcode] settings block, and applies the pinned SessionState guard patch \u2014 advance_passage/choose/roll route through the host (host validates + broadcasts, clients render off signals) and the two DM-seat no-op hooks become real host-side dm_push_passage/dm_override_roll (require_dm). Idempotent. No netfox vendoring needed (native @rpc suffices for authority-turn). Single-player stays byte-identical because the guard is inert when Net.active is false."
+          "note": "OPT-IN multiplayer (build-order #12). Run `skills/netcode/tools/netcode_gen.py inject --project <dir> --profile authority-turn --transport enet` to make the book playable together: copies the nox_netcode addon into addons/, registers the Net + NetBridge autoloads, writes the [nox_netcode] settings block, and applies the pinned SessionState guard patch — advance_passage/choose/roll route through the host (host validates + broadcasts, clients render off signals) and the two DM-seat no-op hooks become real host-side dm_push_passage/dm_override_roll (require_dm). Idempotent. No netfox vendoring needed (native @rpc suffices for authority-turn). Single-player stays byte-identical because the guard is inert when Net.active is false."
         }
       ],
       "systems": [
@@ -1222,7 +1222,7 @@
         "godotsmith:templates/docs/GDD_TEMPLATE.md"
       ],
       "assetPlanHints": [
-        "Passage illustration plates (16:9, ~1100x620; veritas-ink style pack: hand-drawn traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plates) \u2014 one per illustration/* manifest slot, generated from each slot's promptTemplate + source.summary; write file+provenance back into assets.manifest.json",
+        "Passage illustration plates (16:9, ~1100x620; veritas-ink style pack: hand-drawn traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plates) — one per illustration/* manifest slot, generated from each slot's promptTemplate + source.summary; write file+provenance back into assets.manifest.json",
         "Page frame / parchment page background (ui/page_frame slot: aged parchment, ornate ink filigree border, empty center)",
         "Dice tray panel art (ui/dice_tray slot: worn leather tray seen from above, empty center)",
         "2d6 dice faces or spritesheet for the tray (replaces the number labels)",
@@ -1290,7 +1290,7 @@
       "name": "Top-Down Action (Unity)",
       "engine": "unity",
       "engineVersion": "6000.0 LTS",
-      "description": "Unity port of the top-down-action archetype (Hotline-Miami-like), pure first-party: Rigidbody2D player with 8-directional movement, mouse aim, hitscan Physics2D raycast shot with LineRenderer tracer, dash with cooldown and health/respawn; three shootable practice targets; a direct-steering chaser enemy with contact damage (Unity has no first-party 2D navmesh \u2014 see TEMPLATE.md); code-built demo scene via the NoxBootstrap editor script (no committed .unity files); GameManager singleton with world flags and JSON save/load mirroring the NoxDev ABI save_data() contract via ISaveable.",
+      "description": "Unity port of the top-down-action archetype (Hotline-Miami-like), pure first-party: Rigidbody2D player with 8-directional movement, mouse aim, hitscan Physics2D raycast shot with LineRenderer tracer, dash with cooldown and health/respawn; three shootable practice targets; a direct-steering chaser enemy with contact damage (Unity has no first-party 2D navmesh — see TEMPLATE.md); code-built demo scene via the NoxBootstrap editor script (no committed .unity files); GameManager singleton with world flags and JSON save/load mirroring the NoxDev ABI save_data() contract via ISaveable.",
       "status": "validated",
       "validatedEditor": "6000.0.40f1",
       "skeleton": "genres/top-down-action-unity/skeleton",
@@ -1528,7 +1528,7 @@
       "name": "Obby 3D Multiplayer (3D obstacle course, netcode drop-in)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A 3D obstacle-course platformer (obby, Roblox-obby style) that ships the nox_netcode realtime drop-in pre-wired \u2014 the 3D twin of obby-multiplayer. Avatars are CharacterBody3D with world-relative WASD + jump; the COURSE is built entirely in code from data (StaticBody3D+BoxShape3D platforms, ordered Area3D checkpoint gates, Area3D hazards, a finish Area3D, a KILL_Y fall line) under a fixed follow Camera3D. GameManager (reused verbatim from the 2D obby \u2014 it is dimension-agnostic) holds the run as pure, headless-testable logic (monotonic checkpoint progress with anti-skip, deaths, a live/best time, save/load). It runs two ways from one codebase: OFFLINE it spawns one local CharacterBody3D avatar and handles checkpoint/respawn/finish itself (a complete single-player obby, no multiplayer dependency); ONLINE (a nox_netcode session running) the NetSpawner3D spawns one avatar per peer via MultiplayerSpawner+MultiplayerSynchronizer (Vector3 sync) and checkpoint/respawn/finish route through NetEvents so the host arbitrates an authoritative, cheat-resistant race. Vendored addon: nox_netcode (Net autoload, realtime profile, ENet transport; ships net_player_3d.gd + net_spawner_3d.gd alongside the 2D avatar/spawner). NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (best time persists), pause input, scalable_text.",
+      "description": "A 3D obstacle-course platformer (obby, Roblox-obby style) that ships the nox_netcode realtime drop-in pre-wired — the 3D twin of obby-multiplayer. Avatars are CharacterBody3D with world-relative WASD + jump; the COURSE is built entirely in code from data (StaticBody3D+BoxShape3D platforms, ordered Area3D checkpoint gates, Area3D hazards, a finish Area3D, a KILL_Y fall line) under a fixed follow Camera3D. GameManager (reused verbatim from the 2D obby — it is dimension-agnostic) holds the run as pure, headless-testable logic (monotonic checkpoint progress with anti-skip, deaths, a live/best time, save/load). It runs two ways from one codebase: OFFLINE it spawns one local CharacterBody3D avatar and handles checkpoint/respawn/finish itself (a complete single-player obby, no multiplayer dependency); ONLINE (a nox_netcode session running) the NetSpawner3D spawns one avatar per peer via MultiplayerSpawner+MultiplayerSynchronizer (Vector3 sync) and checkpoint/respawn/finish route through NetEvents so the host arbitrates an authoritative, cheat-resistant race. Vendored addon: nox_netcode (Net autoload, realtime profile, ENet transport; ships net_player_3d.gd + net_spawner_3d.gd alongside the 2D avatar/spawner). NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (best time persists), pause input, scalable_text.",
       "status": "validated",
       "skeleton": "genres/obby-3d-multiplayer/skeleton",
       "doc": "genres/obby-3d-multiplayer/TEMPLATE.md",
@@ -1570,7 +1570,7 @@
       "name": "Noir Detective (investigation + deduction, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A film-noir detective game where the play IS deduction (Lacuna / Snatcher lineage), not twitch. The whole CASE is a data-driven catalogue in a GameManager autoload as pure, headless-testable logic: suspects, locations, clues (staged per location), and deductions (each unlocked by the right clue set). You investigate locations to surface clues, combine the right clues into deductions (motive / means / opportunity), and only once the deduction chain is complete may you accuse \u2014 noir plays fair, no naming a name on a hunch; accuse the real culprit and the case closes solved, accuse wrong and they walk. The investigation scene (noir.gd) builds a three-column casebook in code in a noir palette (Investigate / Casebook / Deductions + Accuse) and only reads the engine. Ships a complete sample case, 'The Neon Alibi'. Swap the SUSPECTS/LOCATIONS/CLUES/DEDUCTIONS/CULPRIT consts to author a new case with zero UI changes. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (an in-progress case \u2014 clues found, deductions made \u2014 persists), pause + restart input, scalable_text.",
+      "description": "A film-noir detective game where the play IS deduction (Lacuna / Snatcher lineage), not twitch. The whole CASE is a data-driven catalogue in a GameManager autoload as pure, headless-testable logic: suspects, locations, clues (staged per location), and deductions (each unlocked by the right clue set). You investigate locations to surface clues, combine the right clues into deductions (motive / means / opportunity), and only once the deduction chain is complete may you accuse — noir plays fair, no naming a name on a hunch; accuse the real culprit and the case closes solved, accuse wrong and they walk. The investigation scene (noir.gd) builds a three-column casebook in code in a noir palette (Investigate / Casebook / Deductions + Accuse) and only reads the engine. Ships a complete sample case, 'The Neon Alibi'. Swap the SUSPECTS/LOCATIONS/CLUES/DEDUCTIONS/CULPRIT consts to author a new case with zero UI changes. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (an in-progress case — clues found, deductions made — persists), pause + restart input, scalable_text.",
       "status": "validated",
       "skeleton": "genres/noir-detective/skeleton",
       "doc": "genres/noir-detective/TEMPLATE.md",
@@ -1609,7 +1609,7 @@
       "name": "Match Three (grid puzzle / minigame, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A match-3 grid puzzle (Bejeweled/Candy-Crush lineage) \u2014 the classic dating-sim/gacha minigame \u2014 with the whole BOARD engine in a GameManager autoload as pure, seedable, headless-testable logic: an 8x8 grid of gem types generated with NO pre-made matches and a guaranteed legal move; try_swap validates an adjacent swap (only a swap that makes a line of 3+ commits, else it reverts), then resolves the full cascade \u2014 clear matched runs (score = gems x 10 x the chain step, so deeper cascades pay more), gravity pulls gems down, new gems refill from the top, repeat until stable; find_matches scans H+V runs; has_legal_move probes every adjacent swap and auto-reshuffles a dead board. match3.gd renders the gem grid in code, click a gem then an adjacent gem to swap, with a score/moves HUD + chain banner. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (the exact board + score persist), pause + restart input, scalable_text. Drops in as a standalone game or a minigame inside a larger title.",
+      "description": "A match-3 grid puzzle (Bejeweled/Candy-Crush lineage) — the classic dating-sim/gacha minigame — with the whole BOARD engine in a GameManager autoload as pure, seedable, headless-testable logic: an 8x8 grid of gem types generated with NO pre-made matches and a guaranteed legal move; try_swap validates an adjacent swap (only a swap that makes a line of 3+ commits, else it reverts), then resolves the full cascade — clear matched runs (score = gems x 10 x the chain step, so deeper cascades pay more), gravity pulls gems down, new gems refill from the top, repeat until stable; find_matches scans H+V runs; has_legal_move probes every adjacent swap and auto-reshuffles a dead board. match3.gd renders the gem grid in code, click a gem then an adjacent gem to swap, with a score/moves HUD + chain banner. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (the exact board + score persist), pause + restart input, scalable_text. Drops in as a standalone game or a minigame inside a larger title.",
       "status": "validated",
       "skeleton": "genres/match-three/skeleton",
       "doc": "genres/match-three/TEMPLATE.md",
@@ -1623,7 +1623,7 @@
         {
           "skill": "game-feel",
           "params": {},
-          "note": "hook swap/clear/cascade for juice \u2014 pop/scale on clear, screen shake on big chains, particle bursts"
+          "note": "hook swap/clear/cascade for juice — pop/scale on clear, screen shake on big chains, particle bursts"
         }
       ],
       "systems": [
@@ -1647,7 +1647,7 @@
       "name": "Gacha Summon (collection / pity system, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "The summon + collection core of a companion-collection game (Genshin/FGO lineage) \u2014 on-mission for waifu/companion rosters. The whole GACHA is a GameManager autoload as pure, seedable, headless-testable logic: a wallet of premium gems, published rarity RATES (3\u2605/4\u2605/5\u2605) with a real PITY system \u2014 a 5\u2605 rate that ramps from soft pity (74) and is GUARANTEED at hard pity (90), plus a 4\u2605-or-better guaranteed every 10 pulls \u2014 a rarity\u2192pool draw, single and 10-pulls that spend gems (stopping when the wallet is dry), and a collection that tracks dupes. pull(count) returns per-pull results {rarity,item,dupe}; current_five_chance() exposes the live pity-adjusted odds. gacha.gd renders the summon screen in code \u2014 wallet + pity + next-5\u2605 chance, Pull \u00d71 / Pull \u00d710, the last results (rarity-coloured), and the collection by rarity. Swap the POOL const to your own roster. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (wallet + pity + whole collection persist), pause + restart input, scalable_text. Drops in standalone or as the summon screen of a larger game.",
+      "description": "The summon + collection core of a companion-collection game (Genshin/FGO lineage) — on-mission for waifu/companion rosters. The whole GACHA is a GameManager autoload as pure, seedable, headless-testable logic: a wallet of premium gems, published rarity RATES (3★/4★/5★) with a real PITY system — a 5★ rate that ramps from soft pity (74) and is GUARANTEED at hard pity (90), plus a 4★-or-better guaranteed every 10 pulls — a rarity→pool draw, single and 10-pulls that spend gems (stopping when the wallet is dry), and a collection that tracks dupes. pull(count) returns per-pull results {rarity,item,dupe}; current_five_chance() exposes the live pity-adjusted odds. gacha.gd renders the summon screen in code — wallet + pity + next-5★ chance, Pull ×1 / Pull ×10, the last results (rarity-coloured), and the collection by rarity. Swap the POOL const to your own roster. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (wallet + pity + whole collection persist), pause + restart input, scalable_text. Drops in standalone or as the summon screen of a larger game.",
       "status": "validated",
       "skeleton": "genres/gacha-summon/skeleton",
       "doc": "genres/gacha-summon/TEMPLATE.md",
@@ -1656,7 +1656,7 @@
         {
           "skill": "companion-npcs",
           "params": {},
-          "note": "make the 5\u2605/4\u2605 pool real companions \u2014 each pulled unit gets a full companion-npcs persona/voice for the roster + chat"
+          "note": "make the 5★/4★ pool real companions — each pulled unit gets a full companion-npcs persona/voice for the roster + chat"
         },
         {
           "skill": "pixel-perfect",
@@ -1674,11 +1674,11 @@
         "godotsmith:templates/docs/ADR_TEMPLATE.md"
       ],
       "assetPlanHints": [
-        "Character cards for the 5\u2605/4\u2605 pool via card-creature-art (portrait art)",
-        "Rarity frames (3\u2605/4\u2605/5\u2605 borders) via card-frame",
+        "Character cards for the 5★/4★ pool via card-creature-art (portrait art)",
+        "Rarity frames (3★/4★/5★ borders) via card-frame",
         "Star / gem / currency icons via qwen-icon",
         "Banner splash / summon backdrop via zit-txt2img",
-        "Summon whoosh + 5\u2605 reveal stinger SFX"
+        "Summon whoosh + 5★ reveal stinger SFX"
       ]
     },
     {
@@ -1686,7 +1686,7 @@
       "name": "Action Adventure 3D (Zelda-like dungeon, 3D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A third-person 3D action-adventure (Zelda-3D lineage): a CharacterBody3D hero with world-relative movement under a fixed follow camera, a jump, a SWORD swing (a short-lived Area3D hitbox that damages enemies), and LOCK-ON (face + strafe the nearest foe); enemies that chase and deal contact damage; and a gated DUNGEON quest \u2014 clear the room, find the KEY, touch the locked DOOR to unlock it, then defeat the BOSS. The quest + combat STATE lives in a GameManager autoload as pure, headless-testable logic with the ordering rules enforced (no door without the key, the boss can't be hit until the door is open, defeating the boss wins). The dungeon (floor, walls, doorway divider, key, door, room + boss chamber) is built in code from that state; player/enemy are their own CharacterBody3D scenes. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (hearts/key/door/boss/progress persist), pause + restart input, scalable_text HUD (hearts + objective). The 3D-quest genre \u2014 engine pin Godot 4.6 Forward+.",
+      "description": "A third-person 3D action-adventure (Zelda-3D lineage): a CharacterBody3D hero with world-relative movement under a fixed follow camera, a jump, a SWORD swing (a short-lived Area3D hitbox that damages enemies), and LOCK-ON (face + strafe the nearest foe); enemies that chase and deal contact damage; and a gated DUNGEON quest — clear the room, find the KEY, touch the locked DOOR to unlock it, then defeat the BOSS. The quest + combat STATE lives in a GameManager autoload as pure, headless-testable logic with the ordering rules enforced (no door without the key, the boss can't be hit until the door is open, defeating the boss wins). The dungeon (floor, walls, doorway divider, key, door, room + boss chamber) is built in code from that state; player/enemy are their own CharacterBody3D scenes. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (hearts/key/door/boss/progress persist), pause + restart input, scalable_text HUD (hearts + objective). The 3D-quest genre — engine pin Godot 4.6 Forward+.",
       "status": "validated",
       "skeleton": "genres/action-adventure-3d/skeleton",
       "doc": "genres/action-adventure-3d/TEMPLATE.md",
@@ -1700,7 +1700,7 @@
         {
           "skill": "3d-asset-pipeline",
           "params": {},
-          "note": "swap the capsule player/enemy + box dungeon for real 3D models (blender-bridge normalize \u2192 GLB) and dungeon materials via the dungeon-tile texture preset"
+          "note": "swap the capsule player/enemy + box dungeon for real 3D models (blender-bridge normalize → GLB) and dungeon materials via the dungeon-tile texture preset"
         }
       ],
       "systems": [
@@ -1714,7 +1714,7 @@
       ],
       "assetPlanHints": [
         "Seamless dungeon wall / floor materials via dungeon-tile (zit-seamless-tile)",
-        "Hero + enemy + boss character models (concept via card-creature-art / qwen-char-turnaround \u2192 blender-bridge for GLB)",
+        "Hero + enemy + boss character models (concept via card-creature-art / qwen-char-turnaround → blender-bridge for GLB)",
         "Key / heart / objective HUD icons via qwen-icon",
         "A skybox / environment via viz-skybox-panorama",
         "Sword swing / hit / door-unlock / boss-defeat SFX"
@@ -1722,10 +1722,10 @@
     },
     {
       "id": "euro-engine-builder",
-      "name": "Euro Engine-Builder (competitive resource\u2192production\u2192VP engine, 2D)",
+      "name": "Euro Engine-Builder (competitive resource→production→VP engine, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Competitive Euro-style ENGINE-BUILDER board game (Scythe/Wingspan/Wyrmspan lineage): every player grows a resource\u2192production\u2192victory-point engine and the best engine wins. The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (EuroEngine) owned by a GameManager autoload \u2014 1 human + up to 4 heuristic-AI opponents (2\u20135 total). 5 tracked resources (wood/grain/metal/coin/energy) with a strict conservation ledger (pool == start + produced \u2212 spent, proven every turn); a 25-card development deck (5 categories, 3 copies each) with per-card cost/output/VP shuffled by a seeded RNG; a shared action board of 5 action types (PRODUCE/BUILD/TRADE/RESEARCH/DEPLOY) where a turn is exactly ONE legal action (is_legal rejects out-of-turn/unaffordable/malformed); 3 objective-token types (build 3 mining cards / reach 3 stars / bank 12 coin) claimed first-come, plus end-game majorities (most stars/cards/coin), plus VP from built cards and goal-stars; an end trigger (first to 6 goal-stars via DEPLOY, else 18 rounds) \u2192 final_scoring with a single deterministic winner. The AI is a genuine NON-LLM heuristic: it enumerates every legal action and scores each by a weighted evaluation (immediate VP + resource-efficiency + engine growth + quadratic progress-to-goal + option/conversion value), deterministic index tie-break, never illegal, never stalls. Full to_dict/from_dict save-load (banks, tableaus, hands, stars, deck, objectives, cursor, RNG state). board.gd renders the action board + per-player panels (resources/VP/stars/production/tableau) + objectives + current-player indicator + turn log, enabling only legal actions for the active human seat and auto-resolving AI turns. PLAY MODES \u2014 a SEAT-CONTROLLER matrix (STAGE 1): every one of the 2\u20135 seats carries a ControllerKind \u2014 HUMAN_LOCAL (the turn dispatcher blocks for local UI input), AI_HEURISTIC (auto-resolves via ai_choose), or the OPTIONAL AI_LLM (a local-LLM-assisted seat) \u2014 and GameManager is the turn dispatcher that asks whose-turn/what-kind. Supported modes: all-AI, single-player 1-human-vs-heuristic-AI (the default preset, unchanged), and LOCAL HOTSEAT pass-and-play (2+ HUMAN_LOCAL seats on one machine) with a 'pass the device' hand-off banner shown before every human turn after the first, plus an OPTIONAL LLM-ASSIST seat (AI_LLM): a local LLM (default Ollama http://localhost:11434, host/model in [euro_llm] project settings) is shown the seat's state + the ENUMERATED legal actions and picks one, which is re-validated via is_legal/apply_action \u2014 fully OFFLINE-SAFE, falling back to the deterministic ai_choose heuristic on ANY failure (provider disabled, unreachable, timeout, non-2xx, unparseable, or an illegal/out-of-range pick), so an AI_LLM seat with no provider plays exactly like AI_HEURISTIC and the game always progresses (default OFF; no network unless enabled + a seat opts in). The dispatch is an OPEN seam: AI_LLM is now wired (LlmSeat, an encapsulated HTTPRequest hook), and networked-remote (REMOTE) drops in the same way \u2014 ONE new enum value + ONE new dispatch case + a transport hook \u2014 deliberately NOT present (no stubs; the dispatcher's default branch asserts a clear error on any unwired kind, never silently passing). Seat controllers + names round-trip through to_dict/from_dict. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Replays byte-identically from a seed (hotseat included, with fixed human inputs); drops in standalone or as the 4X/board core of a larger game. NETWORKED LAN/internet multiplayer via a vendored nox_netcode authority-turn subset (host-authoritative turns, seed-synced; offline modes byte-identical). Full play-mode matrix: SP-vs-heuristic-AI, local hotseat, optional LLM-assist seat (Ollama), and networked host/join.",
+      "description": "Competitive Euro-style ENGINE-BUILDER board game (Scythe/Wingspan/Wyrmspan lineage): every player grows a resource→production→victory-point engine and the best engine wins. The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (EuroEngine) owned by a GameManager autoload — 1 human + up to 4 heuristic-AI opponents (2–5 total). 5 tracked resources (wood/grain/metal/coin/energy) with a strict conservation ledger (pool == start + produced − spent, proven every turn); a 25-card development deck (5 categories, 3 copies each) with per-card cost/output/VP shuffled by a seeded RNG; a shared action board of 5 action types (PRODUCE/BUILD/TRADE/RESEARCH/DEPLOY) where a turn is exactly ONE legal action (is_legal rejects out-of-turn/unaffordable/malformed); 3 objective-token types (build 3 mining cards / reach 3 stars / bank 12 coin) claimed first-come, plus end-game majorities (most stars/cards/coin), plus VP from built cards and goal-stars; an end trigger (first to 6 goal-stars via DEPLOY, else 18 rounds) → final_scoring with a single deterministic winner. The AI is a genuine NON-LLM heuristic: it enumerates every legal action and scores each by a weighted evaluation (immediate VP + resource-efficiency + engine growth + quadratic progress-to-goal + option/conversion value), deterministic index tie-break, never illegal, never stalls. Full to_dict/from_dict save-load (banks, tableaus, hands, stars, deck, objectives, cursor, RNG state). board.gd renders the action board + per-player panels (resources/VP/stars/production/tableau) + objectives + current-player indicator + turn log, enabling only legal actions for the active human seat and auto-resolving AI turns. PLAY MODES — a SEAT-CONTROLLER matrix (STAGE 1): every one of the 2–5 seats carries a ControllerKind — HUMAN_LOCAL (the turn dispatcher blocks for local UI input), AI_HEURISTIC (auto-resolves via ai_choose), or the OPTIONAL AI_LLM (a local-LLM-assisted seat) — and GameManager is the turn dispatcher that asks whose-turn/what-kind. Supported modes: all-AI, single-player 1-human-vs-heuristic-AI (the default preset, unchanged), and LOCAL HOTSEAT pass-and-play (2+ HUMAN_LOCAL seats on one machine) with a 'pass the device' hand-off banner shown before every human turn after the first, plus an OPTIONAL LLM-ASSIST seat (AI_LLM): a local LLM (default Ollama http://localhost:11434, host/model in [euro_llm] project settings) is shown the seat's state + the ENUMERATED legal actions and picks one, which is re-validated via is_legal/apply_action — fully OFFLINE-SAFE, falling back to the deterministic ai_choose heuristic on ANY failure (provider disabled, unreachable, timeout, non-2xx, unparseable, or an illegal/out-of-range pick), so an AI_LLM seat with no provider plays exactly like AI_HEURISTIC and the game always progresses (default OFF; no network unless enabled + a seat opts in). The dispatch is an OPEN seam: AI_LLM is now wired (LlmSeat, an encapsulated HTTPRequest hook), and networked-remote (REMOTE) drops in the same way — ONE new enum value + ONE new dispatch case + a transport hook — deliberately NOT present (no stubs; the dispatcher's default branch asserts a clear error on any unwired kind, never silently passing). Seat controllers + names round-trip through to_dict/from_dict. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Replays byte-identically from a seed (hotseat included, with fixed human inputs); drops in standalone or as the 4X/board core of a larger game. NETWORKED LAN/internet multiplayer via a vendored nox_netcode authority-turn subset (host-authoritative turns, seed-synced; offline modes byte-identical). Full play-mode matrix: SP-vs-heuristic-AI, local hotseat, optional LLM-assist seat (Ollama), and networked host/join.",
       "status": "validated",
       "skeleton": "genres/euro-engine-builder/skeleton",
       "doc": "genres/euro-engine-builder/TEMPLATE.md",
@@ -1764,7 +1764,7 @@
       "name": "Cosmic-Horror Co-op (investigation + doom, 2D board game)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A CO-OPERATIVE cosmic-horror investigation board game (Eldritch Horror / Arkham Horror lineage \u2014 our OWN generic genre engine, no trademarked content): 1-4 INVESTIGATORS play as ONE team and race to solve MYSTERIES before DOOM consumes the world. The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (CosmicEngine) owned by a GameManager autoload, replaying byte-identically from a seed. Investigators: 8 archetypes (Scholar/Detective/Soldier/Occultist/Doctor/Reporter/Drifter/Priest), each with 5 skills (lore/influence/observation/strength/will), health + sanity pools (either at 0 -> that investigator is DEFEATED), a clue + asset inventory, and a location. World map: a graph of 9 named locations (safe towns / clue sites / gate spots) with a fixed connection layout; BFS distance drives movement. Global tracks: DOOM (starts 16 normal / 5 harsh, ticks DOWN on ominous mythos, LOST at 0) and MYSTERY progress (solve 3 to WIN); a 14-card mythos deck drives the antagonist automatically. Round structure: (1) ACTION phase \u2014 each investigator takes 2 actions from {move, rest, acquire, prepare, trade, spend_clue} (is_legal rejects non-adjacent moves / out-of-turn / defeated / unaffordable / malformed); (2) ENCOUNTER phase \u2014 each resolves a location encounter (combat / close-gate / investigate / quiet watch) via a SKILL CHECK; (3) MYTHOS phase (automated) \u2014 advance doom (scaled by a difficulty threat multiplier), open gates + spawn monsters, apply a global effect, then every monster hunts the nearest investigator. Skill checks (the core mechanic): roll a dice pool = tested skill (+ asset/focus bonuses), each die a success on 5-6, pass at >= required successes, CLUES spent to reroll failed dice \u2014 one reusable resolver resolve_from_rolls() (pure, boundary-tested) wrapped by perform_check() (seeded RNG, clue spend clamped to what you hold). Monsters: 6 types (Cultist/Deep One/Shambler/Nightgaunt/Maniac/Spawn of the Outer Dark) with distinct toughness/damage/horror/check-skill/speed; spawn from gates, move toward investigators, force combat; defeating one yields clues. Mysteries: 6 cards across 4 concrete kinds \u2014 research/ritual (invest K clues then pass a finalize check), seal (close X gates), hunt (slay a spawned quarry); solve 3 to win. LOSS: Doom 0, ALL investigators defeated, too many gates open (difficulty gate limit), or the round cap. CO-OP SEAT CONTROLLERS \u2014 all investigators are ONE team; each seat carries a ControllerKind: HUMAN_LOCAL (the dispatcher blocks for local UI input) or AI_AUTOPILOT (a GENUINE co-op heuristic ai_choose() that enumerates every legal action and scores each toward the SHARED objective \u2014 rest when a pool is critically low & safe, invest clues into the active clue-mystery (huge when the clue would COMPLETE it, holding a combat reserve otherwise), move toward the mystery goal (nearest clue site / open gate / quarry) by BFS-distance reduction, grab assets at a safe stop, bank focus before a looming encounter, hand a clue to a teammate about to finalize, stay to fight a monster on it; deterministic index tie-break, never illegal, never stalls). AI_LLM and REMOTE are DOCUMENTED FUTURE SEAMS \u2014 present as enum values, NOT wired and NOT stubbed: using one FAILS LOUD (is_supported_kind is false; the dispatcher's default branch asserts), each dropping in as ONE dispatch case + one hook. GameManager is the co-op turn dispatcher (auto-resolves autopilot seats, blocks on humans, with a 'pass the device' hand-off for LOCAL HOTSEAT), plus new_all_autopilot_game (watch the AI buddies play). board.gd renders a drawn map (locations + connections + investigator/monster tokens), a panel per investigator (skills/HP/SAN/clues/assets/location), the DOOM + MYSTERY + gate tracks, the active mystery, an action bar for the human seat, and a chronicle log \u2014 reads the engine and forwards clicks only. Full to_dict/from_dict save-load (investigators, monsters, gates, decks, mystery progress, cursor, seat controllers, RNG state). Both outcomes are genuinely reachable from the same rules \u2014 only the DIFFICULTY preset (doom start / gate limit / threat / starting vitals) changes: across 60 seeds normal won 47 / lost 13 on autopilot alone while harsh lost all 60 (Doom-0), nothing hardcoded. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Replays byte-identically from a seed; drops in standalone or as the co-op investigation core of a larger game.",
+      "description": "A CO-OPERATIVE cosmic-horror investigation board game (Eldritch Horror / Arkham Horror lineage — our OWN generic genre engine, no trademarked content): 1-4 INVESTIGATORS play as ONE team and race to solve MYSTERIES before DOOM consumes the world. The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (CosmicEngine) owned by a GameManager autoload, replaying byte-identically from a seed. Investigators: 8 archetypes (Scholar/Detective/Soldier/Occultist/Doctor/Reporter/Drifter/Priest), each with 5 skills (lore/influence/observation/strength/will), health + sanity pools (either at 0 -> that investigator is DEFEATED), a clue + asset inventory, and a location. World map: a graph of 9 named locations (safe towns / clue sites / gate spots) with a fixed connection layout; BFS distance drives movement. Global tracks: DOOM (starts 16 normal / 5 harsh, ticks DOWN on ominous mythos, LOST at 0) and MYSTERY progress (solve 3 to WIN); a 14-card mythos deck drives the antagonist automatically. Round structure: (1) ACTION phase — each investigator takes 2 actions from {move, rest, acquire, prepare, trade, spend_clue} (is_legal rejects non-adjacent moves / out-of-turn / defeated / unaffordable / malformed); (2) ENCOUNTER phase — each resolves a location encounter (combat / close-gate / investigate / quiet watch) via a SKILL CHECK; (3) MYTHOS phase (automated) — advance doom (scaled by a difficulty threat multiplier), open gates + spawn monsters, apply a global effect, then every monster hunts the nearest investigator. Skill checks (the core mechanic): roll a dice pool = tested skill (+ asset/focus bonuses), each die a success on 5-6, pass at >= required successes, CLUES spent to reroll failed dice — one reusable resolver resolve_from_rolls() (pure, boundary-tested) wrapped by perform_check() (seeded RNG, clue spend clamped to what you hold). Monsters: 6 types (Cultist/Deep One/Shambler/Nightgaunt/Maniac/Spawn of the Outer Dark) with distinct toughness/damage/horror/check-skill/speed; spawn from gates, move toward investigators, force combat; defeating one yields clues. Mysteries: 6 cards across 4 concrete kinds — research/ritual (invest K clues then pass a finalize check), seal (close X gates), hunt (slay a spawned quarry); solve 3 to win. LOSS: Doom 0, ALL investigators defeated, too many gates open (difficulty gate limit), or the round cap. CO-OP SEAT CONTROLLERS — all investigators are ONE team; each seat carries a ControllerKind: HUMAN_LOCAL (the dispatcher blocks for local UI input) or AI_AUTOPILOT (a GENUINE co-op heuristic ai_choose() that enumerates every legal action and scores each toward the SHARED objective — rest when a pool is critically low & safe, invest clues into the active clue-mystery (huge when the clue would COMPLETE it, holding a combat reserve otherwise), move toward the mystery goal (nearest clue site / open gate / quarry) by BFS-distance reduction, grab assets at a safe stop, bank focus before a looming encounter, hand a clue to a teammate about to finalize, stay to fight a monster on it; deterministic index tie-break, never illegal, never stalls). AI_LLM and REMOTE are DOCUMENTED FUTURE SEAMS — present as enum values, NOT wired and NOT stubbed: using one FAILS LOUD (is_supported_kind is false; the dispatcher's default branch asserts), each dropping in as ONE dispatch case + one hook. GameManager is the co-op turn dispatcher (auto-resolves autopilot seats, blocks on humans, with a 'pass the device' hand-off for LOCAL HOTSEAT), plus new_all_autopilot_game (watch the AI buddies play). board.gd renders a drawn map (locations + connections + investigator/monster tokens), a panel per investigator (skills/HP/SAN/clues/assets/location), the DOOM + MYSTERY + gate tracks, the active mystery, an action bar for the human seat, and a chronicle log — reads the engine and forwards clicks only. Full to_dict/from_dict save-load (investigators, monsters, gates, decks, mystery progress, cursor, seat controllers, RNG state). Both outcomes are genuinely reachable from the same rules — only the DIFFICULTY preset (doom start / gate limit / threat / starting vitals) changes: across 60 seeds normal won 47 / lost 13 on autopilot alone while harsh lost all 60 (Doom-0), nothing hardcoded. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Replays byte-identically from a seed; drops in standalone or as the co-op investigation core of a larger game.",
       "status": "validated",
       "skeleton": "genres/cosmic-horror-coop/skeleton",
       "doc": "genres/cosmic-horror-coop/TEMPLATE.md",
@@ -1804,7 +1804,7 @@
       "name": "Wildlife Expedition (nature-exploration + wildlife-documentation board game, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A competitive NATURE-EXPLORATION + WILDLIFE-DOCUMENTATION board game (National-Geographic flavour \u2014 our OWN generic genre engine, no trademarks) that synthesises the SIGNATURE mechanics of three modern classics into one real depth engine: the shared exploration TRAIL + resources + SEASONS (the PARKS lineage), a SPECIES-CARD TABLEAU engine with powers + season goals (the Wingspan lineage), and BIODIVERSITY / set-variety end-game scoring (the Cascadia lineage). The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (WildlifeEngine) owned by a GameManager autoload, replaying byte-identically from a seed; 2\u20135 players (1 human + heuristic AIs by default). SIX tracked resources (sun/water/forest/mountain/wildlife-sighting/film) with a STRICT conservation ledger (pool == start + produced \u2212 spent, proven every turn). The shared TRAIL: 9 site tiles from a Start camp to the Trailhead, each with a biome, a resource yield and sometimes a small action (draw a species / restock gear); 2 pawns per player advance FORWARD only and good interior sites have limited CAPACITY, so the trail is a race. FOUR SEASONS: a season runs until every explorer reaches the Trailhead (or a round cap), and at each boundary season income (species + gear) fires, the active season GOAL scores, the trail RE-SEEDS (sites/bonuses shift) and pawns reset; after 4 seasons \u2192 final scoring. 37 unique SPECIES (\u00d72 copies), each a biome, a documentation COST, a POINT value, a CATEGORY (mammal/bird/reptile/aquatic/insect/plant) and a real varied POWER (gain resources now; chain a gain whenever you later document a matching category / any species; per-season income; draw-on-rest; end-game scoring hook) \u2014 documenting plays a species to your FIELD JOURNAL (tableau) and fires its power AND any chain powers already in the journal. An OBSERVATION gate ties documenting to where your pawns stand (a pawn must observe the species' biome; sightings are the observation currency, discounted by Binoculars gear). FOUR season goals (one active per season) + SEVEN EXPEDITION contracts (end-game bonus objectives) + 6 developable GEAR/stations (points + an ongoing perk). SET-VARIETY SCORING: escalating tiers for distinct CATEGORIES and distinct BIOMES, a largest-single-category bonus, per-species points, gear, expeditions and accumulated season goals \u2014 final_scoring() yields a per-player breakdown whose COMPONENTS SUM to the total, with a single deterministic winner. A turn is exactly ONE legal action from {MOVE, DOCUMENT, REST, DEVELOP}: is_legal() rejects out-of-turn / finished / move-backward / occupied-site / off-biome / unaffordable / malformed actions and apply_action() re-validates. The AI is a genuine NON-LLM heuristic (ai_choose): it enumerates every legal action and scores each by species value + power synergy + progress toward goals & expeditions + resource efficiency + diversity gain + trail-yield value, deterministic index tie-break, never illegal, never stalls. PLAY MODES \u2014 a SEAT-CONTROLLER matrix: every 2\u20135 seats carries a ControllerKind \u2014 HUMAN_LOCAL (the dispatcher blocks for local UI input) or AI_HEURISTIC (auto-resolves via ai_choose) \u2014 and GameManager is the turn dispatcher. Supported lineups: all-AI (new_all_ai_game), single-player 1-human-vs-AI (the default new_game), and LOCAL HOTSEAT pass-and-play (new_hotseat_game, 2+ HUMAN_LOCAL seats on one machine) with a 'pass the device' hand-off before every human turn after the first. AI_LLM and REMOTE are DOCUMENTED FUTURE SEAMS \u2014 present as enum values, NOT wired and NOT stubbed: is_supported_kind is false for them and the dispatcher's default branch FAILS LOUD if one is assigned, each dropping in as one dispatch case + one hook (no netcode addon is vendored). board.gd renders the trail (sites + biomes + yields + pawn markers), the shared species offer + your hand + the gear shop, per-player field journals + resources + live score + pawns, the season/goal/expedition track, a current-player indicator + a pass-the-device hand-off overlay, and a turn log \u2014 reads the engine and forwards clicks only. Full to_dict/from_dict save-load (banks, ledger, pawns, journals, hands, gear, trail, offer, gear shop, decks, season, goals, cursor, seat controllers, RNG state). Validated by seven headless probes to fails=0: a full 4-season all-AI game (single winner, components sum to totals, conservation every turn, no illegal action, terminates), determinism (same seed byte-identical / different seed differs), rules+powers, exact set-variety/expedition/goal scoring on a crafted state, hotseat, UI build, and save/load. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Drops in standalone or as the board core of a larger game.",
+      "description": "A competitive NATURE-EXPLORATION + WILDLIFE-DOCUMENTATION board game (National-Geographic flavour — our OWN generic genre engine, no trademarks) that synthesises the SIGNATURE mechanics of three modern classics into one real depth engine: the shared exploration TRAIL + resources + SEASONS (the PARKS lineage), a SPECIES-CARD TABLEAU engine with powers + season goals (the Wingspan lineage), and BIODIVERSITY / set-variety end-game scoring (the Cascadia lineage). The WHOLE rules engine is a pure, seedable, headless-testable RefCounted class (WildlifeEngine) owned by a GameManager autoload, replaying byte-identically from a seed; 2–5 players (1 human + heuristic AIs by default). SIX tracked resources (sun/water/forest/mountain/wildlife-sighting/film) with a STRICT conservation ledger (pool == start + produced − spent, proven every turn). The shared TRAIL: 9 site tiles from a Start camp to the Trailhead, each with a biome, a resource yield and sometimes a small action (draw a species / restock gear); 2 pawns per player advance FORWARD only and good interior sites have limited CAPACITY, so the trail is a race. FOUR SEASONS: a season runs until every explorer reaches the Trailhead (or a round cap), and at each boundary season income (species + gear) fires, the active season GOAL scores, the trail RE-SEEDS (sites/bonuses shift) and pawns reset; after 4 seasons → final scoring. 37 unique SPECIES (×2 copies), each a biome, a documentation COST, a POINT value, a CATEGORY (mammal/bird/reptile/aquatic/insect/plant) and a real varied POWER (gain resources now; chain a gain whenever you later document a matching category / any species; per-season income; draw-on-rest; end-game scoring hook) — documenting plays a species to your FIELD JOURNAL (tableau) and fires its power AND any chain powers already in the journal. An OBSERVATION gate ties documenting to where your pawns stand (a pawn must observe the species' biome; sightings are the observation currency, discounted by Binoculars gear). FOUR season goals (one active per season) + SEVEN EXPEDITION contracts (end-game bonus objectives) + 6 developable GEAR/stations (points + an ongoing perk). SET-VARIETY SCORING: escalating tiers for distinct CATEGORIES and distinct BIOMES, a largest-single-category bonus, per-species points, gear, expeditions and accumulated season goals — final_scoring() yields a per-player breakdown whose COMPONENTS SUM to the total, with a single deterministic winner. A turn is exactly ONE legal action from {MOVE, DOCUMENT, REST, DEVELOP}: is_legal() rejects out-of-turn / finished / move-backward / occupied-site / off-biome / unaffordable / malformed actions and apply_action() re-validates. The AI is a genuine NON-LLM heuristic (ai_choose): it enumerates every legal action and scores each by species value + power synergy + progress toward goals & expeditions + resource efficiency + diversity gain + trail-yield value, deterministic index tie-break, never illegal, never stalls. PLAY MODES — a SEAT-CONTROLLER matrix: every 2–5 seats carries a ControllerKind — HUMAN_LOCAL (the dispatcher blocks for local UI input) or AI_HEURISTIC (auto-resolves via ai_choose) — and GameManager is the turn dispatcher. Supported lineups: all-AI (new_all_ai_game), single-player 1-human-vs-AI (the default new_game), and LOCAL HOTSEAT pass-and-play (new_hotseat_game, 2+ HUMAN_LOCAL seats on one machine) with a 'pass the device' hand-off before every human turn after the first. AI_LLM and REMOTE are DOCUMENTED FUTURE SEAMS — present as enum values, NOT wired and NOT stubbed: is_supported_kind is false for them and the dispatcher's default branch FAILS LOUD if one is assigned, each dropping in as one dispatch case + one hook (no netcode addon is vendored). board.gd renders the trail (sites + biomes + yields + pawn markers), the shared species offer + your hand + the gear shop, per-player field journals + resources + live score + pawns, the season/goal/expedition track, a current-player indicator + a pass-the-device hand-off overlay, and a turn log — reads the engine and forwards clicks only. Full to_dict/from_dict save-load (banks, ledger, pawns, journals, hands, gear, trail, offer, gear shop, decks, season, goals, cursor, seat controllers, RNG state). Validated by seven headless probes to fails=0: a full 4-season all-AI game (single winner, components sum to totals, conservation every turn, no illegal action, terminates), determinism (same seed byte-identical / different seed differs), rules+powers, exact set-variety/expedition/goal scoring on a crafted state, hotseat, UI build, and save/load. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text. Drops in standalone or as the board core of a larger game.",
       "status": "validated",
       "skeleton": "genres/wildlife-expedition/skeleton",
       "doc": "genres/wildlife-expedition/TEMPLATE.md",
@@ -1982,7 +1982,7 @@
       "name": "Video Store Sim (80s VHS-rental-store management sim, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "An 80s VHS RENTAL-STORE management sim (neon-Blockbuster / retail-tycoon lineage): you OWN the store - a CATALOG of VHS TITLES across six genres (action/comedy/horror/drama/family/scifi) that you BUY COPIES of - and grow your NET WORTH by stocking the right depth of hot NEW RELEASES vs the evergreen catalogue. The whole sim is a pure, seedable, headless-testable VideoStoreEngine (RefCounted) owned by a GameManager autoload: 24 titles (14 evergreen catalogue at baseline demand + 10 new releases that arrive during the run), each with a baseline popularity + genre + per-copy purchase cost. THE HEART is NEW-RELEASE HYPE - a title\u2019s rental DEMAND is a pure time function demand(t,day)=baseline+baseline*gain*e^(-lambda*weeks): a new release SPIKES the week it drops then DECAYS exponentially over the weeks toward its catalogue baseline, so how many copies of a hot release to stock vs catalogue is the core daily decision. A real CUSTOMER ECONOMY: each day seeded FOOT TRAFFIC = base x reputation x marketing x selection-breadth x membership x noise, staff THROUGHPUT caps how many are served, each served customer wants a title (weighted by current demand) and RENTS an available copy (a new-release premium price) - or if every copy is out it is a MISSED rental (lost goodwill). RETURNS after a few days, some LATE (LATE FEES, a real revenue stream, but a harsh late-fee policy CHURNS members), a few DAMAGED (the tape leaves stock). A cash-flow ECONOMY with strict INTEGER MONEY CONSERVATION (cash == start + sum of a named-flow ledger) verified EVERY day, tracking CASH + NET WORTH (cash + depreciated inventory - debt); MEMBERSHIP (happy renters sign up -> members multiply traffic; bad service churns them); is_legal-gated ACTIONS (buy_copies/remove_copy/set_staff/hire/set_late_fee/marketing/loan/repay) that reject illegal moves with byte-identical state; days->months with loan interest; a WIN (reach the net-worth goal) and a LOSS (bankruptcy) both genuinely reachable by a deterministic auto-play, with a MAX_DAYS cap that guarantees termination; and full save/load incl. RNG (byte-identical replays, FNV-1a state checksum stable across processes). store.gd renders a HUD (cash/net worth/reputation/members/day-month/traffic+income), a scrollable CATALOG (title/genre/current demand+new-release flag/copies owned-shelf-out/today rentals vs misses), an action panel (title picker + quantity slider to buy copies, late-fee slider, marketing/hire/fire/loan, next-day + auto-play) and a finance readout - all in code. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole store persists), pause + restart input, scalable_text. A deterministic economy/inventory engine mirroring mall-tycoon\u2019s money-conservation discipline - swap the TITLE catalogue + genres for your own.",
+      "description": "An 80s VHS RENTAL-STORE management sim (neon-Blockbuster / retail-tycoon lineage): you OWN the store - a CATALOG of VHS TITLES across six genres (action/comedy/horror/drama/family/scifi) that you BUY COPIES of - and grow your NET WORTH by stocking the right depth of hot NEW RELEASES vs the evergreen catalogue. The whole sim is a pure, seedable, headless-testable VideoStoreEngine (RefCounted) owned by a GameManager autoload: 24 titles (14 evergreen catalogue at baseline demand + 10 new releases that arrive during the run), each with a baseline popularity + genre + per-copy purchase cost. THE HEART is NEW-RELEASE HYPE - a title’s rental DEMAND is a pure time function demand(t,day)=baseline+baseline*gain*e^(-lambda*weeks): a new release SPIKES the week it drops then DECAYS exponentially over the weeks toward its catalogue baseline, so how many copies of a hot release to stock vs catalogue is the core daily decision. A real CUSTOMER ECONOMY: each day seeded FOOT TRAFFIC = base x reputation x marketing x selection-breadth x membership x noise, staff THROUGHPUT caps how many are served, each served customer wants a title (weighted by current demand) and RENTS an available copy (a new-release premium price) - or if every copy is out it is a MISSED rental (lost goodwill). RETURNS after a few days, some LATE (LATE FEES, a real revenue stream, but a harsh late-fee policy CHURNS members), a few DAMAGED (the tape leaves stock). A cash-flow ECONOMY with strict INTEGER MONEY CONSERVATION (cash == start + sum of a named-flow ledger) verified EVERY day, tracking CASH + NET WORTH (cash + depreciated inventory - debt); MEMBERSHIP (happy renters sign up -> members multiply traffic; bad service churns them); is_legal-gated ACTIONS (buy_copies/remove_copy/set_staff/hire/set_late_fee/marketing/loan/repay) that reject illegal moves with byte-identical state; days->months with loan interest; a WIN (reach the net-worth goal) and a LOSS (bankruptcy) both genuinely reachable by a deterministic auto-play, with a MAX_DAYS cap that guarantees termination; and full save/load incl. RNG (byte-identical replays, FNV-1a state checksum stable across processes). store.gd renders a HUD (cash/net worth/reputation/members/day-month/traffic+income), a scrollable CATALOG (title/genre/current demand+new-release flag/copies owned-shelf-out/today rentals vs misses), an action panel (title picker + quantity slider to buy copies, late-fee slider, marketing/hire/fire/loan, next-day + auto-play) and a finance readout - all in code. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole store persists), pause + restart input, scalable_text. A deterministic economy/inventory engine mirroring mall-tycoon’s money-conservation discipline - swap the TITLE catalogue + genres for your own.",
       "status": "validated",
       "skeleton": "genres/video-store-sim/skeleton",
       "doc": "genres/video-store-sim/TEMPLATE.md",
@@ -2167,7 +2167,7 @@
       "name": "Pirate Career Sim (age-of-sail, systemic)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "An age-of-sail PIRATE CAREER SIM (Sid Meier\u2019s Pirates! lineage) with DEEPER, fully-systemic mechanics. KEY DESIGN DECISION: the whole career is a pure, seedable, headless-testable RefCounted class (PirateEngine) on a deterministic DAY-TICK model \u2014 NO physics nodes \u2014 so every price, wind, broadside, boarding roll, mutiny check and rival move is a pure function of state + ONE seeded RNG, and a career replays BYTE-IDENTICALLY from a seed (verified across processes). A MAX_CAREER_DAYS cap + \u201cevery action costs \u22651 day\u201d bounds it, so it ALWAYS terminates in a WIN (retire at/above a rank) or a LOSS (ship sunk with no reserves / crew mutiny / retire below threshold) \u2014 no hardcoded winner. TEN interlocking systems, all real formulas: WORLD (16 ports across 4 rival nations Crown/Empire/Republic/Company, each with position, owner, wealth tier, garrison + a per-good local economy); SAILING (travel costs days via a deterministic wind model \u2014 downwind fast, upwind slow, navigation eases it \u2014 that also sets sea-combat initiative/the weather gauge); TRADE (6 goods sugar/tobacco/cloth/rum/spice/ivory priced on a real supply/demand scarcity curve; buying/selling MOVES the local price unit-by-unit (price impact) and prices DRIFT back to equilibrium, so cross-port arbitrage is emergent + profitable, never scripted); SEA COMBAT (deterministic turn-based ship duel \u2014 maneuver for the wind gauge, fire broadsides scaling with cannons \u00d7 gunnery \u00d7 range \u00d7 hull, pick round/chain/grape shot to wreck hull/sails/crew \u2192 sink/flee/board, turn-capped); BOARDING (crew-vs-crew melee from crew \u00d7 morale \u00d7 captain fencing \u2192 capture ship+cargo or get repelled); NATION REPUTATION (a 4-nation standing vector \u2014 attacking a nation lowers its standing + lifts its sworn enemy\u2019s; Letters of Marque sanction privateering; very low standing makes ports hostile + spawns warship hunters); CREW & MORALE (wages, food, plunder shares; low morale \u2192 MUTINY ends the career; dividing plunder + shore leave restore it); CAPTAIN PROGRESSION (fame/gold/land grants; four skills navigation/gunnery/fencing/wit that improve with use; AGING \u2192 a bounded career \u2192 a retirement RANK from the final score); TREASURE/QUESTS (seeded treasure-map fragments found in prizes assemble into a dig, plus a bounded ordered quest chain of deliver/bounty steps); AI RIVALS (rival captains sailing, trading, and clashing under the same deterministic rules). is_legal rejects illegal actions (sail with no crew, buy over cargo/gold, sell more than aboard, attack with no encounter); to_dict/from_dict + career_checksum save the whole career and prove determinism; three deterministic auto-play policies (trade/reckless/neglect) drive a career to WIN or LOSS with no UI. GameManager autoload adds the NoxDev ABI (buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text). port_map.gd renders the play surface in code \u2014 the seeded map (ports by nation + the player + a wind arrow via _draw()), captain/ship/reputation panels, a trade panel (buy/sell + quantity slider), the port list (sail with day-costs), a combat panel (Sink/Cripple/Board stances), crew & career actions (divide plunder, shore leave, recruit, dig treasure, retire), an Auto-Step demo, and a log. Drops in standalone or as the career/economy core of a larger game.",
+      "description": "An age-of-sail PIRATE CAREER SIM (Sid Meier’s Pirates! lineage) with DEEPER, fully-systemic mechanics. KEY DESIGN DECISION: the whole career is a pure, seedable, headless-testable RefCounted class (PirateEngine) on a deterministic DAY-TICK model — NO physics nodes — so every price, wind, broadside, boarding roll, mutiny check and rival move is a pure function of state + ONE seeded RNG, and a career replays BYTE-IDENTICALLY from a seed (verified across processes). A MAX_CAREER_DAYS cap + “every action costs ≥1 day” bounds it, so it ALWAYS terminates in a WIN (retire at/above a rank) or a LOSS (ship sunk with no reserves / crew mutiny / retire below threshold) — no hardcoded winner. TEN interlocking systems, all real formulas: WORLD (16 ports across 4 rival nations Crown/Empire/Republic/Company, each with position, owner, wealth tier, garrison + a per-good local economy); SAILING (travel costs days via a deterministic wind model — downwind fast, upwind slow, navigation eases it — that also sets sea-combat initiative/the weather gauge); TRADE (6 goods sugar/tobacco/cloth/rum/spice/ivory priced on a real supply/demand scarcity curve; buying/selling MOVES the local price unit-by-unit (price impact) and prices DRIFT back to equilibrium, so cross-port arbitrage is emergent + profitable, never scripted); SEA COMBAT (deterministic turn-based ship duel — maneuver for the wind gauge, fire broadsides scaling with cannons × gunnery × range × hull, pick round/chain/grape shot to wreck hull/sails/crew → sink/flee/board, turn-capped); BOARDING (crew-vs-crew melee from crew × morale × captain fencing → capture ship+cargo or get repelled); NATION REPUTATION (a 4-nation standing vector — attacking a nation lowers its standing + lifts its sworn enemy’s; Letters of Marque sanction privateering; very low standing makes ports hostile + spawns warship hunters); CREW & MORALE (wages, food, plunder shares; low morale → MUTINY ends the career; dividing plunder + shore leave restore it); CAPTAIN PROGRESSION (fame/gold/land grants; four skills navigation/gunnery/fencing/wit that improve with use; AGING → a bounded career → a retirement RANK from the final score); TREASURE/QUESTS (seeded treasure-map fragments found in prizes assemble into a dig, plus a bounded ordered quest chain of deliver/bounty steps); AI RIVALS (rival captains sailing, trading, and clashing under the same deterministic rules). is_legal rejects illegal actions (sail with no crew, buy over cargo/gold, sell more than aboard, attack with no encounter); to_dict/from_dict + career_checksum save the whole career and prove determinism; three deterministic auto-play policies (trade/reckless/neglect) drive a career to WIN or LOSS with no UI. GameManager autoload adds the NoxDev ABI (buses, game_manager+persistent groups with save_data/load_data, pause+restart input, scalable_text). port_map.gd renders the play surface in code — the seeded map (ports by nation + the player + a wind arrow via _draw()), captain/ship/reputation panels, a trade panel (buy/sell + quantity slider), the port list (sail with day-costs), a combat panel (Sink/Cripple/Board stances), crew & career actions (divide plunder, shore leave, recruit, dig treasure, retire), an Auto-Step demo, and a log. Drops in standalone or as the career/economy core of a larger game.",
       "status": "validated",
       "skeleton": "genres/pirate-sim/skeleton",
       "doc": "genres/pirate-sim/TEMPLATE.md",
@@ -2176,7 +2176,7 @@
         {
           "skill": "companion-npcs",
           "params": {},
-          "note": "give each nation governor + rival captain a persona/voice via companion-npcs + Dialogue Manager \u2014 tavern rumours, marque offers, pre-duel taunts, quest-giver lines"
+          "note": "give each nation governor + rival captain a persona/voice via companion-npcs + Dialogue Manager — tavern rumours, marque offers, pre-duel taunts, quest-giver lines"
         },
         {
           "skill": "pixel-perfect",
@@ -2286,7 +2286,7 @@
       "name": "Animal Society RPG (survival + migration, 2D)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A mature ANIMAL-SOCIETY survival RPG in the WATERSHIP DOWN / SECRET OF NIMH / AMERICAN TAIL lineage - lead a small band of NAMED animals (rabbits / mice) with distinct SOCIAL ROLES across a dangerous seeded landscape to found and grow a THRIVING WARREN, surviving predators, seasons, hunger, and the band's own morale. A deterministic day/tick society + survival sim, sibling to ant-colony + god-game + cosmic-horror-coop. The whole game is WarrenEngine (a pure, seedable, RefCounted GDScript engine, no scene deps) replaying byte-identically from a seed. THE BAND: a colony of named animals, each with a SOCIAL ROLE (Chief/leader, Scout, Seer/lookout, Forager, Fighter/protector, Storyteller/morale, Kit/young), a sex, an age, traits (courage/wisdom/speed) + health, needs (hunger/fatigue), and a bond to the band; roles confer REAL, measurable abilities - a Forager gathers strictly more food, a Scout lowers the ambush rate, a Seer's early-warning improves escape in a raid, a Fighter raises the band's defence, a Storyteller lifts morale on rest, a Chief steadies morale + reduces dissent, and a Kit matures into an adult role. SURVIVAL SIM: seasons cycle over a year and modulate food + danger (lean, dangerous winter vs rich, calm summer); each day the band takes ONE decision, then the day RESOLVES - everyone eats (starvation harms/kills), fatigue + illness accrue, a hazard may strike, morale drifts, and once settled a breeding pair reproduces up to a population cap. PREDATORS + HAZARDS: four threats (Fox / Hawk / Cat / the \u201cMan\u201d and his road and machines) hunt on a deterministic model - a Scout/Seer warning + the band's fighters/speed decide escape vs loss, and a raid can KILL a named member (real stakes). SOCIAL LAYER (the Watership heart): morale/cohesion is driven by leadership, storytelling, losses, and success; low morale -> dissent -> a member may DESERT and splinter the band. MIGRATION QUEST: the band travels a seeded chain of stops (from the old Sandleford warren toward Watership Down); each leg costs days + risks a predator encounter, and you must arrive with a viable founding group (enough survivors + a breeding pair) then GROW the warren to a target size. take_action() applies one decision then advances the day via _end_day() (a MOVE_ON runs one _end_day per travel-day of the leg): eat -> fatigue/illness -> hazard -> morale drift -> reproduction -> aging/maturation -> desertion -> compact the fallen -> judge; no unbounded rescans, so every run terminates under MAX_DAYS. Win/loss is genuinely reachable both ways under a deterministic auto-play policy: WIN by founding the new warren AND growing it to the target (a thriving society); LOSE if the band is wiped out, falls below a viable founding size, or fails to reach the site before the deadline. Forage yield, encounter chance, and rest-morale gain are exposed as pure preview helpers so the role abilities are directly, measurably testable. The balanced policy plays to survive + thrive (forage when lean, rest for morale, scout a dangerous leg, then move on; in growth it keeps a surplus so the pair breeds), the reckless policy charges on and gets the band killed - nothing hardcoded (across 60 seeds balanced won 54 / lost 6, reckless lost all 60). to_dict()/from_dict() round-trip the ENTIRE run (the band + roles/sexes/ages/traits/needs/bonds + morale + food + journey + counters + RNG state); checksum() (FNV-1a) proves determinism within a process AND across two separate processes. warren.gd renders a drawn journey strip (stops, the band's position, danger shaded, the goal, a role-coloured band token), a HUD (season/year/day/food/morale/population/phase/cohesion), a decision bar (Forage/Scout/Rest/Move On/Shelter/Assign Role), and a members panel - reads the engine and forwards a decision only. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole run + RNG persist), pause + restart input, scalable_text. Drops in standalone or as the survival/society layer of a larger game.",
+      "description": "A mature ANIMAL-SOCIETY survival RPG in the WATERSHIP DOWN / SECRET OF NIMH / AMERICAN TAIL lineage - lead a small band of NAMED animals (rabbits / mice) with distinct SOCIAL ROLES across a dangerous seeded landscape to found and grow a THRIVING WARREN, surviving predators, seasons, hunger, and the band's own morale. A deterministic day/tick society + survival sim, sibling to ant-colony + god-game + cosmic-horror-coop. The whole game is WarrenEngine (a pure, seedable, RefCounted GDScript engine, no scene deps) replaying byte-identically from a seed. THE BAND: a colony of named animals, each with a SOCIAL ROLE (Chief/leader, Scout, Seer/lookout, Forager, Fighter/protector, Storyteller/morale, Kit/young), a sex, an age, traits (courage/wisdom/speed) + health, needs (hunger/fatigue), and a bond to the band; roles confer REAL, measurable abilities - a Forager gathers strictly more food, a Scout lowers the ambush rate, a Seer's early-warning improves escape in a raid, a Fighter raises the band's defence, a Storyteller lifts morale on rest, a Chief steadies morale + reduces dissent, and a Kit matures into an adult role. SURVIVAL SIM: seasons cycle over a year and modulate food + danger (lean, dangerous winter vs rich, calm summer); each day the band takes ONE decision, then the day RESOLVES - everyone eats (starvation harms/kills), fatigue + illness accrue, a hazard may strike, morale drifts, and once settled a breeding pair reproduces up to a population cap. PREDATORS + HAZARDS: four threats (Fox / Hawk / Cat / the “Man” and his road and machines) hunt on a deterministic model - a Scout/Seer warning + the band's fighters/speed decide escape vs loss, and a raid can KILL a named member (real stakes). SOCIAL LAYER (the Watership heart): morale/cohesion is driven by leadership, storytelling, losses, and success; low morale -> dissent -> a member may DESERT and splinter the band. MIGRATION QUEST: the band travels a seeded chain of stops (from the old Sandleford warren toward Watership Down); each leg costs days + risks a predator encounter, and you must arrive with a viable founding group (enough survivors + a breeding pair) then GROW the warren to a target size. take_action() applies one decision then advances the day via _end_day() (a MOVE_ON runs one _end_day per travel-day of the leg): eat -> fatigue/illness -> hazard -> morale drift -> reproduction -> aging/maturation -> desertion -> compact the fallen -> judge; no unbounded rescans, so every run terminates under MAX_DAYS. Win/loss is genuinely reachable both ways under a deterministic auto-play policy: WIN by founding the new warren AND growing it to the target (a thriving society); LOSE if the band is wiped out, falls below a viable founding size, or fails to reach the site before the deadline. Forage yield, encounter chance, and rest-morale gain are exposed as pure preview helpers so the role abilities are directly, measurably testable. The balanced policy plays to survive + thrive (forage when lean, rest for morale, scout a dangerous leg, then move on; in growth it keeps a surplus so the pair breeds), the reckless policy charges on and gets the band killed - nothing hardcoded (across 60 seeds balanced won 54 / lost 6, reckless lost all 60). to_dict()/from_dict() round-trip the ENTIRE run (the band + roles/sexes/ages/traits/needs/bonds + morale + food + journey + counters + RNG state); checksum() (FNV-1a) proves determinism within a process AND across two separate processes. warren.gd renders a drawn journey strip (stops, the band's position, danger shaded, the goal, a role-coloured band token), a HUD (season/year/day/food/morale/population/phase/cohesion), a decision bar (Forage/Scout/Rest/Move On/Shelter/Assign Role), and a members panel - reads the engine and forwards a decision only. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (whole run + RNG persist), pause + restart input, scalable_text. Drops in standalone or as the survival/society layer of a larger game.",
       "status": "validated",
       "skeleton": "genres/animal-society-rpg/skeleton",
       "doc": "genres/animal-society-rpg/TEMPLATE.md",
@@ -2314,7 +2314,7 @@
       ],
       "assetPlanHints": [
         "Named-animal portraits per role (chief / scout / seer / forager / fighter / storyteller / kit) in a rabbit or mouse set via card-creature-art / zit-txt2img",
-        "Predator art (fox / hawk / cat / the \u201cMan\u201d and his machines) via card-creature-art / zit-txt2img",
+        "Predator art (fox / hawk / cat / the “Man” and his machines) via card-creature-art / zit-txt2img",
         "A parchment migration map / journey strip with stop markers via zit-txt2img; season-tinted backdrops (spring/summer/autumn/winter)",
         "Role / need (food / rest / morale) / decision icons for the HUD + decision bar via qwen-icon",
         "Ambient loop (meadow wind + distant road) + forage / raid / birth / desertion / arrival SFX stingers"
@@ -2356,6 +2356,61 @@
         "A field / soil / irrigation-furrow tileset (tilled, planted, mature, fallow, irrigated) via zit-seamless-tile",
         "Livestock (cattle / pigs / chickens), machinery (tractor / harvester), commodity, weather and currency icons via qwen-icon",
         "A rural farm-ambience / barnyard loop + tractor-engine / auction-bell / weather SFX bed"
+      ]
+    },
+    {
+      "id": "classic-roguelike",
+      "name": "Classic Roguelike (Rogue/NetHack-lineage turn-based dungeon crawl, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Rogue/NetHack-lineage CLASSIC ROGUELIKE: descend a procedurally generated multi-level dungeon one turn at a time, fight monsters with bump-combat, grab gold and potions, level up, and try to reach the bottom before permadeath ends the run. OUR OWN engine, generic content (no trademarks) -- RogueEngine is a PURE, seedable RefCounted class (no Godot-node dependency, no Time calls: a single private RNG drives world-gen AND play) so a run replays BYTE-IDENTICALLY from a seed and drives headlessly. Real systems: seeded dungeon generation (non-overlapping rooms joined by L-shaped corridors, guaranteed-connected, down-stairs placed each floor), turn-based bump-combat (move into a monster to attack; monsters take their turn after you), a 4-tier monster table (rat/kobold/orc/wraith) that deepens with depth, greedy monster AI, fog-of-war exploration (seen[] tiles), items (gold + healing potions), 8-floor descent with escalating danger, XP/level-up (raises max HP + attack), and PERMADEATH (death or reaching MAX_DEPTH ends the run). checksum() is an FNV-1a fold over the entire state (grid + player + monsters + items) for cross-process determinism proof. A deterministic BFS-pathfinding auto-play seat (auto_step/auto_play_to_end 'greedy') clears reachable monsters then routes to the stairs and descends -- it plays a real run to a genuine win/death (validated: a seeded run reaches depth 5 and dies at turn 303), not a stalled loop. save_data/load_data snapshot the whole run (NoxDev ABI). GameManager autoload wires the ABI (buses, new_run reseed, save/load); dungeon.gd renders the crawl in code -- fog-lit tiles, the @ player, monsters, gold/potion pips, a live HUD (depth/HP/ATK/level/gold/potions) and the message log, with arrow/WASD movement, Q to quaff, > to descend, R for a fresh seeded run. Drops in standalone or as the dungeon core of a larger RPG.",
+      "status": "validated",
+      "skeleton": "genres/classic-roguelike/skeleton",
+      "doc": "genres/classic-roguelike/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the roguelike action set (arrows/WASD step, Space wait, Q quaff, > descend, R restart) is baked into dungeon.gd's _unhandled_key_input; re-run only to add a rebinding UI or numpad diagonals"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "levels are generated in code by RogueEngine._gen_level (rooms + L-corridors + stairs) -- layout work means tuning the generator (room count/size, corridor style, feature placement), not hand-placing tiles"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the HUD line + message log are drawn with draw_string on the fallback font -- theme them (panel, font, HP colour ramp) from the game palette; the @ and monster glyphs are draw_rect placeholders to swap for tiles/sprites"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the draw_rect tiles/entities for a real 16x16 tileset + monster sprites (wall/floor/stairs tiles via tileset recipes, rat/kobold/orc/wraith + @ via character-sprite); the engine already exposes tile()/monsters/items/player for a sprite layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook the message log + hp deltas for hit flashes and screen shake on take_damage, a descend sting on stairs, and a death fanfare on game_over/won"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "16x16 dungeon tileset (wall/floor/stairs-down, VGA/ASCII-revival look) -- replaces the draw_rect terrain in dungeon.gd _draw",
+        "Monster sprites for the 4-tier table (rat, kobold, orc, wraith; ~16x16 or billboard) -- replaces the red draw_rect monster blocks",
+        "Player @ sprite / avatar (16x16) -- replaces the white draw_rect player block",
+        "Item icons (gold pile, potion flask; ~12x12) -- replaces the coloured draw_circle pips",
+        "Bitmap/pixel font for the HUD + message log (readable at small sizes)",
+        "SFX: footstep, bump-attack hit, monster death, gold pickup, potion glug, stairs descend, level-up chime, death sting"
       ]
     }
   ]
