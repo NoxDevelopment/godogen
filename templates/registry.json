@@ -3677,6 +3677,61 @@
     "SFX: shift bustle, cash chime (budget-scaled), sour under-skill note, hire ping, upgrade thunk, goal fanfare",
     "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
    ]
+  },
+  {
+   "id": "adult-trainer",
+   "name": "Adult Trainer (mature-themed raise/trainer sim, Princess-Maker lineage — SYSTEMS ONLY, 2D)",
+   "engine": "godot",
+   "engineVersion": "4.6.1-stable",
+   "description": "A mature-THEMED RAISE / TRAINER sim (Princess-Maker lineage) run as a DETERMINISTIC sim. IMPORTANT: this template ships the RAISER SYSTEMS ONLY -- a companion with five stat tracks, a weekly schedule of training activities with stamina/mood/money trade-offs, seeded events, an affection relationship meter, and stat-gated ENDINGS -- PLUS a `mature_content` GATING FLAG that is OFF by default and only calls EMPTY author hooks. It contains NO explicit content; an author who adds mature content owns their own assets, an age-verification gate, and platform compliance (the same clean-room approach as the dating-sim + adult-management templates). TrainerEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG drives the weekly events, so a whole 24-week raise replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the state). Real systems, no stubs: five stat tracks (discipline / grace / wit / fitness / artistry); an activity table (study / etiquette / combat / art / drill to raise stats, work to earn, rest to recover, outing to court affection) each with money/stamina/mood/affection deltas; OVERTRAINING (a draining activity with too little stamina yields halved gains + an extra mood hit); a mood-scaled learning multiplier (a happy trainee learns better); seeded weekly EVENTS (inspiration, a bad week, a fond moment, a windfall); and a stat-gated ENDING resolver (Burnout if mood/affection collapse, else Devoted<Track> / <Track>Prodigy / Beloved Companion / Well-Rounded). A deterministic TRAINER auto-seat raises toward a target path (keep money/stamina/mood/affection above floors, push the target stat + affection); auto_play_to_end plays a whole raise (validated: the trainer reaches a 'Wit Prodigy' ending with wit 100, affection 67 -- meeting the target -- with the mature_content gate OFF the whole run). save_data/load_data snapshot the whole raise incl. RNG state (NoxDev ABI). GameManager picks each week's activity; trainer_view.gd renders the five stat-track bars, the money/stamina/mood/affection HUD, the weekly activity buttons, and an OFF-by-default mature-content gate toggle with a SYSTEMS-ONLY notice -- with an autoplay toggle + restart.",
+   "status": "validated",
+   "skeleton": "genres/adult-trainer/skeleton",
+   "doc": "genres/adult-trainer/TEMPLATE.md",
+   "vendoredAddons": [],
+   "primitives": [
+    {
+     "skill": "input-handling",
+     "params": {},
+     "note": "the weekly activity buttons + the mature-gate toggle are in trainer_view.gd; re-run for a schedule planner (queue several weeks), a stat-detail tooltip, or a gift/wardrobe screen"
+    },
+    {
+     "skill": "world-layout",
+     "params": {},
+     "note": "the raiser tuning (stat tracks, the activity table + deltas, overtraining, the event table, and the ending resolver) lives in TrainerEngine consts/methods -- design work is more activities, branching events, and multiple target endings, not scene nodes; the mature_content gate + _mature_hook are INTENTIONALLY EMPTY (systems only)"
+    },
+    {
+     "skill": "ui-theme",
+     "params": {},
+     "note": "the stat bars, resource bars and activity buttons are drawn in code -- theme them (a companion portrait that reacts to mood/affection, themed activity icons, an ending card) from the game palette"
+    },
+    {
+     "skill": "ui-animation",
+     "params": {},
+     "note": "the engine exposes each week's deltas + events -- drive a stat-bar fill tween, a mood/affection portrait reaction, an event pop-up, and an end-of-raise ending reveal"
+    },
+    {
+     "skill": "game-feel",
+     "params": {},
+     "note": "hook a training week (a study/spar sting), an overtrain (a strained groan), an outing (a warm chime + affection heart), an event pop, and a per-ending fanfare (or a somber Burnout cue)"
+    }
+   ],
+   "systems": [
+    "godotsmith:templates/menu_system",
+    "godotsmith:templates/save_system",
+    "godotsmith:templates/settings_system"
+   ],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "A companion portrait set that reacts to mood / affection (a few expressions)",
+    "Activity icons (study / etiquette / combat / art / drill / work / rest / outing)",
+    "Stat-track + resource bar art (money / stamina / mood / affection) + an ending card set",
+    "HUD chrome: week counter, target tracker, an event pop-up frame",
+    "SFX: training sting, overtrain groan, outing chime, event pop, per-ending fanfare, Burnout cue",
+    "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
+   ]
   }
  ]
 }
