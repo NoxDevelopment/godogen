@@ -2742,6 +2742,61 @@
         "HUD chrome: HP bar, wave/score readout, enemy HP rings, hurt vignette",
         "SFX: player fire + reload, enemy fire, bullet impacts, enemy death, player hurt, wave-clear + victory/defeat stings"
       ]
+    },
+    {
+      "id": "rhythm",
+      "name": "Rhythm Game (Guitar Hero/DDR/osu!mania-lite 4-lane note highway, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Guitar-Hero / DDR / osu!-mania-lineage RHYTHM GAME run as a DETERMINISTIC FIXED-TIMESTEP sim at 60 ticks/sec: a seeded NOTE CHART scrolls down four lanes toward a hit line and the player taps each lane in time. OUR OWN engine, generic content (no trademarks). RhythmEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); the RNG only BUILDS the chart and play is otherwise a pure function of the input stream, so a whole song replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly. Real systems: a seeded procedural CHART generator (BPM-derived beat spacing with syncopation + occasional CHORDS + a no-repeat-lane bias); JUDGMENT BY TIMING WINDOW -- a tap judges against the nearest un-hit note in that lane, Perfect within +/-2 ticks, Good within +/-5, and a note that scrolls past the window unhit becomes a Miss; COMBO + a tiered MULTIPLIER (x1..x4) driving score; ACCURACY (%) and a letter GRADE (S/A/B/C/D); and a proper song end with a final grade. A deterministic AUTO-PLAY seat taps every note exactly on time (full-combo of Perfects, grade S), and a parameterized 'late<N>' policy taps N ticks late so the Good/Miss tiers are demonstrably exercised -- auto_step/auto_play_to_end run a whole song (validated: the perfect seat full-combos an 80-note chart to a grade-S 27500, while a 4-tick-late seat scores strictly worse at 13750, proving the windows are enforced). save_data/load_data snapshot the whole song incl. RNG state (NoxDev ABI). GameManager steps the sim in _physics_process (60Hz) with EDGE-triggered taps; rhythm_view.gd renders the 4-lane highway (notes scrolling to the hit line), lane targets that flash on press, a judgment flash, a progress bar and a score/combo/multiplier/accuracy/grade HUD -- tap D/F/J/K or the arrow keys, with an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/rhythm/skeleton",
+      "doc": "genres/rhythm/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the 4-lane tap set (D/F/J/K + arrow-key alternates, edge-triggered per tick, T autoplay, R restart) is sampled in rhythm_view.gd; re-run for gamepad/hold-notes or a rebinding UI"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the note highway, lane targets, judgment flash, combo/multiplier + grade HUD and progress bar are drawn in code -- theme them (lane skins, hit-burst VFX, health/energy bar, full-combo banner) from the game palette"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "THE genre's core: bind the chart to a real track. The chart is BPM-derived ticks in RhythmEngine so a song's beatmap maps directly onto note.time; add hit-sounds per lane + a miss cue and sync the music start to START_OFFSET"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the rectangle notes + lane targets for real note/receptor sprites + hit bursts; the engine exposes visible_notes()/playhead so a sprite + particle layer reads directly off it"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook per-lane hit flashes (already surfaced), Perfect/Good/Miss pop text, a combo-milestone flourish, screen pulse on the beat, and a grade reveal on song clear"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Note + receptor (lane target) sprites per lane, plus a held-note body/tail if you add holds",
+        "Hit-burst / judgment VFX (Perfect/Good/Miss) + a combo-milestone flourish",
+        "Lane skin / highway backdrop (with an on-beat pulse) + a full-combo banner",
+        "HUD chrome: score, combo x multiplier, accuracy %, a grade badge, a health/energy bar, a progress/seek bar",
+        "A song + its beatmap (the chart maps BPM-derived ticks to note.time; replace the procedural generator with an authored map)",
+        "SFX: per-lane hit sound, miss cue, combo-break, song-clear grade stinger"
+      ]
     }
   ]
 }
