@@ -3072,6 +3072,61 @@
         "SFX: kick/pass thwack, tackle slide, ball-off-post, goal net-bulge + crowd roar, referee whistle",
         "Optional: crowd ambience + a commentary one-liner bank"
       ]
+    },
+    {
+      "id": "life-sim",
+      "name": "Life Sim (The Sims-lite needs/job/relationships/aspiration, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A The-Sims-lineage LIFE SIM run as a DETERMINISTIC FIXED-TIMESTEP sim: a character with six decaying NEEDS (hunger/energy/hygiene/fun/social/bladder) does timed ACTIONS to meet them, holds a JOB (earning money on a daily schedule, paid by mood), builds RELATIONSHIPS with NPCs, and works toward an ASPIRATION goal -- over a day/clock cycle with seeded daily EVENTS. OUR OWN engine, generic content (no trademarks). LifeEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG only drives the start jitter + the daily events, so a whole life replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over quantized needs). Real systems: SIX NEEDS that decay at per-need rates (tuned so each drains ~1-2 refills per 240-tick day) and, if energy hits 0, force an exhaustion COLLAPSE-sleep; timed ACTIONS (toilet/eat/shower/sleep/relax/socialize) that restore their need over a duration (sleep also pauses most decay); a JOB with a 9-17 work window, a ~4.5h shift paid WAGE x mood and draining energy/hygiene/bladder/fun, one shift/day; a MOOD = the average of needs that scales pay; RELATIONSHIPS with 3 NPCs where socialize deepens your best friendship; a day/CLOCK cycle (10 ticks/hour) with seeded daily events (a bill, a nice chat, waking up inspired); and an ASPIRATION goal (reach a money + best-friend milestone). A heuristic routine auto-seat lives a well-adjusted day -- urgent needs first, go to work on schedule when rested, top up social + fun in free time, sleep at night -- and auto_step/auto_play_days run whole weeks (validated: over 26 days the routine earns $2779, builds a best friend to 100, keeps mood ~75 with ZERO collapses, and reaches the aspiration goal). save_data/load_data snapshot the whole life incl. RNG state (NoxDev ABI). GameManager steps the sim in real time (speed-adjustable) applying the player's chosen action; life_view.gd renders the six need bars (red when low), the clock + money + mood, a relationship panel, the current action, an aspiration bar, an action-button row, and an event log -- click an action or press 1-7, with an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/life-sim/skeleton",
+      "doc": "genres/life-sim/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the life-sim controls (click an action or press 1-7, T autoplay, R restart) are in life_view.gd; re-run for a top-down house with clickable objects, a build/buy mode, or a time-speed control"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "needs/actions/job/aspiration are data at the top of LifeEngine (NEEDS/DECAY/ACTIONS/WAGE/ASPIRE) -- design work means tuning the daily curve + adding actions/careers/rooms, and (optionally) placing objects in a house that map to actions"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the need bars, clock, money, mood, relationship panel, aspiration bar, action buttons + event log are drawn in code -- theme them (mood ring, need icons, a Sims-style command wheel, relationship portraits) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the bars + buttons for real UI + a top-down house with a character sprite and interactable objects (fridge/bed/shower/TV); the engine exposes needs/action/rel/money for a rich UI"
+        },
+        {
+          "skill": "narrative-content",
+          "params": {},
+          "note": "flavour lives in the NPCS + daily-event branches + the log -- name the townsfolk, write event vignettes + relationship milestones + aspiration payoffs; an AI writer can theme a whole neighbourhood"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "A character sprite (idle + a few action poses) and NPC portraits for the 3 friends",
+        "Need icons (hunger/energy/hygiene/fun/social/bladder) + a mood ring/emoji",
+        "A top-down house/room set with interactable objects mapped to actions (fridge/bed/shower/toilet/TV/phone)",
+        "UI chrome: need bars, a clock, money + mood readouts, a relationship panel, an aspiration meter, a command wheel",
+        "SFX: eat/shower/toilet/sleep cues, a phone/social chime, a work-shift jingle, an aspiration fanfare, a low-need alert",
+        "Optional: day/night lighting + a lo-fi routine soundtrack"
+      ]
     }
   ]
 }
