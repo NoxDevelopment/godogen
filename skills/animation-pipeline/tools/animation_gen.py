@@ -379,6 +379,24 @@ def cmd_cycle(args):
         )
         engine_outputs["unity_json"] = str(unity)
 
+    # Engine-AGNOSTIC sheet JSON (Aseprite/TexturePacker hash — the universal
+    # importer format for Phaser / PixiJS / web tools / most engines).
+    from engine_writers import write_generic_sheet_json
+    sheet_json = write_generic_sheet_json(
+        output_sheet, output_sheet.with_suffix(".sheet.json"),
+        frame_size=(frame_w, frame_h), frame_count=n, columns=n,
+        fps=args.fps, anim_name=f"{args.type}_{args.direction}",
+        loop=args.type in {"idle", "walk", "run"},
+    )
+    engine_outputs["sheet_json"] = str(sheet_json)
+
+    # Optional MP4 preview (best-effort via ffmpeg; GIF is the portable fallback).
+    if getattr(args, "mp4", False):
+        from engine_writers import write_sprite_mp4
+        mp4 = write_sprite_mp4(frame_paths, output_sheet.with_suffix(".mp4"), args.fps)
+        if mp4:
+            engine_outputs["mp4"] = str(mp4)
+
     # If not keeping individual frames, remove the frames dir.
     if not args.keep_frames:
         for fp in frame_paths:
@@ -520,6 +538,21 @@ def cmd_sheet(args):
         )
         engine_outputs["unity_json"] = str(unity)
 
+    # Engine-agnostic Aseprite/TexturePacker sheet JSON (Phaser/Pixi/web/etc.).
+    from engine_writers import write_generic_sheet_json
+    sheet_json = write_generic_sheet_json(
+        output, output.with_suffix(".sheet.json"),
+        frame_size=(fw, fh), frame_count=n, columns=args.columns or n,
+        fps=args.fps, anim_name=args.anim_name, loop=args.loop,
+    )
+    engine_outputs["sheet_json"] = str(sheet_json)
+
+    if getattr(args, "mp4", False):
+        from engine_writers import write_sprite_mp4
+        mp4 = write_sprite_mp4(frame_paths, output.with_suffix(".mp4"), args.fps)
+        if mp4:
+            engine_outputs["mp4"] = str(mp4)
+
     print(json.dumps({
         "ok": True, "subcommand": "sheet",
         "sheet": str(output), "frame_count": n, "frame_size": [fw, fh],
@@ -557,6 +590,7 @@ def main():
     p.add_argument("--keep-frames", action="store_true", help="Keep per-frame PNGs in _frames/ dir")
     p.add_argument("--fps", type=int, default=8)
     p.add_argument("--gif", action="store_true", help="Also save a preview .gif next to the sheet")
+    p.add_argument("--mp4", action="store_true", help="Also save a preview .mp4 (best-effort via ffmpeg; nearest-4x)")
     p.add_argument("--target-size", type=int, default=0, help="Pixelize target dim (0 = no resize)")
     p.add_argument("--palette", default="")
     p.add_argument("--colors", type=int, default=0)
@@ -587,6 +621,7 @@ def main():
     p.add_argument("--fps", type=int, default=8)
     p.add_argument("--loop", action="store_true")
     p.add_argument("--gif", action="store_true")
+    p.add_argument("--mp4", action="store_true", help="Also save a preview .mp4 (best-effort via ffmpeg)")
     p.add_argument("--engine", default="both", choices=["godot", "unity", "both", "none"])
     p.set_defaults(func=cmd_sheet)
 

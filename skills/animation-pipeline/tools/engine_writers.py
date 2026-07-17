@@ -121,6 +121,126 @@ def write_unity_animation_json(
     return output_json
 
 
+def build_sheet_json(
+    image_name: str,
+    frame_size: tuple[int, int],
+    frame_count: int,
+    columns: int,
+    fps: int,
+    anim_name: str,
+    loop: bool,
+) -> dict:
+    """The ENGINE-AGNOSTIC sprite-sheet descriptor — Aseprite/TexturePacker 'hash'
+    format, the de-facto interchange consumed by Phaser 3, PixiJS, Cocos, web
+    tools, and most importers. Frames are laid out row-major in a `columns`-wide
+    grid; duration is per-frame in ms. Pure (no IO) so it's unit-testable.
+    """
+    fw, fh = frame_size
+    cols = max(1, columns)
+    rows = (frame_count + cols - 1) // cols
+    duration_ms = round(1000.0 / float(fps)) if fps > 0 else 100
+    frames: dict[str, dict] = {}
+    for i in range(frame_count):
+        col, row = i % cols, i // cols
+        frames[f"{anim_name} {i}.png"] = {
+            "frame": {"x": col * fw, "y": row * fh, "w": fw, "h": fh},
+            "rotated": False,
+            "trimmed": False,
+            "spriteSourceSize": {"x": 0, "y": 0, "w": fw, "h": fh},
+            "sourceSize": {"w": fw, "h": fh},
+            "duration": duration_ms,
+        }
+    return {
+        "frames": frames,
+        "meta": {
+            "app": "https://noxdev.studio",
+            "version": "1.0",
+            "image": image_name,
+            "format": "RGBA8888",
+            "size": {"w": cols * fw, "h": rows * fh},
+            "scale": "1",
+            "frameTags": [
+                {
+                    "name": anim_name,
+                    "from": 0,
+                    "to": max(0, frame_count - 1),
+                    "direction": "forward" if loop else "forward",
+                }
+            ],
+            "fps": fps,
+            "loop": bool(loop),
+        },
+    }
+
+
+def write_generic_sheet_json(
+    sheet_path: Path,
+    output_json: Path,
+    frame_size: tuple[int, int],
+    frame_count: int,
+    columns: int,
+    fps: int,
+    anim_name: str,
+    loop: bool,
+) -> Path:
+    """Write the engine-agnostic Aseprite/TexturePacker-hash sheet JSON next to
+    the PNG sheet (the universal importer format — Phaser/Pixi/web/etc.)."""
+    data = build_sheet_json(
+        sheet_path.name, frame_size, frame_count, columns, fps, anim_name, loop
+    )
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    return output_json
+
+
+def write_sprite_mp4(
+    frame_paths: list[Path],
+    output_mp4: Path,
+    fps: int,
+    upscale: int = 4,
+) -> Path | None:
+    """Best-effort MP4 of an animation cycle (for previews / marketing) via
+    ffmpeg. Pixel-art-safe: nearest-neighbour upscale, yuv420p, even dims.
+    Returns the path, or None if ffmpeg isn't available (GIF stays the portable
+    fallback). Frames are fed by an explicit concat list so any naming works.
+    """
+    import shutil
+    import subprocess
+    import tempfile
+
+    if shutil.which("ffmpeg") is None or not frame_paths:
+        return None
+    output_mp4.parent.mkdir(parents=True, exist_ok=True)
+    hold = 1.0 / float(fps if fps > 0 else 8)
+    # ffconcat demuxer: each frame held for `hold` seconds (last needs a repeat).
+    lines = ["ffconcat version 1.0"]
+    for p in frame_paths:
+        lines.append(f"file '{p.as_posix()}'")
+        lines.append(f"duration {hold:.4f}")
+    lines.append(f"file '{frame_paths[-1].as_posix()}'")
+    with tempfile.NamedTemporaryFile("w", suffix=".ffconcat", delete=False, encoding="utf-8") as fh:
+        fh.write("\n".join(lines))
+        concat_path = fh.name
+    vf = f"scale=iw*{upscale}:ih*{upscale}:flags=neighbor,pad=ceil(iw/2)*2:ceil(ih/2)*2"
+    try:
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-safe", "0", "-f", "concat", "-i", concat_path,
+                "-vf", vf, "-r", str(fps), "-pix_fmt", "yuv420p",
+                "-movflags", "+faststart", str(output_mp4),
+            ],
+            check=True, capture_output=True,
+        )
+    except (subprocess.CalledProcessError, OSError):
+        return None
+    finally:
+        try:
+            Path(concat_path).unlink()
+        except OSError:
+            pass
+    return output_mp4 if output_mp4.exists() else None
+
+
 def _relative(target: Path, anchor: Path) -> str:
     try:
         return target.resolve().relative_to(anchor.resolve().parent).as_posix()
