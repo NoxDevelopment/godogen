@@ -2907,6 +2907,61 @@
         "SFX: click, purchase chime, golden spawn ping, frenzy start/stop, ascension fanfare",
         "Number-abbreviation font that reads at K/M/B/T scale"
       ]
+    },
+    {
+      "id": "educational-quiz",
+      "name": "Educational Quiz (adaptive timed multiple-choice with a report card, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A learning-game EDUCATIONAL QUIZ: a timed, ADAPTIVE multiple-choice quiz that generates arithmetic questions on the fly, mixes in a factual trivia bank, scales difficulty to the player's streak, scores with time + streak bonuses, and produces a per-CATEGORY report card + a letter grade. OUR OWN engine, generic content (no trademarks). QuizEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG generates the questions AND shuffles the choices, so a whole quiz -- the exact questions, options and their order -- replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly. Real systems: ON-THE-FLY QUESTION GENERATION (seeded arithmetic across +/-/x whose operand magnitude scales with difficulty, with unique near-miss distractors placed at a seeded slot) blended ~55/45 with a 12-entry trivia bank (science/geography/math) whose choices are seeded-shuffled with the correct-index tracked; ADAPTIVE DIFFICULTY (1-5) that rises on a streak and falls on a miss; a per-question TIMER where running out counts as wrong; SCORING = base + difficulty bonus + streak bonus + a fast-answer time bonus; a per-CATEGORY REPORT CARD (correct/total) and a letter GRADE (A-F) with a pass mark; and full save/load. A deterministic auto-seat answers with a 'perfect' policy (reads the key → aces the quiz, grade A) or a 'guess' policy (a fixed no-RNG pattern that lands right only occasionally) so the scoring/grading is demonstrably responsive; auto_step/auto_play_to_end run a whole quiz (validated: perfect = 20/20 grade A, score 9450, streak 20, 3 categories; guess = 5/20, score 850 -- strictly worse). save_data/load_data snapshot the whole quiz incl. RNG state (NoxDev ABI). GameManager runs the countdown in _physics_process; quiz_view.gd renders the question, four answer buttons, a timer bar, a live score/streak/difficulty HUD, a right/wrong flash, and an end-screen report card + grade -- click an answer or press 1-4, with an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/educational-quiz/skeleton",
+      "doc": "genres/educational-quiz/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the quiz controls (click an answer or press 1-4, T autoplay, R restart) are in quiz_view.gd; re-run for a touch layout, drag-to-order / fill-in-the-blank input, or a buzzer mode"
+        },
+        {
+          "skill": "narrative-content",
+          "params": {},
+          "note": "THE content seam: the trivia bank (TRIVIA) + the arithmetic generator (_make_arithmetic) are the question source — author subjects/questions here or point an AI writer at a curriculum to generate a themed bank; difficulty tiers are already modelled"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the question card, answer buttons, timer bar, score/streak HUD, right/wrong flash and report card are drawn in code — theme them (subject icons, mascot, celebratory streak FX, a printable report card) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the drawn buttons + panels for real UI art (answer tiles, a timer ring, subject badges, a grade stamp); the engine exposes question/choices/report_card for a rich UI"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook correct (a chime + a +points pop + streak flare), wrong (a soft buzz + the correct answer highlight), a ticking timer in the last seconds, and a grade-reveal fanfare on the report card"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Answer-tile art (4 states: idle/hover/correct/wrong) + a question card frame",
+        "Subject/category badges (math/science/geography/…) + a mascot or host",
+        "A timer ring/bar, streak flare VFX, and a +points floater",
+        "An end-screen report card layout + a grade stamp (A-F)",
+        "SFX: correct chime, wrong buzz, timer tick, streak milestone, grade-reveal fanfare",
+        "Optional: a themed question bank (JSON) authored per subject/grade to replace the built-in generator"
+      ]
     }
   ]
 }
