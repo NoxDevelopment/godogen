@@ -3182,6 +3182,61 @@
         "UI chrome: health/hunger/warmth meters, a hotbar, a crafting menu with recipe costs, a clock",
         "SFX: chop/mine, pickup, craft/build chime, fire crackle + low-fuel warning, nightfall cue, low-health heartbeat, dawn sting"
       ]
+    },
+    {
+      "id": "dating-sim",
+      "name": "Dating Sim (stat-raiser + affection routes + calendar; adult-CAPABLE via a content gate, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Persona-social-link / stat-raiser-lineage DATING SIM: raise player STATS through daily activities, spend a CALENDAR pursuing romanceable CHARACTERS via DATES + GIFTS matched to their seeded PREFERENCES, cross AFFECTION thresholds to unlock milestone events, and CONFESS to complete a route. OUR OWN engine, generic content (no trademarks). IMPORTANT: this is a SYSTEMS template -- it models the dating-sim MECHANICS (stats/affection/calendar/gifts/routes/endings) and exposes a `mature_content` GATING FLAG that DEFAULTS OFF and unlocks only EMPTY author hooks; it ships NO explicit content (the adult-capability is the plumbing, not the payload). DatingEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG rolls the characters + their preferences + a small daily mood variance, so a whole playthrough replays BYTE-IDENTICALLY from a seed (FNV-1a checksum). Real systems: 3 player STATS (charm/wit/fitness) raised by training; a MONEY economy (work for gift money); 3 romanceable CHARACTERS each with a seeded liked-stat, liked-gift and preferred-date; a SEMESTER CALENDAR where every action costs a day; DATES whose affection gain scales with matching their preferred date type AND meeting their valued stat at a bar that RISES with the current affection (so you must keep improving to keep courting); GIFTS that cost money and pay big when they match the liked gift; AFFECTION MILESTONES (30/60/90) that fire relationship events (a 90 milestone exposes a gated, empty mature hook); and a CONFESSION at 90 that completes a route + ends the semester with a partner (or no confession = the bittersweet ending). A pursue-a-partner auto-seat plays optimally -- raise the target's liked stat to the date bar, buy their liked gift, take them on their favourite date, and confess at 90 -- and auto_step/auto_play_to_end run a whole semester (validated: the seat completes a route with a partner by day 12, maxing affection to 100, with the mature gate OFF). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager drives the calendar (menu-based, one day per action); dating_view.gd renders the player stats + money + day, the 3 character cards (affection bar + revealed preferences + milestones), an action panel (train/work/date/gift/confess) and an event log, plus a clearly-labelled mature-content gate toggle that stays OFF by default. Ties naturally to the Immersion Engine / companion persona systems.",
+      "status": "validated",
+      "skeleton": "genres/dating-sim/skeleton",
+      "doc": "genres/dating-sim/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the menu controls (click a character to select, click an action, keys 1-4 for train/work, A autoplay, R restart) are in dating_view.gd; re-run for a proper social-menu UI, a map/location picker, or controller nav"
+        },
+        {
+          "skill": "narrative-content",
+          "params": {},
+          "note": "THE content seam: characters + their preferences + milestone events + endings live as data in DatingEngine (NAMES/GIFTS/DATES/MILESTONES + the milestone/confess branches) -- author romanceable casts, date vignettes, gift reactions, and route endings here; an AI writer can theme a whole cast (this is where the Immersion-Engine persona ties in). Any mature scene MUST sit behind the mature_content gate."
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the stat bars, character cards, affection meters, action panel + log are drawn in code -- theme them (character portraits/sprites, a heart-meter, a phone/calendar UI, a gift shop) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the cards for real character portraits + expression sets and a dating-app/VN-style UI; the engine exposes chars/affection/prefs for a portrait + dialogue layer (pairs with the visual-novel template)"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook affection gains (a heart pop + a chime), a milestone (a special-event flourish), a liked-gift reaction, a stat-up sparkle, and a confession scene (music swell + a route-complete card)"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Character portraits per romanceable cast member with an expression set (neutral/happy/blush/upset)",
+        "A heart/affection meter, milestone-event art, and route-ending cards",
+        "UI chrome: a calendar/phone, a stat panel, a gift shop, a social menu, a save/load screen",
+        "Gift icons + date-location backdrops (cafe/gym/museum/park/concert)",
+        "SFX: affection chime, liked-gift sparkle, stat-up, milestone flourish, confession music swell",
+        "NOTE: any mature assets belong behind the mature_content gate and are the developer's responsibility to author/rate; the template ships none"
+      ]
     }
   ]
 }
