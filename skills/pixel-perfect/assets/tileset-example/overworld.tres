@@ -1,0 +1,15 @@
+[gd_resource type="TileSet" load_steps=2 format=3 uid="uid://a69dddc4e72f"]
+
+[ext_resource type="Texture2D" path="res://overworld.png" id="tex_1"]
+
+[sub_resource type="TileSetAtlasSource" id="atlas_1"]
+texture = ExtResource("tex_1")
+texture_region_size = Vector2i(32, 32)
+separation = Vector2i(2, 2)
+0:0/0 = 0
+1:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+
+[resource]
+sources/0 = SubResource("atlas_1")

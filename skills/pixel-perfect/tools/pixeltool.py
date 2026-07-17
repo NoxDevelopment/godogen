@@ -346,6 +346,78 @@ def choose_backend(args) -> str:
     return "snap"
 
 
+def assemble_tileset(inputs: list[str], tile_size: int, cols: int,
+                     palette: np.ndarray | None, colors: int, dither: str,
+                     extrude: int, separation: int, margin: int) -> tuple[np.ndarray, dict]:
+    """Pack tile PNGs into ONE shared-palette atlas (the 'snap the sheet ONCE'
+    invariant): derive a single palette across every tile, lock each to it, and
+    lay them on a uniform grid with optional edge-extrude anti-bleed padding and
+    cell separation. Returns (atlas RGBA array, meta dict)."""
+    tiles: list[np.ndarray] = []
+    for p in inputs:
+        im = Image.open(p).convert("RGBA")
+        if im.size != (tile_size, tile_size):
+            im = im.resize((tile_size, tile_size), Image.NEAREST)
+        tiles.append(np.asarray(im, dtype=np.uint8).copy())
+    n = len(tiles)
+    if n == 0:
+        sys.exit("pixeltool tileset: no input tiles")
+    # ONE palette shared across the whole sheet (matches the sprite-sheet rule).
+    if palette is not None:
+        pal = palette
+    else:
+        stacked = np.concatenate([t.reshape(-1, 4) for t in tiles], axis=0)[None, ...]
+        pal = derive_palette(stacked, colors if colors > 0 else 16)
+    snapped = [apply_palette(t, pal, dither) for t in tiles]
+
+    if cols <= 0:
+        cols = int(np.ceil(np.sqrt(n)))
+    rows = int(np.ceil(n / cols))
+    step = tile_size + separation
+    W = margin * 2 + cols * tile_size + (cols - 1) * separation
+    H = margin * 2 + rows * tile_size + (rows - 1) * separation
+    atlas = np.zeros((H, W, 4), dtype=np.uint8)
+    for i, t in enumerate(snapped):
+        r, c = divmod(i, cols)
+        x = margin + c * step
+        y = margin + r * step
+        atlas[y:y + tile_size, x:x + tile_size] = t
+        for e in range(1, extrude + 1):  # replicate borders into the gutter (anti-bleed)
+            if x - e >= 0:
+                atlas[y:y + tile_size, x - e] = t[:, 0]
+            if x + tile_size - 1 + e < W:
+                atlas[y:y + tile_size, x + tile_size - 1 + e] = t[:, -1]
+            if y - e >= 0:
+                atlas[y - e, x:x + tile_size] = t[0, :]
+            if y + tile_size - 1 + e < H:
+                atlas[y + tile_size - 1 + e, x:x + tile_size] = t[-1, :]
+    meta = {
+        "tiles": n, "tile_size": tile_size, "cols": cols, "rows": rows,
+        "separation": separation, "margin": margin, "extrude": extrude,
+        "atlas_size": [int(W), int(H)],
+        "palette": ["#%02x%02x%02x" % (int(x[0]), int(x[1]), int(x[2])) for x in pal.tolist()],
+    }
+    return atlas, meta
+
+
+def cmd_tileset(args) -> None:
+    pal = parse_palette(args.palette) if args.palette else None
+    atlas, meta = assemble_tileset(
+        args.inputs, args.tile_size, args.cols, pal, args.colors, args.dither,
+        args.extrude, args.separation, args.margin,
+    )
+    out = Path(args.output)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(atlas).save(out)
+    meta = {"output": str(out), **meta}
+    out.with_suffix(out.suffix + ".meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    if args.json:
+        print(json.dumps(meta))
+    else:
+        print(f"[tileset] {meta['tiles']} tiles -> {meta['atlas_size'][0]}x{meta['atlas_size'][1]} "
+              f"({meta['cols']}x{meta['rows']}, {len(meta['palette'])}c)  {out}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         prog="pixeltool", description=__doc__,
@@ -375,7 +447,27 @@ def main() -> None:
                     help="force a backend; pixeloe = photo/render -> pixel conversion")
     cl.add_argument("--scale", type=int, default=0, help="also write <output>_preview.png at Nx nearest")
     cl.add_argument("--json", action="store_true", help="print JSON result")
+
+    ts = sub.add_parser("tileset", help="pack generated tiles into a shared-palette Godot atlas")
+    ts.add_argument("inputs", nargs="+", help="tile PNGs (order = row-major atlas order)")
+    ts.add_argument("-o", "--output", required=True, help="atlas PNG path")
+    ts.add_argument("--tile-size", type=int, default=32, help="tile size in px (default 32)")
+    ts.add_argument("--cols", type=int, default=0, help="atlas columns (0 = ceil(sqrt(n)))")
+    ts.add_argument("--palette", help="lock to exact palette: comma-separated #hex list")
+    ts.add_argument("--colors", type=int, default=16,
+                    help="shared adaptive palette size when --palette is absent")
+    ts.add_argument("--dither", choices=["none", "ordered", "fs"], default="none")
+    ts.add_argument("--extrude", type=int, default=0,
+                    help="edge-extrude N px into the gutter (anti-bleed)")
+    ts.add_argument("--separation", type=int, default=0, help="px gap between cells")
+    ts.add_argument("--margin", type=int, default=0, help="px border around the atlas")
+    ts.add_argument("--json", action="store_true", help="print JSON result")
+
     args = ap.parse_args()
+
+    if args.cmd == "tileset":
+        cmd_tileset(args)
+        return
 
     if args.pixel_size == "auto":
         args.pixel_size = None

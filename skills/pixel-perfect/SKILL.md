@@ -110,3 +110,28 @@ quality recipe restyles first:
 + quantize; pixel_snap is the stronger finisher — prefer it as the post step
 (exact-palette + drift correction). Pairs with `asset-reuse` (palette_swap on
 SNAPPED art stays perfectly clean) and `animation-pipeline`.
+
+## Tilesets — assemble generated tiles into a Godot atlas
+
+Generate tiles (`zit-seamless-tile` / the `overworld-tile` · `dungeon-tile`
+presets / `zit-pixel-art`), then PACK them into ONE shared-palette atlas — the
+"snap the sheet ONCE" rule applied to tilesets:
+
+```bash
+python3 tools/pixeltool.py tileset grass.png water.png dirt.png stone.png \
+  -o overworld.png --tile-size 32 --cols 2 --extrude 1 --separation 2 --colors 16
+# then the Godot-ready TileSet + crisp-pixel import sidecar:
+python3 ../engine-export/tools/export_gen.py tileset-tres \
+  --asset overworld.png --tile-size 32 --grid 2x2 --separation 2 -o overworld.tres
+```
+
+- ONE shared palette is derived across every tile and locked in (no per-tile
+  drift). `--palette "#hex,..."` locks an exact list; else `--colors` sizes it.
+- `--extrude N` replicates each tile's border into the `--separation` gutter
+  (anti-bleed — bilinear sampling never pulls a neighbour's colour).
+- `engine-export tileset-tres` writes the `.tres` **and** a `.import` sidecar
+  (lossless, mipmaps off) so tiles don't import blurry. Final **Nearest
+  FILTERING** is a node/project setting (`TileMapLayer.texture_filter = Nearest`
+  / project `default_texture_filter`), NOT a texture-import field.
+- Worked example: `assets/tileset-example/` (4 tiles → atlas + `.tres` +
+  `.import` + a `TileMapLayer` scene).

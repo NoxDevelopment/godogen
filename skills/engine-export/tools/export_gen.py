@@ -289,7 +289,8 @@ def emit_sprite_prefab_json(asset: Path, frame_count: int, fps: float,
 # Godot: TileSet .tres
 # ---------------------------------------------------------------------------
 
-def emit_tileset_tres(asset: Path, tile_size: int, grid: str, output: Path) -> None:
+def emit_tileset_tres(asset: Path, tile_size: int, grid: str, output: Path,
+                      separation: int = 0, margin: int = 0) -> None:
     if "x" not in grid:
         raise SystemExit("--grid must be like 4x4 or 6x4")
     cols_s, rows_s = grid.split("x", 1)
@@ -306,6 +307,12 @@ def emit_tileset_tres(asset: Path, tile_size: int, grid: str, output: Path) -> N
         'texture = ExtResource("tex_1")',
         f"texture_region_size = Vector2i({tile_size}, {tile_size})",
     ]
+    # margins/separation MUST precede the cell markers so the atlas grid resolves
+    # (a pixeltool `tileset --margin/--separation` atlas needs these to line up).
+    if margin:
+        lines.append(f"margins = Vector2i({margin}, {margin})")
+    if separation:
+        lines.append(f"separation = Vector2i({separation}, {separation})")
     # Mark every cell as present (0/0 = no auto-collision; user adds in editor)
     for r in range(rows):
         for c in range(cols):
@@ -317,6 +324,36 @@ def emit_tileset_tres(asset: Path, tile_size: int, grid: str, output: Path) -> N
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n".join(lines), encoding="utf-8")
+
+
+def emit_texture_import(asset: Path) -> None:
+    """Write a Godot-4 `.import` sidecar for a pixel-art texture: lossless (no
+    VRAM compression), NO mipmaps, alpha border fixed — the crisp-pixel fix so
+    tiles don't import blurry. Godot completes uid/dest_files on first import.
+    (Nearest FILTERING is a node/project setting, not an import field.)"""
+    res_path = _resolve_res_path(asset)
+    text = "\n".join([
+        "[remap]",
+        "",
+        'importer="texture"',
+        'type="CompressedTexture2D"',
+        "",
+        "[deps]",
+        "",
+        f'source_file="res://{res_path}"',
+        "",
+        "[params]",
+        "",
+        "compress/mode=0",
+        "compress/high_quality=false",
+        "mipmaps/generate=false",
+        "roughness/mode=0",
+        "process/fix_alpha_border=true",
+        "process/premult_alpha=false",
+        "detect_3d/compress_to=0",
+        "",
+    ])
+    asset.with_suffix(asset.suffix + ".import").write_text(text, encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -412,9 +449,13 @@ def cmd_tileset_tres(args) -> None:
     if not asset.exists():
         raise SystemExit(f"asset not found: {asset}")
     output = Path(args.output)
-    emit_tileset_tres(asset, args.tile_size, args.grid, output)
-    print(json.dumps({"ok": True, "format": "godot.tileset_tres",
-                      "wrote": str(output)}, indent=2))
+    emit_tileset_tres(asset, args.tile_size, args.grid, output,
+                      separation=args.separation, margin=args.margin)
+    wrote = [str(output)]
+    if not args.no_import:
+        emit_texture_import(asset)
+        wrote.append(str(asset) + ".import")
+    print(json.dumps({"ok": True, "format": "godot.tileset_tres", "wrote": wrote}, indent=2))
 
 
 def cmd_audio_scene(args) -> None:
@@ -484,6 +525,9 @@ def main():
     p.add_argument("--asset", required=True)
     p.add_argument("--tile-size", type=int, default=32)
     p.add_argument("--grid", required=True, help="e.g. 4x4 or 6x4")
+    p.add_argument("--separation", type=int, default=0, help="px gap between cells (match the atlas)")
+    p.add_argument("--margin", type=int, default=0, help="px atlas border (match the atlas)")
+    p.add_argument("--no-import", action="store_true", help="skip the crisp-pixel .import sidecar")
     p.add_argument("-o", "--output", required=True)
     p.set_defaults(func=cmd_tileset_tres)
 

@@ -61,10 +61,11 @@ python3 .claude/skills/engine-export/tools/export_gen.py tileset-tres \
   --asset assets/tilesets/grass_32px_4x4.png \
   --tile-size 32 \
   --grid 4x4 \
+  --separation 2 --margin 0 \
   -o assets/tilesets/grass.tres
 ```
 
-Emits a `TileSet` resource with one `TileSetAtlasSource` per tile. Each tile gets its `texture_region` set correctly; the agent can then add custom data layers (collisions, navigation) in the editor.
+Emits ONE `TileSetAtlasSource` (with a per-cell present-marker for every grid cell); the agent adds custom data layers (collisions, navigation) in the editor. Pass `--separation`/`--margin` to **match a `pixeltool tileset` atlas** built with gutters (they set the atlas source's `separation`/`margins`). It also auto-writes a `<asset>.import` sidecar (lossless, **mipmaps off**, alpha-border fixed) so pixel tiles don't import blurry — pass `--no-import` to skip it. Note: final **Nearest FILTERING** is a node/project setting (`TileMapLayer.texture_filter = Nearest` / project `default_texture_filter`), not a texture-import field — see the `pixel-perfect` tileset example scene.
 
 ### audio-scene — Godot AudioStreamPlayer scene
 

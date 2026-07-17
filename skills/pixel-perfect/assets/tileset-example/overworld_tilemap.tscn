@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+; Reference scene — a TileMapLayer using the assembled overworld tileset.
+; texture_filter = 1 (Nearest) keeps pixel tiles crisp (the filtering fix is a
+; node/project setting, NOT a texture-import field). Paint cells in the editor.
+
+[ext_resource type="TileSet" path="res://overworld.tres" id="1_tileset"]
+
+[node name="OverworldTilemap" type="TileMapLayer"]
+texture_filter = 1
+tile_set = ExtResource("1_tileset")

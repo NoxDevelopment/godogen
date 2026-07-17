@@ -1,0 +1,24 @@
+{
+  "output": "assets\\tileset-example\\overworld.png",
+  "tiles": 4,
+  "tile_size": 32,
+  "cols": 2,
+  "rows": 2,
+  "separation": 2,
+  "margin": 0,
+  "extrude": 1,
+  "atlas_size": [
+    66,
+    66
+  ],
+  "palette": [
+    "#6096c8",
+    "#664c30",
+    "#787880",
+    "#568a40",
+    "#3a6ea5",
+    "#585860",
+    "#846642",
+    "#426c30"
+  ]
+}
