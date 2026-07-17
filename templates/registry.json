@@ -3512,6 +3512,61 @@
     "SFX: launch thunk, wall tick, colour-keyed pop (chain-pitched), floater drop, descent warning, board-clear fanfare",
     "Optional: a level map + a booster/powerup set + a bubble-skin roster"
    ]
+  },
+  {
+   "id": "word-puzzle",
+   "name": "Word Puzzle (Wordle-style letter deduction + marathon, 2D)",
+   "engine": "godot",
+   "engineVersion": "4.6.1-stable",
+   "description": "A Wordle-lineage WORD PUZZLE run as a DETERMINISTIC sim: each ROUND hides a seeded target word; you GUESS words and each guess is scored PER-LETTER -- HIT (right letter, right spot) / PRESENT (right letter, wrong spot) / ABSENT -- using the exact Wordle duplicate-letter rule (greens consume letter counts first, then presents from the leftover counts). Solve inside MAX_GUESSES to bank a STREAK + score; play a whole MARATHON of rounds (no repeated targets) for a run. OUR OWN engine, generic embedded word list (authors swap in a full dictionary). WordEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG picks the target sequence, so a whole marathon replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the state). Real systems: correct per-letter feedback with duplicate handling, guess validation against the word list, a streak + fewer-guesses-more-points scoring model, and a marathon of distinct rounds. A deterministic SOLVER auto-seat filters the word list to those still CONSISTENT with every (guess, feedback) so far, then greedily picks the next guess by positional letter frequency across the surviving candidates (with a distinct-letter information bonus) -- a strong Wordle solver; auto_step/auto_play_to_end play a whole marathon (validated: the solver cracks 8/8 words for a perfect streak-8 run). save_data/load_data snapshot the whole marathon incl. RNG state (NoxDev ABI). GameManager collects the typed guess; word_view.gd renders the guess grid with HIT/PRESENT/ABSENT colouring, an on-screen keyboard coloured by known letters, and a round/streak/score HUD -- type A-Z, Backspace, Enter to submit, with an autoplay (solver) toggle + restart.",
+   "status": "validated",
+   "skeleton": "genres/word-puzzle/skeleton",
+   "doc": "genres/word-puzzle/TEMPLATE.md",
+   "vendoredAddons": [],
+   "primitives": [
+    {
+     "skill": "input-handling",
+     "params": {},
+     "note": "typing (A-Z / Backspace / Enter) + autoplay/restart are in word_view.gd; re-run to add a clickable on-screen keyboard, a hint/reveal button, or share-a-result grid export"
+    },
+    {
+     "skill": "world-layout",
+     "params": {},
+     "note": "the puzzle shape (word length, guess count, rounds-per-marathon, and the embedded WORDS list) is in WordEngine consts -- design work is the dictionary + daily-word schedule + difficulty tiers, not scene nodes"
+    },
+    {
+     "skill": "ui-theme",
+     "params": {},
+     "note": "the guess grid, the letter-coloured keyboard and the round/streak HUD are drawn in code -- theme them (tile flip reveals, a colour-blind palette, a streak flame, a results share card) from the game palette"
+    },
+    {
+     "skill": "ui-animation",
+     "params": {},
+     "note": "the engine exposes each guess's per-letter feedback -- drive a staggered tile-flip reveal, a shake on an invalid guess, a bounce on a solve, and a keyboard-key recolour"
+    },
+    {
+     "skill": "game-feel",
+     "params": {},
+     "note": "hook the key press (a soft click), the row submit (a staggered flip + colour reveal), a solve (a chime + streak bump), a fail (a low thud + answer reveal), and a marathon-complete fanfare scaled to rounds solved"
+    }
+   ],
+   "systems": [
+    "godotsmith:templates/menu_system",
+    "godotsmith:templates/save_system",
+    "godotsmith:templates/settings_system"
+   ],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "A tile set (empty / hit / present / absent) with a flip-reveal animation + a colour-blind alt palette",
+    "An on-screen keyboard with per-key known-state colouring",
+    "HUD chrome: round counter, streak flame, score, a marathon progress bar",
+    "A results/share card (the emoji-grid recap) + a daily-word calendar",
+    "SFX: key click, row-flip reveal, solve chime, fail thud, streak bump, marathon fanfare",
+    "A real dictionary file (answers + valid guesses) to replace the embedded starter list"
+   ]
   }
  ]
 }
