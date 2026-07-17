@@ -1,0 +1,25 @@
+; Engine configuration file.
+; Scaffolded from the NoxDev genre-template registry (id: auto-battler).
+
+config_version=5
+
+[application]
+
+config/name="Auto Battler Template"
+run/main_scene="res://scenes/autobattler_view.tscn"
+config/features=PackedStringArray("4.6")
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
+
+[autoload]
+
+GameManager="*res://scripts/game_manager.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"

@@ -3237,6 +3237,61 @@
         "SFX: affection chime, liked-gift sparkle, stat-up, milestone flourish, confession music swell",
         "NOTE: any mature assets belong behind the mature_content gate and are the developer's responsibility to author/rate; the template ships none"
       ]
+    },
+    {
+      "id": "auto-battler",
+      "name": "Auto Battler (Super Auto Pets / How Many Dudes team-shop roguelite, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Super-Auto-Pets / 'How Many Dudes'-lineage AUTO-BATTLER roguelite: draft a roster of 'Dudes' from a rolling GOLD SHOP, build ABILITY + SYNERGY combos, then watch the team AUTO-RESOLVE combat (no per-unit input) against ESCALATING enemy waves -- win trophies, lose lives, and either win the run or run out of lives. OUR OWN engine, generic content (no trademarks). AutoBattlerEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG drives the shop + the enemy waves, so a whole run replays BYTE-IDENTICALLY from a seed (FNV-1a checksum). Real systems: a 9-unit POOL of Dudes with atk/hp/tier/tag + ABILITIES -- zap (start-of-battle: damage the enemy front), rage (on-hurt: +atk), vengeance (on-faint: buff the ally behind), mend (each tick: heal the weakest ally), coin (on-buy: +gold); a rolling SHOP (buy/sell/ROLL/FREEZE, tier-gated by round) with a gold economy; a TEAM (front->back order) capped at 5; team SYNERGIES (3+ melee -> +atk, 2+ support -> +hp, 2+ magic -> extra zap damage) recomputed on every buy/sell; ESCALATING enemy WAVES that add more + tougher units each round; and a fully DETERMINISTIC AUTO-COMBAT that fires start-of-battle abilities, then trades front-unit blows tick-by-tick with on-hurt/on-faint/mend triggers until one side is wiped -- win a trophy or lose a life, hit the trophy target to WIN or 0 lives to LOSE. A heuristic shop AI drafts the strongest affordable board (buy best value, replace the weakest, roll for upgrades) and auto_step/auto_play_to_end run a whole run (validated: the AI drafts a full team, wins trophies against the waves, and reaches a real terminal -- e.g., 3 trophies by round 10). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager drives the shop phase then auto-resolves the round; autobattler_view.gd renders the shop cards, your team (front->back), the round/gold/lives/trophies HUD, a live synergy readout, Roll + End-Round buttons and the last combat result -- left-click buy, right-click freeze, click a team unit to sell, with an autoplay toggle + new run.",
+      "status": "validated",
+      "skeleton": "genres/auto-battler/skeleton",
+      "doc": "genres/auto-battler/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the shop controls (left-click buy, right-click freeze, click team-unit to sell, R roll, Space end-round, T autoplay, N new run) are in autobattler_view.gd; re-run for drag-to-reorder the team, a sell/combine gesture, or gamepad"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the unit POOL + their abilities + the SYNERGY rules + the enemy-wave scaling are constants/functions in AutoBattlerEngine (POOL, _apply_synergies, _make_enemy_team) -- design work is balancing the roster + synergies + difficulty curve, not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the shop + team cards, the HUD, the synergy readout and the combat-result banner are drawn in code -- theme them (unit portraits, tier gems, a battle-playback animation, a synergy panel) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the coloured cards for real unit art + a combat playback (units walking up + trading blows); the engine's simulate() is deterministic so you can REPLAY the exact fight frame-by-frame for the animation"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook buy/sell (a shop pop), synergy-activated (a flare), the combat playback (attack lunges + ability VFX + faints), a trophy/heart gain, and a run win/lose sting"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Unit ('Dude') portraits/sprites for the roster (with tier frames + a tag/class colour) + attack/faint poses for a battle playback",
+        "Ability icons (zap/rage/vengeance/mend/coin) + a synergy panel with class crests",
+        "Shop chrome: unit cards, a freeze snowflake, a gold counter, Roll/End-Round buttons, a reroll shimmer",
+        "A combat arena backdrop + hit/faint VFX + a trophy/heart HUD",
+        "SFX: buy/sell pop, freeze click, roll shuffle, attack thwack, ability cues, faint, trophy/heart gain, run win/lose",
+        "Optional: a relic/upgrade set (How-Many-Dudes-style rule-warpers) to bolt onto the roster"
+      ]
     }
   ]
 }
