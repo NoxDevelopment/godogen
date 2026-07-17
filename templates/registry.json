@@ -2632,6 +2632,61 @@
         "Class + spell iconography (sword/bow/staff/spellbook; magic-missile/fireball/cure/bless)",
         "SFX: sword/bow/mace hit, spell cast (missile/fireball/cure/bless), miss, crit sting, level-up fanfare, party-member down, victory/defeat music"
       ]
+    },
+    {
+      "id": "fighting-1v1",
+      "name": "Fighting Game (Street Fighter/MK-lite 1v1 with frame data, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Street-Fighter / Mortal-Kombat-lineage 1-v-1 FIGHTING GAME run as a DETERMINISTIC FIXED-TIMESTEP sim at 60 ticks/sec with REAL FRAME DATA -- so play is about frame advantage, spacing, blocking high/low, and combos, not ad-hoc timers. OUR OWN engine, generic content (no trademarks). FightEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency) whose single RNG seeds the AI personalities + a little starting jitter and is otherwise pure, so a whole best-of-3 replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly -- exactly what a rollback/lockstep netcode fighter needs. Real systems: 5 moves (light/heavy punch, light/heavy kick, a special PROJECTILE) each with genuine STARTUP / ACTIVE / RECOVERY frames, damage, hit/blockstun, range and a hit HEIGHT (high overhead / mid / low); a fighter state machine (idle/walk/jump-with-gravity/crouch/block/attack/hitstun/blockstun) driven by a per-tick input {dir, up, down, atk}; BLOCKING by holding away, with correct guard required per height (stand-block overheads, crouch-block lows, chip damage on block); COMBOS via hitstun + special-CANCELS out of cancelable normals that have connected; PUSHBACK + body separation; PROJECTILES that travel and hit; ROUNDS as a best-of-3 with a 60-second timer (higher HP wins a timeout) and KO detection. A heuristic AI (ai_input) with a seeded personality (aggression + reaction) blocks on reaction, anti-airs jump-ins with heavy punch, pokes/combos in range, zones with the projectile, and manages spacing; auto_step/auto_play_to_end drive BOTH fighters for a full self-playing match (validated: a seeded match ends in ~1466 frames with a clean 2-0). save_data/load_data snapshot the whole match incl. RNG state (NoxDev ABI). GameManager steps the sim in _physics_process (60Hz) with the human's sampled inputs; fight_view.gd renders the stage, both fighters with the ACTIVE-frame hitbox extended (so spacing + whiffs read), health bars, round pips, the timer and projectiles -- P1 on A/D move (hold back = block) / W jump / S crouch / F-G-V-B-H attacks, with an attract-mode toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/fighting-1v1/skeleton",
+      "doc": "genres/fighting-1v1/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the fighter control set (A/D move + hold-back block, W jump, S crouch, F/G/V/B/H attacks, T attract, R restart) is sampled per physics tick in fight_view.gd; re-run for a full motion-input parser (QCF specials, charge moves) or gamepad mapping"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the health bars, round pips, timer and KO/round banners are drawn in code -- theme them (super meter, portrait plates, combo counter, hit-spark styling) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the rectangle fighters for real sprite sheets keyed to the frame data (idle/walk/jump/crouch/each attack's startup-active-recovery + hitstun) -- the engine already exposes state/move/mframe so a sprite driver reads directly off it"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook hit vs block (hit-spark vs guard-spark), hitstop/freeze frames on contact, screen shake on heavies, and a KO slow-mo; the _hit path yields exactly the events you need"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "punch/kick whiffs + impacts per weight, block clink, projectile fire/hit, round-announcer + KO calls -- driven off the combat log + round flow"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Two character sprite sheets keyed to frame data: idle/walk/jump/crouch/block/hitstun + each move's startup-active-recovery poses",
+        "A projectile sprite + travel/impact animation",
+        "Stage backdrop + floor art (parallax layers optional)",
+        "HUD chrome: health bars, super meter, round pips, timer, portrait plates, combo counter",
+        "Hit/guard sparks + hitstop-friendly impact VFX",
+        "SFX: light/heavy punch + kick whiffs & impacts, block clink, projectile fire/hit, jump/land, round announcer + KO calls, victory theme"
+      ]
     }
   ]
 }
