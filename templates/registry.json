@@ -3787,6 +3787,61 @@
     "SFX: swap click, type-keyed match pop, cascade chain, preferred-token sparkle, gift chime, route fanfare",
     "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
    ]
+  },
+  {
+   "id": "adult-sandbox",
+   "name": "Adult Sandbox (mature-themed open life/relationship sandbox — SYSTEMS ONLY, 2D)",
+   "engine": "godot",
+   "engineVersion": "4.6.1-stable",
+   "description": "A mature-themed open LIFE / RELATIONSHIP SANDBOX run as a DETERMINISTIC sim (also completes the original 17-genre taxonomy as gap #17). IMPORTANT: this template ships the SANDBOX SYSTEMS ONLY -- an open map of locations, a time-of-day / day-of-week clock, player needs (energy / money / fitness / mood), NPCs on seeded weekly SCHEDULES, and multi-NPC RELATIONSHIPS with stages -- PLUS a `mature_content` GATING FLAG that is OFF by default and only calls EMPTY author hooks. It contains NO explicit content; an author who adds mature content owns their own assets, an age-verification gate, and platform compliance (the same clean-room approach as dating-sim / adult-management / adult-trainer / adult-puzzle-dating). SandboxEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG lays out the NPC schedules, so a whole run replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the state). Real systems, no stubs: an open MAP of 7 locations (home / work / gym / bar / park / cafe / shop) with FREE travel (repositioning) and a BLOCK-based clock (6 time blocks per day across 21 days, with day-of-week); player NEEDS (energy / money / fitness / mood) driven by context ACTIONS (work earns + drains, train raises fitness, sleep recovers + advances the day, relax lifts mood, buy stocks a gift, wait passes a block); NPCs on SEEDED WEEKLY SCHEDULES (each NPC is at a specific public location each day-of-week/block, so you must find them); multi-NPC RELATIONSHIPS with 5 STAGES (Stranger->Acquaintance->Friend->Close->Partner) advanced by socializing (mood + per-NPC affinity scaled) and gifting; and an open-ended PROGRESS score (no hard win). A deterministic RESIDENT auto-seat manages needs (sleep when exhausted, work when broke, train once a day, stock a gift when flush) and deepens the best relationship by travelling to where that NPC is THIS block and socializing/gifting; auto_play_to_end plays a whole run (validated: it lifts all four NPCs to Close+ with a Partner-stage relationship). The gated milestone (a Partner-stage relationship) calls an INTENTIONALLY EMPTY _mature_hook -- no content ships. save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager drives travel + actions; sandbox_view.gd renders the location map (with who is where), the day/block clock, the needs bars, the NPCs present + their stages, the context actions, and an OFF-by-default mature-content gate toggle with a SYSTEMS-ONLY notice -- with an autoplay toggle + restart.",
+   "status": "validated",
+   "skeleton": "genres/adult-sandbox/skeleton",
+   "doc": "genres/adult-sandbox/TEMPLATE.md",
+   "vendoredAddons": [],
+   "primitives": [
+    {
+     "skill": "input-handling",
+     "params": {},
+     "note": "click-a-location-to-travel + context action + socialize/gift buttons + the mature-gate toggle are in sandbox_view.gd; re-run for a walkable 2D map (WASD between rooms), a phone/relationship menu, or an inventory screen"
+    },
+    {
+     "skill": "world-layout",
+     "params": {},
+     "note": "the sandbox tuning (the location list, the block/day clock, the NPC roster + schedule generation, relationship stage thresholds + gain formula, the needs economy) lives in SandboxEngine consts/methods -- design work is the town map, NPC personalities + storylets, and quests, not scene nodes; the mature_content gate + _mature_hook are INTENTIONALLY EMPTY (systems only)"
+    },
+    {
+     "skill": "ui-theme",
+     "params": {},
+     "note": "the map buttons, needs bars, NPC list and action buttons are drawn in code -- theme them (a town map/minimap, NPC portraits, a clock/calendar, relationship hearts) from the game palette"
+    },
+    {
+     "skill": "ui-animation",
+     "params": {},
+     "note": "the engine exposes location, time, needs and per-NPC relationship deltas -- drive a travel transition, a needs-bar pulse, an NPC-present highlight, and a relationship stage-up flourish"
+    },
+    {
+     "skill": "game-feel",
+     "params": {},
+     "note": "hook travel (a footstep/whoosh), work/train (a sting), a socialize (a warm chime), a relationship stage-up (a heart + fanfare), sleep (a day-fade), and a low-energy warning"
+    }
+   ],
+   "systems": [
+    "godotsmith:templates/menu_system",
+    "godotsmith:templates/save_system",
+    "godotsmith:templates/settings_system"
+   ],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "A town map / location set (home / work / gym / bar / park / cafe / shop) + a travel transition",
+    "NPC portraits + a relationship panel with 5 stage markers + hearts",
+    "A clock/calendar widget (time-of-day blocks + day-of-week) + needs bars (energy/money/fitness/mood)",
+    "HUD chrome: who-is-where map badges, an action bar, a progress readout",
+    "SFX: travel whoosh, work/train sting, socialize chime, stage-up fanfare, sleep day-fade, low-energy warning",
+    "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
+   ]
   }
  ]
 }
