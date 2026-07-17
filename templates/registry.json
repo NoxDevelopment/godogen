@@ -2412,6 +2412,61 @@
         "Bitmap/pixel font for the HUD + message log (readable at small sizes)",
         "SFX: footstep, bump-attack hit, monster death, gold pickup, potion glug, stairs descend, level-up chime, death sting"
       ]
+    },
+    {
+      "id": "rts",
+      "name": "Real-Time Strategy (StarCraft/AoE-lite base-build + army, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A StarCraft/AoE-lineage REAL-TIME STRATEGY: mine minerals with workers, spend them to train more workers + a barracks + soldiers, and raze the enemy town hall before yours falls. OUR OWN engine, generic content (no trademarks). The trick that keeps an RTS in the NoxDev pure-engine pattern: RtsEngine runs as a DETERMINISTIC FIXED-TIMESTEP LOCKSTEP sim -- play advances in discrete ticks, commands are queued and applied in a fixed sorted order, and a single private RNG drives world-gen + tie-breaks + AI, so a whole match replays BYTE-IDENTICALLY from a seed and drives headlessly (no Godot-node or Time dependency in the engine). Real systems: two symmetric bases (town hall + starting workers + a 4-patch mineral field, with seeded opening jitter); a worker economy (walk to patch -> mine a load over MINE_TICKS -> haul CARRY back to a town hall -> deposit, auto-resuming the nearest live patch); production queues (town hall trains workers, barracks trains soldiers, one at a time, paid on queue); greedy tile-stepping movement that slides around buildings; combat with vision-based target acquisition (nearest enemy unit, else nearest enemy building), range + attack cooldown; construction (a worker walks out, lays a barracks, and builds it over BUILD_BARRACKS_TICKS); victory when a side's town hall is razed. A weighted-heuristic MACRO AI (ai_take_turn) can drive EITHER side -- keep workers mining, train up to a worker target, tech to a barracks, pump soldiers, then attack-move the whole army at the enemy hall; auto_step/auto_play_to_end drive BOTH sides for a full self-playing match (validated: a seeded match ends at tick 1788 with a real winner -- barracks built, army fielded, hall razed -- not a stalled cap). checksum() is an FNV-1a fold over the entire state (minerals + every building + every unit + every patch) for cross-process determinism proof. save_data/load_data snapshot the whole match incl. RNG state (NoxDev ABI). GameManager autoload steps the sim in _physics_process for real-time feel; rts_view.gd renders the board in code -- mineral patches, team-coloured buildings + units, HP bars, a live HUD -- with left-drag box selection, right-click context commands (gather/attack/move), and hotkeys to train/build, pause, hand your side to the AI, change sim speed, and restart.",
+      "status": "validated",
+      "skeleton": "genres/rts/skeleton",
+      "doc": "genres/rts/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the RTS control set (left-drag box select, right-click context command, Q/E train, B build, Space pause, F auto, [ ] speed, R restart) is baked into rts_view.gd; re-run only to add rebinding or edge-scroll/camera"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the map (two bases + mineral fields + seeded jitter) is generated in RtsEngine._build_world -- layout work means tuning base positions/patch counts or adding terrain-blocked tiles, not hand-placing nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the HUD (minerals/workers/army per side) + selection ring + HP bars are drawn in code -- theme them (resource icons, command-card panel, minimap) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the draw_rect/draw_circle units + buildings for real sprites (worker/soldier via character-sprite, town-hall/barracks via building art, mineral crystals via icon recipes); the engine exposes units/buildings/patches for a sprite layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook selection + command acks (blips), attack hits (muzzle/impact + shake), build-complete and unit-ready chimes, and a victory/defeat sting off game_over"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Worker + soldier sprites per team (2 tint sets; ~16x16 or billboard) -- replaces the team-coloured draw_circle/draw_rect units",
+        "Town hall + barracks building art per team (with an under-construction variant) -- replaces the draw_rect buildings",
+        "Mineral crystal / resource-node art (depletion states) -- replaces the cyan draw_rect patches",
+        "Terrain tileset (grass/dirt/cliff) for the board -- replaces the flat background rect",
+        "HUD chrome: resource bar with icons, a command-card panel, selection reticle, minimap frame",
+        "SFX: mine tick, deposit chime, unit-ready + build-complete stingers, attack hit, unit death, victory/defeat fanfare"
+      ]
     }
   ]
 }
