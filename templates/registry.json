@@ -3402,6 +3402,61 @@
         "SFX: swallow pop (pitch rises with size), rival gulp, size-milestone chime, match-end fanfare",
         "Optional: a virtual joystick for mobile + a skin/cosmetic set"
       ]
+    },
+    {
+      "id": "endless-runner",
+      "name": "Endless Runner (Subway Surfers / Temple Run 3-lane dodge, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Subway-Surfers / Temple-Run-lineage ENDLESS RUNNER run as a DETERMINISTIC FIXED-TIMESTEP sim: you auto-run forward down 3 LANES, SWITCH lanes / JUMP / SLIDE to dodge seeded obstacles, grab coins, and survive as the speed ramps up. OUR OWN engine, generic content (no trademarks). RunnerEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG lays out the obstacles + coins ahead, so a whole run replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over quantized state). Real systems: an auto-advancing runner whose SPEED ramps with distance; a rolling procedural TRACK spawned ahead (rows of obstacles that TIGHTEN with distance but NEVER block all 3 lanes, guaranteeing a fair path) with three obstacle kinds -- BLOCK (must not share its lane), HURDLE (must be jumping), DUCK (must be sliding) -- plus coin lines on the free lane; lane-switch + timed JUMP + timed SLIDE actions with posture windows; collision that ends the run (recording what you crashed on) unless you cleared the obstacle correctly; a distance+coins SCORE; and a survive-the-distance-cap win. A deterministic DODGE auto-seat routes to the nearest fully-clear lane, jumps hurdles, slides ducks, and drifts for coins when safe; auto_step/auto_play_to_end run a whole run (validated: the seat runs 2029m collecting 38 coins for score 2409 before the ramping speed finally beats a slide). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager feeds the player's per-tick intent; runner_view.gd renders the 3 lanes, the player with jump/slide posture, scrolling obstacles (colour-coded by kind) + coins, and a distance/coins/score/speed HUD -- A/D lanes, W/Up/Space jump, S/Down slide, with an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/endless-runner/skeleton",
+      "doc": "genres/endless-runner/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the runner controls (A/D lanes, W/Up/Space jump, S/Down slide, T autoplay, R restart) are in runner_view.gd; re-run for swipe controls (the mobile default), a hoverboard/powerup, or gamepad"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the track (spawn cadence + obstacle mix + the never-block-all-lanes fairness rule + coin lines) is in RunnerEngine (_spawn_row/_spawn_ahead) -- design work is the difficulty curve + set-piece patterns + biomes, not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the lanes, player posture, obstacles + coins and the distance/coins HUD are drawn in code -- theme them (a runner character with run/jump/slide anims, themed obstacles, a coin counter, a mission bar) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the rects for a real 2.5D/side runner: a character sprite (run/jump/slide) + themed obstacles + coins; the engine exposes lane/distance/posture/obstacles for a sprite + parallax layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook lane-switch (a quick dash + lean), jump/slide (a hop/whoosh + dust), coin pickup (a ping + sparkle + combo), a near-miss slow-mo, a speed-up whoosh, and a crash tumble + score tally"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "A runner character sprite/skeleton with run / jump / slide / stumble animations",
+        "Themed obstacles for block / hurdle / duck (walls, low barriers, high beams) + coins + powerups",
+        "A scrolling track/biome set with parallax background layers + a finish/crash camera",
+        "HUD chrome: distance, coins, score, a mission/objective bar, a boost meter",
+        "SFX: footstep loop, lane-swish, jump/slide whoosh, coin ping + combo, near-miss stinger, crash tumble",
+        "Optional: a hoverboard/powerup set + a character/skin roster"
+      ]
     }
   ]
 }
