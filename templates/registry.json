@@ -3732,6 +3732,61 @@
     "SFX: training sting, overtrain groan, outing chime, event pop, per-ending fanfare, Burnout cue",
     "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
    ]
+  },
+  {
+   "id": "adult-puzzle-dating",
+   "name": "Adult Puzzle Dating (HuniePop-style match-3 to dating meter — SYSTEMS ONLY, 2D)",
+   "engine": "godot",
+   "engineVersion": "4.6.1-stable",
+   "description": "A HuniePop-style MATCH-3 that FEEDS a dating meter, run as a DETERMINISTIC sim. IMPORTANT: this template ships the PUZZLE + DATING SYSTEMS ONLY -- a real match-3 board whose cleared tokens convert to AFFECTION for the current date (weighted by that character's PREFERENCES), a gift economy, and route completion -- PLUS a `mature_content` GATING FLAG that is OFF by default and only calls EMPTY author hooks. It contains NO explicit content; an author who adds mature content owns their own assets, an age-verification gate, and platform compliance (the same clean-room approach as dating-sim / adult-management / adult-trainer). PuzzleDateEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG fills + refills the board, so a whole date replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the state). Real systems, no stubs: a full MATCH-3 core (no-initial-match fill, adjacent-swap legality that requires a match, run>=3 detection horizontally + vertically, clear + gravity + RNG refill, and CASCADES); an AFFECTION conversion where each cleared token adds BASE * the current character's PREFERENCE weight for that token type * the character's MOOD multiplier; a CURRENCY earned from clears; a GIFT economy (buy gifts that add affection + raise the mood multiplier); multiple dateable characters each with a fixed preference vector; and ROUTE COMPLETION (reach an affection threshold to finish a character, then advance to the next -- finishing all routes wins). A deterministic PLAYER auto-seat enumerates every legal swap and picks the one with the best preference-weighted immediate clear, buying the best affordable gift when flush; auto_play_to_end plays a whole run (validated: it completes all 3 character routes in 15 turns of a 40-turn budget). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager drives token swaps + gift buys; puzzledate_view.gd renders the token board, the current date's affection bar + preference legend, the gift buttons, a currency/turn HUD, a route roster, and an OFF-by-default mature-content gate toggle with a SYSTEMS-ONLY notice -- with an autoplay toggle + restart.",
+   "status": "validated",
+   "skeleton": "genres/adult-puzzle-dating/skeleton",
+   "doc": "genres/adult-puzzle-dating/TEMPLATE.md",
+   "vendoredAddons": [],
+   "primitives": [
+    {
+     "skill": "input-handling",
+     "params": {},
+     "note": "click-two-adjacent-tokens-to-swap + gift buttons + the mature-gate toggle are in puzzledate_view.gd; re-run for drag-swap, a valid-move hinter, a match-preview highlight, or a token-type filter"
+    },
+    {
+     "skill": "world-layout",
+     "params": {},
+     "note": "the coupling tuning (grid/type count, the per-character preference vectors, the affection threshold, the gift table, mood multipliers) lives in PuzzleDateEngine consts -- design work is the character roster + preference design, special tokens/power-ups, and date structure, not scene nodes; the mature_content gate + _mature_hook are INTENTIONALLY EMPTY (systems only)"
+    },
+    {
+     "skill": "ui-theme",
+     "params": {},
+     "note": "the token board, affection bar, preference legend and gift buttons are drawn in code -- theme them (token art per affection type, a character portrait that reacts to affection/mood, a date backdrop, a gift shop) from the game palette"
+    },
+    {
+     "skill": "ui-animation",
+     "params": {},
+     "note": "the engine exposes each move's cleared count + affection gain + cascades -- drive a swap tween, a token-clear burst, a cascade chain, an affection-bar fill, and a route-complete flourish"
+    },
+    {
+     "skill": "game-feel",
+     "params": {},
+     "note": "hook a swap (a click), a match clear (a type-keyed pop), a cascade (a rising chain pitch), a preferred-token bonus (a sparkle + affection ping), a gift (a warm chime), and a route-complete fanfare"
+    }
+   ],
+   "systems": [
+    "godotsmith:templates/menu_system",
+    "godotsmith:templates/save_system",
+    "godotsmith:templates/settings_system"
+   ],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "Token art per affection type (passion / talent / charm / romance / joy) + a clear/burst frame",
+    "A character portrait set that reacts to affection / mood + a date backdrop per character",
+    "An affection bar + preference legend + a gift-shop panel",
+    "HUD chrome: turn counter, munny, a route roster with completion ticks",
+    "SFX: swap click, type-keyed match pop, cascade chain, preferred-token sparkle, gift chime, route fanfare",
+    "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
+   ]
   }
  ]
 }
