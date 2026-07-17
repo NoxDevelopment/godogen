@@ -3567,6 +3567,61 @@
     "SFX: key click, row-flip reveal, solve chime, fail thud, streak bump, marathon fanfare",
     "A real dictionary file (answers + valid guesses) to replace the embedded starter list"
    ]
+  },
+  {
+   "id": "solitaire",
+   "name": "Solitaire (Klondike patience, draw-1, 2D)",
+   "engine": "godot",
+   "engineVersion": "4.6.1-stable",
+   "description": "A Klondike SOLITAIRE (patience) game run as a DETERMINISTIC sim: a seeded 52-card shuffle deals the classic 7-column tableau (1..7 cards, only the top of each face-up), a 24-card stock, a waste pile, and 4 foundations (build A->K by suit). You draw from stock, build alternating-colour descending runs across the tableau, uncover face-down cards, and race all 52 cards home to the foundations. OUR OWN engine (cards are plain ints 0..51: suit=card/13, rank=card%13). SolitaireEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); the whole game is integer card state driven by one seeded RNG, so it replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the state). Real systems, no stubs: a Fisher-Yates seeded deal; draw-1 stock with bounded recycling/redeals; correct tableau legality (empty accepts only a King; else opposite-colour + rank-1); MULTI-CARD RUN moves (a maximal alternating descending face-up run detected via run_start, moved as a unit); auto-flip of an exposed face-down card; foundation build-up by suit; and win/stuck detection. A deterministic GREEDY SOLVER auto-seat plays real games with sensible priorities -- SAFE foundation auto-play (a card is safe home only when both opposite-colour foundations are >= rank-1), uncovering tableau moves, waste plays, King-to-empty, a draw/recycle loop, and a last-resort forced-home to break stalls -- with stall detection so it always terminates. Over a 400-seed sweep the greedy seat solves ~5.5% outright and makes real progress on the rest; SEED 10 is SOLVED end-to-end (52/52 home in 123 moves, 1 redeal), which the probe asserts as proof the whole move set works. save_data/load_data snapshot the whole game incl. RNG state (NoxDev ABI). GameManager drives interactive moves (draw / select-then-place / send-home); solitaire_view.gd renders foundations, stock, waste and the 7 columns with face-down/up cards and click-to-move -- click stock to draw, click a card then a column to move, right-click to send home, H for one solver move, with an autoplay toggle + restart.",
+   "status": "validated",
+   "skeleton": "genres/solitaire/skeleton",
+   "doc": "genres/solitaire/TEMPLATE.md",
+   "vendoredAddons": [],
+   "primitives": [
+    {
+     "skill": "input-handling",
+     "params": {},
+     "note": "draw / click-to-select / click-to-place / right-click-home / H hint / T autoplay / R restart are in solitaire_view.gd; re-run for drag-and-drop, double-click-to-foundation, an auto-complete button, and undo"
+    },
+    {
+     "skill": "world-layout",
+     "params": {},
+     "note": "the variant rules (draw-1 vs draw-3, redeal cap, safe-autoplay policy) are SolitaireEngine consts/methods -- design work is other patience variants (Spider, FreeCell, Pyramid), daily deals, and a scoring/timer mode, not scene nodes"
+    },
+    {
+     "skill": "ui-theme",
+     "params": {},
+     "note": "the cards (rank+suit glyphs), foundations, stock/waste and the felt are drawn in code -- theme them (a real card face/back set, suit colours, a green-felt table, a foundation glow) from the game palette"
+    },
+    {
+     "skill": "ui-animation",
+     "params": {},
+     "note": "the engine exposes every move -- drive a card-slide tween on moves, a flip on uncover, a cascade/fireworks on win, and a snap-back on an illegal drop"
+    },
+    {
+     "skill": "game-feel",
+     "params": {},
+     "note": "hook the deal (a riffle), a card place (a soft snap), a foundation drop (a rising pitch by rank), an uncover flip (a tick), a redeal (a shuffle), and a win cascade fanfare"
+    }
+   ],
+   "systems": [
+    "godotsmith:templates/menu_system",
+    "godotsmith:templates/save_system",
+    "godotsmith:templates/settings_system"
+   ],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "A full 52-card face set (rank+suit) + a card back + foundation suit markers",
+    "A green-felt table + pile outlines (stock / waste / foundations / tableau)",
+    "Card-move + flip + win-cascade animations (slide tweens, a fireworks/cascade)",
+    "HUD chrome: foundations counter, moves/time/score, a hint + auto-complete button, undo",
+    "SFX: deal riffle, card snap, foundation ping (rank-pitched), flip tick, redeal shuffle, win fanfare",
+    "Optional: additional patience variants (Spider / FreeCell / Pyramid) + a daily-deal calendar"
+   ]
   }
  ]
 }
