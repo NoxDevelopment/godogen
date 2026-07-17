@@ -2852,6 +2852,61 @@
         "SFX: move/rotate blip, soft/hard drop, per-count line clear (single..tetris), level-up, game over",
         "Optional: a soundtrack that ramps tempo with level"
       ]
+    },
+    {
+      "id": "idle-clicker",
+      "name": "Idle Clicker (Cookie Clicker-lite incremental with generators + prestige, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Cookie-Clicker-lineage INCREMENTAL / IDLE game run as a DETERMINISTIC FIXED-TIMESTEP sim at 60 ticks/sec: tap to earn currency, spend it on GENERATORS (each with a x1.15 escalating cost + passive output) and one-off UPGRADES (click + per-building x2 multipliers), and chase seeded GOLDEN bonuses on the way to a prestige-style ASCENSION milestone. OUR OWN engine, generic content (no trademarks). IdleEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); the ONLY randomness is the seeded golden-bonus schedule, so a whole run replays BYTE-IDENTICALLY from a seed. Real systems: 7 generators (Clicker..Lab) with compounding x1.15 costs + per-building output; 8 one-off UPGRADES gated by ownership (click-power x2s + per-generator x2s + an all-generator x2); a manual click whose power scales with upgrades; GOLDEN bonuses that spawn on a seeded 15-40s cadence and, if tapped in their 5s window, grant either a LUMP (90s of current output, with an early-game floor) or a 7x FRENZY for 7s (both click + passive); and an ASCENSION goal (total-earned milestone) as the prestige seam. Big numbers are handled in doubles and the FNV-1a checksum folds STRING-FORMATTED floats so it never overflows and stays cross-process byte-identical. A greedy auto-seat clicks, grabs every golden, and buys the best value (cheapest available upgrade, else the best cps-per-cost generator); auto_step/auto_play_ticks run a whole idle session (validated: in 12 sim-minutes the seat bakes 1.41M total at 1067/s across 142 generators + 5 upgrades and reaches ascension). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager steps the sim in _physics_process (60Hz) applying the player's captured clicks/buys/taps; idle_view.gd renders the big clickable cookie (frenzy-tinted), the counter + cps, a generator shop, the available upgrades, an ascension progress bar, and the golden bonus when it appears -- with abbreviated K/M/B/T number formatting, an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/idle-clicker/skeleton",
+      "doc": "genres/idle-clicker/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the idle controls (click the cookie, click a shop row to buy, click the golden bonus, T autoplay, R restart) are captured as events + applied on the next sim tick in idle_view.gd; re-run for keyboard shortcuts, buy-x10, or a mobile tap layout"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "THE genre's face — the big cookie, the counter, the generator shop rows, the upgrade chips, the golden bonus and the ascension bar are all code-drawn; theme them (juicy button, cps ticker, tooltips, milestone toasts) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the drawn cookie + shop rows for real art (a clickable hero object, generator icons, upgrade badges, a golden-cookie sprite); the engine exposes cookies/cps/counts/upgrades for a rich UI"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook click (a squash + a floating +N), purchase (a chime + a shelf pop), golden spawn (a shimmer + a ping), frenzy (a screen tint + faster ticker), and ascension-ready (a milestone fanfare)"
+        },
+        {
+          "skill": "narrative-content",
+          "params": {},
+          "note": "idle games thrive on flavour: name + describe the 7 generators + the upgrades + ascension in GENERATORS/UPGRADES, and add lore/news-ticker lines; an AI writer can theme the whole tree to any setting"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "A big clickable hero object (the 'cookie') with a click squash + frenzy variant",
+        "Generator icons for the 7 tiers + upgrade badges + a golden-bonus sprite (lump vs frenzy)",
+        "UI chrome: counter + cps ticker, shop rows, upgrade chips, an ascension/prestige bar, floating +N numbers",
+        "A milestone/ascension fanfare screen + a news-ticker strip",
+        "SFX: click, purchase chime, golden spawn ping, frenzy start/stop, ascension fanfare",
+        "Number-abbreviation font that reads at K/M/B/T scale"
+      ]
     }
   ]
 }
