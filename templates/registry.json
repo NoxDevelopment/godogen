@@ -2467,6 +2467,61 @@
         "HUD chrome: resource bar with icons, a command-card panel, selection reticle, minimap frame",
         "SFX: mine tick, deposit chime, unit-ready + build-complete stingers, attack hit, unit death, victory/defeat fanfare"
       ]
+    },
+    {
+      "id": "tbs-4x",
+      "name": "Turn-Based 4X (Civilization-lite eXplore/eXpand/eXploit/eXterminate, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Civilization-lineage TURN-BASED 4X STRATEGY: eXplore a seeded map through fog of war, eXpand by founding cities with settlers, eXploit tiles for food/production/science/gold, and eXterminate rivals by capturing their cities. OUR OWN engine, generic content (no trademarks). TbsEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency) so a whole game replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly. Real systems: seeded map generation (smoothed random elevation + moisture -> ocean/plains/grass/forest/hill/mountain, edge-biased so continents form inland); per-terrain yields ([food,prod,gold]) + terrain defensive multipliers; two civs (0=player, 1=AI) alternating turns with per-civ FOG OF WAR (seen[] grids revealed by units/cities); CITIES that work their pop-best surrounding tiles each turn -> food drives GROWTH (accumulate to a pop-scaled cost), production drives a BUILD QUEUE, science accumulates civ-wide; a 4-step TECH TREE (bronze_working->spearman, pottery->granary +food, writing->library +science, mathematics->walls +city HP/def) researched in order; UNITS (settler founds cities with min-spacing, warrior, tech-gated spearman) with movement points + greedy 8-dir stepping; HP-BASED COMBAT that is fully DETERMINISTIC (no RNG) using effective-strength ratios with terrain defense, plus a melee advance onto a cleared tile; CITY SIEGE + CAPTURE (garrison defends, else innate city defense trades HP; at 0 HP an adjacent melee unit flips ownership, halves pop, and garrisons); DOMINATION VICTORY (a civ with no cities and no settlers is eliminated) with a score fallback at the turn cap. A weighted-heuristic MACRO AI (ai_take_turn) drives EITHER civ -- research the next tech, build settlers up to a city target then military, expand settlers to the nearest well-spaced spot, and hunt+attack the nearest enemy unit/city -- and auto_step/auto_play_to_end drive BOTH civs for a full self-playing game (validated: a seeded AI-vs-AI game ends at turn 60 with a real winner after expanding to 7 cities and researching all 4 techs, not a cap stall). save_data/load_data snapshot the whole game incl. RNG + fog (NoxDev ABI). GameManager autoload runs the player's turn then hands the AI its turn; tbs_view.gd renders the fogged map, team-coloured cities (with pop + HP) and units in code, with click-select/move/attack, Enter to end turn, F to found, 1-6 to set a city's build, Tab to cycle units, and an auto-play toggle.",
+      "status": "validated",
+      "skeleton": "genres/tbs-4x/skeleton",
+      "doc": "genres/tbs-4x/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the 4X control set (click select/move, click-adjacent-enemy attack, Enter end-turn, F found, 1-6 city build, Tab cycle, A auto, R restart) is baked into tbs_view.gd; re-run only to add camera pan/zoom or a command palette"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the map is generated in TbsEngine._gen_map (smoothed elevation+moisture -> terrain) with seeded starts -- layout work means tuning the generator (thresholds, continents, resource specials) not hand-placing tiles"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the HUD (turn/science/gold/tech), city pop labels, HP bars and fog are drawn in code -- theme them (terrain tiles, city banners, a tech panel, a minimap) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the draw_rect terrain + team-tinted unit/city glyphs for a real tileset + unit sprites (settler/warrior/spearman via character-sprite, city art per era, terrain via tileset recipes); the engine exposes terrain/units/cities for a sprite layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook combat (impact + shake), city-captured + tech-unlocked stingers, a growth chime, and an end-turn whoosh; the message log already narrates founds/captures/research"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Terrain tileset for the 6 types (ocean/plains/grass/forest/hill/mountain) with a fog/unexplored variant -- replaces the flat draw_rect terrain",
+        "Unit sprites per team for settler/warrior/spearman (2 tint sets) -- replaces the team-coloured circle/square glyphs",
+        "City art per team (with a pop badge + captured/damaged states) -- replaces the team draw_rect cities",
+        "HUD chrome: top resource/tech bar, a city panel with a build list, a tech-tree panel, a minimap frame",
+        "Tech-tree icons for bronze working / pottery / writing / mathematics and their buildings (granary/library/walls)",
+        "SFX: found-city + city-captured stingers, unit attack/death, tech-unlocked chime, growth pop, end-turn whoosh, victory/defeat fanfare"
+      ]
     }
   ]
 }
