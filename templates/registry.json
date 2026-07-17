@@ -2522,6 +2522,61 @@
         "Tech-tree icons for bronze working / pottery / writing / mathematics and their buildings (granary/library/walls)",
         "SFX: found-city + city-captured stingers, unit attack/death, tech-unlocked chime, growth pop, end-turn whoosh, victory/defeat fanfare"
       ]
+    },
+    {
+      "id": "tactics-srpg",
+      "name": "Tactics SRPG (Fire Emblem/XCOM grid tactics with weapon triangle, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Fire-Emblem / XCOM-lineage TACTICS SRPG: two armies fight on a grid in alternating TEAM PHASES -- each unit MOVES (Dijkstra move-range over per-terrain cost) then ACTS once (attack / heal / wait). OUR OWN engine, generic content (no trademarks). SrpgEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency) whose single private RNG seeds the map AND every hit/crit roll, so a whole battle -- misses and crits included -- replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly. It is a REAL SRPG combat kernel, not a sketch: 5 classes (soldier/sword, fighter/axe, knight/lance, archer/bow rng-2, healer/staff) with distinct hp/atk/def/spd/move/range/hit/crit; a WEAPON TRIANGLE (sword>axe>lance>sword; bow+staff neutral) shifting both hit% and damage; hit% from base accuracy + speed + terrain AVOID + triangle; CRITS (3x) from a speed-scaled chance; COUNTERATTACKS when the defender survives and the attacker is in its range; DOUBLE ATTACKS on a >=4 speed lead; terrain that adds avoid + defense + fort HEALING; and dedicated HEALERS that mend the most-wounded ally in range. Movement is a true Dijkstra reachability over terrain move-cost, blocked by enemies, ending only on empty tiles. Win = wipe out the enemy's combat units (a lone healer can't win); a count fallback resolves the turn cap. A weighted-heuristic macro AI (ai_take_phase) drives EITHER team -- for each unit it finds the best (stand-tile, target) pair (favouring kills, damage, accuracy, and hitting healers), advances when nothing is in reach, and lets healers patch the wounded -- and auto_step/auto_play_to_end drive BOTH teams for a full self-playing battle (validated: a seeded 5-v-5 battle ends round 20 with a real winner, 10 units down to 1). save_data/load_data snapshot the whole battle incl. RNG state (NoxDev ABI). GameManager runs the player phase then hands the AI its phase; srpg_view.gd renders terrain + units + HP + the selected unit's move-range and attackable enemies in code, with a classic 2-click flow (select -> move onto a lit tile -> click an in-range enemy to attack, or an ally to heal), plus wait / end-phase / auto / restart.",
+      "status": "validated",
+      "skeleton": "genres/tactics-srpg/skeleton",
+      "doc": "genres/tactics-srpg/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the SRPG control set (click select, click a lit tile to move, click a red-ring enemy to attack / ally to heal, W wait, Enter end-phase, A auto, R restart) is baked into srpg_view.gd; re-run only for cursor/gamepad control or an action menu"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the battlefield is generated in SrpgEngine._gen_map (seeded terrain mix + guaranteed forts) with mirrored deployment -- layout work means authoring maps/terrain weights or hand-placing units, not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the HUD (round/phase/counts), unit stat line, HP bars, move-range overlay and target rings are drawn in code -- theme them (terrain tiles, class portraits, a combat-forecast panel) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the class-letter glyphs for real 32x32 unit sprites (soldier/fighter/knight/archer/healer per team via character-sprite) + a terrain tileset; the engine exposes units/terrain/reachable for a sprite + animation layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook the combat log (hit/miss/CRIT/defeat) for hit flashes, a crit zoom, a miss whiff, and a defeat fade; the exchange already yields per-strike events"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Unit sprites per team for the 5 classes (soldier/fighter/knight/archer/healer; ~32x32, idle+attack) -- replaces the class-letter glyphs",
+        "Terrain tileset for plain/forest/hill/fort/wall (with the fort + forest avoid read clearly) -- replaces the flat draw_rect terrain",
+        "Move-range + attack-range tile overlays (blue/red) and a cursor -- polish over the code-drawn overlays",
+        "A combat-forecast panel (attacker vs defender: hit%, dmg, crit%, doubling arrows) + class portraits",
+        "Weapon-triangle iconography (sword/axe/lance/bow/staff) for the HUD",
+        "SFX: sword/axe/lance/bow hit, miss whiff, crit sting, heal chime, unit-defeated fall, phase-change flourish, victory/defeat fanfare"
+      ]
     }
   ]
 }
