@@ -2577,6 +2577,61 @@
         "Weapon-triangle iconography (sword/axe/lance/bow/staff) for the HUD",
         "SFX: sword/axe/lance/bow hit, miss whiff, crit sting, heal chime, unit-defeated fall, phase-change flourish, victory/defeat fanfare"
       ]
+    },
+    {
+      "id": "crpg-party",
+      "name": "Party CRPG (Baldur's-Gate-lite D&D-5e-lite adventure + initiative combat, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Baldur's-Gate / Gold-Box-lineage PARTY CRPG on a D&D-5e-LITE ruleset: a 4-hero party (fighter/wizard/cleric/rogue) runs an ADVENTURE PATH of encounters -- initiative-order combats, skill-check EVENTS, and rests -- leveling up until it beats the boss or is wiped. OUR OWN engine, generic content (no trademarks). CrpgEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency) whose single private RNG seeds the party rolls, the encounter path, AND every d20 attack/save/damage roll, so a whole adventure -- crits, misses and all -- replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly. It is a REAL d20 kernel, not a sketch: six ABILITY SCORES per hero with 5e modifiers + proficiency; class profiles (hit dice, armor, casting stat, extra attacks) -> HP = HD + CON + level, AC = 10 + DEX + armor; INITIATIVE (d20 + DEX) turn order; d20 ATTACK ROLLS vs AC with NAT-20 crits (double damage dice), STR/DEX damage mods, rogue SNEAK ATTACK, and fighter EXTRA ATTACK at level 5; SPELLS off limited slots -- wizard magic-missile (auto-hit) + fireball (an AoE DEX save for half), cleric cure-wounds + bless (party +1 to-hit) -- with a SAVE DC of 8+prof+casting-mod; SAVING THROWS; XP + LEVEL-UP (more HP, more slots, extra attack) awarded on victory. The ADVENTURE PATH is a seeded mix of combat / skill-check event / rest nodes ending in a boss dragon: EVENTS are real d20 ability checks (STR/DEX/INT/WIS/CHA vs a DC) resolved by the best-suited hero, branching to a reward (gold/heal/xp/slot) or a penalty (trap/curse/ambush -- an ambush even injects a surprise fight); RESTS restore HP + slots. Win = clear the boss; lose = a TPK. A weighted-heuristic party+enemy AI drives combat (clerics heal the badly hurt then bless, wizards fireball a crowd else magic-missile, martials focus the lowest-HP foe; enemies focus the weakest hero) and auto_step/auto_play_to_end run the WHOLE adventure headlessly -- balanced to a real challenge (~30%% auto-win, reliably reaching the boss; validated: seed 20260720 clears all 9 nodes to VICTORY at party level 4). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager runs the party's combat turns while the engine AI resolves enemy turns; crpg_view.gd renders party + enemy stat blocks (HP, level, slots, the active initiative actor), the combat log and encounter progress in code, with click-an-enemy-to-attack (wizard auto-picks fireball vs a crowd) plus H heal / F fireball / B bless / D defend / SPACE resolve-event / A full-auto / R restart.",
+      "status": "validated",
+      "skeleton": "genres/crpg-party/skeleton",
+      "doc": "genres/crpg-party/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the CRPG control set (click enemy = attack, H heal, F fireball, B bless, D defend, SPACE resolve event, A auto, R restart) is baked into crpg_view.gd; re-run only for an action-bar UI or target-cycling"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the party + enemy stat blocks, HP bars, initiative highlight, event prompt and combat log are drawn in code -- theme them (portrait frames, a proper action bar, a spell menu, damage floaters) from the game palette"
+        },
+        {
+          "skill": "narrative-content",
+          "params": {},
+          "note": "the adventure path (combat/event/rest nodes) + skill-check EVENTS live as data in CrpgEngine (EVENTS, _gen_path) -- author encounters, branching event text, and outcomes here; an AI-DM can emit new nodes"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the code-drawn stat blocks for real party portraits + enemy art (fighter/wizard/cleric/rogue + goblin/orc/ogre/dragon via character-sprite/creature-art) and a battle backdrop; the engine exposes party/enemies for a sprite layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook the combat log (hit/CRIT/miss/heal/fireball/level-up/defeat) for damage floaters, a crit flash, a heal glow, a fireball burst, a level-up chime, and victory/defeat stings"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Party portraits for the 4 classes (fighter/wizard/cleric/rogue) with hurt/downed states -- replaces the code-drawn party blocks",
+        "Enemy art for goblin/orc/ogre + a boss dragon (idle + attack) -- replaces the enemy stat blocks",
+        "A battle backdrop + adventure-map art for the encounter path (combat/event/rest/boss nodes)",
+        "UI chrome: initiative tracker, an action bar (attack/spells/defend), a spell menu with slot pips, damage/heal floaters",
+        "Class + spell iconography (sword/bow/staff/spellbook; magic-missile/fireball/cure/bless)",
+        "SFX: sword/bow/mace hit, spell cast (missile/fireball/cure/bless), miss, crit sting, level-up fanfare, party-member down, victory/defeat music"
+      ]
     }
   ]
 }
