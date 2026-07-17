@@ -2687,6 +2687,61 @@
         "Hit/guard sparks + hitstop-friendly impact VFX",
         "SFX: light/heavy punch + kick whiffs & impacts, block clink, projectile fire/hit, jump/land, round announcer + KO calls, victory theme"
       ]
+    },
+    {
+      "id": "twin-stick-shooter",
+      "name": "Twin-Stick Shooter (Enter the Gungeon/Nuclear Throne-lite arena survival, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "An Enter-the-Gungeon / Nuclear-Throne-lineage TWIN-STICK SHOOTER run as a DETERMINISTIC FIXED-TIMESTEP sim at 60 ticks/sec: MOVE with one stick and AIM/FIRE with the other while waves of enemies pour in from the edges. OUR OWN engine, generic content (no trademarks). ShooterEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency) whose single RNG seeds the spawns + enemy jitter and is otherwise pure, so a whole run replays BYTE-IDENTICALLY from a seed (FNV-1a checksum, position-quantized) and drives headlessly. Real systems: independent MOVE + AIM vectors (true twin-stick) with a fire cooldown; player + enemy BULLETS with velocity + lifetime + circle collision; three enemy archetypes with distinct behaviour -- a CHASER that rushes for contact damage, a ranged SHOOTER that keeps mid-range and fires aimed bullets, and a tanky BRUTE -- each with hp/speed/radius/contact/xp; ESCALATING WAVES (count + roster deepen; shooters from wave 2, brutes from wave 3, a brute-heavy final wave) spawned from the arena edges; player I-FRAMES after a hit; SCORE per kill; and a survive-all-waves WIN vs a death LOSE. A heuristic KITE-AND-FIRE auto-seat aims at the nearest enemy, kites when crowded / closes when far / strafes at range, edges away from walls, dodges the closest incoming bullet, and always fires; auto_step/auto_play_to_end drive a full run (validated: the seat clears all 6 waves to a WIN, score 1032, in ~1928 frames). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager steps the sim in _physics_process (60Hz); shooter_view.gd renders the arena, player (aim line + i-frame flash), enemies (colour + HP ring by type), bullets and a HP/wave/score HUD -- WASD move, MOUSE aim, hold LMB/Space to fire, with an attract-mode toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/twin-stick-shooter/skeleton",
+      "doc": "genres/twin-stick-shooter/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the twin-stick control set (WASD move + mouse aim + hold-to-fire) is sampled per physics tick in shooter_view.gd; re-run to add a right-stick gamepad aim, dash/roll, or weapon-swap"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "waves + spawns are generated in ShooterEngine (_start_wave/_wave_type/_edge_spawn) -- design work means tuning the wave curve + roster or adding room layouts/obstacles, not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the HP bar, wave/score HUD, enemy HP rings and aim line are drawn in code -- theme them (reticle, ammo/reload, minimap, damage vignette) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the circles for real top-down sprites (player + 3 enemy types + a boss, bullets, muzzle flashes); the engine exposes player/enemies/bullets for a sprite + particle layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook fire (muzzle flash + light kick), hits (enemy flash + hitstop), player-hurt (screen shake + red vignette during i-frames), kills (pop + score floater), and wave-clear/boss stings"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Top-down player sprite (idle/walk + a muzzle flash) and an aim reticle",
+        "Enemy sprites for chaser / shooter / brute + a boss (idle + telegraph), each reading at a glance",
+        "Bullet sprites (player vs enemy, distinct colour/shape) + impact puffs",
+        "Arena floor/wall tileset + optional obstacle props",
+        "HUD chrome: HP bar, wave/score readout, enemy HP rings, hurt vignette",
+        "SFX: player fire + reload, enemy fire, bullet impacts, enemy death, player hurt, wave-clear + victory/defeat stings"
+      ]
     }
   ]
 }
