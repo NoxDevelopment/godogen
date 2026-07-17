@@ -2797,6 +2797,61 @@
         "A song + its beatmap (the chart maps BPM-derived ticks to note.time; replace the procedural generator with an authored map)",
         "SFX: per-lane hit sound, miss cue, combo-break, song-clear grade stinger"
       ]
+    },
+    {
+      "id": "block-puzzle",
+      "name": "Block Puzzle (Tetris-lite falling-block line-clearer, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Tetris-lineage FALLING-BLOCK PUZZLE: stack the 7 tetrominoes in a 10x20 well and clear full lines before the stack tops out. OUR OWN engine, generic content (no trademarks). BlockEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency) whose RNG only drives the piece sequence, so a whole game replays BYTE-IDENTICALLY from a seed (FNV-1a checksum) and drives headlessly. Real systems: a seeded 7-BAG randomizer (Fisher-Yates over the 7 types → each appears once per bag, the modern standard); all 7 tetrominoes with their rotation states + real COLLISION; ROTATION with WALL KICKS (tries x offsets 0,-1,+1,-2,+2); gravity on a level-scaled interval plus SOFT DROP + HARD DROP (with drop-distance points); LINE CLEARS that shift the stack down with the classic single/double/triple/TETRIS scoring (100/300/500/800 x level); LEVELS that speed gravity every 10 lines; a NEXT-piece preview; and TOP-OUT game over. It also ships a strong PLACEMENT AI: ai_place enumerates every rotation x column, drops the piece, and scores the resulting board with Dellacherie-style weights (aggregate height, holes, bumpiness, lines cleared), then executes the best placement. auto_step/auto_play_to_end drive a full game (validated: the AI clears 236 lines to level 24 for score 339790 without ever topping out over a 600-piece run). save_data/load_data snapshot the whole game incl. RNG + bag state (NoxDev ABI). GameManager steps gravity in _physics_process; block_view.gd renders the well, the active piece with its GHOST (landing preview), the next-piece box, and a score/lines/level HUD -- arrow keys / A-D to move (with DAS auto-repeat), Down to soft-drop, Space to hard-drop, Up/X and Z to rotate, plus an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/block-puzzle/skeleton",
+      "doc": "genres/block-puzzle/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the block controls (←/→ move with DAS auto-repeat, ↓ soft, Space hard, ↑/X rotate CW, Z CCW, T autoplay, R restart) are sampled per physics tick in block_view.gd; re-run for gamepad, a hold/swap slot, or configurable DAS/ARR"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the well, ghost piece, next-piece box and score/lines/level HUD are drawn in code -- theme them (piece skins, a hold box, a lines-to-next-level bar, line-clear flash) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the flat cells for real block sprites per type (+ a connected-border skin) and a framed well; the engine exposes board/current_cells()/next_type for a sprite layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook lock (a soft thud + brief flash), line-clear (row flash + shake scaled by lines, a special Tetris burst), level-up, and a top-out shatter; the _clear_lines path yields the count you need"
+        },
+        {
+          "skill": "audio-design",
+          "params": {},
+          "note": "piece move/rotate blips, soft/hard-drop, a per-count line-clear sound (single..tetris), level-up jingle, and a game-over stinger"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Block sprites per tetromino type (7 colours) + a connected/bevelled skin variant; a ghost-piece style",
+        "Well frame + background (with a subtle grid) and a next/hold box",
+        "Line-clear VFX (row flash + a distinct Tetris burst) and a top-out shatter",
+        "HUD chrome: score/lines/level readouts, a lines-to-next-level bar, a combo/back-to-back badge",
+        "SFX: move/rotate blip, soft/hard drop, per-count line clear (single..tetris), level-up, game over",
+        "Optional: a soundtrack that ramps tempo with level"
+      ]
     }
   ]
 }
