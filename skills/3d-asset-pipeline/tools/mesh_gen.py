@@ -74,15 +74,79 @@ QUALITY_PRESETS: dict[str, dict] = {
 
 
 # ---------------------------------------------------------------------------
-# Tripo3D wrapper
+# Backend dispatch — local Hunyuan3D (free, on-device) or Tripo3D (cloud, paid)
 # ---------------------------------------------------------------------------
+# Roadmap finding #6: prefer the coherent, style-anchored LOCAL image→3D lane
+# (Hunyuan3D via ComfyUI, GPU-validated) over the paid Tripo3D API. "auto" uses
+# the local backend when a ComfyUI with the Hunyuan3D node is reachable, and
+# falls back to Tripo3D otherwise.
 
-def _generate_glb(image_path: Path, output_path: Path, quality: str) -> dict:
-    """Run Tripo3D image_to_glb with the chosen quality preset.
+# Shared quality preset → Hunyuan3D decimation target (faces).
+_HY3D_FACES = {"lowpoly": 5000, "medium": 20000, "high": 40000, "ultra": 60000}
 
-    Returns a dict with {path, cost_cents, quality, notes} on success;
-    raises on failure (caller logs + reports JSON error).
+
+def _resolve_backend(backend: str) -> str:
+    """Resolve 'auto' to a concrete backend: local Hunyuan3D if a ComfyUI with the
+    node is up, else the Tripo3D cloud API."""
+    if backend != "auto":
+        return backend
+    try:
+        import hunyuan3d
+        if hunyuan3d.is_available():
+            return "hunyuan3d"
+    except Exception:
+        pass
+    return "tripo3d"
+
+
+def _generate_glb(image_path: Path, output_path: Path, quality: str,
+                  backend: str = "auto", textured: bool | None = None) -> dict:
+    """Generate a GLB from an image via the chosen backend + quality preset.
+
+    Returns {path, cost_cents, quality, backend, ...} on success; raises on
+    failure (caller logs + reports JSON error).
     """
+    if quality not in QUALITY_PRESETS:
+        raise SystemExit(f"--quality must be one of {sorted(QUALITY_PRESETS.keys())}, got {quality!r}")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    resolved = _resolve_backend(backend)
+    if resolved == "hunyuan3d":
+        return _generate_glb_hunyuan(image_path, output_path, quality, textured)
+    return _generate_glb_tripo(image_path, output_path, quality)
+
+
+def _generate_glb_hunyuan(image_path: Path, output_path: Path, quality: str,
+                          textured: bool | None) -> dict:
+    """Local Hunyuan3D (ComfyUI) generation — free, on-device, style-anchored."""
+    import hunyuan3d
+
+    max_faces = _HY3D_FACES.get(quality, 40000)
+    want_tex = True if textured is None else bool(textured)
+    print(
+        f"[mesh_gen] Hunyuan3D (local, $0) quality={quality} max_faces={max_faces} "
+        f"textured={want_tex} -> {output_path}",
+        file=sys.stderr,
+    )
+    hunyuan3d.image_to_glb(
+        image_path, output_path, textured=want_tex, max_faces=max_faces,
+    )
+    return {
+        "path": str(output_path),
+        "cost_cents": 0,
+        "quality": quality,
+        "backend": "hunyuan3d",
+        "textured": want_tex,
+        "notes": (
+            "Local Hunyuan3D "
+            + ("PBR-textured" if want_tex else "shape-only")
+            + " mesh (free, on-device, style-anchored)."
+        ),
+    }
+
+
+def _generate_glb_tripo(image_path: Path, output_path: Path, quality: str) -> dict:
+    """Tripo3D cloud generation — paid, fallback when no local ComfyUI is up."""
     try:
         from tripo3d import MODEL_V3, image_to_glb
     except ImportError as e:
@@ -91,14 +155,9 @@ def _generate_glb(image_path: Path, output_path: Path, quality: str) -> dict:
             f"or check that TRIPO3D_API_KEY is set. Underlying error: {e}"
         )
 
-    if quality not in QUALITY_PRESETS:
-        raise SystemExit(f"--quality must be one of {sorted(QUALITY_PRESETS.keys())}, got {quality!r}")
-
     p = QUALITY_PRESETS[quality]
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
     print(
-        f"[mesh_gen] Tripo3D quality={quality} face_limit={p['face_limit']} "
+        f"[mesh_gen] Tripo3D (cloud) quality={quality} face_limit={p['face_limit']} "
         f"cost={p['cost_cents']}c -> {output_path}",
         file=sys.stderr,
     )
@@ -113,6 +172,7 @@ def _generate_glb(image_path: Path, output_path: Path, quality: str) -> dict:
         "path": str(output_path),
         "cost_cents": p["cost_cents"],
         "quality": quality,
+        "backend": "tripo3d",
         "notes": p["notes"],
     }
 
@@ -127,7 +187,9 @@ def cmd_mesh(args):
         raise SystemExit(f"Image not found: {image_path}")
     output_path = Path(args.output)
 
-    result = _generate_glb(image_path, output_path, args.quality)
+    result = _generate_glb(image_path, output_path, args.quality,
+                           backend=args.backend,
+                           textured=(False if getattr(args, "no_texture", False) else None))
     engine_outputs = _write_engine_sidecars(output_path, args.engine, source_image=image_path)
 
     print(json.dumps({
@@ -175,7 +237,9 @@ def cmd_batch(args):
         img = Path(item["image"])
         out = Path(item["output"])
         try:
-            r = _generate_glb(img, out, args.quality)
+            r = _generate_glb(img, out, args.quality,
+                              backend=args.backend,
+                              textured=(False if getattr(args, "no_texture", False) else None))
             engine_outputs = _write_engine_sidecars(out, args.engine, source_image=img)
             r["engine_outputs"] = engine_outputs
             r["ok"] = True
@@ -248,7 +312,9 @@ def cmd_prop(args):
         raise SystemExit(f"image-pipeline reported success but {intermediate_png} not found")
 
     # Now mesh it.
-    mesh_result = _generate_glb(intermediate_png, output_glb, args.quality)
+    mesh_result = _generate_glb(intermediate_png, output_glb, args.quality,
+                                backend=args.backend,
+                                textured=(False if getattr(args, "no_texture", False) else None))
     engine_outputs = _write_engine_sidecars(output_glb, args.engine, source_image=intermediate_png)
 
     print(json.dumps({
@@ -351,15 +417,30 @@ def _uid_for(path: Path) -> str:
 # CLI
 # ---------------------------------------------------------------------------
 
+def _add_backend_args(p):
+    """Shared 3D-backend selection flags for mesh/batch/prop."""
+    p.add_argument(
+        "--backend", default="auto", choices=["auto", "hunyuan3d", "tripo3d"],
+        help="3D backend: auto (local Hunyuan3D if a ComfyUI is up, else Tripo3D) · "
+             "hunyuan3d (local, free, on-device) · tripo3d (cloud API, paid).",
+    )
+    p.add_argument(
+        "--no-texture", action="store_true",
+        help="Hunyuan3D only: skip the PBR paint stage (shape-only .glb — faster, "
+             "no compiled rasterizer needed). Ignored by the Tripo3D backend.",
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description="3d-asset-pipeline: PNG → GLB + engine sidecars")
     sub = parser.add_subparsers(required=True, dest="cmd")
 
-    p = sub.add_parser("mesh", help="Convert a PNG to GLB via Tripo3D")
+    p = sub.add_parser("mesh", help="Convert a PNG to GLB (local Hunyuan3D or Tripo3D)")
     p.add_argument("--image", required=True, help="Source PNG path")
     p.add_argument("-o", "--output", required=True, help="Output GLB path")
     p.add_argument("--quality", default="medium", choices=list(QUALITY_PRESETS.keys()))
     p.add_argument("--engine", default="both", choices=["godot", "unity", "both", "none"])
+    _add_backend_args(p)
     p.set_defaults(func=cmd_mesh)
 
     p = sub.add_parser("batch", help="Process many PNGs into GLBs")
@@ -368,6 +449,7 @@ def main():
     p.add_argument("--output-dir", help="Output dir for --input-dir mode (default: same as input)")
     p.add_argument("--quality", default="medium", choices=list(QUALITY_PRESETS.keys()))
     p.add_argument("--engine", default="both", choices=["godot", "unity", "both", "none"])
+    _add_backend_args(p)
     p.set_defaults(func=cmd_batch)
 
     p = sub.add_parser("prop", help="One-shot: txt2img → mesh → GLB")
@@ -380,6 +462,7 @@ def main():
     p.add_argument("--quality", default="medium", choices=list(QUALITY_PRESETS.keys()))
     p.add_argument("-o", "--output", required=True, help="Output GLB path")
     p.add_argument("--engine", default="both", choices=["godot", "unity", "both", "none"])
+    _add_backend_args(p)
     p.set_defaults(func=cmd_prop)
 
     p = sub.add_parser("list-presets", help="List quality presets and exit")

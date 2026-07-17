@@ -1,8 +1,17 @@
 # 3D Asset Pipeline
 
-PNG → GLB via Tripo3D, with quality presets, batch processing, and one-shot prop generation that chains image-pipeline (txt2img) → mesh → engine sidecars in a single command.
+PNG → GLB, with quality presets, batch processing, and one-shot prop generation that chains image-pipeline (txt2img) → mesh → engine sidecars in a single command.
 
-**Tripo3D is a paid API** — every `mesh` call costs 30–60¢. Use `batch` carefully; pre-budget with `asset_gen.py set_budget` (the budget gate is shared across all paid generators in the godogen stack).
+## Backends (local-first)
+
+Two image→3D backends, chosen with `--backend`:
+
+- **`hunyuan3d`** (default via `auto`) — **LOCAL, free, on-device.** Runs the GPU-validated Hunyuan3D lane through a running ComfyUI (kijai `ComfyUI-Hunyuan3DWrapper`). Shape-gen needs no build; PBR texture-paint needs the compiled `custom_rasterizer` + `differentiable_renderer` extensions (built once for py3.13/cu118 with the VS2019 v142 toolset). Style-anchored: pairs perfectly with the image-pipeline's ZIT/LoRA renders. `$0` per mesh.
+- **`tripo3d`** — cloud API, **paid (30–60¢/mesh)**. The fallback when no local ComfyUI is up.
+
+`--backend auto` (the default) uses the local Hunyuan3D backend when a ComfyUI with the node is reachable (`GET /object_info/Hy3DGenerateMesh`), and falls back to Tripo3D otherwise. Point the client at a non-default ComfyUI with `COMFYUI_HOST` / `COMFYUI_OUTPUT_DIR`.
+
+Hunyuan3D produces a **PBR-textured** mesh by default (parity with Tripo3D); pass `--no-texture` for the faster shape-only `.glb` (no rasterizer build needed). **Tripo3D is a paid API** — pre-budget with `asset_gen.py set_budget` (the budget gate is shared across all paid generators in the godogen stack); the local backend records `cost_cents: 0`.
 
 ## TL;DR
 
