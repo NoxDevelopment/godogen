@@ -1,0 +1,39 @@
+{
+  "sheet": "C:\\code\\ai\\godogen\\skills\\pixel-perfect\\assets\\extract-example\\sprites_sheet.png",
+  "mode": "cc",
+  "tile_count": 3,
+  "tiles": [
+    {
+      "file": "tile_000.png",
+      "x": 8,
+      "y": 8,
+      "w": 16,
+      "h": 16,
+      "area": 256,
+      "id": 1
+    },
+    {
+      "file": "tile_001.png",
+      "x": 40,
+      "y": 8,
+      "w": 24,
+      "h": 20,
+      "area": 480,
+      "id": 2
+    },
+    {
+      "file": "tile_002.png",
+      "x": 72,
+      "y": 16,
+      "w": 16,
+      "h": 24,
+      "area": 384,
+      "id": 3
+    }
+  ],
+  "connectivity": 8,
+  "alpha_threshold": 1,
+  "min_area": 1,
+  "pad": 0,
+  "cc_backend": "scipy"
+}

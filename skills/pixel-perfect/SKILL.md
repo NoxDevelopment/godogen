@@ -135,3 +135,9 @@ python3 ../engine-export/tools/export_gen.py tileset-tres \
   / project `default_texture_filter`), NOT a texture-import field.
 - Worked example: `assets/tileset-example/` (4 tiles → atlas + `.tres` +
   `.import` + a `TileMapLayer` scene).
+- **Reverse — `extract`**: slice tiles OUT of an arbitrary sheet.
+  `pixeltool.py extract sheet.png -o out/ --mode grid --tile-size 32 --separation 2`
+  (inverse of the assembler's layout) or `--mode cc` (connected-component: crop
+  each opaque blob to its own tile, own-pixels-only so overlapping bboxes never
+  leak — scipy when present, else a validated dependency-free numpy labeler).
+  Writes an `index.json`. Example: `assets/extract-example/` + `roundtrip_check.py`.

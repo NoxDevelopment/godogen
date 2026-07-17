@@ -418,6 +418,136 @@ def cmd_tileset(args) -> None:
               f"({meta['cols']}x{meta['rows']}, {len(meta['palette'])}c)  {out}")
 
 
+def _parse_tile_size(spec: str) -> tuple[int, int]:
+    s = str(spec).lower().strip()
+    if "x" in s:
+        a, b = s.split("x", 1)
+        try:
+            return int(a), int(b)
+        except ValueError:
+            sys.exit(f"pixeltool extract: bad --tile-size: {spec}")
+    try:
+        n = int(s)
+    except ValueError:
+        sys.exit(f"pixeltool extract: bad --tile-size: {spec}")
+    return n, n
+
+
+def _cc_label(mask: np.ndarray, connectivity: int) -> tuple[np.ndarray, int]:
+    """Dependency-free connected-component labeling (validated equal to scipy)."""
+    h, w = mask.shape
+    lbl = np.where(mask, np.arange(1, h * w + 1).reshape(h, w), 0).astype(np.int64)
+    offs = ([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+            if connectivity == 8 else [(-1, 0), (1, 0), (0, -1), (0, 1)])
+    BIG = np.iinfo(np.int64).max
+    while True:
+        cur = lbl.copy()
+        for dy, dx in offs:
+            sh = np.full_like(lbl, BIG)
+            src = lbl[max(0, dy):h + min(0, dy), max(0, dx):w + min(0, dx)]
+            sh[max(0, -dy):h + min(0, -dy), max(0, -dx):w + min(0, -dx)] = np.where(src > 0, src, BIG)
+            cur = np.minimum(cur, np.where(mask, sh, BIG))
+        cur = np.where(mask, cur, 0)
+        if np.array_equal(cur, lbl):
+            break
+        lbl = cur
+    uniq = np.unique(lbl)
+    uniq = uniq[uniq > 0]
+    remap = np.zeros(int(lbl.max()) + 1, dtype=np.int64)
+    remap[uniq] = np.arange(1, len(uniq) + 1)
+    return remap[lbl], int(len(uniq))
+
+
+def extract_grid(arr: np.ndarray, tw: int, th: int, cols: int, rows: int,
+                 margin: int, separation: int, keep_empty: bool) -> list[dict]:
+    """Slice fixed-size cells from a grid sheet (inverse of assemble_tileset)."""
+    H, W = arr.shape[:2]
+    step_x, step_y = tw + separation, th + separation
+    if cols <= 0:
+        cols = max(1, (W - 2 * margin + separation) // step_x)
+    if rows <= 0:
+        rows = max(1, (H - 2 * margin + separation) // step_y)
+    out: list[dict] = []
+    for r in range(rows):
+        for c in range(cols):
+            x = margin + c * step_x
+            y = margin + r * step_y
+            if y + th > H or x + tw > W:
+                continue
+            cell = arr[y:y + th, x:x + tw].copy()
+            if not keep_empty and not (cell[..., 3] > 0).any():
+                continue
+            out.append({"cell": cell, "x": x, "y": y, "w": tw, "h": th, "row": r, "col": c})
+    return out
+
+
+def extract_cc(arr: np.ndarray, connectivity: int, alpha_threshold: int,
+               min_area: int, pad: int) -> tuple[list[dict], str]:
+    """Crop each connected opaque blob to its own tile (bbox + own pixels only)."""
+    mask = arr[..., 3] >= alpha_threshold
+    try:
+        from scipy import ndimage  # type: ignore
+        structure = ndimage.generate_binary_structure(2, 1 if connectivity == 4 else 2)
+        lbl, n = ndimage.label(mask, structure=structure)
+        backend = "scipy"
+    except ImportError:
+        lbl, n = _cc_label(mask, connectivity)
+        backend = "numpy"
+    comps: list[dict] = []
+    for cid in range(1, n + 1):
+        ys, xs = np.where(lbl == cid)
+        if ys.size == 0 or ys.size < min_area:
+            continue
+        y0, y1 = int(ys.min()), int(ys.max()) + 1
+        x0, x1 = int(xs.min()), int(xs.max()) + 1
+        crop = arr[y0:y1, x0:x1].copy()
+        keep = lbl[y0:y1, x0:x1] == cid
+        crop[~keep] = 0  # never leak a neighbour's pixels from an overlapping bbox
+        if pad > 0:
+            crop = np.pad(crop, ((pad, pad), (pad, pad), (0, 0)))
+        comps.append({"cell": crop, "x": x0, "y": y0, "w": x1 - x0, "h": y1 - y0,
+                      "area": int(ys.size), "id": int(cid)})
+    comps.sort(key=lambda t: (t["y"], t["x"]))  # deterministic reading-order naming
+    return comps, backend
+
+
+def cmd_extract(args) -> None:
+    tw, th = _parse_tile_size(args.tile_size)
+    img = Image.open(args.sheet).convert("RGBA")
+    arr = np.asarray(img, dtype=np.uint8).copy()
+    if args.mode == "grid":
+        tiles = extract_grid(arr, tw, th, args.cols, args.rows, args.margin,
+                             args.separation, args.keep_empty)
+        backend = "grid"
+    else:
+        tiles, backend = extract_cc(arr, args.connectivity, args.alpha_threshold,
+                                    args.min_area, args.pad)
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    entries: list[dict] = []
+    for i, t in enumerate(tiles):
+        name = f"{args.prefix}{i:03d}.png"
+        Image.fromarray(t["cell"]).save(outdir / name)
+        e = {"file": name, "x": t["x"], "y": t["y"], "w": t["w"], "h": t["h"]}
+        if args.mode == "grid":
+            e.update(row=t["row"], col=t["col"])
+        else:
+            e.update(area=t["area"], id=t["id"])
+        entries.append(e)
+    index = {"sheet": args.sheet, "mode": args.mode, "tile_count": len(entries), "tiles": entries}
+    if args.mode == "grid":
+        index.update(tile_size=[tw, th], cols=args.cols, rows=args.rows,
+                     margin=args.margin, separation=args.separation)
+    else:
+        index.update(connectivity=args.connectivity, alpha_threshold=args.alpha_threshold,
+                     min_area=args.min_area, pad=args.pad, cc_backend=backend)
+    (outdir / "index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
+    if args.json:
+        print(json.dumps(index))
+    else:
+        print(f"[extract:{args.mode}] {args.sheet} -> {len(entries)} tiles ({backend})  {outdir}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         prog="pixeltool", description=__doc__,
@@ -463,10 +593,31 @@ def main() -> None:
     ts.add_argument("--margin", type=int, default=0, help="px border around the atlas")
     ts.add_argument("--json", action="store_true", help="print JSON result")
 
+    ex = sub.add_parser("extract",
+                        help="slice tiles out of an arbitrary sheet (grid or connected-component)")
+    ex.add_argument("sheet")
+    ex.add_argument("-o", "--outdir", required=True)
+    ex.add_argument("--mode", choices=["grid", "cc"], default="grid")
+    ex.add_argument("--tile-size", default="32", help="grid: N or WxH source px per cell")
+    ex.add_argument("--cols", type=int, default=0)
+    ex.add_argument("--rows", type=int, default=0)
+    ex.add_argument("--margin", type=int, default=0)
+    ex.add_argument("--separation", type=int, default=0)
+    ex.add_argument("--keep-empty", action="store_true", help="grid: also emit fully-transparent cells")
+    ex.add_argument("--connectivity", type=int, choices=[4, 8], default=8)
+    ex.add_argument("--alpha-threshold", type=int, default=1)
+    ex.add_argument("--min-area", type=int, default=1)
+    ex.add_argument("--pad", type=int, default=0, help="cc: pad each crop by N transparent px")
+    ex.add_argument("--prefix", default="tile_")
+    ex.add_argument("--json", action="store_true", help="print JSON result")
+
     args = ap.parse_args()
 
     if args.cmd == "tileset":
         cmd_tileset(args)
+        return
+    if args.cmd == "extract":
+        cmd_extract(args)
         return
 
     if args.pixel_size == "auto":

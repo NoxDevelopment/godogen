@@ -1,0 +1,51 @@
+{
+  "sheet": "C:\\code\\ai\\godogen\\skills\\pixel-perfect\\assets\\tileset-example\\overworld.png",
+  "mode": "grid",
+  "tile_count": 4,
+  "tiles": [
+    {
+      "file": "tile_000.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "row": 0,
+      "col": 0
+    },
+    {
+      "file": "tile_001.png",
+      "x": 34,
+      "y": 0,
+      "w": 32,
+      "h": 32,
+      "row": 0,
+      "col": 1
+    },
+    {
+      "file": "tile_002.png",
+      "x": 0,
+      "y": 34,
+      "w": 32,
+      "h": 32,
+      "row": 1,
+      "col": 0
+    },
+    {
+      "file": "tile_003.png",
+      "x": 34,
+      "y": 34,
+      "w": 32,
+      "h": 32,
+      "row": 1,
+      "col": 1
+    }
+  ],
+  "tile_size": [
+    32,
+    32
+  ],
+  "cols": 0,
+  "rows": 0,
+  "margin": 0,
+  "separation": 2
+}
