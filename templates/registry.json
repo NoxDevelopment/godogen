@@ -3347,6 +3347,61 @@
         "SFX: slide whoosh, tier-rising merge click, new-tile blip, milestone chime, game-over tone",
         "Optional Merge-2/3 art: a free-board item ladder + a generator prop for the board-merge variant"
       ]
+    },
+    {
+      "id": "dot-io",
+      "name": "Dot IO (Hole.io / Agar.io grow-by-absorbing arena, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Hole.io / Agar.io-lineage .IO GROW-ARENA game run as a DETERMINISTIC FIXED-TIMESTEP sim (4 of the top-10 downloaded hypercasual games are .io games): steer your 'hole', SWALLOW objects (and rival holes) smaller than your current size to GROW, and out-mass the AI rivals before the timer ends. OUR OWN engine, generic content (no trademarks). DotIoEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG places the objects + drives the rival AI, so a whole match replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over quantized state, so it survives cross-process float math). Real systems: an arena of scattered OBJECTS of varied sizes; a size-gated SWALLOW rule (a hole absorbs any object with size <= its own within its radius) that GROWS the hole (radius = sqrt(size)) and scores the swallowed mass, with objects respawning to keep the arena stocked (Hole.io endless growth, tuned to a believable curve); HOLE-vs-HOLE predation (a hole 1.12x bigger swallows a smaller one on overlap -> the small hole respawns at start size); a rival AI that heads for the nearest swallowable object and FLEES a much bigger hole nearby; a 60-second MATCH TIMER; and a WINNER by mass. A deterministic auto-play drives every hole (all-AI) for a full match (validated: the player grows from size 22 to ~4652 for score ~33k and wins the arena; determinism holds cross-process). save_data/load_data snapshot the whole match incl. RNG state (NoxDev ABI). GameManager steps the sim in _physics_process (60Hz) steering the player toward the mouse; dotio_view.gd renders the arena, objects, the player + rival holes sized by mass, a leaderboard + a timer HUD -- move toward the mouse, with an attract (all-AI) toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/dot-io/skeleton",
+      "doc": "genres/dot-io/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the .io control (steer the hole toward the mouse/touch, T attract, R restart) is in dotio_view.gd; re-run for a virtual-joystick mobile control, a dash/ability, or gamepad"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the arena + object spread + growth/predation tuning are constants/functions in DotIoEngine (N_OBJECTS/_make_object/OBJ_GROWTH/HOLE_EAT_RATIO) -- design work is the growth curve + arena/object theming (a city of swallowable props for the Hole.io look), not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the arena, holes, objects, leaderboard + timer are drawn in code -- theme them (a top-down city/agar skin, a size/leaderboard HUD, a swallow ripple) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the circles for a real hole shader/sprite + top-down swallowable props (Hole.io) or cell blobs (Agar.io); the engine exposes holes/objects/size for a sprite + shader layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook a swallow (a suck-in + a little grow-pop + score floater), a hole-eat-hole moment (a big gulp + screen shake), a size-milestone flourish, and a final leaderboard reveal"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "A hole shader/sprite that scales with mass (Hole.io) OR a cell blob (Agar.io) per player colour",
+        "Top-down swallowable props (a themed city: cones/benches/cars/buildings at increasing sizes) or food pellets",
+        "A swallow ripple/suck VFX + a hole-eats-hole gulp + a size-milestone flare",
+        "HUD chrome: a size/score readout, a live leaderboard, a match timer, a minimap",
+        "SFX: swallow pop (pitch rises with size), rival gulp, size-milestone chime, match-end fanfare",
+        "Optional: a virtual joystick for mobile + a skin/cosmetic set"
+      ]
     }
   ]
 }
