@@ -3127,6 +3127,61 @@
         "SFX: eat/shower/toilet/sleep cues, a phone/social chime, a work-shift jingle, an aspiration fanfare, a low-need alert",
         "Optional: day/night lighting + a lo-fi routine soundtrack"
       ]
+    },
+    {
+      "id": "survival-crafting",
+      "name": "Survival Crafting (Don't Starve/Valheim-lite gather/craft/survive, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A Don't-Starve / Valheim-lineage SURVIVAL-CRAFTING game run as a DETERMINISTIC FIXED-TIMESTEP sim: gather wood/stone/food from seeded resource nodes, CRAFT tools + a campfire + cooked meals, manage HUNGER / WARMTH / HEALTH across a DAY-NIGHT cycle (night is cold -- keep a fire lit), and survive N days. OUR OWN engine, generic content (no trademarks). SurvivalEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG places the world + drives events, so a whole playthrough replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over quantized needs). Real systems: a seeded WORLD of resource nodes (trees→wood, rocks→stone, berry bushes→food+fiber) that DEPLETE on harvest and REGROW over time; an INVENTORY + a CRAFTING system (recipes with resource costs and an optional fire requirement -- axe→faster wood, campfire→a warmth source, meal→better hunger restore, shelter→a night warmth bonus); CAMPFIRES that burn FUEL down and are refuelable with wood and provide WARMTH within a radius; a DAY-NIGHT cycle where NIGHT is cold (warmth drains fast unless near a lit fire) and HUNGER drains always; a HEALTH model that bleeds when hunger OR warmth hit 0 and slowly regenerates when both are healthy; DEATH (health 0) vs a survive-all-days WIN. A heuristic survival auto-seat plays the full loop -- eat/cook when hungry, build + refuel + huddle at a campfire before/through the night, craft an axe, and gather whatever it's short on -- and auto_step/auto_play_to_end run a whole playthrough (validated: the AI gathers, crafts an axe + a campfire, keeps the fire lit through all 8 cold nights, and SURVIVES to day 9 at full health). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager steps the sim in real time (one tick/frame interactive, multi-tick autoplay); survival_view.gd renders the world of resource nodes, campfires with a night warmth-glow, the player, a day/NIGHT tint that deepens after dusk, and a health/hunger/warmth + inventory HUD -- WASD move, E harvest, Q eat, X/C/V/B craft, F refuel, with an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/survival-crafting/skeleton",
+      "doc": "genres/survival-crafting/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the survival controls (WASD move, E harvest nearest, Q eat, X/C/V/B craft, F refuel, T autoplay, R restart) are in survival_view.gd; re-run for a hotbar + crafting-menu UI, a placement mode for structures, or gamepad"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "the world (resource node counts + placement) is generated in SurvivalEngine._gen_world and the economy/recipes are constants (RECIPES/decay/fuel) -- design work means tuning the survival curve + biomes + recipe tree, not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the world, nodes, fire glow, night tint, and the health/hunger/warmth + inventory HUD are drawn in code -- theme them (a crafting menu, a hotbar, resource icons, a temperature/threat meter, a proper day-night sky) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "swap the coloured circles for real top-down art (a character, tree/rock/bush sprites, a campfire animation, dropped-item icons, structure art); the engine exposes pos/nodes/fires/inv for a sprite + lighting layer"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook harvest (chop/mine hits + resource pop), craft (a satisfying build chime), the fire (a warm flicker + a low-fuel warning), nightfall (a chill vignette + threat cue), and a low-health heartbeat + a survive-the-night dawn sting"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "A top-down character sprite (walk/chop/mine) + tree/rock/berry-bush sprites with depleted variants",
+        "A campfire animation (lit/embers/out) + a warmth-glow light and dropped-item icons",
+        "Structure art (shelter) + placement ghost; resource icons for wood/stone/food/fiber/meal",
+        "A day-night sky/lighting ramp + a night threat/temperature vignette",
+        "UI chrome: health/hunger/warmth meters, a hotbar, a crafting menu with recipe costs, a clock",
+        "SFX: chop/mine, pickup, craft/build chime, fire crackle + low-fuel warning, nightfall cue, low-health heartbeat, dawn sting"
+      ]
     }
   ]
 }
