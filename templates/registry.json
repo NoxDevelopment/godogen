@@ -2962,6 +2962,61 @@
         "SFX: correct chime, wrong buzz, timer tick, streak milestone, grade-reveal fanfare",
         "Optional: a themed question bank (JSON) authored per subject/grade to replace the built-in generator"
       ]
+    },
+    {
+      "id": "hidden-object",
+      "name": "Hidden Object (seek-and-find with decoys, hints + timer, 2D)",
+      "engine": "godot",
+      "engineVersion": "4.6.1-stable",
+      "description": "A seek-and-find HIDDEN-OBJECT casual game: a cluttered scene of seeded item placements, a FIND LIST to locate by clicking, DECOY items that punish misclicks, a limited HINT system, a per-round TIMER, combo + time-bonus scoring, and escalating rounds. OUR OWN engine, generic content (no trademarks). HiddenEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG lays out the objects (rejection-sampled with a minimum separation) AND picks the find list, so a whole game -- the exact scene layout every round -- replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over quantized positions) and drives headlessly. Real systems: per-round scene generation of (5+round) TARGET items among (8+round*2) DECOYS placed with min-spacing over the play area; click HIT-TESTING (nearest object within a click radius) that scores a find, ignores/penalizes a decoy, and penalizes an empty-area misclick (breaking the combo); a COMBO that grows the per-find score; a HINT system (3 per round) that reveals + pulses the next unfound target for 2.5s at a score cost; a per-round countdown TIMER (running out = lose) with a time-BONUS on clearing; a live per-round FIND CHECKLIST (name + found state) for the UI; escalating ROUNDS to a MAX_ROUNDS win. A deterministic solver auto-seat clicks each unfound target's exact position (it can see the scene) and uses one hint per round for coverage; auto_step/auto_play_to_end clear a whole game (validated: the solver finds every item across all 4 rounds to a WIN, score 5720, ZERO misclicks -- proving the placement + hit-testing + find-list + scoring + round progression all work). save_data/load_data snapshot the whole game incl. RNG state (NoxDev ABI). GameManager runs the timer in _physics_process; hidden_view.gd renders the play area, the objects (coloured labelled placeholders for real scene art + item sprites), a find-list checklist, a timer bar, the score/hints/misses HUD, and a pulsing hint highlight -- click objects to find them, H for a hint, with an autoplay toggle + restart.",
+      "status": "validated",
+      "skeleton": "genres/hidden-object/skeleton",
+      "doc": "genres/hidden-object/TEMPLATE.md",
+      "vendoredAddons": [],
+      "primitives": [
+        {
+          "skill": "input-handling",
+          "params": {},
+          "note": "the seek-and-find controls (click objects in the play area, H hint, T autoplay, R restart) are in hidden_view.gd; re-run for a magnifier/zoom, a pixel-hunt cursor, or touch + pinch-zoom"
+        },
+        {
+          "skill": "world-layout",
+          "params": {},
+          "note": "THE genre's craft: scenes are generated in HiddenEngine (_start_round/_place with rejection-sampled min-separation) -- design work means authoring hand-placed scenes/hotspots over painted backgrounds or tuning the clutter density, not scene nodes"
+        },
+        {
+          "skill": "ui-theme",
+          "params": {},
+          "note": "the play area, object placeholders, find-list checklist, timer bar, hint pulse and score HUD are drawn in code -- theme them (a painted scene, item sprites, a parchment checklist, a magnifier, a found-item sparkle) from the game palette"
+        },
+        {
+          "skill": "pixel-perfect",
+          "params": {},
+          "note": "THIS is where hidden-object games live: replace the coloured circles with a painted BACKGROUND SCENE + real item sprites tucked into it, and the checklist with item thumbnails; the engine already stores each object's name + position + target/decoy flag for a hand-placed or generated layout"
+        },
+        {
+          "skill": "game-feel",
+          "params": {},
+          "note": "hook a find (a sparkle + a satisfying ping + a checklist tick), a misclick (a soft buzz + shake), a hint (a spotlight sweep), the last-10-seconds timer (a heartbeat), and a round-clear + game-win fanfare"
+        }
+      ],
+      "systems": [
+        "godotsmith:templates/menu_system",
+        "godotsmith:templates/save_system",
+        "godotsmith:templates/settings_system"
+      ],
+      "docTemplates": [
+        "godotsmith:templates/docs/GDD_TEMPLATE.md",
+        "godotsmith:templates/docs/ADR_TEMPLATE.md"
+      ],
+      "assetPlanHints": [
+        "Painted BACKGROUND SCENES (the rooms/dioramas to search) + a set of item sprites tucked into them",
+        "A find-list checklist panel with item thumbnails + a found/tick state",
+        "A magnifier/cursor, a found-item sparkle, and a misclick shake/flash",
+        "A hint spotlight/sweep VFX + a hint-charge indicator",
+        "HUD chrome: round, score, timer bar/ring, hints remaining, combo readout",
+        "SFX: item-found ping, misclick buzz, hint sweep, timer heartbeat, round-clear + win fanfare"
+      ]
     }
   ]
 }
