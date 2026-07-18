@@ -3842,6 +3842,61 @@
     "SFX: travel whoosh, work/train sting, socialize chime, stage-up fanfare, sleep day-fade, low-energy warning",
     "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
    ]
+  },
+  {
+   "id": "autobattler-horde",
+   "name": "Autobattler Horde (How Many Dudes-style army-scaler, 2D)",
+   "engine": "godot",
+   "engineVersion": "4.6.1-stable",
+   "description": "A HORDE AUTO-BATTLER ('How Many Dudes?'-lineage army-scaler) run as a DETERMINISTIC sim: between waves you spend gold to RECRUIT a horde (cheap DUDES + tougher BRUTES + rare CHAMPIONS), then your WHOLE army AUTO-BATTLES the wave's enemy army in a deterministic focus-fire attrition sim where BOTH numbers AND stats matter -- more units means more total DPS AND a deeper HP pool to grind through. Survivors persist + heal between waves (a snowball), so a growing horde carries forward; clear all waves to WIN, get wiped to LOSE. This is a DISTINCT auto-battler flavor from the team-shop `auto-battler` template (that one is TFT-lite bench + synergy + trophies; THIS one is army-scaling horde combat -- the 'how many dudes' fantasy). HordeEngine is a pure, seedable RefCounted class (no Godot-node/Time dependency); one seeded RNG builds the enemy waves and the combat itself is pure integer arithmetic, so a whole run replays BYTE-IDENTICALLY from a seed (FNV-1a checksum over the state). Real systems, no stubs: a recruit economy (three unit tiers with cost/hp/atk); a scaling enemy wave generator (bigger + tougher each wave, brutes + champions entering as the wave climbs); a deterministic FOCUS-FIRE ATTRITION battle (each tick the SUM of a side's atk hits the OTHER side's front unit; a downed front is removed and the next steps up -- so victory tracks whichever side has the higher hp x atk product, and dudes are gold-efficient); survivors persisting + healing; a clear reward + interest economy tuned so a well-built horde SNOWBALLS. A deterministic COMMANDER auto-seat plays the 'how many dudes' strategy (a champion anchor when flush, a modest brute front line, then pile the rest into dudes) and auto-battles each wave; auto_play_to_end plays a whole run (validated: the horde snowballs from ~8 units to ~100 and clears all 12 waves). save_data/load_data snapshot the whole run incl. RNG state (NoxDev ABI). GameManager recruits + fights; horde_view.gd renders the wave/gold HUD, the recruit + FIGHT buttons, the horde visualised as rows of tier-coloured blocks, and the last battle result -- with an autoplay toggle + restart.",
+   "status": "validated",
+   "skeleton": "genres/autobattler-horde/skeleton",
+   "doc": "genres/autobattler-horde/TEMPLATE.md",
+   "vendoredAddons": [],
+   "primitives": [
+    {
+     "skill": "input-handling",
+     "params": {},
+     "note": "the recruit buttons + FIGHT + autoplay/restart are in horde_view.gd; re-run for a drag-to-place formation, a unit-info tooltip, an auto-recruit preset, or a fast-forward battle"
+    },
+    {
+     "skill": "world-layout",
+     "params": {},
+     "note": "the balance (unit tiers cost/hp/atk, the enemy wave budget curve, the reward+interest economy, the focus-fire combat) lives in HordeEngine consts/methods -- design work is more unit types, synergies/abilities, boss waves, and formations, not scene nodes"
+    },
+    {
+     "skill": "ui-theme",
+     "params": {},
+     "note": "the HUD, recruit buttons and the horde blocks are drawn in code -- theme them (unit sprites per tier, a battlefield with the two armies clashing, a gold/wave banner, a victory screen) from the game palette"
+    },
+    {
+     "skill": "ui-animation",
+     "params": {},
+     "note": "the engine exposes the army composition + each wave's enemy size + survivors -- drive a battle march-and-clash animation, per-unit death poofs, a survivor tally, and a horde-count ticker"
+    },
+    {
+     "skill": "game-feel",
+     "params": {},
+     "note": "hook a recruit (a ping + a dude popping in), the FIGHT start (a horn), the clash (a rising rumble scaled by army size), unit deaths (poofs), a wave clear (a cheer + coin shower), and a wipe (a somber cue)"
+    }
+   ],
+   "systems": [
+    "godotsmith:templates/menu_system",
+    "godotsmith:templates/save_system",
+    "godotsmith:templates/settings_system"
+   ],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "Unit sprites per tier (dude / brute / champion) + enemy variants + death poofs",
+    "A battlefield backdrop with two armies clashing + a march-and-collide animation",
+    "HUD chrome: wave/gold banner, recruit buttons with counts, a FIGHT button, a horde-count ticker",
+    "A wave-clear reward screen (coin shower) + a victory / wipe screen",
+    "SFX: recruit ping, battle horn, clash rumble (army-size scaled), death poof, wave-clear cheer, wipe cue",
+    "Optional: unit abilities/synergies, boss waves, and a formation editor"
+   ]
   }
  ]
 }
