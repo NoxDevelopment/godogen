@@ -1,0 +1,11 @@
+; nox_rpg self-test project (headless probe only).
+config_version=5
+
+[application]
+
+config/name="nox_rpg test"
+config/features=PackedStringArray("4.6")
+
+[debug]
+
+gdscript/warnings/unused_signal=0
