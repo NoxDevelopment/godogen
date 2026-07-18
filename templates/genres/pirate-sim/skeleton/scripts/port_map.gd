@@ -66,10 +66,8 @@ func _build_ui() -> void:
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 
-	var bg: ColorRect = ColorRect.new()
-	bg.color = Color(0.06, 0.10, 0.15)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_layer.add_child(bg)
+	# Backdrop painted in _draw() (root layer 0), behind the port map. A full-rect
+	# ColorRect in this front CanvasLayer would occlude the whole map.
 
 	_title = _mk_label(Vector2(24, 14), 22, Color(0.90, 0.86, 0.62))
 	_result_lbl = _mk_label(Vector2(24, 46), 15, Color(0.96, 0.72, 0.42))
@@ -317,6 +315,7 @@ func _map_point(p: Vector2) -> Vector2:
 
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.06, 0.10, 0.15), true)
 	var e: PirateEngine = GameManager.engine
 	if e.ports.is_empty():
 		return

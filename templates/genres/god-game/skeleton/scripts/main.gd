@@ -59,6 +59,7 @@ func _on_tick() -> void:
 # =====================================================================
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, get_viewport_rect().size), Color(0.09, 0.09, 0.12), true)
 	var w: GodWorld = GameManager.world
 	if w == null:
 		return
@@ -155,10 +156,8 @@ func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
 
-	var bg := ColorRect.new()
-	bg.color = Color(0.09, 0.09, 0.12)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.add_child(bg)
+	# Backdrop painted in _draw() (root layer 0), behind the terrain. A full-rect
+	# ColorRect in this front CanvasLayer would occlude the whole map.
 
 	var title := _mk_label(layer, Vector2(24, 16), 22, Color(0.92, 0.86, 0.60))
 	title.text = "GOD GAME — shape the land, grow your tribe"

@@ -61,6 +61,7 @@ func _on_changed() -> void:
 # =====================================================================
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, get_viewport_rect().size), Color(0.09, 0.10, 0.08), true)
 	var b: WarrenEngine = GameManager.band
 	if b == null:
 		return
@@ -100,10 +101,8 @@ func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
 
-	var bg := ColorRect.new()
-	bg.color = Color(0.09, 0.10, 0.08)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.add_child(bg)
+	# Backdrop painted in _draw() (root layer 0), behind the world. A full-rect
+	# ColorRect in this front CanvasLayer would occlude the whole map.
 
 	_title_label = _mk_label(layer, Vector2(24, 14), 22, Color(0.92, 0.85, 0.55))
 	_title_label.text = "WATERSHIP ROAD — lead the band to a new warren, and make it thrive"

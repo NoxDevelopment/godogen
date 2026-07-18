@@ -61,6 +61,7 @@ func _on_tick() -> void:
 # =====================================================================
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, get_viewport_rect().size), Color(0.07, 0.07, 0.09), true)
 	var w: AntWorld = GameManager.world
 	if w == null:
 		return
@@ -188,10 +189,9 @@ func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
 
-	var bg := ColorRect.new()
-	bg.color = Color(0.07, 0.07, 0.09)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.add_child(bg)
+	# Backdrop is painted in _draw() (root canvas layer 0), behind the colony map.
+	# A full-rect ColorRect in this front CanvasLayer would occlude the entire
+	# map — the bug that left only the HUD visible over a black void.
 
 	var title := _mk_label(layer, Vector2(24, 14), 22, Color(0.90, 0.82, 0.55))
 	title.text = "ANT COLONY — forage, tunnel, raise castes, war the rival"
