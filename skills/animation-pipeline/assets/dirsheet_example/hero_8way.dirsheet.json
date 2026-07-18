@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "subcommand": "dirsheet",
+  "sheet": "C:\\code\\ai\\godogen\\skills\\animation-pipeline\\assets\\dirsheet_example\\hero_8way.png",
+  "frame_size": [
+    16,
+    16
+  ],
+  "columns": 4,
+  "rows": 8,
+  "directions": [
+    {
+      "name": "down",
+      "row": 0,
+      "frame_count": 4,
+      "from": 0,
+      "to": 3
+    },
+    {
+      "name": "down_left",
+      "row": 1,
+      "frame_count": 4,
+      "from": 4,
+      "to": 7
+    },
+    {
+      "name": "left",
+      "row": 2,
+      "frame_count": 4,
+      "from": 8,
+      "to": 11
+    },
+    {
+      "name": "up_left",
+      "row": 3,
+      "frame_count": 4,
+      "from": 12,
+      "to": 15
+    },
+    {
+      "name": "up",
+      "row": 4,
+      "frame_count": 4,
+      "from": 16,
+      "to": 19
+    },
+    {
+      "name": "up_right",
+      "row": 5,
+      "frame_count": 4,
+      "from": 20,
+      "to": 23
+    },
+    {
+      "name": "right",
+      "row": 6,
+      "frame_count": 4,
+      "from": 24,
+      "to": 27
+    },
+    {
+      "name": "down_right",
+      "row": 7,
+      "frame_count": 2,
+      "from": 28,
+      "to": 29
+    }
+  ],
+  "fps": 8,
+  "loop": false,
+  "layout": "row-per-direction, row-major frame index"
+}

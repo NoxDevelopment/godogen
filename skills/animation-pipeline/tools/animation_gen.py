@@ -118,7 +118,20 @@ DIRECTION_DESCRIPTORS = {
     "up":     "facing away, 3/4 back view, walking away from viewer",
     "front":  "facing camera, front view",
     "back":   "facing away, back view",
+    # 8-way diagonals (top-down / ARPG movement sheets)
+    "down_right": "facing down-right, 3/4 front view angled to the right",
+    "down_left":  "facing down-left, 3/4 front view angled to the left",
+    "up_right":   "facing up-right, 3/4 back view angled to the right",
+    "up_left":    "facing up-left, 3/4 back view angled to the left",
 }
+
+# Canonical row order for directional (4-/8-way) character sheets: clockwise from
+# south. A sheet only includes the directions actually supplied; the row index is
+# the position within this order after filtering.
+DIRECTION_ROW_ORDER = [
+    "down", "down_left", "left", "up_left",
+    "up", "up_right", "right", "down_right",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -562,6 +575,111 @@ def cmd_sheet(args):
     }, indent=2))
 
 
+def cmd_dirsheet(args):
+    """Assemble a DIRECTIONAL character sheet: one row per facing (canonical
+    clockwise-from-south order), columns = animation frames, blank-padded to the
+    longest row. Reads <input-dir>/<direction>/*.png subfolders. Emits the sheet
+    PNG + a .dirsheet.json (per-direction row + frame span) that Godot/Unity can
+    import as an N-way character (each direction = one animation)."""
+    pt = _imp_pixel_toolkit()
+    from PIL import Image
+
+    root = Path(args.input_dir)
+    if not root.exists():
+        raise SystemExit(f"--input-dir not found: {root}")
+
+    # discover the directions that actually have frames, in canonical row order
+    present: list[str] = []
+    frames_by_dir: dict[str, list] = {}
+    for name in DIRECTION_ROW_ORDER:
+        sub = root / name
+        if not sub.is_dir():
+            continue
+        paths = sorted(sub.glob("*.png"))
+        if paths:
+            present.append(name)
+            frames_by_dir[name] = [Image.open(p).convert("RGBA") for p in paths]
+    if not present:
+        raise SystemExit(
+            f"No per-direction frames under {root} (expected subfolders like "
+            f"{root}/down/*.png; known: {', '.join(DIRECTION_ROW_ORDER)})"
+        )
+
+    fw, fh = frames_by_dir[present[0]][0].size
+    cols = max(len(frames_by_dir[d]) for d in present)
+    rows = len(present)
+    blank = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+
+    # row-major flat list (rows*cols), blank-padded, so make_spritesheet lays it
+    # out as a proper grid
+    flat = []
+    directions_meta = []
+    for row_idx, d in enumerate(present):
+        fset = frames_by_dir[d]
+        for c in range(cols):
+            flat.append(fset[c] if c < len(fset) else blank)
+        start = row_idx * cols
+        directions_meta.append({
+            "name": d,
+            "row": row_idx,
+            "frame_count": len(fset),
+            "from": start,
+            "to": start + len(fset) - 1,
+        })
+
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    sheet = pt.make_spritesheet(flat, columns=cols)
+    sheet.save(output)
+
+    meta = {
+        "ok": True,
+        "subcommand": "dirsheet",
+        "sheet": str(output),
+        "frame_size": [fw, fh],
+        "columns": cols,
+        "rows": rows,
+        "directions": directions_meta,
+        "fps": args.fps,
+        "loop": args.loop,
+        "layout": "row-per-direction, row-major frame index",
+    }
+    dirsheet_json = output.with_suffix(".dirsheet.json")
+    dirsheet_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    meta["dirsheet_json"] = str(dirsheet_json)
+
+    # engine-agnostic sheet JSON with a frameTag per direction (Phaser/Pixi/etc.)
+    frame_tags = [
+        {"name": f"{args.anim_name}_{d['name']}", "from": d["from"],
+         "to": d["to"], "direction": "forward"}
+        for d in directions_meta
+    ]
+    generic = {
+        "frames": {},
+        "meta": {
+            "app": "noxdev-animation-pipeline",
+            "format": "RGBA8888",
+            "size": {"w": cols * fw, "h": rows * fh},
+            "scale": "1",
+            "frameTags": frame_tags,
+        },
+    }
+    for row_idx, d in enumerate(present):
+        for c in range(len(frames_by_dir[d])):
+            generic["frames"][f"{args.anim_name}_{d} {c}"] = {
+                "frame": {"x": c * fw, "y": row_idx * fh, "w": fw, "h": fh},
+                "rotated": False, "trimmed": False,
+                "spriteSourceSize": {"x": 0, "y": 0, "w": fw, "h": fh},
+                "sourceSize": {"w": fw, "h": fh},
+                "duration": int(1000 / max(args.fps, 1)),
+            }
+    generic_json = output.with_suffix(".sheet.json")
+    generic_json.write_text(json.dumps(generic, indent=2), encoding="utf-8")
+    meta["sheet_json"] = str(generic_json)
+
+    print(json.dumps(meta, indent=2))
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -624,6 +742,16 @@ def main():
     p.add_argument("--mp4", action="store_true", help="Also save a preview .mp4 (best-effort via ffmpeg)")
     p.add_argument("--engine", default="both", choices=["godot", "unity", "both", "none"])
     p.set_defaults(func=cmd_sheet)
+
+    p = sub.add_parser("dirsheet",
+                       help="Assemble a DIRECTIONAL (4-/8-way) character sheet: one row per facing")
+    p.add_argument("--input-dir", required=True,
+                   help="folder with per-direction subfolders (down/ left/ up/ right/ diagonals…), each *.png")
+    p.add_argument("-o", "--output", required=True, help="output sheet PNG")
+    p.add_argument("--anim-name", default="walk")
+    p.add_argument("--fps", type=int, default=8)
+    p.add_argument("--loop", action="store_true")
+    p.set_defaults(func=cmd_dirsheet)
 
     args = parser.parse_args()
     args.func(args)

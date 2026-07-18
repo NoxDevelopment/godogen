@@ -78,6 +78,35 @@ python3 .claude/skills/animation-pipeline/tools/animation_gen.py sheet \
 
 Use when frames came from elsewhere (Aseprite export, hand-drawn, interpolate's output). Same engine-companion emission as `cycle`.
 
+### dirsheet — Assemble a DIRECTIONAL (4-/8-way) character sheet
+
+```bash
+python3 .claude/skills/animation-pipeline/tools/animation_gen.py dirsheet \
+  --input-dir hero_frames/ \
+  --anim-name walk --fps 8 --loop \
+  -o assets/animations/hero_8way.png
+```
+
+For top-down / ARPG characters that face multiple directions. Reads per-direction
+subfolders under `--input-dir` — `down/ down_left/ left/ up_left/ up/ up_right/
+right/ down_right/`, each holding that facing's `*.png` frames — and lays them out
+as **one row per facing** (canonical clockwise-from-south order), columns = frames,
+blank-padded to the longest row. Include only the directions you have (4-way = just
+`down/left/up/right`; the row index is the position after filtering). Emits:
+
+- `<output>.png` — the grid sheet (rows × cols).
+- `<output>.dirsheet.json` — the directional map: each direction's `row`,
+  `frame_count`, and row-major `from`/`to` frame span (so an engine binds one
+  animation per facing).
+- `<output>.sheet.json` — the engine-agnostic Aseprite/TexturePacker sheet with a
+  `frameTag` per direction (`walk_down`, `walk_left`, …) for Phaser/Pixi/web.
+
+Pair with `cycle --direction <dir>` (now 8-way: the four diagonals `down_right`
+etc. joined `right/left/up/down/front/back`) run once per facing into those
+subfolders, then `dirsheet` to pack them. Validated live (fails=0): canonical row
+order, correct grid dims + per-direction placement, blank-padding for short rows,
+frame spans, and one frameTag per direction. Example: `assets/dirsheet_example/`.
+
 ## Cross-cutting flags
 
 - `--preset NAME` — pixel-art preset (53 options in image-pipeline)
