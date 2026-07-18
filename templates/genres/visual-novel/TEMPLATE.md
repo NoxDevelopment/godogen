@@ -87,14 +87,22 @@ format `noxdev-vn`):
   (which logs `[VN voice] <name> | <provider>/<voice> | <instruction>` by
   default). Override `_speak()` to synthesize with your TTS of choice or play a
   pre-rendered clip — the fields are already parsed and resolved.
+- **Cutscenes (E1)**: a scene can open with a `cutscene` — an ordered list of
+  `panels`, each a static screen (`image`) and/or a Daz clip (`clip`) + a
+  `caption` + an auto-advance `durationMs`. The runtime plays them full-bleed, one
+  at a time (click or timed) BEFORE the scene's dialogue, once per scene. Clips
+  play through a `VideoStreamPlayer` when the file is a stream Godot reads (e.g.
+  `.ogv`; convert Daz `.mp4` → `.ogv`/`.webm`); otherwise the static image + the
+  caption card carry the beat.
 - **Wiring**: `story.gd` auto-detects `res://vn/story.vn.json`; when present it
   switches to `vn_player.tscn`, otherwise it runs the built-in dice demo. So a
   fresh scaffold shows the demo; a Studio export makes it play your story with
   zero code.
 
 Headless-verified (Godot 4.6.1): the runtime parses a sample export, resolves
-sprites/emotions/voice, renders the first line, gates + takes a flag-setting
-choice, and navigates — all assertions green.
+sprites/emotions/voice, plays a scene's multi-panel opening cutscene through to the
+dialogue, renders the first line, gates + takes a flag-setting choice, and
+navigates — all assertions green.
 
 ## How to extend
 

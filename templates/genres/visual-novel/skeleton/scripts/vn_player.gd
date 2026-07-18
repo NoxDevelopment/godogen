@@ -20,6 +20,14 @@ var _line_idx := 0
 var _flags := {}
 var _vars := {}  # numeric stats/meters (Immersion P4)
 
+# Cutscene playback (VN Maker E1) — a scene's opening cutscene is an ordered list of
+# panels (static screens and/or Daz clips + captions), played one at a time before the
+# dialogue. Played once per scene (re-entry doesn't replay).
+var _cutscene_panels := []
+var _panel_idx := 0
+var _in_cutscene := false
+var _cut_done := {}     # scene ids whose cutscene has already played
+
 var _bg_color: ColorRect
 var _bg: TextureRect
 var _portrait: TextureRect
@@ -29,6 +37,14 @@ var _text: Label
 var _emotion: Label
 var _hint: Label
 var _choices: VBoxContainer
+
+# Cutscene overlay (built on top of everything, hidden until a cutscene plays)
+var _cut_layer: Control
+var _cut_media: TextureRect
+var _cut_video: VideoStreamPlayer
+var _cut_caption: Label
+var _cut_hint: Label
+var _cut_timer: Timer
 
 
 func _ready() -> void:
@@ -54,7 +70,80 @@ func _ready() -> void:
 	_scene_id = str(parsed.get("start", ""))
 	if not _scenes.has(_scene_id) and not _order.is_empty():
 		_scene_id = _order[0]
+	_enter_scene(_scene_id)
+
+
+## Enter a scene: if it opens with an unplayed cutscene, play that first; otherwise
+## render the dialogue. The only place a cutscene is (re)started, so line-advance
+## inside a scene never restarts it.
+func _enter_scene(id: String) -> void:
+	_scene_id = id
+	_line_idx = 0
+	var sc := _cur_scene()
+	var cut = sc.get("cutscene", null)
+	if typeof(cut) == TYPE_DICTIONARY and not bool(_cut_done.get(id, false)):
+		var panels: Array = cut.get("panels", [])
+		if not panels.is_empty():
+			_cutscene_panels = panels
+			_panel_idx = 0
+			_in_cutscene = true
+			_cut_layer.visible = true
+			_render_panel()
+			return
+	_in_cutscene = false
+	_cut_layer.visible = false
 	_render()
+
+
+## Draw the current cutscene panel — a Daz clip if the file is a playable VideoStream,
+## else a static image, plus the caption card and a progress/click hint.
+func _render_panel() -> void:
+	var p: Dictionary = _cutscene_panels[clampi(_panel_idx, 0, _cutscene_panels.size() - 1)]
+	var img := str(p.get("image", ""))
+	var clip := str(p.get("clip", ""))
+	var cap := str(p.get("caption", ""))
+	_cut_timer.stop()
+	_cut_video.stop()
+	_cut_video.visible = false
+	_cut_media.texture = null
+	_cut_media.visible = false
+	# Prefer the clip when it's a stream Godot can play (e.g. .ogv); Daz .mp4 needs
+	# converting to .ogv/.webm — a static image or the caption card covers the rest.
+	if clip != "" and ResourceLoader.exists(clip):
+		var vs = load(clip)
+		if vs is VideoStream:
+			_cut_video.stream = vs
+			_cut_video.visible = true
+			_cut_video.play()
+	if not _cut_video.visible and img != "":
+		_set_texture(_cut_media, img)
+		_cut_media.visible = _cut_media.texture != null
+	_cut_caption.text = cap
+	_cut_caption.visible = cap != ""
+	var n := _cutscene_panels.size()
+	var is_last := _panel_idx + 1 >= n
+	var prefix := ("%d/%d · " % [_panel_idx + 1, n]) if n > 1 else ""
+	_cut_hint.text = "%s▸ click to %s" % [prefix, ("continue" if is_last else "advance")]
+	var dur := int(p.get("durationMs", 0))
+	if dur > 0:
+		_cut_timer.wait_time = float(dur) / 1000.0
+		_cut_timer.start()
+
+
+## Advance to the next cutscene panel, or end the cutscene and start the dialogue.
+func _advance_panel() -> void:
+	if not _in_cutscene:
+		return
+	_cut_timer.stop()
+	if _panel_idx + 1 >= _cutscene_panels.size():
+		_in_cutscene = false
+		_cut_done[_scene_id] = true
+		_cut_video.stop()
+		_cut_layer.visible = false
+		_render()
+	else:
+		_panel_idx += 1
+		_render_panel()
 
 
 func _cur_scene() -> Dictionary:
@@ -149,9 +238,7 @@ func _on_choice(ch: Dictionary) -> void:
 	_vars = VnRuntime.apply_var_ops(_vars, ch.get("setVars", []))
 	var goto := str(ch.get("goto", ""))
 	if goto != "" and _scenes.has(goto):
-		_scene_id = goto
-		_line_idx = 0
-		_render()
+		_enter_scene(goto)
 
 
 func _unhandled_input(e: InputEvent) -> void:
@@ -162,6 +249,9 @@ func _unhandled_input(e: InputEvent) -> void:
 		advance = true
 	if not advance:
 		return
+	if _in_cutscene:
+		_advance_panel()
+		return
 	if _choices.get_child_count() > 0:
 		return # waiting on a choice
 	var sc := _cur_scene()
@@ -171,9 +261,7 @@ func _unhandled_input(e: InputEvent) -> void:
 		_line_idx += 1
 		_render()
 	elif str(sc.get("next", "")) != "" and _scenes.has(str(sc.get("next", ""))):
-		_scene_id = str(sc.get("next", ""))
-		_line_idx = 0
-		_render()
+		_enter_scene(str(sc.get("next", "")))
 
 
 func _set_texture(node: TextureRect, path: String) -> void:
@@ -282,3 +370,58 @@ func _build_ui() -> void:
 	_choices.custom_minimum_size = Vector2(400, 0)
 	_choices.add_theme_constant_override("separation", 8)
 	add_child(_choices)
+
+	# --- Cutscene overlay (on top of everything; hidden until a cutscene plays) ---
+	_cut_layer = Control.new()
+	_cut_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_cut_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cut_layer.visible = false
+	add_child(_cut_layer)
+
+	var cut_bg := ColorRect.new()
+	cut_bg.color = Color.BLACK
+	cut_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cut_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cut_layer.add_child(cut_bg)
+
+	_cut_video = VideoStreamPlayer.new()
+	_cut_video.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_cut_video.expand = true
+	_cut_video.visible = false
+	_cut_video.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cut_layer.add_child(_cut_video)
+
+	_cut_media = TextureRect.new()
+	_cut_media.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_cut_media.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_cut_media.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_cut_media.visible = false
+	_cut_media.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cut_layer.add_child(_cut_media)
+
+	_cut_caption = Label.new()
+	_cut_caption.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	_cut_caption.offset_top = -140.0
+	_cut_caption.offset_bottom = -70.0
+	_cut_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_cut_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_cut_caption.add_theme_font_size_override("font_size", 22)
+	_cut_caption.add_theme_color_override("font_color", Color.WHITE)
+	_cut_caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cut_layer.add_child(_cut_caption)
+
+	_cut_hint = Label.new()
+	_cut_hint.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_cut_hint.offset_left = -260.0
+	_cut_hint.offset_top = -34.0
+	_cut_hint.offset_right = -12.0
+	_cut_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_cut_hint.add_theme_font_size_override("font_size", 12)
+	_cut_hint.add_theme_color_override("font_color", Color(0.85, 0.88, 0.92))
+	_cut_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cut_layer.add_child(_cut_hint)
+
+	_cut_timer = Timer.new()
+	_cut_timer.one_shot = true
+	_cut_timer.timeout.connect(_advance_panel)
+	add_child(_cut_timer)
