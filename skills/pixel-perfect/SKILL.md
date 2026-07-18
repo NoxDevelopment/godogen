@@ -141,3 +141,13 @@ python3 ../engine-export/tools/export_gen.py tileset-tres \
   each opaque blob to its own tile, own-pixels-only so overlapping bboxes never
   leak — scipy when present, else a validated dependency-free numpy labeler).
   Writes an `index.json`. Example: `assets/extract-example/` + `roundtrip_check.py`.
+- **Depth — `normalmap`**: derive a tangent-space normal map from any image's
+  luminance for 2D dynamic lighting (Godot `CanvasTexture.normal_texture`, Unity
+  sprite normal maps). `pixeltool.py normalmap tile.png tile_n.png --strength 2.0`
+  — bright = high by default (`--invert` to flip), `+Z` out of the surface
+  (OpenGL/Godot convention: flat → `(128,128,255)`), Sobel gradients with no
+  scipy dependency. `--wrap` samples edges wrap-around so a **tile's** normal map
+  is seamless; source alpha is preserved (transparent → flat normal) unless
+  `--opaque`; `--scale N` also writes an `Nx` nearest preview. Validated live
+  (fails=0): ramp slope → correct nx sign, flat region → exactly `(128,128,255)`,
+  `--wrap` seam diff 0.0. Example: `assets/normalmap_example/`.

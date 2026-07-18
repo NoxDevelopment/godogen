@@ -32,9 +32,15 @@ Usage:
       [--dither none|ordered|fs] [--morph] [--alpha-binarize]
       [--chroma global|flood] [--chroma-color "#FF00FF"] [--chroma-tol 40]
       [--backend auto|snap|unfake|hough|pixeloe] [--scale N] [--json]
+  pixeltool.py tileset t0.png t1.png ... -o atlas.png [--tile-size 32] [--extrude 2]
+  pixeltool.py extract sheet.png -o out/ [--mode grid|cc] [--tile-size 32]
+  pixeltool.py normalmap in.png out_n.png [--strength 2.0] [--invert] [--wrap]
+      [--opaque] [--scale N] [--json]
 
 Output = true-resolution PNG (1 image pixel per art pixel). --scale N writes an
 extra <out>_preview.png at Nx nearest-neighbor. Engines import with Nearest.
+normalmap derives a tangent-space normal map (2D dynamic lighting) from an
+image's luminance — +Z out (flat=(128,128,255)); --wrap for seamless tiles.
 """
 
 from __future__ import annotations
@@ -548,6 +554,78 @@ def cmd_extract(args) -> None:
         print(f"[extract:{args.mode}] {args.sheet} -> {len(entries)} tiles ({backend})  {outdir}")
 
 
+def _sobel_gradients(height: np.ndarray, wrap: bool):
+    """Vectorised Sobel dx/dy over a float heightmap. wrap=True tiles seamlessly
+    (essential for tileset normals); else clamp at the edges. No scipy needed."""
+    mode = "wrap" if wrap else "edge"
+    hp = np.pad(height, 1, mode=mode)
+    nw, n, ne = hp[:-2, :-2], hp[:-2, 1:-1], hp[:-2, 2:]
+    w, e = hp[1:-1, :-2], hp[1:-1, 2:]
+    sw, s, se = hp[2:, :-2], hp[2:, 1:-1], hp[2:, 2:]
+    gx = (ne + 2.0 * e + se) - (nw + 2.0 * w + sw)
+    gy = (sw + 2.0 * s + se) - (nw + 2.0 * n + ne)
+    return gx, gy
+
+
+def height_to_normal(height: np.ndarray, strength: float, wrap: bool) -> np.ndarray:
+    """height (H×W float 0..1) -> RGB normal map (H×W×3 uint8), tangent-space,
+    +Z out of the surface (OpenGL/Godot convention). Flat -> (128,128,255)."""
+    gx, gy = _sobel_gradients(height.astype(np.float64), wrap)
+    nx = -gx * strength
+    ny = -gy * strength
+    nz = np.ones_like(nx)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nx, ny, nz = nx / length, ny / length, nz / length
+    rgb = np.empty((height.shape[0], height.shape[1], 3), dtype=np.uint8)
+    rgb[..., 0] = np.clip((nx * 0.5 + 0.5) * 255.0 + 0.5, 0, 255).astype(np.uint8)
+    rgb[..., 1] = np.clip((ny * 0.5 + 0.5) * 255.0 + 0.5, 0, 255).astype(np.uint8)
+    rgb[..., 2] = np.clip((nz * 0.5 + 0.5) * 255.0 + 0.5, 0, 255).astype(np.uint8)
+    return rgb
+
+
+def cmd_normalmap(args) -> None:
+    img = Image.open(args.input).convert("RGBA")
+    rgba = np.asarray(img, dtype=np.uint8)
+    # luminance heightmap (Rec.601); optionally invert (dark = high vs low)
+    lum = (0.299 * rgba[..., 0] + 0.587 * rgba[..., 1] + 0.114 * rgba[..., 2]) / 255.0
+    if args.invert:
+        lum = 1.0 - lum
+    rgb = height_to_normal(lum, args.strength, args.wrap)
+    out = np.empty((rgb.shape[0], rgb.shape[1], 4), dtype=np.uint8)
+    out[..., :3] = rgb
+    # transparent source pixels -> flat normal + keep them transparent
+    alpha = rgba[..., 3]
+    transparent = alpha < 1
+    out[transparent, 0] = 128
+    out[transparent, 1] = 128
+    out[transparent, 2] = 255
+    out[..., 3] = 255 if args.opaque else alpha
+    Image.fromarray(out).save(args.output)
+    if args.scale and args.scale > 1:
+        prev = Image.fromarray(out).resize(
+            (out.shape[1] * args.scale, out.shape[0] * args.scale), Image.NEAREST
+        )
+        prev_path = args.output.rsplit(".", 1)[0] + "_preview.png"
+        prev.save(prev_path)
+    result = {
+        "op": "normalmap",
+        "input": args.input,
+        "output": args.output,
+        "size": [out.shape[1], out.shape[0]],
+        "strength": args.strength,
+        "wrap": bool(args.wrap),
+        "invert": bool(args.invert),
+    }
+    if args.json:
+        print(json.dumps(result))
+    else:
+        print(
+            f"[normalmap] {args.input} -> {args.output}  "
+            f"({out.shape[1]}x{out.shape[0]}, strength={args.strength}, "
+            f"wrap={bool(args.wrap)})"
+        )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         prog="pixeltool", description=__doc__,
@@ -611,6 +689,22 @@ def main() -> None:
     ex.add_argument("--prefix", default="tile_")
     ex.add_argument("--json", action="store_true", help="print JSON result")
 
+    nm = sub.add_parser("normalmap",
+                        help="derive a tangent-space normal map from an image's luminance")
+    nm.add_argument("input")
+    nm.add_argument("output")
+    nm.add_argument("--strength", type=float, default=2.0,
+                    help="bump strength (higher = steeper relief; default 2.0)")
+    nm.add_argument("--invert", action="store_true",
+                    help="treat dark as high (default: bright = high)")
+    nm.add_argument("--wrap", action="store_true",
+                    help="sample edges wrap-around so the map tiles seamlessly (tilesets)")
+    nm.add_argument("--opaque", action="store_true",
+                    help="force alpha 255 (default: keep source alpha, flat normal where transparent)")
+    nm.add_argument("--scale", type=int, default=0,
+                    help="also write <output>_preview.png at Nx nearest")
+    nm.add_argument("--json", action="store_true", help="print JSON result")
+
     args = ap.parse_args()
 
     if args.cmd == "tileset":
@@ -618,6 +712,9 @@ def main() -> None:
         return
     if args.cmd == "extract":
         cmd_extract(args)
+        return
+    if args.cmd == "normalmap":
+        cmd_normalmap(args)
         return
 
     if args.pixel_size == "auto":
