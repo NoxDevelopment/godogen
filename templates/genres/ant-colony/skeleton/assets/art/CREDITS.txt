@@ -1,0 +1,74 @@
+CC0 / PUBLIC-DOMAIN 2D ART FOR A TOP-DOWN ANT-COLONY GAME
+=========================================================
+All assets below are CC0 (Creative Commons Zero / public domain). No attribution
+required. Every license was individually verified on the source page.
+
+CANONICAL GAME FILES (use these)
+--------------------------------
+ant_worker.png        27x16   small red top-down insect  (colony worker)
+ant_queen.png         54x38   big red top-down insect    (colony queen, same red = same colony)
+ant_enemy.png         27x16   small grey top-down insect (rival-colony worker)
+ant_enemy_queen.png   54x38   big grey top-down insect   (rival-colony queen)
+tile_dirt.png         512x512 seamless brown soil        (underground ground)
+tile_grass.png        512x512 seamless grass             (surface ground)
+tile_tunnel.png       512x512 seamless sand (from 2048)  (tunnel / dug sand)
+food.png              32x32   strawberry berry           (food pickup)
+food_honeycomb.png    32x32   honeycomb                  (alt food pickup, thematic)
+food_apple.png        32x32   apple                      (alt food pickup)
+
+EXTRA COLOR VARIANTS (same sheet, for more ant castes/teams)
+------------------------------------------------------------
+small_red/yellow/green/grey.png   27x16  small top-down insects
+big_red/yellow/green/grey.png     54x38  big top-down insects
+  -> e.g. yellow = soldier caste, green = 3rd rival colony, etc.
+
+SOURCES + LICENSES
+------------------
+1) ANTS/INSECTS -- "Old Bugs" (Bug Blaster GFX) by Master484
+   Page:   https://opengameart.org/content/old-bugs
+   File:   oldbugs_BugSprites.png (850x1500 sprite sheet, downloaded)
+   License: CC0 / Public Domain (stated on the sheet: "LICENSE : PUBLIC DOMAIN / CC0")
+   The small_* / big_* / ant_* PNGs were cropped from the "SMALL BUGS" and
+   "BIG BUGS" grids (first animation frame per color row) and the 1px grid
+   border + black background were removed / keyed to transparency.
+
+2) DIRT -- "Tileable Dirt Textures"
+   Page:   https://opengameart.org/content/tileable-dirt-textures
+   File:   dirt_textures.zip -> dirt_extracted/Dirt_01..04.png (+ normal maps _Nrm)
+   License: CC0
+   tile_dirt.png = Dirt_01.png (512x512, seamless). Dirt_02..04 also available.
+
+3) GRASS -- "Seamless Grass Texture"
+   Page:   https://opengameart.org/content/seamless-grass-texture
+   File:   tile_grass_512.png (grass00_0.png, 512x512, seamless)
+   License: CC0
+
+4) SAND/TUNNEL -- "Simple Seamless tiles of dirt and sand" by LuminousDragonGames
+   Page:   https://opengameart.org/content/simple-seamless-tiles-of-dirt-and-sand
+   File:   tile_sand_src.png (Sand1_0.png, 2048x2048, seamless)
+   License: CC0 (author credit optional)
+   tile_tunnel.png = tile_sand_src.png resized to 512x512.
+
+5) FOOD -- "Dungeon Crawl 32x32 tiles" (DCSS), maintained by Chris Hamons
+   Page:   https://opengameart.org/node/12210  (via CC0 Food Icons collection)
+   Zip:    food_dcss.zip -> food_dcss/32x32/*.png
+   License: CC0 (verified on node 12210)
+   food.png=strawberry_01, food_honeycomb.png=honeycomb, food_apple.png=apple.
+   Many more CC0 foods available in food_dcss/32x32/ (bread_ration, grapes,
+   pear, sausage, cheese, lump_of_royal_jelly, etc.)
+
+REJECTED (license failed verification)
+--------------------------------------
+- "[LPC] Food" by bluecarrot16 (opengameart node 98209): listed on the
+  "CC0 Food Icons" collection but its ACTUAL license is CC-BY-SA 3.0 / GPL 3.0.
+  NOT CC0 -> downloaded, verified, and DELETED. Do not use.
+
+NOTES
+-----
+- The ants are generic top-down "bugs" (rounded body, 2 eyes, 4 splayed legs),
+  not literally ant-shaped, but read clearly as small insects from above and
+  come in 4 colors x 2 sizes -- ideal for worker/queen/rival differentiation.
+- No genuinely CC0 *ant-specific* top-down sprite was found; the dedicated
+  ant sprites on OpenGameArt ("16x16 Ant Enemies", "Walking Ant") are CC0 but
+  SIDE-VIEW, so they were not used for this top-down game.
+- _ASSET_OVERVIEW.png is a preview montage (not a game asset).

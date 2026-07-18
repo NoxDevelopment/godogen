@@ -19,6 +19,16 @@ const COLONY_COLOR: PackedColorArray = [
 	Color(1.00, 0.45, 0.38),   # RIVAL — red
 ]
 
+# Real CC0 art (OpenGameArt): seamless ground tiles + top-down insect sprites.
+var _tex_grass: Texture2D
+var _tex_dirt: Texture2D
+var _tex_tunnel: Texture2D
+var _tex_food: Texture2D
+var _tex_worker: Texture2D
+var _tex_queen: Texture2D
+var _tex_enemy: Texture2D
+var _tex_enemy_queen: Texture2D
+
 var _selected_zone := AntWorld.ZONE_FORAGE
 var _zone_buttons: Array[Button] = []
 var _pop_label: Label
@@ -32,6 +42,7 @@ var _show_pheromone := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_load_art()
 	_build_hud()
 	var timer := Timer.new()
 	timer.wait_time = TICK_SECONDS
@@ -41,6 +52,17 @@ func _ready() -> void:
 	GameManager.world_reset.connect(_on_world_reset)
 	_refresh_hud()
 	queue_redraw()
+
+
+func _load_art() -> void:
+	_tex_grass = load("res://assets/art/tile_grass.png")
+	_tex_dirt = load("res://assets/art/tile_dirt.png")
+	_tex_tunnel = load("res://assets/art/tile_tunnel.png")
+	_tex_food = load("res://assets/art/food.png")
+	_tex_worker = load("res://assets/art/ant_worker.png")
+	_tex_queen = load("res://assets/art/ant_queen.png")
+	_tex_enemy = load("res://assets/art/ant_enemy.png")
+	_tex_enemy_queen = load("res://assets/art/ant_enemy_queen.png")
 
 
 func _on_world_reset() -> void:
@@ -68,7 +90,7 @@ func _draw() -> void:
 	for y in w.height:
 		for x in w.width:
 			var p := ORIGIN + Vector2(x * CELL, y * CELL)
-			draw_rect(Rect2(p, Vector2(CELL, CELL)), _cell_color(w, x, y))
+			_draw_terrain(w, x, y, p)
 			if _show_pheromone:
 				var f := w.food_ph(AntWorld.YOU, x, y)
 				if f > 0.5:
@@ -90,18 +112,69 @@ func _draw() -> void:
 	for i in w.ant_count():
 		var a := w.ant_info(i)
 		var ap := ORIGIN + Vector2(int(a["x"]) * CELL + CELL * 0.5, int(a["y"]) * CELL + CELL * 0.5)
-		var col: Color = COLONY_COLOR[int(a["colony"])]
+		var colony := int(a["colony"])
 		var caste := int(a["caste"])
-		var r := CELL * 0.28
-		if caste == AntWorld.SOLDIER:
-			col = col.lerp(Color(1, 1, 1), 0.35)
-			r = CELL * 0.34
-		elif caste == AntWorld.QUEEN:
-			col = col.lerp(Color(1, 0.9, 0.4), 0.5)
-			r = CELL * 0.5
+		var mine := colony == AntWorld.YOU
+		var tex: Texture2D
+		var sz := CELL * 1.15
+		if caste == AntWorld.QUEEN:
+			tex = _tex_queen if mine else _tex_enemy_queen
+			sz = CELL * 2.0
+		else:
+			tex = _tex_worker if mine else _tex_enemy
+			if caste == AntWorld.SOLDIER:
+				sz = CELL * 1.5
 		if int(a["carry"]) == 1:
-			draw_circle(ap, r + 2.0, Color(0.95, 0.85, 0.3))  # food halo
-		draw_circle(ap, r, col)
+			draw_circle(ap, sz * 0.5 + 2.0, Color(0.95, 0.85, 0.3, 0.9))  # food halo
+		if tex != null:
+			var w2 := sz
+			var h2 := sz * float(tex.get_height()) / float(maxi(1, tex.get_width()))
+			draw_texture_rect(tex, Rect2(ap - Vector2(w2, h2) * 0.5, Vector2(w2, h2)), false)
+		else:
+			draw_circle(ap, CELL * 0.3, COLONY_COLOR[colony])
+
+
+## Paint one terrain cell with a real seamless texture (region-sampled from the
+## CC0 tile so adjacent cells form a continuous ground), tinted per terrain type.
+func _draw_terrain(w: AntWorld, x: int, y: int, p: Vector2) -> void:
+	var cell := Rect2(p, Vector2(CELL, CELL))
+	var t := w.terrain_at(x, y)
+	var tex: Texture2D = _tex_dirt
+	var tint := Color.WHITE
+	match t:
+		AntWorld.OPEN:
+			if y < AntWorld.SURFACE_ROWS:
+				tex = _tex_grass
+			else:
+				tex = _tex_dirt
+				tint = Color(0.72, 0.72, 0.78)   # dug-out underground air
+		AntWorld.SOIL:
+			tex = _tex_dirt
+		AntWorld.TUNNEL:
+			tex = _tex_tunnel
+		AntWorld.CHAMBER:
+			tex = _tex_tunnel
+			tint = Color(1.08, 1.06, 0.98)
+		AntWorld.FOOD:
+			tex = _tex_grass
+		AntWorld.ROCK:
+			tex = _tex_dirt
+			tint = Color(0.45, 0.45, 0.50)
+		AntWorld.NEST:
+			tex = _tex_tunnel
+			tint = Color(0.70, 0.85, 1.10)
+		AntWorld.RNEST:
+			tex = _tex_tunnel
+			tint = Color(1.10, 0.70, 0.65)
+	if tex == null:
+		draw_rect(cell, _cell_color(w, x, y))
+		return
+	var tw := tex.get_width()
+	var th := tex.get_height()
+	var src := Rect2((x * CELL) % tw, (y * CELL) % th, CELL, CELL)
+	draw_texture_rect_region(tex, cell, src, tint)
+	if t == AntWorld.FOOD and _tex_food != null:
+		draw_texture_rect(_tex_food, cell, false)
 
 
 func _cell_color(w: AntWorld, x: int, y: int) -> Color:
