@@ -31,15 +31,24 @@ INTERP = {"none": 0, "linear": 1, "cubic": 2, "nohalo": 3, "lohalo": 3}  # gimp 
 
 
 def find_gimp() -> str | None:
-    """Locate a GIMP executable (PATH first, then common Windows install dirs)."""
-    for name in ("gimp-console-2.10", "gimp-2.10", "gimp-console", "gimp"):
+    """Locate a GIMP executable (PATH first, then common install dirs incl. a
+    per-user AppData install — GIMP's installer offers 'just for me')."""
+    for name in ("gimp-console-2.10", "gimp-2.10", "gimp-console-3.0", "gimp-console", "gimp"):
         p = shutil.which(name)
         if p:
             return p
-    for base in (
+    bases = [
         r"C:/Program Files/GIMP 2/bin",
         r"C:/Program Files/GIMP 2.10/bin",
-    ):
+        r"C:/Program Files/GIMP 3/bin",
+    ]
+    local = os.environ.get("LOCALAPPDATA")
+    if local:
+        bases += [
+            os.path.join(local, "Programs", "GIMP 2", "bin"),
+            os.path.join(local, "Programs", "GIMP 3", "bin"),
+        ]
+    for base in bases:
         if os.path.isdir(base):
             for f in sorted(os.listdir(base)):
                 if f.startswith("gimp-console") and f.endswith(".exe"):
@@ -56,7 +65,7 @@ def build_scriptfu(op: str, in_path: str, out_path: str, **kw) -> str:
     """Build the script-fu batch string for an op. Pure — no IO. This is the
     testable heart of the bridge."""
     load = f"(let* ((image (car (gimp-file-load RUN-NONINTERACTIVE {_q(in_path)} {_q(in_path)}))) (drawable (car (gimp-image-get-active-drawable image))))"
-    save = f"(gimp-image-flatten image) (file-save RUN-NONINTERACTIVE image (car (gimp-image-get-active-drawable image)) {_q(out_path)} {_q(out_path)}) (gimp-image-delete image))"
+    save = f"(gimp-image-flatten image) (gimp-file-save RUN-NONINTERACTIVE image (car (gimp-image-get-active-drawable image)) {_q(out_path)} {_q(out_path)}) (gimp-image-delete image))"
 
     if op == "scale":
         w = int(kw.get("width", 0))

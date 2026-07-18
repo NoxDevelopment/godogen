@@ -36,5 +36,8 @@ Tooling shipped 2026-07-17 (builder + invoker + graceful degrade + 11-check
 probe). **Studio surface SHIPPED 2026-07-17**: a `gimpProcess` action in the
 Studio `dcc.ts` (next to blender/daz) + a `/gimp` page (op picker for
 scale/indexed/flatten/convert + result preview), registered under the Train area.
-The action parses the tool's JSON result (the tool always exits 0). GIMP 2.10+ on
-PATH is the only remaining gap; until then the surface degrades honestly.
+The action parses the tool's JSON result (the tool always exits 0). **VALIDATED END-TO-END 2026-07-18** on a real GIMP 2.10 install: all ops (scale /
+indexed / flatten / convert) produce output. Two fixes made when GIMP was first
+installed: detect a per-user AppData install (%LOCALAPPDATA%/Programs/GIMP 2/bin),
+and the save procedure was `file-save` (an unbound variable — never exercised while
+GIMP was absent) → corrected to `gimp-file-save`.
