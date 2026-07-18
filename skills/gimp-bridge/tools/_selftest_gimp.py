@@ -33,6 +33,39 @@ check("flatten flattens", "gimp-image-flatten image" in flat)
 conv = build_scriptfu("convert", "a.png", "b.webp")
 check("convert re-encodes to output ext", "b.webp" in conv and "gimp-file-load" in conv)
 
+bc = build_scriptfu("brightness-contrast", "a.png", "b.png", brightness=127, contrast=-127)
+check("brightness-contrast maps -127..127 to -1..1", "gimp-drawable-brightness-contrast drawable 1.0000 -1.0000" in bc)
+
+hs = build_scriptfu("hue-saturation", "a.png", "b.png", hue=40, lightness=0, saturation=-20)
+check("hue-saturation uses HUE-RANGE-ALL(0) + args", "gimp-drawable-hue-saturation drawable 0 40 0 -20 0" in hs)
+
+bl = build_scriptfu("blur", "a.png", "b.png", radius=4)
+check("blur is gaussian IIR", "plug-in-gauss RUN-NONINTERACTIVE image drawable 4.00 4.00 0" in bl)
+
+sh = build_scriptfu("sharpen", "a.png", "b.png", radius=2, amount=0.8, threshold=0)
+check("sharpen is unsharp-mask", "plug-in-unsharp-mask RUN-NONINTERACTIVE image drawable 2.00 0.80 0" in sh)
+
+r90 = build_scriptfu("rotate", "a.png", "b.png", degrees=90)
+r270 = build_scriptfu("rotate", "a.png", "b.png", degrees=270)
+check("rotate 90 -> ROTATE-90(0)", "gimp-image-rotate image 0" in r90)
+check("rotate 270 -> ROTATE-270(2)", "gimp-image-rotate image 2" in r270)
+try:
+    build_scriptfu("rotate", "a.png", "b.png", degrees=45)
+    check("rotate rejects non-quadrant angles", False)
+except ValueError:
+    check("rotate rejects non-quadrant angles", True)
+
+fh = build_scriptfu("flip", "a.png", "b.png", axis="horizontal")
+fv = build_scriptfu("flip", "a.png", "b.png", axis="vertical")
+check("flip horizontal -> 0", "gimp-image-flip image 0" in fh)
+check("flip vertical -> 1", "gimp-image-flip image 1" in fv)
+
+ds = build_scriptfu("drop-shadow", "a.png", "b.png", offset_x=4, offset_y=4, blur=8, opacity=60)
+check("drop-shadow calls script-fu-drop-shadow", "script-fu-drop-shadow image drawable 4 4 8 '(0 0 0) 60 FALSE" in ds)
+
+gr = build_scriptfu("grain", "a.png", "b.png", amount=40, dulling=2)
+check("grain is hsv-noise value channel", "plug-in-hsv-noise RUN-NONINTERACTIVE image drawable 2 0 0 40" in gr)
+
 scr = build_scriptfu("script", "a.png", "b.png", scriptfu="(do {IN} -> {OUT})")
 check("script substitutes IN/OUT tokens", "a.png" in scr and "b.png" in scr and "{IN}" not in scr)
 
