@@ -92,6 +92,52 @@ func _ready() -> void:
 	c2.load_data(snap)
 	_check("save_load", c2.items() == c.items())
 
+	# --- trading (faction-priced buy/sell) ---
+	var trade := RPGTrading.new({ "potion": 10, "iron_sword": 50 })
+	var player := RPGInventory.new(items)
+	var merchant := RPGInventory.new(items)
+	player.add("gold", 100)
+	merchant.add("potion", 5)
+	merchant.add("gold", 200)
+	_check("buy_price_neutral", trade.buy_price("potion", "neutral") == 10)
+	_check("buy_price_friendly_cheaper", trade.buy_price("potion", "friendly") == 9)
+	var b := trade.buy(player, merchant, "potion", 2, "friendly") # 2 * 9 = 18
+	_check("buy_ok", b.ok and int(b.spent) == 18)
+	_check("buy_moved_goods", player.count("potion") == 2 and player.count("gold") == 82 and merchant.count("potion") == 3)
+	var s := trade.sell(player, merchant, "potion", 1) # sell_price 5
+	_check("sell_ok", s.ok and int(s.earned) == 5 and player.count("gold") == 87)
+	var broke := RPGInventory.new(items)
+	_check("buy_no_gold", not trade.buy(broke, merchant, "potion", 1).ok)
+
+	# --- jobs (time-gated pay + rep) ---
+	var jobs := RPGJobs.new({
+		"deliver_ore": { "duration": 3, "pay": { "gold": 25, "items": { "leather": 1 } }, "rep": { "smiths_guild": 5 } },
+	})
+	var jinv := RPGInventory.new(items)
+	var jfac := RPGFactions.new()
+	_check("job_start", jobs.start("deliver_ore").ok and jobs.is_active())
+	jobs.tick(2)
+	_check("job_not_ready", not jobs.ready() and not jobs.complete(jinv, jfac).ok)
+	jobs.tick(1)
+	_check("job_ready", jobs.ready() and is_equal_approx(jobs.progress(), 1.0))
+	var done := jobs.complete(jinv, jfac)
+	_check("job_paid", done.ok and jinv.count("gold") == 25 and jinv.count("leather") == 1 and jfac.rep("smiths_guild") == 5)
+	_check("job_cleared", not jobs.is_active())
+
+	# --- NPC schedules (deterministic day-clock) ---
+	var sched := RPGSchedule.new({
+		"smith": [
+			{ "from": 8,  "to": 18, "location": "forge",  "activity": "working" },
+			{ "from": 18, "to": 22, "location": "tavern", "activity": "drinking" },
+			{ "from": 22, "to": 8,  "location": "home",   "activity": "sleeping" }, # crosses midnight
+		],
+	})
+	_check("sched_working", String(sched.activity_at("smith", 10).get("location")) == "forge")
+	_check("sched_tavern", String(sched.activity_at("smith", 20).get("location")) == "tavern")
+	_check("sched_sleeps_midnight", String(sched.activity_at("smith", 2).get("location")) == "home")
+	_check("sched_wraps", sched.location_of("smith", 26) == "home") # hour 26 -> 2 -> home
+	_check("sched_unknown_npc", sched.location_of("nobody", 12) == "home")
+
 	var msg := "DEBUG: nox_rpg — inventory+crafting+factions%s fails=%d => %s" % [
 		_line, _fails, ("OK" if _fails == 0 else "FAILED")]
 	print(msg)
