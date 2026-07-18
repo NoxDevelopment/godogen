@@ -33,5 +33,8 @@ clear "GIMP not found" — the bridge is ready, the executable is the only gap.
 
 ## Status
 Tooling shipped 2026-07-17 (builder + invoker + graceful degrade + 11-check
-probe). Studio `dcc.ts` surface (a `gimpProcess` action next to blender/daz) is
-the follow-on wiring.
+probe). **Studio surface SHIPPED 2026-07-17**: a `gimpProcess` action in the
+Studio `dcc.ts` (next to blender/daz) + a `/gimp` page (op picker for
+scale/indexed/flatten/convert + result preview), registered under the Train area.
+The action parses the tool's JSON result (the tool always exits 0). GIMP 2.10+ on
+PATH is the only remaining gap; until then the surface degrades honestly.
