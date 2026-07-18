@@ -123,6 +123,25 @@ def patch_project_name(project_dir: Path, name: str) -> None:
     print(f'[scaffold] project name set to "{name}"')
 
 
+def patch_unity_project_name(project_dir: Path, name: str) -> None:
+    """Set productName in a Unity project's ProjectSettings.asset (the Unity analogue
+    of Godot's config/name). Tolerant: warns rather than failing if the field is absent."""
+    settings = project_dir / "ProjectSettings" / "ProjectSettings.asset"
+    if not settings.is_file():
+        print(f"[scaffold] WARNING: no ProjectSettings.asset at {settings} — name left as-is")
+        return
+    safe = name.replace("\n", " ").replace("\r", " ").strip()
+    text = settings.read_text(encoding="utf-8")
+    new_text, count = re.subn(
+        r"^(\s*)productName:.*$", rf"\g<1>productName: {safe}", text, count=1, flags=re.M
+    )
+    if count == 0:
+        print("[scaffold] WARNING: no productName line in ProjectSettings.asset — name left as-is")
+        return
+    settings.write_text(new_text, encoding="utf-8", newline="\n")
+    print(f'[scaffold] Unity productName set to "{safe}"')
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("genre", help="template id from the registry, e.g. metroidvania")
@@ -144,39 +163,60 @@ def main(argv: list[str] | None = None) -> int:
     skeleton_dir = registry_dir / template["skeleton"]
     target_dir = args.target.resolve()
 
+    engine = str(template.get("engine", "godot")).lower()
     copy_skeleton(skeleton_dir, target_dir, force=args.force)
-    patch_project_name(target_dir, args.name)
 
-    if args.no_vendor:
-        print("[scaffold] --no-vendor: skipping addon vendoring")
+    # Engine-aware post-copy: Godot patches project.godot + vendors addons + bootstrap
+    # imports; Unity patches ProjectSettings.asset productName and skips the Godot-only
+    # steps (a Unity project is a plain folder — no addon vendoring / godot import).
+    if engine == "godot":
+        patch_project_name(target_dir, args.name)
+        if args.no_vendor:
+            print("[scaffold] --no-vendor: skipping addon vendoring")
+        else:
+            godot = None if args.no_import else find_godot(args.godot)
+            defer = godot is not None
+            records = vendor_addons.vendor_template(
+                template, target_dir, force=args.force, defer_enable=defer
+            )
+            pending = [p for r in records for p in (r.get("enable") or [])]
+            if defer:
+                bootstrap_import(godot, target_dir)
+                if pending:
+                    vendor_addons.enable_plugins(target_dir / "project.godot", pending)
+                    print(f"[scaffold] enabled {len(pending)} plugin(s) after bootstrap import")
+            elif pending and not args.no_import:
+                # No godot found: vendor_template enabled the plugins immediately.
+                print("[scaffold] WARNING: no godot executable found — plugins enabled "
+                      "without a bootstrap import; the first editor import will show "
+                      "one-time addon bootstrap noise. Set $GODOT or pass --godot to fix.")
+    elif engine == "unity":
+        patch_unity_project_name(target_dir, args.name)
+        print("[scaffold] Unity project — skipping Godot addon vendoring + bootstrap import")
     else:
-        godot = None if args.no_import else find_godot(args.godot)
-        defer = godot is not None
-        records = vendor_addons.vendor_template(
-            template, target_dir, force=args.force, defer_enable=defer
-        )
-        pending = [p for r in records for p in (r.get("enable") or [])]
-        if defer:
-            bootstrap_import(godot, target_dir)
-            if pending:
-                vendor_addons.enable_plugins(target_dir / "project.godot", pending)
-                print(f"[scaffold] enabled {len(pending)} plugin(s) after bootstrap import")
-        elif pending and not args.no_import:
-            # No godot found: vendor_template enabled the plugins immediately.
-            print("[scaffold] WARNING: no godot executable found — plugins enabled "
-                  "without a bootstrap import; the first editor import will show "
-                  "one-time addon bootstrap noise. Set $GODOT or pass --godot to fix.")
+        print(f"[scaffold] engine '{engine}': copied the skeleton as-is "
+              "(name-patch / vendor / import are engine-specific)")
 
-    engine = f"{template.get('engine', 'godot')} {template.get('engineVersion', '')}".strip()
+    engine_pin = f"{template.get('engine', 'godot')} {template.get('engineVersion', '')}".strip()
     doc = registry_dir / template.get("doc", "")
     print()
     print(f"[scaffold] '{template['name']}' scaffolded at {target_dir}")
-    print(f"[scaffold] engine pin: {engine}")
+    print(f"[scaffold] engine pin: {engine_pin}")
     if doc.is_file():
         print(f"[scaffold] template guide: {doc}")
     print("[scaffold] next steps:")
-    print(f"    godot --headless --path \"{target_dir}\" --import   # first import")
-    print(f"    godot --path \"{target_dir}\"                        # open the editor")
+    if engine == "unity":
+        pv = target_dir / "ProjectSettings" / "ProjectVersion.txt"
+        ver = ""
+        if pv.is_file():
+            m = re.search(r"m_EditorVersion:\s*(\S+)", pv.read_text(encoding="utf-8"))
+            ver = m.group(1) if m else ""
+        print(f"    Open in Unity Hub with Unity {ver or '6000.0.x'} "
+              "(see ProjectSettings/ProjectVersion.txt)")
+        print(f"    Or headless: \"<Unity.exe>\" -projectPath \"{target_dir}\"")
+    else:
+        print(f"    godot --headless --path \"{target_dir}\" --import   # first import")
+        print(f"    godot --path \"{target_dir}\"                        # open the editor")
     return 0
 
 
