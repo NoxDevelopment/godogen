@@ -19,7 +19,9 @@ the companion library.
 >    active development — the interchange schema and every field mapping in
 >    `schema/FIELD_MAPPINGS.md` **will need updating as the library evolves**.
 >
->    **Last mapped: 2026-07-11 against `localllm_poc@1eb530af`.**
+>    **Last mapped: 2026-07-11 against `localllm_poc@1eb530af`; re-verified
+>    2026-07-18 @ `7d140eb4` (projection holds — the 134-commit seed_spine work
+>    is generation-internal, adds no toJson keys; see FIELD_MAPPINGS.md).**
 >
 >    **Re-mapping procedure:** re-run the read-only exploration of
 >    `companion_ai_core/lib/src/domain/companion/complete_companion_entity.dart`

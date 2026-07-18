@@ -20,7 +20,8 @@ Formats verified against bitbrain/pandora @ godot-4.x (2026-07-11):
   array written as index-keyed dict: {"0": {"type": "string", "value": "..."}, ...}
 
 NOTE: the interchange projection is a point-in-time mapping of companion_ai_core
-(last mapped 2026-07-11 @ localllm_poc@1eb530af — see schema/FIELD_MAPPINGS.md).
+(last mapped 2026-07-11 @ localllm_poc@1eb530af, re-verified 2026-07-18 @ 7d140eb4 —
+see schema/FIELD_MAPPINGS.md).
 This importer only consumes interchange JSON; it never reads the Dart library.
 
 Usage:

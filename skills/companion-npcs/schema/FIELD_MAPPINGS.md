@@ -13,6 +13,18 @@ one-off script over `CompleteCompanionEntity.toJson()` output) is mechanical.
 > **Last mapped: 2026-07-11 against `localllm_poc@1eb530af`**
 > ("feat(seed-spine): S1 — identity latent vector + analytic Gaussian sampler")
 >
+> **Re-verified: 2026-07-18 against `localllm_poc@7d140eb4` — projection HOLDS, no changes.**
+> Diffed 134 commits (1eb530af..7d140eb4). Nearly all are the new **seed_spine**
+> generation subsystem (identity latent vectors, covariance model, lock compiler,
+> backstory DAG, psychology/religiosity derivers) — this is generation-time machinery
+> that flows INTO the existing `physicalProfile` / `voiceProfile` / `personalityProfile`
+> the tables below already map; it adds **no new `toJson()` keys** (verified: no
+> spine/seed/latent/provenance/coherence/lock keys emitted by the entity). The only
+> `complete_companion_entity.dart` change (+34 lines) is a **`fromJson` round-trip fix
+> for `sexualCulturalProfile`** — an intimacy field we DELIBERATELY do not project — so
+> it doesn't touch the interchange. No `interchangeVersion` bump; importer 37-check
+> self-test + schema validation still pass.
+>
 > **Re-mapping procedure when the library evolves:**
 > 1. Re-run the read-only exploration: start at
 >    `companion_ai_core/lib/src/domain/companion/complete_companion_entity.dart`
