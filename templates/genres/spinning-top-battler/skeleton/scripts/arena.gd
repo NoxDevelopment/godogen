@@ -78,10 +78,9 @@ func _build_ui() -> void:
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 
-	var bg := ColorRect.new()
-	bg.color = Color(0.07, 0.08, 0.11)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_layer.add_child(bg)
+	# Backdrop is painted in _draw() (root canvas layer 0) so the arena stays
+	# visible. A full-rect ColorRect in this front CanvasLayer would occlude it
+	# (the bug that made only the builder UI show).
 
 	_title = _mk_label(Vector2(24, 16), 22, Color(0.86, 0.92, 0.98))
 	_score = _mk_label(Vector2(24, 48), 16, Color(0.90, 0.86, 0.55))
@@ -269,6 +268,7 @@ func _on_launch() -> void:
 # =====================================================================
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.07, 0.08, 0.11), true)
 	# stadium bowl
 	draw_circle(ARENA_CENTER, ARENA_VIEW_R, Color(0.12, 0.14, 0.19))
 	draw_arc(ARENA_CENTER, ARENA_VIEW_R, 0.0, TAU, 96, Color(0.55, 0.60, 0.72), 3.0, true)

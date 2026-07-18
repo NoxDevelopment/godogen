@@ -84,6 +84,7 @@ func _on_changed() -> void:
 # =====================================================================
 
 func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.07, 0.08, 0.11), true)
 	var e: PegEngine = GameManager.engine
 	var o := BOARD_ORIGIN
 	var s := BOARD_SCALE
@@ -130,10 +131,9 @@ func _build_ui() -> void:
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 
-	var bg := ColorRect.new()
-	bg.color = Color(0.07, 0.08, 0.11)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_layer.add_child(bg)
+	# Backdrop is painted in _draw() (root canvas layer 0) so the peg board stays
+	# visible. A full-rect ColorRect in this front CanvasLayer would occlude it
+	# (the bug that hid the shot behind the HUD).
 
 	_title = _mk_label(Vector2(40, 18), 24, Color(0.95, 0.86, 0.55))
 	_title.text = "PEG ROGUELIKE — bounce, bank, boss"

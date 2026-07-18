@@ -106,10 +106,9 @@ func _build_ui() -> void:
 	_layer = CanvasLayer.new()
 	add_child(_layer)
 
-	var bg: ColorRect = ColorRect.new()
-	bg.color = Color(0.06, 0.07, 0.10)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_layer.add_child(bg)
+	# Backdrop is painted in _draw() on the root (canvas layer 0) so the fighters
+	# stay visible. A full-rect ColorRect in this front CanvasLayer would occlude
+	# the whole playfield (the bug that made this template render blank).
 
 	_title = _mk_label(Vector2(24, 14), 22, Color(0.92, 0.86, 0.66))
 	_p_status = _mk_label(Vector2(24, 46), 15, Color(0.70, 0.90, 0.72))
@@ -333,6 +332,8 @@ func _rebuild_log() -> void:
 # =====================================================================
 
 func _draw() -> void:
+	# arena backdrop, behind the fighters (root canvas layer)
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.06, 0.07, 0.10), true)
 	var eng: BrawlerEngine = GameManager.engine
 	# stage floor
 	draw_line(Vector2(BrawlerEngine.STAGE_MIN, STAGE_SCREEN_Y),
