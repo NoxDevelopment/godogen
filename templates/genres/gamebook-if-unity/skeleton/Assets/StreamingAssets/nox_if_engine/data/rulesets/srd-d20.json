@@ -1,0 +1,112 @@
+{
+  "id": "srd-d20",
+  "name": "d20 SRD-style (1d20 + modifier vs DC)",
+  "meta": {
+    "family": "meet-or-beat",
+    "license": "genericised — NoxDev reimplementation of the open d20 check math (roll + ability modifier vs a Difficulty Class, with natural-1/natural-20 crits). Resolution math only: no spells, monsters, feats, class text or trademarks.",
+    "degreesOfSuccess": ["critFailure", "failure", "success", "critSuccess"],
+    "advancement": "Ability scores improve at milestones; hit points grow with level. (Advancement content is the campaign's; the engine only interprets the check math.)",
+    "notes": "Full P2 builtin. 1d20 + ability modifier (floor((score-10)/2)) meet-or-beat a Difficulty Class; a natural 20 is a critical success and a natural 1 a critical failure regardless of the arithmetic."
+  },
+  "dice": { "default": "1d20" },
+  "attributes": [
+    { "key": "STR", "label": "Strength",     "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "DEX", "label": "Dexterity",    "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "CON", "label": "Constitution", "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "INT", "label": "Intelligence", "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "WIS", "label": "Wisdom",       "gen": "3d6", "min": 1, "max": 30, "default": 10 },
+    { "key": "CHA", "label": "Charisma",     "gen": "3d6", "min": 1, "max": 30, "default": 10 }
+  ],
+  "resources": [
+    { "key": "HP", "label": "Hit Points", "default": 10, "min": 0, "trackMax": true },
+    { "key": "AC", "label": "Armor Class", "default": 10, "min": 0 }
+  ],
+  "sheetTemplate": {
+    "attributes": ["STR", "DEX", "CON", "INT", "WIS", "CHA"],
+    "resources": ["HP", "AC"],
+    "inventory": true
+  },
+  "resolutionRules": [
+    {
+      "id": "ability-check",
+      "label": "Ability check vs DC",
+      "dice": "1d20",
+      "operands": [
+        { "type": "attributeArg", "ref": "ability", "role": "modifier", "transform": "abilityMod" },
+        { "type": "param",        "ref": "dc",      "role": "target",   "default": 15 }
+      ],
+      "compare": "meet-or-beat",
+      "crit": { "mode": "natural", "low": "fail", "high": "success" },
+      "bands": [
+        { "id": "critSuccess", "when": "critSuccess", "label": "Critical success" },
+        { "id": "success",     "when": "success",     "label": "Success" },
+        { "id": "failure",     "when": "fail",        "label": "Failure" },
+        { "id": "critFailure", "when": "critFail",    "label": "Critical failure" }
+      ]
+    },
+    {
+      "id": "saving-throw",
+      "label": "Saving throw vs DC",
+      "dice": "1d20",
+      "operands": [
+        { "type": "attributeArg", "ref": "ability", "role": "modifier", "transform": "abilityMod" },
+        { "type": "param",        "ref": "dc",      "role": "target",   "default": 13 }
+      ],
+      "compare": "meet-or-beat",
+      "crit": { "mode": "natural", "low": "fail", "high": "success" },
+      "bands": [
+        { "id": "critSuccess", "when": "critSuccess", "label": "Critical save" },
+        { "id": "success",     "when": "success",     "label": "Saved" },
+        { "id": "failure",     "when": "fail",        "label": "Failed save" },
+        { "id": "critFailure", "when": "critFail",    "label": "Critical failure" }
+      ]
+    },
+    {
+      "id": "attack-roll",
+      "label": "Attack roll vs AC",
+      "dice": "1d20",
+      "operands": [
+        { "type": "attributeArg", "ref": "ability", "role": "modifier", "transform": "abilityMod" },
+        { "type": "param",        "ref": "ac",      "role": "target",   "default": 12 }
+      ],
+      "compare": "meet-or-beat",
+      "crit": { "mode": "natural", "low": "fail", "high": "success" },
+      "bands": [
+        { "id": "critSuccess", "when": "critSuccess", "label": "Critical hit" },
+        { "id": "success",     "when": "success",     "label": "Hit" },
+        { "id": "failure",     "when": "fail",        "label": "Miss" },
+        { "id": "critFailure", "when": "critFail",    "label": "Critical miss" }
+      ]
+    }
+  ],
+  "portability": {
+    "attributeMap": {
+      "prowess": "STR",
+      "agility": "DEX",
+      "might": "CON",
+      "wits": "INT",
+      "presence": "CHA",
+      "resolve": "WIS"
+    },
+    "outcomeMap": {
+      "critSuccess": "critSuccess",
+      "success": "success",
+      "failure": "failure",
+      "critFailure": "critFailure"
+    },
+    "semantics": {
+      "skill-test": {
+        "rule": "ability-check",
+        "attrArg": "ability",
+        "difficulty": {
+          "mode": "dc",
+          "arg": "dc",
+          "ladder": {
+            "trivial": 5, "easy": 10, "standard": 15,
+            "hard": 20, "formidable": 25, "heroic": 30
+          }
+        }
+      }
+    }
+  }
+}

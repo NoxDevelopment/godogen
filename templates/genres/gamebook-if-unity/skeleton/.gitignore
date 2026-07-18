@@ -1,0 +1,23 @@
+# Unity-generated — never commit (regenerated on import / build)
+# .meta files are regenerated on import; the NoxDev Unity templates ship none
+# (code-built scenes carry no GUID cross-references to preserve).
+*.meta
+# The demo scene is code-built by NoxBootstrap on first import — not committed
+# (same discipline as the other NoxDev Unity templates).
+/Assets/Scenes/Main.unity
+/Library/
+/Temp/
+/Obj/
+/obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+/.vs/
+*.csproj
+*.sln
+*.user
+*.unityproj
+*.booproj
+*.pidb
+*.suo

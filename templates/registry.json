@@ -1286,6 +1286,40 @@
    ]
   },
   {
+   "id": "gamebook-if-unity",
+   "name": "Nox Loom Gamebook (Unity)",
+   "engine": "unity",
+   "engineVersion": "6000.0 LTS",
+   "description": "Unity port of the Nox Loom computed gamebook (gamebook-if) — a Fighting-Fantasy-style interactive-fiction reader whose rules are DATA, not code. A faithful C# port of the Godot nox_if_engine (spec P0): pure, seedable, deterministic classes under Assets/Scripts/Engine (IFDice/IFRuleset/IFResolver/IFPortableCheck/IFScenario/IFState/IFRunner) over a deterministic IfRng, reading the SAME ruleset+scenario JSON as the Godot engine (shipped verbatim under StreamingAssets/nox_if_engine/data: ff-2d6/srd-d20/pbta/nox-2d10 rulesets + thornwood-crypt/portable-trial scenarios). The generic rule engine (IFResolver) expresses roll-under / meet-or-beat / threshold-band families; the P2 portability layer (IFPortableCheck) compiles a system-agnostic check into a per-ruleset resolver call so ONE scenario runs under every system. Playable reader scene (GamebookPlay renders each passage + a live SKILL/STAMINA/LUCK/GOLD HUD + one button per available choice; check passages auto-chain inside the engine); code-built demo scene via NoxBootstrap (no committed .unity); GameManager singleton with JSON save/load mirroring the NoxDev ABI save_data() via ISaveable, and engine Snapshot/Restore for exact resume. A headless GamebookProbe plays thornwood-crypt under ff-2d6 end-to-end asserting the same invariants as the Godot boot_probe (passage render, effects, an item gate open AND closed, dice-check resolution, a victory ending, save/restore, and determinism). P0 parity with the Godot template; the P1 campaign/module container, P2 Ruleset-Builder round-trip, and the optional P4 AI-DM seam are documented follow-on parity.",
+   "status": "validated",
+   "validatedEditor": "6000.0.40f1",
+   "skeleton": "genres/gamebook-if-unity/skeleton",
+   "doc": "genres/gamebook-if-unity/TEMPLATE.md",
+   "upmPackages": [
+    {
+     "name": "com.unity.nuget.newtonsoft-json",
+     "version": "3.2.1"
+    },
+    {
+     "name": "com.unity.ugui",
+     "version": "2.0.0"
+    }
+   ],
+   "validateMethod": "NoxDev.Editor.NoxBootstrap.BuildDemoScene",
+   "primitives": [],
+   "systems": [],
+   "docTemplates": [
+    "godotsmith:templates/docs/GDD_TEMPLATE.md",
+    "godotsmith:templates/docs/ADR_TEMPLATE.md"
+   ],
+   "assetPlanHints": [
+    "Passage illustration plates (portrait, ink/woodcut style; one per key passage — classic gamebook plates)",
+    "UI page frame + choice-button chrome (parchment / banded-iron motif)",
+    "A sheet-HUD panel background (SKILL / STAMINA / LUCK / GOLD)",
+    "A dice-tray graphic for 2d6 rolls"
+   ]
+  },
+  {
    "id": "top-down-action-unity",
    "name": "Top-Down Action (Unity)",
    "engine": "unity",

@@ -1,0 +1,77 @@
+{
+  "id": "portable-trial",
+  "name": "The Trial of the Warden's Gate",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "A single-check PORTABLE scenario (spec §2.5, P2). It names one canonical SKILL-TEST (attribute 'prowess', difficulty 'hard') and routes on canonical outcome bands (success / partial / failure) to three distinct endings. It carries NO ruleset ('*') and NO native attributes — its effects touch only the universal var/flag/item vocabulary — so the SAME file resolves under ff-2d6, srd-d20, pbta and any user system with a portability block. Under one system it is a 2d6 roll-under, under another a d20-vs-DC, under a third a 2d6+stat threshold — same story, different math.",
+    "portable": true
+  },
+  "ruleset": "*",
+  "start": "gate",
+  "init": {
+    "vars": { "reward": 0 },
+    "items": {},
+    "flags": {}
+  },
+  "passages": [
+    {
+      "id": "gate",
+      "title": "The Warden's Gate",
+      "text": "A slab of banded oak bars the stair, and across it a Warden's sigil that will only yield to a hand that proves itself. There is no key and no trick — only the doing of it.",
+      "choices": [
+        { "id": "attempt", "text": "Set your shoulder to the Warden's Gate and force it.", "goto": "trial" }
+      ]
+    },
+    {
+      "id": "trial",
+      "title": "The Proving",
+      "text": "The sigil flares. Whatever system of the world judges you now, it judges the same deed: can you force the Warden's Gate?",
+      "check": {
+        "semantic": "skill-test",
+        "attribute": "prowess",
+        "difficulty": "hard",
+        "outcomes": {
+          "success": {
+            "effects": [
+              { "kind": "var",  "key": "reward",  "op": "add", "value": 10 },
+              { "kind": "flag", "key": "cleared", "value": true }
+            ],
+            "goto": "won"
+          },
+          "partial": {
+            "effects": [
+              { "kind": "var",  "key": "reward",  "op": "add", "value": 3 },
+              { "kind": "flag", "key": "scraped", "value": true }
+            ],
+            "goto": "scraped"
+          },
+          "failure": {
+            "effects": [
+              { "kind": "flag", "key": "repelled", "value": true }
+            ],
+            "goto": "lost"
+          },
+          "_default": { "goto": "lost" }
+        }
+      }
+    },
+    {
+      "id": "won",
+      "title": "Through Clean",
+      "text": "The gate gives all at once and you are through, the Warden's hoard laid open before you.",
+      "ending": { "id": "triumph", "kind": "victory", "label": "The Gate Forced Clean" }
+    },
+    {
+      "id": "scraped",
+      "title": "Through, Barely",
+      "text": "The gate grinds open a hand's breadth at a time and takes its toll of skin and breath — but you are through, and it cost you.",
+      "ending": { "id": "scraped", "kind": "mixed", "label": "Through at a Cost" }
+    },
+    {
+      "id": "lost",
+      "title": "Held Fast",
+      "text": "The Warden's sigil throws you back. The gate holds, and it keeps whatever it is guarding.",
+      "ending": { "id": "repelled", "kind": "defeat", "label": "The Gate Held" }
+    }
+  ]
+}

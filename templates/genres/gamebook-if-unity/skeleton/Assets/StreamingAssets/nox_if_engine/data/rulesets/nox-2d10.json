@@ -1,0 +1,71 @@
+{
+  "id": "nox-2d10",
+  "name": "Nightlace (2d10 + stat, homebrew)",
+  "meta": {
+    "family": "threshold-bands",
+    "license": "user-authored homebrew — a hand-built sample system that exercises the Ruleset Builder / importer contract. A fourth resolution flavour distinct from all three builtins (2d10 spread, its own stats and outcome band names).",
+    "degreesOfSuccess": ["setback", "mixed", "triumph"],
+    "advancement": "Spend momentum to improve a stat between sessions.",
+    "notes": "Demonstrates that an arbitrary user ruleset.json validates and RUNS the same portable scenario as the builtins. 2d10 + stat: 15+ triumph, 9-14 a mixed result, 8- a setback."
+  },
+  "dice": { "default": "2d10" },
+  "attributes": [
+    { "key": "grit",  "label": "Grit",  "gen": "1d4", "min": 0, "max": 6, "default": 2 },
+    { "key": "guile", "label": "Guile", "gen": "1d4", "min": 0, "max": 6, "default": 2 },
+    { "key": "glory", "label": "Glory", "gen": "1d4", "min": 0, "max": 6, "default": 2 },
+    { "key": "guts",  "label": "Guts",  "gen": "1d4", "min": 0, "max": 6, "default": 2 }
+  ],
+  "resources": [
+    { "key": "vigor",    "label": "Vigor",    "default": 10, "min": 0, "trackMax": true },
+    { "key": "momentum", "label": "Momentum", "default": 0,  "min": 0, "max": 10 }
+  ],
+  "sheetTemplate": {
+    "attributes": ["grit", "guile", "glory", "guts"],
+    "resources": ["vigor", "momentum"],
+    "inventory": true
+  },
+  "resolutionRules": [
+    {
+      "id": "risk",
+      "label": "Take a risk (2d10 + stat)",
+      "dice": "2d10",
+      "operands": [
+        { "type": "attributeArg", "ref": "stat", "role": "modifier" }
+      ],
+      "compare": "threshold-bands",
+      "bands": [
+        { "id": "setback", "max": 8,            "label": "Setback" },
+        { "id": "mixed",   "min": 9, "max": 14,  "label": "Mixed result" },
+        { "id": "triumph", "min": 15,            "label": "Triumph" }
+      ]
+    }
+  ],
+  "portability": {
+    "attributeMap": {
+      "prowess": "grit",
+      "agility": "guile",
+      "might": "grit",
+      "wits": "guile",
+      "presence": "glory",
+      "resolve": "guts"
+    },
+    "outcomeMap": {
+      "triumph": "success",
+      "mixed": "partial",
+      "setback": "failure"
+    },
+    "semantics": {
+      "skill-test": {
+        "rule": "risk",
+        "attrArg": "stat",
+        "difficulty": {
+          "mode": "rollModifier",
+          "ladder": {
+            "trivial": 4, "easy": 2, "standard": 0,
+            "hard": -2, "formidable": -4, "heroic": -6
+          }
+        }
+      }
+    }
+  }
+}
