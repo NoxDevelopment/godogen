@@ -23,6 +23,10 @@ const VERDIGRIS   := Color("6e8f7a")   # Ledger Verdigris — THE signature acce
 const VERDIGRIS_2 := Color("9aa69b")   # verdigris ash
 const FLAME       := Color("c88a3e")   # Tallow Flame — rare warmth (lantern/victory)
 const ARREARS     := Color("8a2e24")   # Old Arrears Red — wounds / blood / danger
+# Prose ink is a hair warmer/softer than pure Bog Ink — printed book ink is never
+# jet-black on paper; this reads as pressed-in ink rather than a screen label.
+const PROSE_INK   := Color("241c12")   # warm reading ink for body prose
+const GILT_EDGE   := Color("3a2c17")   # dark umber edge for the illuminated initial
 
 # --- reused fantasy assets (CC0/OFL) — see credits + asset manifest ----------
 const FONT_DISPLAY := "res://assets/reused/fonts/Cinzel.ttf"          # titles / §N
@@ -46,6 +50,55 @@ static func _res(path: String) -> Resource:
 static func font_display() -> FontFile: return _res(FONT_DISPLAY) as FontFile
 static func font_body() -> FontFile:    return _res(FONT_BODY) as FontFile
 static func font_runic() -> FontFile:   return _res(FONT_RUNIC) as FontFile
+
+
+## The engraved display face with letter-spacing added — tracked caps read as
+## "illuminated / inscribed" rather than a tight default label. Cached per spacing.
+static func font_display_tracked(glyph_spacing: int = 2) -> FontVariation:
+	var key := "fv_display_%d" % glyph_spacing
+	if _cache.has(key):
+		return _cache[key]
+	var fv := FontVariation.new()
+	fv.base_font = font_display()
+	fv.spacing_glyph = glyph_spacing
+	_cache[key] = fv
+	return fv
+
+
+## An ORNAMENTED illuminated drop-cap as BBCode (STYLE_GUIDE §1 "the page is sacred";
+## typography SKILL "drop-caps & illuminated initials"). The first letter becomes a
+## large Uncial versal in Ledger Verdigris — the STYLE_GUIDE signature accent — inked
+## with a dark umber outline and a soft cast shadow so it reads *pressed / gilded into
+## the page*. The remainder of the opening word follows in tracked engraved small-caps
+## (the classic manuscript "versal + spaced opening"), then the prose flows in the body
+## face. Returns the whole passage as BBCode for a RichTextLabel built by `rich()`.
+static func illuminated_cap(text: String) -> String:
+	var body := text.strip_edges(true, false)
+	if body == "":
+		return text
+	var initial := body.substr(0, 1)
+	# extent of the first word (so its tail can render as small-caps opening)
+	var i := 1
+	while i < body.length() and not _is_space(body[i]):
+		i += 1
+	var opener := body.substr(1, i - 1)
+	var tail := body.substr(i)
+	# Balanced LIFO nesting (font > font_size > outline_size > outline_color > color);
+	# the gilt umber outline gives the versal its raised edge, and the label-level ink
+	# shadow set in rich() presses the whole glyph into the page.
+	var cap := "[font=%s][font_size=58]" % FONT_RUNIC \
+		+ "[outline_size=5][outline_color=#%s]" % GILT_EDGE.to_html(false) \
+		+ "[color=#%s]%s[/color]" % [VERDIGRIS.to_html(false), initial] \
+		+ "[/outline_color][/outline_size][/font_size][/font]"
+	if opener == "":
+		return cap + tail
+	var versal := "[font=%s][font_size=22][color=#%s]%s[/color][/font_size][/font]" % [
+		FONT_DISPLAY, UMBER.to_html(false), opener.to_upper()]
+	return cap + versal + tail
+
+
+static func _is_space(ch: String) -> bool:
+	return ch == " " or ch == "\n" or ch == "\t" or ch == "\r"
 
 
 # --- Art by STABLE ID through the Studio-bound AssetBinder (GDD §10a) --------
@@ -150,12 +203,21 @@ static func tex_framed(border: Color = VERDIGRIS) -> PanelContainer:
 # --- Text -------------------------------------------------------------------
 
 
+## An illuminated section heading: the engraved display face, letter-tracked, with a
+## light parchment outline + soft umber cast shadow so the title reads as *inscribed
+## into the page* (engraved/illuminated, typography SKILL) rather than a flat label.
 static func title(text: String, size: int = 30, color: Color = INK) -> Label:
 	var l := Label.new()
 	l.text = text
-	l.add_theme_font_override(&"font", font_display())
+	l.add_theme_font_override(&"font", font_display_tracked(2))
 	l.add_theme_font_size_override(&"font_size", size)
 	l.add_theme_color_override(&"font_color", color)
+	# emboss: a hairline parchment highlight edge + a warm umber drop = "pressed in"
+	l.add_theme_constant_override(&"outline_size", 3)
+	l.add_theme_color_override(&"font_outline_color", Color(PARCHMENT.r, PARCHMENT.g, PARCHMENT.b, 0.55))
+	l.add_theme_color_override(&"font_shadow_color", Color(UMBER.r, UMBER.g, UMBER.b, 0.35))
+	l.add_theme_constant_override(&"shadow_offset_x", 1)
+	l.add_theme_constant_override(&"shadow_offset_y", 2)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.add_to_group(&"scalable_text")
 	return l
@@ -171,14 +233,24 @@ static func label(text: String, size: int = 18, color: Color = INK, body: bool =
 	return l
 
 
-static func rich(size: int = 19, color: Color = INK) -> RichTextLabel:
+## The reading-prose label: warm readable body face on parchment ink, generous
+## line-height, and a faint 1px ink-shadow so the text reads as *pressed into the
+## page* (typography SKILL "subtle emboss/shadow"). Illuminated drop-caps and the
+## engraved bold face are applied per-passage via BBCode (see `illuminated_cap`).
+static func rich(size: int = 19, color: Color = PROSE_INK) -> RichTextLabel:
 	var r := RichTextLabel.new()
 	r.bbcode_enabled = true
 	r.fit_content = true
 	r.add_theme_font_override(&"normal_font", font_body())
-	r.add_theme_font_override(&"bold_font", font_display())
+	r.add_theme_font_override(&"bold_font", font_display_tracked(1))
 	r.add_theme_font_size_override(&"normal_font_size", size)
 	r.add_theme_color_override(&"default_color", color)
+	# generous manuscript line-height — the page breathes (STYLE_GUIDE §1)
+	r.add_theme_constant_override(&"line_separation", 7)
+	# pressed-in ink: a 1px warm shadow under the body glyphs
+	r.add_theme_color_override(&"font_shadow_color", Color(GILT_EDGE.r, GILT_EDGE.g, GILT_EDGE.b, 0.18))
+	r.add_theme_constant_override(&"shadow_offset_x", 1)
+	r.add_theme_constant_override(&"shadow_offset_y", 1)
 	r.add_to_group(&"scalable_text")
 	return r
 

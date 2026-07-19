@@ -1,13 +1,20 @@
-[gd_resource type="Theme" load_steps=11 format=3]
+[gd_resource type="Theme" load_steps=10 format=3]
 
-[ext_resource type="Texture2D" path="res://addons/nox_ui/theme/kenney/buttonLong_grey.png" id="btn_n"]
-[ext_resource type="Texture2D" path="res://addons/nox_ui/theme/kenney/buttonLong_blue.png" id="btn_h"]
-[ext_resource type="Texture2D" path="res://addons/nox_ui/theme/kenney/buttonLong_blue_pressed.png" id="btn_p"]
-[ext_resource type="Texture2D" path="res://addons/nox_ui/theme/kenney/panel_blue.png" id="pnl"]
-[ext_resource type="FontFile" path="res://addons/nox_ui/theme/fonts/Montserrat-Bold.ttf" id="font_mont"]
+; NoxDev shell theme — re-skinned for ff-gamebook (The Grey Tithe) so the standard
+; menu/options/credits shell reads as the SAME illuminated book as the reading view
+; (STYLE_GUIDE "one book"; typography SKILL display+body pairing). Fonts are the reused
+; OFL faces already shipped under the skeleton: Cinzel (engraved display) for buttons/
+; labels, MedievalSharp (warm readable body) as the default. The neutral Kenney grey
+; button + brown panel are tinted to the STYLE_GUIDE parchment palette; ink text carries
+; a parchment outline so it stays legible pressed over the cover backdrop.
+
+[ext_resource type="Texture2D" path="res://addons/nox_ui/theme/kenney/buttonLong_grey.png" id="btn"]
+[ext_resource type="Texture2D" path="res://addons/nox_ui/theme/kenney/panel_brown.png" id="pnl"]
+[ext_resource type="FontFile" path="res://assets/reused/fonts/Cinzel.ttf" id="font_display"]
+[ext_resource type="FontFile" path="res://assets/reused/fonts/MedievalSharp.ttf" id="font_body"]
 
 [sub_resource type="StyleBoxTexture" id="btn_normal"]
-texture = ExtResource("btn_n")
+texture = ExtResource("btn")
 texture_margin_left = 20.0
 texture_margin_top = 8.0
 texture_margin_right = 20.0
@@ -16,9 +23,10 @@ content_margin_left = 24.0
 content_margin_top = 10.0
 content_margin_right = 24.0
 content_margin_bottom = 14.0
+modulate_color = Color(0.847, 0.788, 0.651, 1)
 
 [sub_resource type="StyleBoxTexture" id="btn_hover"]
-texture = ExtResource("btn_h")
+texture = ExtResource("btn")
 texture_margin_left = 20.0
 texture_margin_top = 8.0
 texture_margin_right = 20.0
@@ -27,9 +35,10 @@ content_margin_left = 24.0
 content_margin_top = 10.0
 content_margin_right = 24.0
 content_margin_bottom = 14.0
+modulate_color = Color(0.886, 0.831, 0.698, 1)
 
 [sub_resource type="StyleBoxTexture" id="btn_pressed"]
-texture = ExtResource("btn_p")
+texture = ExtResource("btn")
 texture_margin_left = 20.0
 texture_margin_top = 8.0
 texture_margin_right = 20.0
@@ -38,9 +47,10 @@ content_margin_left = 24.0
 content_margin_top = 12.0
 content_margin_right = 24.0
 content_margin_bottom = 12.0
+modulate_color = Color(0.796, 0.725, 0.561, 1)
 
 [sub_resource type="StyleBoxTexture" id="btn_focus"]
-texture = ExtResource("btn_h")
+texture = ExtResource("btn")
 texture_margin_left = 20.0
 texture_margin_top = 8.0
 texture_margin_right = 20.0
@@ -49,6 +59,7 @@ content_margin_left = 24.0
 content_margin_top = 10.0
 content_margin_right = 24.0
 content_margin_bottom = 14.0
+modulate_color = Color(0.431, 0.561, 0.478, 1)
 
 [sub_resource type="StyleBoxTexture" id="panel"]
 texture = ExtResource("pnl")
@@ -60,16 +71,18 @@ content_margin_left = 28.0
 content_margin_top = 28.0
 content_margin_right = 28.0
 content_margin_bottom = 28.0
+modulate_color = Color(0.804, 0.729, 0.576, 1)
 
 [resource]
-default_font = ExtResource("font_mont")
+default_font = ExtResource("font_body")
 default_font_size = 18
-Button/colors/font_color = Color(1, 0.98, 0.92, 1)
-Button/colors/font_hover_color = Color(1, 1, 1, 1)
-Button/colors/font_pressed_color = Color(1, 0.95, 0.82, 1)
-Button/colors/font_focus_color = Color(1, 1, 1, 1)
-Button/colors/font_outline_color = Color(0.05, 0.06, 0.1, 1)
-Button/constants/outline_size = 5
+Button/colors/font_color = Color(0.078, 0.067, 0.051, 1)
+Button/colors/font_hover_color = Color(0.078, 0.067, 0.051, 1)
+Button/colors/font_pressed_color = Color(0.078, 0.067, 0.051, 1)
+Button/colors/font_focus_color = Color(0.078, 0.067, 0.051, 1)
+Button/colors/font_outline_color = Color(0.906, 0.863, 0.761, 1)
+Button/constants/outline_size = 4
+Button/fonts/font = ExtResource("font_display")
 Button/font_sizes/font_size = 22
 Button/styles/normal = SubResource("btn_normal")
 Button/styles/hover = SubResource("btn_hover")
@@ -78,6 +91,7 @@ Button/styles/focus = SubResource("btn_focus")
 Button/styles/disabled = SubResource("btn_normal")
 Panel/styles/panel = SubResource("panel")
 PanelContainer/styles/panel = SubResource("panel")
-Label/colors/font_color = Color(0.95, 0.93, 0.88, 1)
+Label/colors/font_color = Color(0.906, 0.863, 0.761, 1)
+Label/fonts/font = ExtResource("font_display")
 Label/font_sizes/font_size = 18
-HSlider/colors/font_color = Color(0.95, 0.93, 0.88, 1)
+HSlider/colors/font_color = Color(0.906, 0.863, 0.761, 1)

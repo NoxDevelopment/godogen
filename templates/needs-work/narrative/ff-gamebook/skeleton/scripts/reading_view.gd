@@ -243,14 +243,13 @@ func _bind_plate(section: IFSection) -> void:
 		_plate_caption.text = "[ %s — veritas-gamebook plate, awaiting generation ]" % slot
 
 
-## Enlarge the first character (drop-cap feel) via inline bbcode; keeps the rest of
-## the serif prose flowing. The section number stays hidden in faithful mode.
+## Open the section with an ORNAMENTED illuminated drop-cap: a large Uncial versal in
+## Ledger Verdigris, inked + shadowed so it sits pressed/gilded into the page, followed
+## by the opening word in engraved small-caps, then the flowing body prose. The whole
+## look lives in FFUI.illuminated_cap so every book screen reads as one manuscript.
+## The section number stays hidden in faithful mode.
 func _drop_cap(text: String) -> String:
-	if text.strip_edges() == "":
-		return text
-	var first := text.substr(0, 1)
-	var rest := text.substr(1)
-	return "[color=#6e8f7a][font_size=52]%s[/font_size][/color]%s" % [first, rest]
+	return FFUI.illuminated_cap(text)
 
 
 func _render_choices(section: IFSection) -> void:
