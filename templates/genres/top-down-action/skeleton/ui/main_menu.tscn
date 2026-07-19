@@ -1,19 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://cmenu0twinshoot1"]
+[gd_scene format=3 uid="uid://cp3ghpqm6gxq3"]
+
+[ext_resource type="Script" uid="uid://b172qicj34uj1" path="res://ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme_ui"]
 
-[ext_resource type="Script" path="res://ui/main_menu.gd" id="1_menu"]
-
-[node name="MainMenu" type="Control"]
-theme = ExtResource("theme_ui")
+[node name="MainMenu" type="Control" unique_id=536574652]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("theme_ui")
 script = ExtResource("1_menu")
 
-[node name="BG" type="ColorRect" parent="."]
+[node name="BG" type="ColorRect" parent="." unique_id=1469823447]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +22,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.06, 0.09, 1)
 
-[node name="Accent" type="ColorRect" parent="."]
+[node name="Accent" type="ColorRect" parent="." unique_id=1235711233]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -30,7 +30,7 @@ offset_bottom = 8.0
 grow_horizontal = 2
 color = Color(1, 0.72, 0.12, 1)
 
-[node name="CenterBox" type="CenterContainer" parent="."]
+[node name="CenterBox" type="CenterContainer" parent="." unique_id=2127843437]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,52 +38,52 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+[node name="VBox" type="VBoxContainer" parent="CenterBox" unique_id=1267787963]
 layout_mode = 2
 theme_override_constants/separation = 14
 alignment = 1
 
-[node name="Title" type="Label" parent="CenterBox/VBox"]
+[node name="Title" type="Label" parent="CenterBox/VBox" unique_id=340142600]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+theme_override_font_sizes/font_size = 72
 text = "TWIN  SHOOTER"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 72
-theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
 
-[node name="Subtitle" type="Label" parent="CenterBox/VBox"]
+[node name="Subtitle" type="Label" parent="CenterBox/VBox" unique_id=1640399649]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 20
 text = "Survive three waves of the lab's rogue droids"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
 
-[node name="Best" type="Label" parent="CenterBox/VBox"]
+[node name="Best" type="Label" parent="CenterBox/VBox" unique_id=1218239584]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.35, 1)
+theme_override_font_sizes/font_size = 18
 text = "No run recorded yet"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(1, 0.82, 0.35, 1)
 
-[node name="Spacer" type="Control" parent="CenterBox/VBox"]
+[node name="Spacer" type="Control" parent="CenterBox/VBox" unique_id=1926883110]
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
-[node name="NewGame" type="Button" parent="CenterBox/VBox"]
+[node name="NewGame" type="Button" parent="CenterBox/VBox" unique_id=586984364]
 custom_minimum_size = Vector2(320, 52)
 layout_mode = 2
 text = "NEW GAME"
 
-[node name="Options" type="Button" parent="CenterBox/VBox"]
+[node name="Options" type="Button" parent="CenterBox/VBox" unique_id=1450753612]
 custom_minimum_size = Vector2(320, 52)
 layout_mode = 2
 text = "OPTIONS"
 
-[node name="Quit" type="Button" parent="CenterBox/VBox"]
+[node name="Quit" type="Button" parent="CenterBox/VBox" unique_id=1823337055]
 custom_minimum_size = Vector2(320, 52)
 layout_mode = 2
 text = "QUIT"
 
-[node name="OptionsPanel" type="Panel" parent="."]
+[node name="OptionsPanel" type="Panel" parent="." unique_id=1836525176]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -98,7 +98,7 @@ offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="OptionsPanel"]
+[node name="VBox" type="VBoxContainer" parent="OptionsPanel" unique_id=1483367929]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -111,32 +111,31 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 16
 
-[node name="Header" type="Label" parent="OptionsPanel/VBox"]
+[node name="Header" type="Label" parent="OptionsPanel/VBox" unique_id=1989228388]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "OPTIONS"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 32
 
-[node name="Fullscreen" type="CheckButton" parent="OptionsPanel/VBox"]
+[node name="Fullscreen" type="CheckButton" parent="OptionsPanel/VBox" unique_id=1900371356]
 layout_mode = 2
 text = "Fullscreen"
 
-[node name="VolLabel" type="Label" parent="OptionsPanel/VBox"]
+[node name="VolLabel" type="Label" parent="OptionsPanel/VBox" unique_id=400104062]
 layout_mode = 2
 text = "Master Volume"
 
-[node name="Volume" type="HSlider" parent="OptionsPanel/VBox"]
+[node name="Volume" type="HSlider" parent="OptionsPanel/VBox" unique_id=670405661]
 layout_mode = 2
-min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 0.8
 
-[node name="Spacer2" type="Control" parent="OptionsPanel/VBox"]
+[node name="Spacer2" type="Control" parent="OptionsPanel/VBox" unique_id=1224147599]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Back" type="Button" parent="OptionsPanel/VBox"]
+[node name="Back" type="Button" parent="OptionsPanel/VBox" unique_id=1761711759]
 layout_mode = 2
 text = "BACK"
 
