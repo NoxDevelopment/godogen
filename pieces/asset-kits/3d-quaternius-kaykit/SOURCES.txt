@@ -1,0 +1,64 @@
+3D ASSET LIBRARY — CC0 / PERMISSIVE — category: 3d-quaternius-kaykit
+Compiled 2026-07-18. ALL entries verified CC0 (public domain) unless noted.
+CC0 = commercial use OK, redistribution OK, modification OK, AI-training OK, no attribution required.
+
+================================================================================
+DOWNLOADED (direct URLs, in this folder)
+================================================================================
+
+POLY HAVEN — CC0 (https://polyhaven.com) — verified via api.polyhaven.com
+  HDRIs  (polyhaven-hdris/):
+    kloofendal_43d_clear_4k.hdr   outdoor clear day / IBL
+    venice_sunset_4k.hdr          golden-hour sunset
+    moonless_golf_4k.hdr          night sky
+    brown_photostudio_02_4k.hdr   neutral studio lighting
+    autumn_forest_04_2k.hdr       forest
+    snow_field_2k.hdr             snow / overcast
+    courtyard_night_2k.hdr        urban night
+  Models (glTF, 1k PBR textures) (polyhaven-models/):
+    treasure_chest, Barrel_01 (explosive), kite_shield, Lantern_01, wooden_lantern_01,
+    tree_stump_01, tree_stump_02, fern_02, WoodenTable_01
+  (Removed: fir_tree_01 — 478 MB photoscan .bin, too dense for real-time templates.)
+  API pattern: https://api.polyhaven.com/files/<id>  ->  dl.polyhaven.org/... URLs.
+
+================================================================================
+CATALOG ONLY (Google-Drive folder or itch.io "Download" button — need a click)
+================================================================================
+
+QUATERNIUS — CC0 (https://quaternius.com — every pack page tagged
+  creativecommons.org/publicdomain/zero/1.0). Free = glTF/FBX/OBJ via Google Drive
+  folder; Patreon "Source" = .blend. Free assets are CC0. Formats: glTF/GLB/FBX/OBJ.
+  Pack page                                                    Google-Drive folder id
+  ultimatemodularcharacters.html   Ultimate Modular Characters  1USAAquX2JJWuA2m6zol0KUkFe3UkZ8zX
+  ultimatemodularwomen.html        Ultimate Modular Women       (via page)
+  rpgcharacters.html               RPG Characters               1MIRQXLfTd21HMI5rwOb6Xy0rv0xv1m8b
+  ultimateanimatedanimals.html     Ultimate Animated Animals    1uJ3N5HfB7jKTseJUNQr3N4YaN0UuEtHk
+  ultimatemonsters.html            Ultimate Monsters            18m4KpzpEzhC9wl7jzr6dUc0N8Jozr79C
+  ultimatenature.html              Ultimate Nature (150+)       1-Kl0L_Jg8awbh0S5T-z3zxh4mVlnxTpa
+  survival.html                    Survival Kit                 1NKfC95GMWWJquy6rRzwFVkVDoZ_QP7K_
+  cars.html                        LowPoly Cars                 1fKlbDry77iY8KlEoxzUxIAZQL_XhzWlA
+  medievalweapons.html             Medieval Weapons             1Z6vYiQxY8W73FXuMWzaTQAg9rzbumnOr
+  ultimatemodularscifi.html        Ultimate Modular Sci-Fi      1zpr6HxVa-sCV93IHubN3A1d8HhF2wGbM
+  medievaldungeon.html             Medieval Dungeon             13MoeF0Uy9PHqXXi6gh63tV2PLRD6YXJv
+  ultimateplatformer.html          Ultimate Platformer (100+)   1NDZn_aGnn0vfFV3M22Y8GPcDjO8BVcLs
+  piratekit.html                   Pirate Kit                   1KjMzhVsDcyvYMWeVjZcRfuu8auBLpNi2
+  zombieapocalypsekit.html         Zombie Apocalypse Kit        1mWP6sCHun7OUMHQeDNZLrXTteXlzWg_t
+  universalanimationlibrary.html   Universal Animation Library  (itch download)
+  (Full catalog: ~85 packs listed at https://quaternius.com — all CC0.)
+
+KAYKIT / Kay Lousberg — CC0 (https://kaylousberg.itch.io) — "Free for personal and
+  commercial use, no attribution required (CC0)". Formats: glTF/GLB/FBX/OBJ. Free tier
+  on itch (name-your-price min $0); paid tiers add source files only. Verified CC0.
+  kaykit-dungeon-pack        Dungeon Remastered (200+ dungeon assets)
+  kaykit-adventurers         Character Pack: Adventurers (rigged heroes)
+  kaykit-skeletons           Character Pack: Skeletons (rigged enemies)
+  kaykit-character-animations  Shared humanoid animation set
+  kaykit-medieval-hexagon    Medieval Hexagon strategy tiles
+  city-builder-bits          City Builder Bits (modular city)
+  halloween-bits             Halloween Bits
+  restaurant-bits            Restaurant Bits
+  furniture-bits             Furniture Bits
+  fantasy-weapons-bits       Fantasy Weapons Bits
+  prototype-bits             Prototype Bits (greyboxing)
+  kaykit-forest              Forest Nature Pack
+  (Full catalog at https://kaylousberg.itch.io — all CC0.)

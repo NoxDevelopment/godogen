@@ -1,0 +1,35 @@
+AUDIO ASSET-KIT LICENSE MANIFEST
+=================================
+All packs here permit commercial use + redistribution + AI/ML training.
+Packs are either CC0 (public domain, no attribution) or CC-BY (attribution REQUIRED).
+
+--- CC0 (Public Domain, NO attribution required) ---
+kenney_digital-audio.zip            CC0  Kenney.nl (60 digital/space SFX)
+kenney_ui-audio.zip                 CC0  Kenney.nl (50 UI SFX)
+kenney_rpg-audio.zip                CC0  Kenney.nl (50 RPG SFX)
+kenney_impact-sounds.zip            CC0  Kenney.nl (impacts/hits)
+kenney_interface-sounds.zip         CC0  Kenney.nl (interface clicks/beeps)
+kenney_music-jingles.zip            CC0  Kenney.nl (short music jingles/stingers)
+kenney_sci-fi-sounds.zip            CC0  Kenney.nl (sci-fi SFX)
+kenney_voiceover-pack.zip           CC0  Kenney.nl (spoken word / voice SFX)
+kenney_voiceover-pack-fighter.zip   CC0  Kenney.nl (fighter voice grunts/shouts)
+kenney_casino-audio.zip             CC0  Kenney.nl (casino/slot SFX)
+junkala_512-retro-sfx_CC0.zip       CC0  Juhani Junkala (512 8-bit retro SFX)
+junkala_5-chiptunes-action_CC0.zip  CC0  Juhani Junkala (5 looping action chiptunes)
+junkala_jrpg-pack-4-calm_CC0.zip    CC0  Juhani Junkala (6 calm JRPG tracks)
+junkala_jrpg-pack-5-action_CC0.zip  CC0  Juhani Junkala (action JRPG tracks)
+
+--- CC-BY 3.0 (ATTRIBUTION REQUIRED in shipped product credits) ---
+Required credit line for ALL five files below:
+  "Sound effects by Little Robot Sound Factory (www.littlerobotsoundfactory.com), CC-BY 3.0"
+
+littlerobot_8-bit-sfx_CC-BY.zip     CC-BY 3.0  Little Robot Sound Factory (40 8-bit SFX)
+littlerobot_sci-fi-sfx_CC-BY.zip    CC-BY 3.0  Little Robot Sound Factory (33 sci-fi SFX)
+littlerobot_ui-sfx_CC-BY.zip        CC-BY 3.0  Little Robot Sound Factory (UI SFX)
+littlerobot_voices-450_CC-BY.zip    CC-BY 3.0  Little Robot Sound Factory (450 creature/character voices)
+littlerobot_horror-sfx_CC-BY.zip    CC-BY 3.0  Little Robot Sound Factory (69 horror SFX)
+
+--- REJECTED sources (do NOT use in this factory) ---
+Sonniss GDC Game Audio Bundle : license PROHIBITS AI training AND standalone redistribution.
+Pixabay (music+SFX)           : Content License prohibits standalone redistribution AND AI training.
+Mixkit (music+SFX)            : Free License prohibits redistribution/resale as-is.
