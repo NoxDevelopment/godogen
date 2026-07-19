@@ -4,7 +4,7 @@
 A Kenney starter kit or an SDK is a **piece/base**, NOT a finished game.
 
 - **Layer 1 — Pieces** (`pieces/<category>/`): reusable building blocks.
-- **Layer 2 — Games** (`../templates/genres/`): assembled from pieces, screenshot-verified as real games.
+- **Layer 2 — Games** (`../templates/ready/` + `../templates/needs-work/`): assembled from pieces, screenshot-verified as real games.
 
 All entries below are **permissive** (MIT / Apache-2.0 / BSD / MPL-2.0 / CC0 / Unlicense / Zlib),
 verified by reading each repo's LICENSE. GPL/AGPL/CC-BY-NC and unlicensed candidates were rejected.

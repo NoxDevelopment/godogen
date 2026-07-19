@@ -14,7 +14,7 @@ python <repo>/templates/tools/scaffold.py <genre-id> <target-dir> --name "Game N
 
 That copies a runnable skeleton, vendors the genre's pinned addons (MIT kits, license manifest in `addons/LICENSES.md`), runs the bootstrap import, and enables the plugins — the project imports and boots with zero script errors before any generation starts. Then continue the normal pipeline on top of it:
 
-- Read the genre's `TEMPLATE.md` (`templates/genres/<id>/TEMPLATE.md`) — it states what already exists (player controller, rooms, GUI, groups, input actions) so STRUCTURE.md extends rather than duplicates.
+- Read the genre's `TEMPLATE.md` (path in registry.json's `doc` field — `templates/<readiness>/<genre>/<id>/TEMPLATE.md`) — it states what already exists (player controller, rooms, GUI, groups, input actions) so STRUCTURE.md extends rather than duplicates.
 - The registry entry's `primitives` lists the godogen skills that pair with the template (with params); `assetPlanHints` seeds the asset planner; `systems` names godotsmith drop-in templates that fit the ABI (buses `Master`/`Music`/`SFX`; groups `player`/`game_manager`/`persistent`).
 - Respect the entry's `engineVersion` pin — addon pins are chosen for it. Not every template pins the newest engine (e.g. `fps-immersive` pins 4.5.x because COGITO breaks on 4.6): pass the matching executable via `--godot` and run all headless checks with that same binary.
 

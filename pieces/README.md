@@ -2,7 +2,7 @@
 
 **Two layers.** A Kenney starter kit / SDK / framework is a **piece** (a building block),
 NOT a finished game. Games are **composed** from pieces + real assets + genre logic + look/feel,
-and live in `../templates/genres/` (screenshot-verified as real games).
+and live in `../templates/ready/` + `../templates/needs-work/` (screenshot-verified as real games).
 
 - **`CATALOG.md`** — the full, license-verified catalog (full-game templates + pieces by category),
   sourced from GitHub `godot-template` topic/search, the Godot Asset Library Templates category,

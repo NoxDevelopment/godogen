@@ -13,18 +13,26 @@ Both consumers call the same tools in `tools/`.
 templates/
   registry.json          # the machine-readable registry (this is the API)
   README.md              # this file
+  CATALOG.md             # human index: every template by readiness + genre
   tools/
     vendor_addons.py     # clone pinned addons into a project's addons/
     scaffold.py          # Godot: skeleton copy + vendoring + name patch, end to end
     scaffold_unity.py    # Unity: skeleton copy + UPM pin merge + batchmode validation
-  genres/
-    <id>/
+  ready/                 # verified real look/feel + systems at/near parity
+    <genre>/<id>/
       TEMPLATE.md        # human guide: what you get, how to extend
       skeleton/          # a minimal, runnable Godot project (no addons inside)
-    <id>-unity/
-      TEMPLATE.md        # ditto + the Unity lane house rules
-      skeleton/          # a text-only Unity project (Assets/ + Packages/ + ProjectSettings/)
+  needs-work/            # scaffolds/gameplay-bases still short of full parity
+    <genre>/<id>/
+      TEMPLATE.md        # ditto (Unity ids carry the Unity lane house rules)
+      skeleton/          # Godot project, or a text-only Unity project (Assets/ + Packages/ + ProjectSettings/)
 ```
+
+Reorganized 2026-07-19 from a flat `genres/<id>/` tree to
+`<readiness>/<genre>/<id>/`. Readiness (`ready` vs `needs-work`) is Jesus's
+sign-off gate; genre is durable. The registry's `skeleton`/`doc` paths and
+`CATALOG.md` are the source of truth — consumers resolve paths from the
+registry, never by hardcoding the tree.
 
 Skeletons are committed **without** their third-party addons; addons are vendored at scaffold time at pinned commits so every instantiation is reproducible and the license manifest is always regenerated.
 
@@ -89,7 +97,7 @@ still completes (exit 0 with a "validation skipped" warning) and the entry
 stays `"draft"` with an honest `statusNote` until a licensed editor validates it.
 Unity lane house style (no committed scenes, text-only skeletons, input
 polling, uGUI-not-TMP, ABI mapping) is documented in
-`genres/top-down-action-unity/TEMPLATE.md`.
+`needs-work/action/top-down-action-unity/TEMPLATE.md`.
 
 ## Tools
 
@@ -133,7 +141,7 @@ This keeps godotsmith's `menu_system` / `save_system` / `settings_system` drop-i
 ## Adding a genre (checklist)
 
 1. Pick the base kit from the roadmap's genre→kit map (MIT only; check the engine-version pin — e.g. MetSys `master` tracks Godot 4.7-dev, branch `4.6` is for 4.6.x; COGITO pins 4.4).
-2. Build `genres/<id>/skeleton/` — minimal but **runnable**: project.godot (ABI buses/inputs/groups), one or two content scenes proving the kit is wired, no third-party code inside.
+2. Build `needs-work/<genre>/<id>/skeleton/` — minimal but **runnable**: project.godot (ABI buses/inputs/groups), one or two content scenes proving the kit is wired, no third-party code inside. New templates start under `needs-work/`; move to `ready/<genre>/<id>/` (and update the registry `skeleton`/`doc` paths + `CATALOG.md`) once Jesus signs off.
 3. Add the registry entry with full pins; `status: "draft"`.
 4. Validate: scaffold into a scratch dir, `--import` then `--quit` headless with the pinned engine — zero script errors (addon parse errors mean a wrong pin).
 5. Write `TEMPLATE.md` (what you get / how to extend / kit docs links); flip to `status: "validated"`.

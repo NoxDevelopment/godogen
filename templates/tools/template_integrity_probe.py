@@ -18,7 +18,7 @@ Excluded (regenerated on first import, never committed):
 Allowlisted known-benign (upstream addon example content, not in any play path):
   - bullet-hell BulletUpHell ExampleScenes -> res://icon.png
 
-Usage:  python template_integrity_probe.py [--templates <genres dir>] [--json]
+Usage:  python template_integrity_probe.py [--templates <templates dir>] [--json]
 Exit 0 = every committed res:// reference resolves; non-zero = dangling refs
 (prints fails=N with the offending template/source/reference).
 """
@@ -31,7 +31,9 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_GENRES = os.path.normpath(os.path.join(HERE, "..", "genres"))
+# Templates reorganized 2026-07-19: genres/<id>/skeleton -> <readiness>/<genre>/<id>/skeleton.
+# Discovery walks the templates root for any skeleton/ (structure-agnostic).
+DEFAULT_TEMPLATES = os.path.normpath(os.path.join(HERE, ".."))
 REF = re.compile(r'(?:path|source_file)\s*=\s*"(res://[^"]+)"')
 # project.godot launch surface: main scene + path-based autoloads. uid:// autoloads
 # (addon-provided) can't be resolved statically here — the addon's own files are
@@ -47,10 +49,20 @@ ALLOWLIST = {
 }
 
 
-def committed_set(genres_dir):
-    """Files git would deliver on clone, under the templates/genres tree."""
-    root = os.path.dirname(os.path.dirname(genres_dir))  # repo-ish root
-    rel = os.path.relpath(genres_dir, root).replace("\\", "/")
+def find_skeletons(templates_root):
+    """Yield (template_id, skeleton_path) for every skeleton/ with a project.godot,
+    regardless of nesting depth (handles readiness/genre/<id>/skeleton)."""
+    for dirpath, dirs, files in os.walk(templates_root):
+        if os.path.basename(dirpath) == "skeleton" and "project.godot" in files:
+            tid = os.path.basename(os.path.dirname(dirpath))
+            yield tid, dirpath
+            dirs[:] = []  # skeleton internals never contain another template
+
+
+def committed_set(templates_dir):
+    """Files git would deliver on clone, under the templates/ tree."""
+    root = os.path.dirname(templates_dir)  # repo root (parent of templates/)
+    rel = os.path.relpath(templates_dir, root).replace("\\", "/")
     out = subprocess.run(
         ["git", "ls-files", rel], cwd=root, capture_output=True, text=True
     ).stdout
@@ -65,23 +77,19 @@ def committed_set(genres_dir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--templates", default=DEFAULT_GENRES)
+    ap.add_argument("--templates", default=DEFAULT_TEMPLATES)
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
-    genres = os.path.abspath(args.templates)
-    committed, root = committed_set(genres)
+    templates_root = os.path.abspath(args.templates)
+    committed, root = committed_set(templates_root)
     if not committed:
-        print("fails=1  (no committed files under %s - wrong path?)" % genres)
+        print("fails=1  (no committed files under %s - wrong path?)" % templates_root)
         return 1
 
     report = {}
     scanned = 0
-    for name in sorted(os.listdir(genres)):
-        skel = os.path.join(genres, name, "skeleton")
-        proj = os.path.join(skel, "project.godot")
-        if not os.path.isfile(proj):
-            continue  # Godot templates only (Unity handled separately)
+    for name, skel in sorted(find_skeletons(templates_root)):
         scanned += 1
         dangling = []
         for dirpath, _dirs, filenames in os.walk(skel):
