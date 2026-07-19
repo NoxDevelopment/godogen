@@ -32,6 +32,27 @@ const CAT_COLOR := {
 	"plant": Color(0.52, 0.72, 0.48),
 }
 
+## Real flat nature icons (white silhouettes, tinted per-resource via modulate) —
+## replaces the old two-letter resource chips, matching the euro-engine-builder bar.
+## res://assets/icons/res_*.png (generated flat art, CC0-equivalent, in-repo).
+const RES_ICON := {
+	"sun": "res://assets/icons/res_sun.png",
+	"water": "res://assets/icons/res_water.png",
+	"forest": "res://assets/icons/res_forest.png",
+	"mountain": "res://assets/icons/res_mountain.png",
+	"sighting": "res://assets/icons/res_sighting.png",
+	"film": "res://assets/icons/res_film.png",
+}
+const RES_COLOR := {
+	"sun": Color(0.96, 0.84, 0.34),
+	"water": Color(0.46, 0.74, 0.93),
+	"forest": Color(0.44, 0.74, 0.46),
+	"mountain": Color(0.72, 0.74, 0.82),
+	"sighting": Color(0.93, 0.64, 0.32),
+	"film": Color(0.80, 0.62, 0.90),
+}
+
+var _tex: Dictionary = {}          ## cached loaded textures, by res:// path
 var _layer: CanvasLayer
 var _title: Label
 var _status: Label
@@ -50,6 +71,7 @@ var _handoff_label: Label
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_preload_tex()
 	if GameManager.engine == null or GameManager.engine.players.is_empty():
 		GameManager.new_game(SEED, PLAYERS)
 	_build_ui()
@@ -178,6 +200,39 @@ func _on_handoff_requested(_seat: int, seat_name: String) -> void:
 func _header(pos: Vector2, text: String, size: int, color: Color) -> void:
 	var l := _mk_label(pos, size, color)
 	l.text = text
+
+
+func _preload_tex() -> void:
+	for p in RES_ICON.values():
+		_tex[p] = load(p)
+
+
+func _t(path: String) -> Texture2D:
+	if not _tex.has(path):
+		_tex[path] = load(path)
+	return _tex[path]
+
+
+## An icon + count chip for one resource: white icon tinted with RES_COLOR + amount.
+func _res_chip(res: String, amount: int, icon_px: int = 18, font_px: int = 12) -> Control:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 3)
+	var ic := TextureRect.new()
+	ic.texture = _t(RES_ICON[res])
+	ic.custom_minimum_size = Vector2(icon_px, icon_px)
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.modulate = RES_COLOR[res]
+	ic.tooltip_text = res
+	h.add_child(ic)
+	var l := Label.new()
+	l.text = str(amount)
+	l.add_theme_font_size_override("font_size", font_px)
+	l.add_theme_color_override("font_color", Color(0.86, 0.90, 0.84))
+	l.add_to_group(&"scalable_text")
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	h.add_child(l)
+	return h
 
 
 func _mk_label(pos: Vector2, size: int, color: Color) -> Label:
@@ -403,15 +458,11 @@ func _player_panel(e: WildlifeEngine, pi: int) -> Control:
 	sc.add_to_group(&"scalable_text")
 	box.add_child(sc)
 
-	var res := Label.new()
-	var parts: Array[String] = []
+	var res_row := HBoxContainer.new()
+	res_row.add_theme_constant_override("separation", 7)
 	for r in WildlifeEngine.RESOURCES:
-		parts.append("%s%d" % [r.substr(0, 2), int(p["resources"][r])])
-	res.text = " ".join(parts)
-	res.add_theme_font_size_override("font_size", 11)
-	res.add_theme_color_override("font_color", Color(0.76, 0.82, 0.78))
-	res.add_to_group(&"scalable_text")
-	box.add_child(res)
+		res_row.add_child(_res_chip(String(r), int(p["resources"][r]), 16, 11))
+	box.add_child(res_row)
 
 	var jhead := Label.new()
 	jhead.text = "JOURNAL (%d):" % (p["journal"] as Array).size()
