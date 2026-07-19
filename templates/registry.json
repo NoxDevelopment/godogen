@@ -83,7 +83,8 @@
         "Parallax background layers (2-3, per biome)",
         "Door / passage frame sprite (marks MetSys border type 1)",
         "Map theme override art only if the bundled MetSys 'Exquisite' minimap theme clashes with the palette"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "point-and-click",
@@ -136,7 +137,8 @@
         "Prop sprites with readable silhouettes (transparent PNG, placed on the background)",
         "Cursor sprite set (active/look/wait variants)",
         "Inventory item icons (16x16 or 32x32 px)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "fps-immersive",
@@ -235,7 +237,8 @@
         "First-person wieldable models (hands + tool/weapon, ~5k tris)",
         "UI substitutions for the COGITO HUD theme (crosshair/reticle, attribute bar styling)",
         "Ambience loops + surface-tagged footstep sets (concrete/metal/wood)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "visual-novel",
@@ -294,7 +297,8 @@
         "Title screen key art (1280x720)",
         "d20 die face art or spritesheet for the dice popup (replaces the number label)",
         "UI SFX (advance blip, dice tumble, success/failure stingers)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "bullet-hell",
@@ -381,7 +385,8 @@
         "Bullet sprites (8-16 px, high-contrast: round shot, needle shot; BulletUpHell swaps them via animState resources)",
         "Scrolling background (vertical, tileable, low-contrast so bullets stay readable)",
         "Hit/death explosion flipbook (small, additive)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "deckbuilder",
@@ -447,7 +452,8 @@
         "Table background (1280x720, low-contrast felt/board so cards stay readable)",
         "UI icons (energy bolt, block shield, HP heart, draw/discard pile markers)",
         "Card SFX (draw swish, play thunk, shuffle riffle, enemy hit)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "top-down-action",
@@ -524,7 +530,8 @@
         "vendored": "Beehave v2.9.2 (MIT) — enemy behaviour-tree AI, self-contained (base repo gitignored it)",
         "ui": "ui-theme skill theme.tres (navy+gold, Montserrat) on menu/HUD/win",
         "dialogic": "decoupled — Dialogic 2.0-alpha does not compile on Godot 4.6.1; narrative/Story mode deferred to a Dialogic 4.6 port (task #59). Arena needs none of it."
-      }
+      },
+      "vetted": false
     },
     {
       "id": "iso-arpg",
@@ -569,7 +576,8 @@
         "Loot pickup sprites (small item icons on the ground + 32x32 inventory icons per items.json entry)",
         "Ability bar icons (melee swing, nova burst; 48x48 px)",
         "Impact/nova VFX flipbooks (additive, short)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "arcade-racing",
@@ -634,7 +642,8 @@
         "note": "Kenney official kit; screenshot-verified in-factory."
       },
       "maturity": "gameplay-base",
-      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant"
+      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant",
+      "vetted": false
     },
     {
       "id": "gamebook",
@@ -693,7 +702,8 @@
         "Title screen key art (1280x720, book-cover composition)",
         "Inventory item icons (32x32, per item id used in the book)",
         "UI SFX (page turn, dice tumble, success/failure stingers)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "farming-sim",
@@ -755,7 +765,8 @@
         "Buildings (farmhouse, shipping bin, barn; 2-3 tile footprints)",
         "Season palette variants or overlay tints (spring/summer/autumn/winter)",
         "Ambient loops (birdsong day / crickets night — swap on day_started/night_started) + tool SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "horror-fps",
@@ -866,7 +877,8 @@
         "Scare stinger SFX set + room-tone ambience loops",
         "Flashlight / lantern first-person model (~5k tris)",
         "UI: sanity-themed HUD accents (COGITO attribute bar reskin), scrawled-note font"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "voxel-sandbox",
@@ -928,7 +940,8 @@
         "Block break/place SFX per material family (dirt/stone/wood)",
         "UI: hotbar frame + block icons (rendered from the atlas)",
         "Ambient loop (wind/birds) + cave tone for below-ground"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "vampire-survivors",
@@ -983,7 +996,8 @@
         "note": "GAMEPLAY BASE (loop + real art) — not yet a full game."
       },
       "maturity": "gameplay-base",
-      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant"
+      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant",
+      "vetted": false
     },
     {
       "id": "zelda-like",
@@ -1031,7 +1045,8 @@
         "Item + pickup sprites (small key, heart, boomerang) and 20x20 HUD item icons",
         "Chest sprite (closed/open, ~48x36) and pressure-plate tile",
         "SFX: sword swipe, boomerang whoosh loop, door unlock, chest fanfare, heart/key pickup, hero hurt"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "crowd-rush",
@@ -1082,7 +1097,8 @@
         "Track + rail textures (tileable, low-contrast so the crowd reads) and a skybox gradient",
         "Finish gate + end-tower model (defender count readable from afar on the front plate)",
         "SFX: unit-gain pop, unit-loss squish, good/bad gate chimes, clash brawl loop, finish fanfare"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "fps-classic",
@@ -1142,7 +1158,8 @@
         "note": "Kenney official starter kit; screenshot-verified rendering the real FPS in-factory."
       },
       "maturity": "gameplay-base",
-      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant"
+      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant",
+      "vetted": false
     },
     {
       "id": "dungeon-crawler-classic",
@@ -1192,7 +1209,8 @@
         "Enemy billboard sprites or low-poly models (2-3 silhouettes; replaces the capsule in enemy.gd _build_body)",
         "Door/lever/pickup props (wooden door leaf, locked variant, wall lever, key, potion flask; GLB or billboards)",
         "SFX: footstep thud per step, door creak/unlock, lever clunk, stone grinding (secret), sword hit, spark cast, potion gulp, party-member hurt/fall"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "ff-gamebook",
@@ -1279,7 +1297,8 @@
         "2d6 dice faces or spritesheet for the tray (replaces the number labels)",
         "Title screen key art (1280x720, book-cover composition)",
         "UI SFX: page turn (audio/page_turn slot), dice tumble, success/failure stingers"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "gamebook-if",
@@ -1334,7 +1353,8 @@
         "Adventure-sheet panel art (parchment 9-patch + stat glyphs; the sheet is ruleset-driven so glyphs should suit the chosen system's attributes/resources)",
         "Dice-tray art for the 'ui/dice_tray' slot (leather tray + die faces; the tray renders any ruleset's roll -- 2d6 roll-under, d20 meet-or-beat, PbtA bands)",
         "Title screen key art (1280x720, book-cover composition)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "gamebook-if-unity",
@@ -1368,7 +1388,8 @@
         "UI page frame + choice-button chrome (parchment / banded-iron motif)",
         "A sheet-HUD panel background (SKILL / STAMINA / LUCK / GOLD)",
         "A dice-tray graphic for 2d6 rolls"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "top-down-action-unity",
@@ -1408,7 +1429,8 @@
         "Wall tileset (32px grid, top-down with slight top face)",
         "Muzzle flash + impact spark sprites (small, additive)",
         "Practice target / destructible prop sprite (~32x32 px)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "bullet-hell-unity",
@@ -1448,7 +1470,8 @@
         "Playfield background (vertical-scroll friendly, low-contrast so bullets read clearly)",
         "Muzzle flash + bullet-cancel burst sprites (small, additive)",
         "Boss body sprite (large, multi-emitter; optional for the base loop)"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "city-builder",
@@ -1486,7 +1509,8 @@
         "A ground tileset (grass/dirt/road) for the grid via zit-seamless-tile",
         "Resource + building icons (gold/food/population; house/farm/market) via qwen-icon",
         "Ambient city loop + a soft placement SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "tower-defense",
@@ -1525,7 +1549,8 @@
         "A ground/path tileset (grass + a worn dirt lane) via zit-seamless-tile",
         "Gold / lives / wave HUD icons via qwen-icon",
         "Shoot + hit + leak SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "tcg-duel",
@@ -1564,7 +1589,8 @@
         "A board/mat background + hero portraits (you vs opponent)",
         "Mana/heart/attack icons via qwen-icon",
         "Card-play / attack / draw SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "obby-multiplayer",
@@ -1606,7 +1632,8 @@
         "Checkpoint flag + finish banner art via zit-txt2img/qwen-icon",
         "Parallax course backdrop via image-parallax-depthflow / zit-txt2img",
         "Jump / checkpoint / death / finish SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "obby-3d-multiplayer",
@@ -1648,7 +1675,8 @@
         "Checkpoint flag + finish banner props via hunyuan3d",
         "Skybox / HDRI for the WorldEnvironment",
         "Jump / checkpoint / death / finish SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "noir-detective",
@@ -1687,7 +1715,8 @@
         "Clue / evidence item icons via qwen-icon",
         "Casebook / notebook UI chrome via qwen-txt2img",
         "Rain / jazz / gunshot ambience + SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "match-three",
@@ -1732,7 +1761,8 @@
         "note": "Kenney official kit; screenshot-verified in-factory."
       },
       "maturity": "gameplay-base",
-      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant"
+      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant",
+      "vetted": false
     },
     {
       "id": "gacha-summon",
@@ -1771,7 +1801,8 @@
         "Star / gem / currency icons via qwen-icon",
         "Banner splash / summon backdrop via zit-txt2img",
         "Summon whoosh + 5★ reveal stinger SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "action-adventure-3d",
@@ -1810,7 +1841,8 @@
         "Key / heart / objective HUD icons via qwen-icon",
         "A skybox / environment via viz-skybox-panorama",
         "Sword swing / hit / door-unlock / boss-defeat SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "euro-engine-builder",
@@ -1849,7 +1881,8 @@
         "Resource icons (wood/grain/metal/coin/energy) + goal-star + objective-token icons via qwen-icon",
         "A board mat / player-tableau backdrop via zit-txt2img",
         "Build / produce / deploy-star / trade SFX stingers"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "cosmic-horror-coop",
@@ -1889,7 +1922,8 @@
         "Clue / asset / gate / doom-track icons via qwen-icon; casebook + track UI chrome via qwen-txt2img",
         "A world-map board mat via zit-txt2img",
         "Doom-tick / gate-tear / monster-spawn / dice-roll / mystery-solved SFX stingers + a low dread ambience"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "wildlife-expedition",
@@ -1928,7 +1962,8 @@
         "Resource icons (sun/water/forest/mountain/sighting/film) + season-goal + expedition-contract icons via qwen-icon",
         "A trail board mat + per-player field-journal backdrop via zit-txt2img",
         "Hike / document-shutter / season-change / expedition-complete SFX stingers + a light outdoor ambience"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "falling-sand",
@@ -1961,7 +1996,8 @@
         "Glow + emissive shader for lava / fire / acid via pixel-perfect",
         "Ambient loop (crackle for fire, hiss for steam, trickle for water) + brush/paint SFX",
         "Optional background / vignette framing the sandbox viewport via zit-txt2img"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "god-game",
@@ -1995,7 +2031,8 @@
         "Divine-power icons (raise / lower land, grow food, inspire, miracle) for the palette via qwen-icon",
         "A divine ambience loop + per-power SFX stingers (earth rumble for raise/lower, chime for miracle, chorus for inspire)",
         "Optional sky / cloud vignette framing the world via zit-txt2img"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "poker-roguelike",
@@ -2029,7 +2066,8 @@
         "Chip / coin / multiplier icons via qwen-icon",
         "Blind + boss splash art via zit-txt2img",
         "Chip-count tick, joker-trigger, and win/lose stinger SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "mall-tycoon",
@@ -2067,7 +2105,8 @@
         "A mall-concourse tileset (floor, planters, skylights) via zit-seamless-tile",
         "Store + amenity + currency icons (restrooms/decor/parking/security; cash/net-worth) via qwen-icon",
         "80s mall muzak loop + a soft cash-register / crowd-murmur SFX bed"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "video-store-sim",
@@ -2105,7 +2144,8 @@
         "A neon video-store storefront + carpet/shelf tileset via zit-seamless-tile",
         "Genre + late-fee + membership-card + currency icons via qwen-icon",
         "80s synth store-radio loop + a VHS clunk / register-beep / rewind SFX bed"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "ant-colony",
@@ -2139,7 +2179,8 @@
         "A spider predator sprite (idle / lunge) via qwen-icon",
         "Zone-designation icons (dig / forage / attack) for the palette via qwen-icon",
         "Ambient loop (skittering + underground rumble) + forage/dig/battle SFX stingers"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "peg-roguelike",
@@ -2174,7 +2215,8 @@
         "Enemy + boss art via card-creature-art",
         "Board backdrop / node-map splash via zit-txt2img",
         "Peg-plink, crit-ding, bomb-blast, and win/lose stinger SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "spinning-top-battler",
@@ -2213,7 +2255,8 @@
         "Circular stadium / bowl backdrop via zit-txt2img",
         "AI opponent / rival portraits via card-creature-art",
         "Launch whoosh, metal-clash, ring-out, burst, and win/lose stinger SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "martial-arts-brawler",
@@ -2252,7 +2295,8 @@
         "Dojo / stage backdrop via zit-txt2img",
         "Master / rival opponent portraits via card-creature-art",
         "Hit-impact, block, whoosh, projectile, KO, and win/lose stinger SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "pirate-sim",
@@ -2291,7 +2335,8 @@
         "Good / coin / reputation / rank icons via qwen-icon",
         "Rival captain + governor portraits via card-creature-art",
         "Cannon-broadside, boarding-clash, wind, coin, and win/lose stinger SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "ragdoll-locomotion",
@@ -2333,7 +2378,8 @@
         "Distance-marker + goal-line UI art via qwen-icon",
         "Crowd / stadium parallax via image-parallax-depthflow",
         "Footstep, stumble, thud/wipeout, and goal-cheer SFX"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "dept-store-sim",
@@ -2371,7 +2417,8 @@
         "A department-store aisle / carpet / shelf tileset via zit-seamless-tile",
         "Department + season + catalogue + markdown + currency icons via qwen-icon",
         "80s in-store PA / muzak loop + register-beep / page-turn (catalogue) / crowd-murmur SFX bed"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "animal-society-rpg",
@@ -2410,7 +2457,8 @@
         "A parchment migration map / journey strip with stop markers via zit-txt2img; season-tinted backdrops (spring/summer/autumn/winter)",
         "Role / need (food / rest / morale) / decision icons for the HUD + decision bar via qwen-icon",
         "Ambient loop (meadow wind + distant road) + forage / raid / birth / desertion / arrival SFX stingers"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "farm-management-sim",
@@ -2448,7 +2496,8 @@
         "A field / soil / irrigation-furrow tileset (tilled, planted, mature, fallow, irrigated) via zit-seamless-tile",
         "Livestock (cattle / pigs / chickens), machinery (tractor / harvester), commodity, weather and currency icons via qwen-icon",
         "A rural farm-ambience / barnyard loop + tractor-engine / auction-bell / weather SFX bed"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "classic-roguelike",
@@ -2503,7 +2552,8 @@
         "Item icons (gold pile, potion flask; ~12x12) -- replaces the coloured draw_circle pips",
         "Bitmap/pixel font for the HUD + message log (readable at small sizes)",
         "SFX: footstep, bump-attack hit, monster death, gold pickup, potion glug, stairs descend, level-up chime, death sting"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "rts",
@@ -2558,7 +2608,8 @@
         "Terrain tileset (grass/dirt/cliff) for the board -- replaces the flat background rect",
         "HUD chrome: resource bar with icons, a command-card panel, selection reticle, minimap frame",
         "SFX: mine tick, deposit chime, unit-ready + build-complete stingers, attack hit, unit death, victory/defeat fanfare"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "tbs-4x",
@@ -2613,7 +2664,8 @@
         "HUD chrome: top resource/tech bar, a city panel with a build list, a tech-tree panel, a minimap frame",
         "Tech-tree icons for bronze working / pottery / writing / mathematics and their buildings (granary/library/walls)",
         "SFX: found-city + city-captured stingers, unit attack/death, tech-unlocked chime, growth pop, end-turn whoosh, victory/defeat fanfare"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "tactics-srpg",
@@ -2668,7 +2720,8 @@
         "A combat-forecast panel (attacker vs defender: hit%, dmg, crit%, doubling arrows) + class portraits",
         "Weapon-triangle iconography (sword/axe/lance/bow/staff) for the HUD",
         "SFX: sword/axe/lance/bow hit, miss whiff, crit sting, heal chime, unit-defeated fall, phase-change flourish, victory/defeat fanfare"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "crpg-party",
@@ -2723,7 +2776,8 @@
         "UI chrome: initiative tracker, an action bar (attack/spells/defend), a spell menu with slot pips, damage/heal floaters",
         "Class + spell iconography (sword/bow/staff/spellbook; magic-missile/fireball/cure/bless)",
         "SFX: sword/bow/mace hit, spell cast (missile/fireball/cure/bless), miss, crit sting, level-up fanfare, party-member down, victory/defeat music"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "fighting-1v1",
@@ -2778,7 +2832,8 @@
         "HUD chrome: health bars, super meter, round pips, timer, portrait plates, combo counter",
         "Hit/guard sparks + hitstop-friendly impact VFX",
         "SFX: light/heavy punch + kick whiffs & impacts, block clink, projectile fire/hit, jump/land, round announcer + KO calls, victory theme"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "twin-stick-shooter",
@@ -2833,7 +2888,8 @@
         "Arena floor/wall tileset + optional obstacle props",
         "HUD chrome: HP bar, wave/score readout, enemy HP rings, hurt vignette",
         "SFX: player fire + reload, enemy fire, bullet impacts, enemy death, player hurt, wave-clear + victory/defeat stings"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "rhythm",
@@ -2888,7 +2944,8 @@
         "HUD chrome: score, combo x multiplier, accuracy %, a grade badge, a health/energy bar, a progress/seek bar",
         "A song + its beatmap (the chart maps BPM-derived ticks to note.time; replace the procedural generator with an authored map)",
         "SFX: per-lane hit sound, miss cue, combo-break, song-clear grade stinger"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "block-puzzle",
@@ -2943,7 +3000,8 @@
         "HUD chrome: score/lines/level readouts, a lines-to-next-level bar, a combo/back-to-back badge",
         "SFX: move/rotate blip, soft/hard drop, per-count line clear (single..tetris), level-up, game over",
         "Optional: a soundtrack that ramps tempo with level"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "idle-clicker",
@@ -2998,7 +3056,8 @@
         "A milestone/ascension fanfare screen + a news-ticker strip",
         "SFX: click, purchase chime, golden spawn ping, frenzy start/stop, ascension fanfare",
         "Number-abbreviation font that reads at K/M/B/T scale"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "educational-quiz",
@@ -3053,7 +3112,8 @@
         "An end-screen report card layout + a grade stamp (A-F)",
         "SFX: correct chime, wrong buzz, timer tick, streak milestone, grade-reveal fanfare",
         "Optional: a themed question bank (JSON) authored per subject/grade to replace the built-in generator"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "hidden-object",
@@ -3108,7 +3168,8 @@
         "A hint spotlight/sweep VFX + a hint-charge indicator",
         "HUD chrome: round, score, timer bar/ring, hints remaining, combo readout",
         "SFX: item-found ping, misclick buzz, hint sweep, timer heartbeat, round-clear + win fanfare"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "sports-arcade",
@@ -3163,7 +3224,8 @@
         "A goal celebration screen + a full-time result card",
         "SFX: kick/pass thwack, tackle slide, ball-off-post, goal net-bulge + crowd roar, referee whistle",
         "Optional: crowd ambience + a commentary one-liner bank"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "life-sim",
@@ -3218,7 +3280,8 @@
         "UI chrome: need bars, a clock, money + mood readouts, a relationship panel, an aspiration meter, a command wheel",
         "SFX: eat/shower/toilet/sleep cues, a phone/social chime, a work-shift jingle, an aspiration fanfare, a low-need alert",
         "Optional: day/night lighting + a lo-fi routine soundtrack"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "survival-crafting",
@@ -3273,7 +3336,8 @@
         "A day-night sky/lighting ramp + a night threat/temperature vignette",
         "UI chrome: health/hunger/warmth meters, a hotbar, a crafting menu with recipe costs, a clock",
         "SFX: chop/mine, pickup, craft/build chime, fire crackle + low-fuel warning, nightfall cue, low-health heartbeat, dawn sting"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "dating-sim",
@@ -3328,7 +3392,8 @@
         "Gift icons + date-location backdrops (cafe/gym/museum/park/concert)",
         "SFX: affection chime, liked-gift sparkle, stat-up, milestone flourish, confession music swell",
         "NOTE: any mature assets belong behind the mature_content gate and are the developer's responsibility to author/rate; the template ships none"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "auto-battler",
@@ -3383,7 +3448,8 @@
         "A combat arena backdrop + hit/faint VFX + a trophy/heart HUD",
         "SFX: buy/sell pop, freeze click, roll shuffle, attack thwack, ability cues, faint, trophy/heart gain, run win/lose",
         "Optional: a relic/upgrade set (How-Many-Dudes-style rule-warpers) to bolt onto the roster"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "merge-puzzle",
@@ -3438,7 +3504,8 @@
         "A game-over / win overlay + a restart button",
         "SFX: slide whoosh, tier-rising merge click, new-tile blip, milestone chime, game-over tone",
         "Optional Merge-2/3 art: a free-board item ladder + a generator prop for the board-merge variant"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "dot-io",
@@ -3493,7 +3560,8 @@
         "HUD chrome: a size/score readout, a live leaderboard, a match timer, a minimap",
         "SFX: swallow pop (pitch rises with size), rival gulp, size-milestone chime, match-end fanfare",
         "Optional: a virtual joystick for mobile + a skin/cosmetic set"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "endless-runner",
@@ -3548,7 +3616,8 @@
         "HUD chrome: distance, coins, score, a mission/objective bar, a boost meter",
         "SFX: footstep loop, lane-swish, jump/slide whoosh, coin ping + combo, near-miss stinger, crash tumble",
         "Optional: a hoverboard/powerup set + a character/skin roster"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "bubble-shooter",
@@ -3603,7 +3672,8 @@
         "HUD chrome: score, popped/dropped counters, a shots-to-drop meter, a level/objective bar",
         "SFX: launch thunk, wall tick, colour-keyed pop (chain-pitched), floater drop, descent warning, board-clear fanfare",
         "Optional: a level map + a booster/powerup set + a bubble-skin roster"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "word-puzzle",
@@ -3658,7 +3728,8 @@
         "A results/share card (the emoji-grid recap) + a daily-word calendar",
         "SFX: key click, row-flip reveal, solve chime, fail thud, streak bump, marathon fanfare",
         "A real dictionary file (answers + valid guesses) to replace the embedded starter list"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "solitaire",
@@ -3713,7 +3784,8 @@
         "HUD chrome: foundations counter, moves/time/score, a hint + auto-complete button, undo",
         "SFX: deal riffle, card snap, foundation ping (rank-pitched), flip tick, redeal shuffle, win fanfare",
         "Optional: additional patience variants (Spider / FreeCell / Pyramid) + a daily-deal calendar"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "adult-management",
@@ -3768,7 +3840,8 @@
         "HUD chrome: day counter, goal tracker, marketing + hire/upgrade buttons",
         "SFX: shift bustle, cash chime (budget-scaled), sour under-skill note, hire ping, upgrade thunk, goal fanfare",
         "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "adult-trainer",
@@ -3823,7 +3896,8 @@
         "HUD chrome: week counter, target tracker, an event pop-up frame",
         "SFX: training sting, overtrain groan, outing chime, event pop, per-ending fanfare, Burnout cue",
         "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "adult-puzzle-dating",
@@ -3878,7 +3952,8 @@
         "HUD chrome: turn counter, munny, a route roster with completion ticks",
         "SFX: swap click, type-keyed match pop, cascade chain, preferred-token sparkle, gift chime, route fanfare",
         "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "adult-sandbox",
@@ -3933,7 +4008,8 @@
         "HUD chrome: who-is-where map badges, an action bar, a progress readout",
         "SFX: travel whoosh, work/train sting, socialize chime, stage-up fanfare, sleep day-fade, low-energy warning",
         "NOTE: keep the mature_content gate OFF for store builds; any adult assets are author-supplied, age-verified, and platform-compliant — not part of this template"
-      ]
+      ],
+      "vetted": false
     },
     {
       "id": "autobattler-horde",
@@ -3988,7 +4064,8 @@
         "A wave-clear reward screen (coin shower) + a victory / wipe screen",
         "SFX: recruit ping, battle horn, clash rumble (army-size scaled), death poof, wave-clear cheer, wipe cue",
         "Optional: unit abilities/synergies, boss waves, and a formation editor"
-      ]
+      ],
+      "vetted": false
     }
   ]
 }
