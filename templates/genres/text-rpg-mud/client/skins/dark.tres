@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="NoxSkin" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://skins/nox_skin.gd" id="1_s"]
+[ext_resource type="FontFile" path="res://fonts/Montserrat-Bold.ttf" id="2_b"]
+[ext_resource type="FontFile" path="res://fonts/fantasy_serif.ttf" id="3_d"]
+
+[resource]
+script = ExtResource("1_s")
+world_name = "Sanctuary"
+body_font = ExtResource("2_b")
+display_font = ExtResource("3_d")
+bg = Color(0.0627, 0.0471, 0.0471, 1)
+panel_bg = Color(0.1020, 0.0784, 0.0784, 1)
+panel_border = Color(0.3529, 0.2275, 0.2275, 1)
+title = Color(0.7098, 0.3294, 0.2902, 1)
+accent = Color(0.6039, 0.2902, 0.2275, 1)
+text = Color(0.8118, 0.7686, 0.7216, 1)
+dim = Color(0.5412, 0.4784, 0.4392, 1)
+thoughts_col = Color(0.5412, 0.4157, 0.6039, 1)
+health_col = Color(0.5412, 0.1647, 0.1647, 1)
+resource_col = Color(0.2902, 0.3529, 0.4784, 1)
+spirit_col = Color(0.6275, 0.6275, 0.6902, 1)
+stamina_col = Color(0.4157, 0.4784, 0.2902, 1)
+rt_col = Color(0.6039, 0.3529, 0.1647, 1)
+cast_col = Color(0.4157, 0.2902, 0.4784, 1)
+resource_label = "Mana"
+spirit_label = "Grit"

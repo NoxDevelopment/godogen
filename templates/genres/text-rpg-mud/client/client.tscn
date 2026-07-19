@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://noxmudclient001"]
+[gd_scene load_steps=3 format=3 uid="uid://noxmudclient001"]
 
 [ext_resource type="Script" path="res://client.gd" id="1_cli"]
-[ext_resource type="Theme" path="res://themes/fantasy.tres" id="2_thm"]
 [ext_resource type="Script" path="res://net.gd" id="3_net"]
 
 [node name="Client" type="Control"]
@@ -9,8 +8,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource("2_thm")
 script = ExtResource("1_cli")
+skin_path = "res://skins/fantasy.tres"
 
 [node name="Net" type="Node" parent="."]
 script = ExtResource("3_net")
