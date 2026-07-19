@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dnonb1wl5fs0h" path="res://models/decoration-forest.glb" id="2_dlvak"]
 [ext_resource type="PackedScene" uid="uid://ch83y7b822ibm" path="res://models/decoration-tents.glb" id="3_6wkmy"]
 [ext_resource type="Texture2D" uid="uid://cn1tfklahvwc0" path="res://models/Textures/colormap.png" id="5_qst2b"]
-[ext_resource type="PackedScene" uid="uid://dhc1lsb41pv6p" path="res://models/track-ramp.glb" id="7_0c7ya"]
+[ext_resource type="PackedScene" path="res://models/track-bump.glb" id="7_0c7ya"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vqi4y"]
 resource_name = "colormap"
