@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://c41rp50edgch7"]
+
+[ext_resource type="ArrayMesh" uid="uid://ccjtf8pu3j80m" path="res://assets/objects/laboratory/building_pass.tres" id="1_nhicj"]
+
+[node name="BuildingCard" type="MeshInstance3D"]
+mesh = ExtResource("1_nhicj")
+metadata/object = &"building_card"

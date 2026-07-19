@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="StatEnemyPowerup" load_steps=2 format=3 uid="uid://f107e13ohv24"]
+
+[ext_resource type="Script" path="res://Scripts/Enemies/StatEnemyPowerup.cs" id="1_2fte1"]
+
+[resource]
+script = ExtResource("1_2fte1")
+Value = 0.25

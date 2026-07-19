@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://kve2b43ixa5g"]
+
+[ext_resource type="BoxMesh" uid="uid://jmldsyopndwf" path="res://assets/objects/end_gem.tres" id="1_v0ebb"]
+
+[node name="EndGem" type="MeshInstance3D"]
+mesh = ExtResource("1_v0ebb")

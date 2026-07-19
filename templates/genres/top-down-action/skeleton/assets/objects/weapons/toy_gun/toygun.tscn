@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://1gflwu3l4dcu"]
+
+[ext_resource type="ArrayMesh" uid="uid://3xje3o37tqww" path="res://assets/objects/weapons/toy_gun/laser-gun-design1_Cube.tres" id="1_q2h6i"]
+
+[node name="Toygun" type="MeshInstance3D"]
+mesh = ExtResource("1_q2h6i")
+metadata/object = &"toygun"

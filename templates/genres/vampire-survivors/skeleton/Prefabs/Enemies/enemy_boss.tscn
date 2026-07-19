@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://h7skiwe3dxvx"]
+
+[ext_resource type="Script" uid="uid://ct1gbjwefmypu" path="res://Scripts/Enemies/Enemy.cs" id="1_gq7vj"]
+[ext_resource type="PackedScene" uid="uid://ddy1iprhf2ql3" path="res://addons/kaykit_skeleton_pack/enemy_skeleton_warrior.tscn" id="2_0oqdm"]
+[ext_resource type="PackedScene" uid="uid://bqs2yj7yvc680" path="res://addons/kaykit_skeleton_pack/assets/shield.gltf.glb" id="3_2l28h"]
+[ext_resource type="PackedScene" uid="uid://dbch8185xjxrs" path="res://Prefabs/damage_particles.tscn" id="3_aaiag"]
+[ext_resource type="PackedScene" uid="uid://xjea7a4sc4sr" path="res://addons/kaykit_skeleton_pack/assets/sword_broken_half.gltf.glb" id="4_o0ych"]
+[ext_resource type="PackedScene" uid="uid://cqykri564vk1c" path="res://addons/kaykit_skeleton_pack/assets/bone.gltf.glb" id="5_7kk0h"]
+[ext_resource type="PackedScene" uid="uid://c5kiulb70bq78" path="res://addons/kaykit_skeleton_pack/assets/sword_broken.gltf.glb" id="5_ir3au"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_uexej"]
+radius = 1.0
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ptn36"]
+animation = &"KayKit Animated Character|Idle"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_gor3g"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_xywv6"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_37bnq"]
+"states/KayKit Animated Character|Idle/node" = SubResource("AnimationNodeAnimation_ptn36")
+"states/KayKit Animated Character|Idle/position" = Vector2(482, 100)
+states/Start/position = Vector2(162, 100)
+transitions = ["Start", "KayKit Animated Character|Idle", SubResource("AnimationNodeStateMachineTransition_gor3g"), "KayKit Animated Character|Idle", "End", SubResource("AnimationNodeStateMachineTransition_xywv6")]
+
+[sub_resource type="Curve" id="Curve_frdfq"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.34466, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_2jebh"]
+curve = SubResource("Curve_frdfq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_y0cf7"]
+emission_shape = 1
+emission_sphere_radius = 0.2
+direction = Vector3(0, 0, -1)
+initial_velocity_min = 0.2
+initial_velocity_max = 1.5
+gravity = Vector3(0, 0, 0)
+scale_curve = SubResource("CurveTexture_2jebh")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hp047"]
+blend_mode = 3
+cull_mode = 1
+albedo_color = Color(1, 0.0901961, 0.0588235, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_hh812"]
+material = SubResource("StandardMaterial3D_hp047")
+radial_segments = 8
+rings = 8
+
+[node name="EnemyBoss" type="AnimatableBody3D" unique_id=1491868939]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+collision_layer = 2
+collision_mask = 15
+axis_lock_linear_y = true
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+script = ExtResource("1_gq7vj")
+Lifepoints = 300
+Damages = 50
+MovementSpeed = 2.0
+Experience = 20
+
+[node name="EnemySkeletonWarrior" parent="." unique_id=891721447 instance=ExtResource("2_0oqdm")]
+
+[node name="Skeleton3D" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character" parent_id_path=PackedInt32Array(891721447, 1299331446) index="0" unique_id=488906677]
+bones/0/rotation = Quaternion(-0.0348664, -0.00152229, -0.0435928, 0.99844)
+bones/1/rotation = Quaternion(0.055207986, -3.4924608e-10, -1.2241803e-09, 0.99847496)
+bones/2/rotation = Quaternion(0.6827163, 0.18411563, -0.68271625, 0.18411563)
+bones/3/rotation = Quaternion(-0.6066168, 0.6066169, -0.36334014, -0.3633401)
+bones/4/rotation = Quaternion(0.70161897, -0.293807, -0.6463564, -0.06026468)
+bones/5/rotation = Quaternion(0.30050638, -0.3765909, 0.6798765, 0.55285007)
+
+[node name="Body" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D" index="1"]
+transform = Transform3D(0.9961947, 0.08715567, 1.7229468e-08, -0.08694336, 0.99376804, 0.06975669, 0.0060796733, -0.06949124, 0.997564, 0, 0, 0)
+
+[node name="shield_gltf" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/Body/character_skeleton_warrior_body" index="0" unique_id=30380119 instance=ExtResource("3_2l28h")]
+transform = Transform3D(-1, -1.83917e-14, -8.74226e-08, -3.39286e-08, 0.92162, 0.388095, 8.05701e-08, 0.388095, -0.92162, 0.0115078, 0.548947, -0.332807)
+
+[node name="Head" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D" index="2"]
+transform = Transform3D(0.99619466, 0.08662438, -0.009608684, -0.08694335, 0.9954006, -0.040229045, 0.0060796733, 0.04091137, 0.9991442, 0.00062019785, 0.007071633, -0.0004944982)
+
+[node name="character_skeleton_warrior_head" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/Head" index="0"]
+transform = Transform3D(0.01, -1.34359e-09, 5.96047e-09, 1.34359e-09, 0.01, -7.21775e-09, -5.96047e-09, 7.21775e-09, 0.01, -9.04989e-10, -7.06143e-05, 5.06407e-09)
+
+[node name="character_skeleton_warrior_helmet" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/Head/character_skeleton_warrior_head" index="1"]
+visible = false
+
+[node name="character_skeleton_warrior_jaw" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/Head/character_skeleton_warrior_head" index="2"]
+visible = false
+
+[node name="sword_broken_half_gltf" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/Head/character_skeleton_warrior_head" index="3" unique_id=116897751 instance=ExtResource("4_o0ych")]
+transform = Transform3D(0.309366, -0.94995, 0.043444, 0.946413, 0.312025, 0.0833292, -0.0927142, 0.0153368, 0.995575, -0.260555, 0.683836, 0.0911871)
+
+[node name="ArmLeft" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D" index="3"]
+transform = Transform3D(-1.7229484e-08, 0.42554379, -0.904938, -0.069756754, -0.9027336, -0.42450723, -0.997565, 0.06312546, 0.029684298, 0.0019974394, 0.0067511583, -0.00047208846)
+
+[node name="ArmRight" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D" index="4"]
+transform = Transform3D(-0.037309654, -0.5597962, -0.82778984, -0.39731893, -0.7517667, 0.52629316, -0.9169228, 0.34853205, -0.19436908, -0.0007919056, 0.0069945995, -0.00048911147)
+
+[node name="HandSlotLeft" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D" index="5"]
+transform = Transform3D(-0.9986525, 2.0280451e-07, 0.051899403, 0.051772833, 0.06975671, 0.99622005, -0.0036202762, 0.997565, -0.069662556, 0.004341856, 0.001777797, -0.00012431602)
+
+[node name="bone_gltf" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/HandSlotLeft" index="0" unique_id=2143424067 instance=ExtResource("5_7kk0h")]
+transform = Transform3D(0.00999994, 5.3757e-09, 3.51488e-05, -1.61848e-09, 0.01, -4.89946e-10, -3.51495e-05, -5.83977e-11, 0.00999993, -1.34846e-05, 2.03997e-05, -5.11971e-05)
+
+[node name="HandSlotRight" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D" index="6"]
+transform = Transform3D(-0.9692904, 0.24414787, 0.029460311, 0.121901035, 0.3729699, 0.919801, 0.2135801, 0.89514637, -0.3912775, -0.0038759485, 0.0028529484, 0.0014310293)
+
+[node name="sword_broken_gltf" parent="EnemySkeletonWarrior/RootNode/KayKit Animated Character/Skeleton3D/HandSlotRight" index="0" unique_id=1854663015 instance=ExtResource("5_ir3au")]
+transform = Transform3D(-8.00018e-06, 0.000704448, 0.00997514, 0.000656875, 0.00995365, -0.000702403, -0.0099784, 0.000654681, -5.42369e-05, -0.000211431, 0.000687208, -4.5707e-06)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=154545427]
+transform = Transform3D(0.765, 0, 0, 0, 0.765, 0, 0, 0, 0.765, 0, 0.754766, 0)
+shape = SubResource("SphereShape3D_uexej")
+
+[node name="DamageParticles" parent="." unique_id=2086877086 instance=ExtResource("3_aaiag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.57005, 0)
+
+[node name="AttackCooldown" type="Timer" parent="." unique_id=1938874072]
+one_shot = true
+autostart = true
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1238057972]
+root_node = NodePath("../EnemySkeletonWarrior")
+root_motion_track = NodePath("RootNode/KayKit Animated Character/Skeleton3D:Body")
+tree_root = SubResource("AnimationNodeStateMachine_37bnq")
+anim_player = NodePath("../EnemySkeletonWarrior/AnimationPlayer")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=543394189]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.41888, 0)
+amount = 128
+process_material = SubResource("ParticleProcessMaterial_y0cf7")
+draw_pass_1 = SubResource("SphereMesh_hh812")
+
+[editable path="EnemySkeletonWarrior"]

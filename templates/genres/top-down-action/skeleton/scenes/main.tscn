@@ -1,103 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://tdamain00001"]
+[gd_scene load_steps=6 format=3 uid="uid://bv55eibbam6m6"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1_mn"]
-[ext_resource type="PackedScene" uid="uid://tdaplayer001" path="res://scenes/player.tscn" id="2_pl"]
-[ext_resource type="PackedScene" uid="uid://tdatarget001" path="res://scenes/target.tscn" id="3_tg"]
-[ext_resource type="PackedScene" uid="uid://tdaenemy0001" path="res://scenes/enemy.tscn" id="4_en"]
+[ext_resource type="Script" uid="uid://b1xrinwfnjecq" path="res://scenes/game_manager.gd" id="1_3c0uv"]
+[ext_resource type="PackedScene" uid="uid://jga6pbb5xpug" path="res://characters/player/PlayerEntity.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://b87aieg3uitnk" path="res://scenes/level1/level1.tscn" id="3_6l6n1"]
+[ext_resource type="PackedScene" uid="uid://bd5lrudlpxbay" path="res://ui/GameOverMenu.tscn" id="3_ss24o"]
+[ext_resource type="PackedScene" uid="uid://bsvdg3ojnd0oj" path="res://ui/ControllerMenu.tscn" id="13_ysf7g"]
 
-[sub_resource type="NavigationPolygon" id="nav_arena"]
-vertices = PackedVector2Array(48, 48, 1104, 48, 1104, 600, 48, 600)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(48, 48, 1104, 48, 1104, 600, 48, 600)])
+[node name="Main" type="Node3D"]
+script = ExtResource("1_3c0uv")
+player_packed_scene = ExtResource("2")
 
-[sub_resource type="RectangleShape2D" id="shape_wall_h"]
-size = Vector2(1152, 32)
+[node name="ControllerMenu" parent="." instance=ExtResource("13_ysf7g")]
+visible = false
 
-[sub_resource type="RectangleShape2D" id="shape_wall_v"]
-size = Vector2(32, 584)
+[node name="GameOverMenu" parent="." instance=ExtResource("3_ss24o")]
+visible = false
 
-[node name="Main" type="Node2D"]
-script = ExtResource("1_mn")
-
-[node name="Background" type="Polygon2D" parent="."]
-z_index = -10
-color = Color(0.113725, 0.12549, 0.14902, 1)
-polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
-
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
-navigation_polygon = SubResource("nav_arena")
-
-[node name="Walls" type="StaticBody2D" parent="."]
-collision_layer = 1
-collision_mask = 0
-
-[node name="TopShape" type="CollisionShape2D" parent="Walls"]
-position = Vector2(576, 16)
-shape = SubResource("shape_wall_h")
-
-[node name="BottomShape" type="CollisionShape2D" parent="Walls"]
-position = Vector2(576, 632)
-shape = SubResource("shape_wall_h")
-
-[node name="LeftShape" type="CollisionShape2D" parent="Walls"]
-position = Vector2(16, 324)
-shape = SubResource("shape_wall_v")
-
-[node name="RightShape" type="CollisionShape2D" parent="Walls"]
-position = Vector2(1136, 324)
-shape = SubResource("shape_wall_v")
-
-[node name="Visuals" type="Node2D" parent="."]
-
-[node name="Top" type="Polygon2D" parent="Visuals"]
-color = Color(0.227451, 0.247059, 0.290196, 1)
-polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 32, 0, 32)
-
-[node name="Bottom" type="Polygon2D" parent="Visuals"]
-color = Color(0.227451, 0.247059, 0.290196, 1)
-polygon = PackedVector2Array(0, 616, 1152, 616, 1152, 648, 0, 648)
-
-[node name="Left" type="Polygon2D" parent="Visuals"]
-color = Color(0.227451, 0.247059, 0.290196, 1)
-polygon = PackedVector2Array(0, 32, 32, 32, 32, 616, 0, 616)
-
-[node name="Right" type="Polygon2D" parent="Visuals"]
-color = Color(0.227451, 0.247059, 0.290196, 1)
-polygon = PackedVector2Array(1120, 32, 1152, 32, 1152, 616, 1120, 616)
-
-[node name="Player" parent="." instance=ExtResource("2_pl")]
-position = Vector2(200, 324)
-
-[node name="TargetA" parent="." instance=ExtResource("3_tg")]
-position = Vector2(700, 160)
-
-[node name="TargetB" parent="." instance=ExtResource("3_tg")]
-position = Vector2(960, 324)
-
-[node name="TargetC" parent="." instance=ExtResource("3_tg")]
-position = Vector2(700, 500)
-
-[node name="Enemy" parent="." instance=ExtResource("4_en")]
-position = Vector2(1000, 120)
-
-[node name="SpawnPoint" type="Marker2D" parent="."]
-position = Vector2(200, 324)
-
-[node name="HUD" type="CanvasLayer" parent="."]
-
-[node name="Margin" type="MarginContainer" parent="HUD"]
-offset_left = 12.0
-offset_top = 8.0
-offset_right = 320.0
-offset_bottom = 100.0
-
-[node name="Rows" type="VBoxContainer" parent="HUD/Margin"]
-layout_mode = 2
-
-[node name="HealthLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
-layout_mode = 2
-text = "HP 5/5"
-
-[node name="TargetsLabel" type="Label" parent="HUD/Margin/Rows" groups=["scalable_text"]]
-layout_mode = 2
-text = "Targets left: 3"
+[node name="Level1" parent="." instance=ExtResource("3_6l6n1")]
