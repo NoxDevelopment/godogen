@@ -1,9 +1,9 @@
 [gd_scene load_steps=25 format=3 uid="uid://hftestroom01"]
 
 [ext_resource type="Script" path="res://scripts/test_room.gd" id="1_tr"]
-[ext_resource type="PackedScene" uid="uid://kicjwmh02uwf" path="res://addons/cogito/PackedScenes/cogito_player.tscn" id="2_pl"]
-[ext_resource type="PackedScene" uid="uid://bdyukj85qkut0" path="res://addons/cogito/PackedScenes/door.tscn" id="3_dr"]
-[ext_resource type="PackedScene" uid="uid://0fj068bj0csc" path="res://addons/cogito/PackedScenes/Pickups/pickup_health_potion.tscn" id="4_hp"]
+[ext_resource type="PackedScene" path="res://COGITO/PrefabScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" path="res://COGITO/PrefabScenes/door.tscn" id="3_dr"]
+[ext_resource type="PackedScene" path="res://COGITO/PrefabScenes/Pickups/pickup_health_potion.tscn" id="4_hp"]
 [ext_resource type="Script" path="res://addons/resonate/music_manager/music_bank.gd" id="5_mb"]
 [ext_resource type="Script" path="res://addons/resonate/music_manager/music_track_resource.gd" id="6_mt"]
 [ext_resource type="Script" path="res://addons/resonate/music_manager/music_stem_resource.gd" id="7_ms"]
