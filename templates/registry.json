@@ -4066,6 +4066,18 @@
         "Optional: unit abilities/synergies, boss waves, and a formation editor"
       ],
       "vetted": false
+    },
+    {
+      "id": "text-rpg-mud",
+      "title": "Text MUD / MMORPG (living world)",
+      "engine": "evennia+godot",
+      "status": "server-live",
+      "maturity": "living-world-foundation",
+      "vetted": false,
+      "reference": "GemStone IV (Simutronics)",
+      "paritySpec": "docs/GEMSTONE4_PARITY_SPEC.md",
+      "note": "Evennia BSD server (Postgres) + planned Godot client. Live server + PROVEN living world (autonomous world-clock + wandering agent). NOT the old untracked SP stub. 89-item GS4 parity roadmap in the spec.",
+      "todoForFullGame": "GS4-parity Godot client (tag protocol) + systems depth (professions/combat/spells) + full town+hunting-zones + townsfolk daily-routine agents"
     }
   ]
 }
