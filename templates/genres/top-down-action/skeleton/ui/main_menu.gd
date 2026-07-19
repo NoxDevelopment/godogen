@@ -18,9 +18,6 @@ func _refresh_best() -> void:
 func _on_new_game_pressed() -> void:
 	GameFlow.new_game()
 
-func _on_story_pressed() -> void:
-	GameFlow.play_story()
-
 func _on_options_pressed() -> void:
 	_options.visible = true
 	$OptionsPanel/VBox/Back.grab_focus()

@@ -7,7 +7,7 @@ extends PlayerState
 @export var snap_length := 0.5
 @export var do_stop_on_slope := true
 
-var _switch_component :SwitchComponent = null
+var _switch_component: Node = null  # duck-typed: interactable with an on_interaction(bool) method
 var _move_direction := Vector3.ZERO
 var _player_input := Vector3.ZERO
 var _is_directing := true

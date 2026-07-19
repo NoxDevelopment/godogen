@@ -8,7 +8,6 @@ extends Node
 const ARENA := "res://scenes/play/arena.tscn"
 const MENU := "res://ui/main_menu.tscn"
 const WIN := "res://ui/win_screen.tscn"
-const STORY := "res://scenes/main.tscn"
 const SAVE_PATH := "user://twinshooter_save.cfg"
 
 ## How many waves make up a full run.
@@ -63,10 +62,6 @@ func add_item() -> void:
 func to_menu() -> void:
 	_timing = false
 	get_tree().change_scene_to_file(MENU)
-
-func play_story() -> void:
-	_timing = false
-	get_tree().change_scene_to_file(STORY)
 
 func pause_timer() -> void:
 	_timing = false

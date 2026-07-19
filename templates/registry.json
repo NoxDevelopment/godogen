@@ -520,7 +520,10 @@
           "screenshots/02_arena_wave.png",
           "screenshots/03_victory.png"
         ],
-        "verifiedBy": "windowed screenshot capture of menu, arena+HUD, victory"
+        "verifiedBy": "cold runtime probe: 6 Beehave enemies load + AI swarms/damages player, player armed, HUD live, ZERO script errors",
+        "vendored": "Beehave v2.9.2 (MIT) — enemy behaviour-tree AI, self-contained (base repo gitignored it)",
+        "ui": "ui-theme skill theme.tres (navy+gold, Montserrat) on menu/HUD/win",
+        "dialogic": "decoupled — Dialogic 2.0-alpha does not compile on Godot 4.6.1; narrative/Story mode deferred to a Dialogic 4.6 port (task #59). Arena needs none of it."
       }
     },
     {

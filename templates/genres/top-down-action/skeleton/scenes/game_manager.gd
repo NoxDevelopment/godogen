@@ -3,7 +3,10 @@ class_name GameManager extends Node3D
 @export var player_packed_scene:PackedScene = null
 static var gameover_menu: Control = null
 static var player:PlayerEntity = null
-static var level:LevelManager = null
+# A "level" is any child that emits introscene_finished (duck-typed) — the story
+# LevelManager. Combat arenas pre-place the player, so this stays null there.
+# Untyped so its story-only members (player_start_point, skip_intro, …) resolve dynamically.
+static var level = null
 
 static func get_player()->PlayerEntity:
 	return player
@@ -40,7 +43,7 @@ func find_game_elements():
 	for child in children:
 		if child is PlayerEntity:
 			player = child
-		elif child is LevelManager:
+		elif child.has_signal("introscene_finished"):
 			level = child
 		elif child is GameOverMenu:
 			gameover_menu = child

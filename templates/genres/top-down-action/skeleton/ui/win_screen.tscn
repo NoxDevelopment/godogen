@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwin0twinshoot1"]
+[gd_scene load_steps=3 format=3 uid="uid://cwin0twinshoot1"]
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme_ui"]
 
 [ext_resource type="Script" path="res://ui/win_screen.gd" id="1_win"]
 
 [node name="WinScreen" type="Control"]
+theme = ExtResource("theme_ui")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

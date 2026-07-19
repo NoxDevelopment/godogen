@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmenu0twinshoot1"]
+[gd_scene load_steps=3 format=3 uid="uid://cmenu0twinshoot1"]
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme_ui"]
 
 [ext_resource type="Script" path="res://ui/main_menu.gd" id="1_menu"]
 
 [node name="MainMenu" type="Control"]
+theme = ExtResource("theme_ui")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -69,12 +71,7 @@ layout_mode = 2
 [node name="NewGame" type="Button" parent="CenterBox/VBox"]
 custom_minimum_size = Vector2(320, 52)
 layout_mode = 2
-text = "NEW GAME  —  ARENA RUN"
-
-[node name="Story" type="Button" parent="CenterBox/VBox"]
-custom_minimum_size = Vector2(320, 52)
-layout_mode = 2
-text = "STORY MODE"
+text = "NEW GAME"
 
 [node name="Options" type="Button" parent="CenterBox/VBox"]
 custom_minimum_size = Vector2(320, 52)
@@ -144,7 +141,6 @@ layout_mode = 2
 text = "BACK"
 
 [connection signal="pressed" from="CenterBox/VBox/NewGame" to="." method="_on_new_game_pressed"]
-[connection signal="pressed" from="CenterBox/VBox/Story" to="." method="_on_story_pressed"]
 [connection signal="pressed" from="CenterBox/VBox/Options" to="." method="_on_options_pressed"]
 [connection signal="pressed" from="CenterBox/VBox/Quit" to="." method="_on_quit_pressed"]
 [connection signal="toggled" from="OptionsPanel/VBox/Fullscreen" to="." method="_on_fullscreen_toggled"]

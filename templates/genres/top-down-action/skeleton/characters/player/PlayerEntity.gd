@@ -23,8 +23,12 @@ func _ready():
 	game_data.controller_scheme_changed.connect(_on_controller_scheme_changed)
 	if use_saved_controller:
 		_on_controller_scheme_changed(game_data.controller_scheme)
-	Dialogic.timeline_started.connect(_on_dialog_started)
-	Dialogic.timeline_ended.connect(_on_dialog_ended)
+	# Dialogic is optional (narrative addon). Connect only if the autoload is present,
+	# so the combat game runs standalone without a hard dependency on it.
+	var _dlg: Node = get_node_or_null("/root/Dialogic")
+	if _dlg:
+		_dlg.timeline_started.connect(_on_dialog_started)
+		_dlg.timeline_ended.connect(_on_dialog_ended)
 
 
 func on_hit():
