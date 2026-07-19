@@ -1,0 +1,257 @@
+[gd_scene load_steps=3 format=3 uid="uid://noxui0mainmenu01"]
+
+[ext_resource type="Script" path="res://addons/nox_ui/scenes/main_menu.gd" id="1_mm"]
+[ext_resource type="Theme" path="res://addons/nox_ui/theme/nox_theme.tres" id="2_th"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_th")
+script = ExtResource("1_mm")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.06, 0.09, 1)
+
+[node name="Backdrop" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+self_modulate = Color(0.4, 0.4, 0.46, 1)
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Accent" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 8.0
+grow_horizontal = 2
+color = Color(1, 0.72, 0.12, 1)
+
+[node name="CenterBox" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "NOXDEV GAME"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 72
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+
+[node name="Subtitle" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+
+[node name="Spacer" type="Control" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="NewGame" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+text = "NEW GAME"
+
+[node name="Continue" type="Button" parent="CenterBox/VBox"]
+visible = false
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+text = "CONTINUE"
+
+[node name="Options" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+text = "OPTIONS"
+
+[node name="Credits" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+text = "CREDITS"
+
+[node name="Quit" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+text = "QUIT"
+
+[node name="OptionsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -230.0
+offset_right = 260.0
+offset_bottom = 230.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="OptionsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 28.0
+offset_right = -28.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="Label" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "OPTIONS"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
+
+[node name="Fullscreen" type="CheckButton" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="Vsync" type="CheckButton" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "V-Sync"
+
+[node name="Master" type="HBoxContainer" parent="OptionsPanel/VBox"]
+layout_mode = 2
+
+[node name="L" type="Label" parent="OptionsPanel/VBox/Master"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Master"
+
+[node name="S" type="HSlider" parent="OptionsPanel/VBox/Master"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 0.9
+
+[node name="Music" type="HBoxContainer" parent="OptionsPanel/VBox"]
+layout_mode = 2
+
+[node name="L" type="Label" parent="OptionsPanel/VBox/Music"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Music"
+
+[node name="S" type="HSlider" parent="OptionsPanel/VBox/Music"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="SFX" type="HBoxContainer" parent="OptionsPanel/VBox"]
+layout_mode = 2
+
+[node name="L" type="Label" parent="OptionsPanel/VBox/SFX"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "SFX"
+
+[node name="S" type="HSlider" parent="OptionsPanel/VBox/SFX"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 0.9
+
+[node name="Spacer" type="Control" parent="OptionsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Back" type="Button" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "BACK"
+
+[node name="CreditsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -200.0
+offset_right = 280.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CreditsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 28.0
+offset_right = -28.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="Label" parent="CreditsPanel/VBox"]
+layout_mode = 2
+text = "CREDITS"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
+
+[node name="Text" type="Label" parent="CreditsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Back" type="Button" parent="CreditsPanel/VBox"]
+layout_mode = 2
+text = "BACK"
+
+[connection signal="pressed" from="CenterBox/VBox/NewGame" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Continue" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Options" to="." method="_on_options_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Credits" to="." method="_on_credits_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Quit" to="." method="_on_quit_pressed"]
+[connection signal="toggled" from="OptionsPanel/VBox/Fullscreen" to="." method="_on_fullscreen_toggled"]
+[connection signal="toggled" from="OptionsPanel/VBox/Vsync" to="." method="_on_vsync_toggled"]
+[connection signal="value_changed" from="OptionsPanel/VBox/Master/S" to="." method="_on_master_changed"]
+[connection signal="value_changed" from="OptionsPanel/VBox/Music/S" to="." method="_on_music_changed"]
+[connection signal="value_changed" from="OptionsPanel/VBox/SFX/S" to="." method="_on_sfx_changed"]
+[connection signal="pressed" from="OptionsPanel/VBox/Back" to="." method="_on_opt_back_pressed"]
+[connection signal="pressed" from="CreditsPanel/VBox/Back" to="." method="_on_cred_back_pressed"]

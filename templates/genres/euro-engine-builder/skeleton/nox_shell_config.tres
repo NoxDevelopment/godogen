@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="NoxShellConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://addons/nox_ui/nox_shell_config.gd" id="1"]
+[resource]
+script = ExtResource("1")
+game_title = "IRONWRIGHT"
+subtitle = "Build your engine, master the trade-realm"
+new_game_scene = "res://scenes/board.tscn"
+show_continue = false
+credits = "A NoxDev Studio production.
+Shell: nox_ui  ·  UI art: Kenney (CC0)  ·  Font: Montserrat / Cinzel"

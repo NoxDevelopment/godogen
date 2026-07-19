@@ -9,7 +9,7 @@ config_version=5
 [application]
 
 config/name="Cosmic-Horror Co-op Template"
-run/main_scene="res://scenes/board.tscn"
+run/main_scene="res://addons/nox_ui/scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6")
 
 [audio]
@@ -17,6 +17,8 @@ config/features=PackedStringArray("4.6")
 buses/default_bus_layout="res://default_bus_layout.tres"
 
 [autoload]
+NoxSettings="*res://addons/nox_ui/game_settings.gd"
+NoxShell="*res://addons/nox_ui/nox_shell.gd"
 
 GameManager="*res://scripts/game_manager.gd"
 
