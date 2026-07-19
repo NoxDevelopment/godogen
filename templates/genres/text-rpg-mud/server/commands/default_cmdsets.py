@@ -31,9 +31,19 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         Populates the cmdset
         """
         super().at_cmdset_creation()
-        #
-        # any commands you add below will overload the default ones.
-        #
+        # NoxDev deep systems — each guarded so one broken module never removes the
+        # rest of the game's commands.
+        from evennia.utils import logger
+        for path, name in [
+            ("world.nox_economy", "TraderCmdSet"),
+            ("world.nox_crafting", "CraftCmdSet"),
+            ("world.nox_magic", "MagicCmdSet"),
+        ]:
+            try:
+                mod = __import__(path, fromlist=[name])
+                self.add(getattr(mod, name))
+            except Exception:
+                logger.log_trace("failed to load cmdset %s.%s" % (path, name))
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

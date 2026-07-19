@@ -35,58 +35,58 @@ def at_server_start():
     created from a standalone process, or merely restored from the DB, do not get
     a live task. This is the template's world-init hook.
     """
-    from evennia import create_object, create_script
+    from evennia import create_script
     from evennia.objects.models import ObjectDB
     from evennia.scripts.models import ScriptDB
-    from typeclasses.rooms import Room
-    from typeclasses.exits import Exit
-    from typeclasses.characters import Character
-    from typeclasses.nox_living import WorldClock, WanderScript
+    from evennia.utils import logger
+    from typeclasses.nox_living import WorldClock
 
-    # 1) Build the starter area once (idempotent).
-    if not ObjectDB.objects.filter(db_key="Town Square").exists():
-        sq = create_object(Room, key="Town Square")
-        sq.db.desc = "A cobbled square at the heart of the settlement. Roads lead north and east."
-        rd = create_object(Room, key="North Road")
-        rd.db.desc = "A muddy road running north from the square."
-        mk = create_object(Room, key="Market Row")
-        mk.db.desc = "Stalls and shopfronts line this busy row."
-        create_object(Exit, key="north", location=sq, destination=rd)
-        create_object(Exit, key="south", location=rd, destination=sq)
-        create_object(Exit, key="east", location=sq, destination=mk)
-        create_object(Exit, key="west", location=mk, destination=sq)
-        rat = create_object(Character, key="a giant rat", location=sq)
-        rat.db.desc = "A mangy giant rat with yellowed teeth, twitching its whiskers."
+    # 1) Build the original AURETHIA region (Harrowgate + Ravenholt + Mistwood +
+    #    Ratwarren; ~39 rooms, 16 NPCs). Idempotent — skips if already built.
+    from world.nox_world import build_world, STARTER_TOWN_HUB
+    build_world()
 
-    # 2) (Re)create interval scripts fresh so their LoopingCall timers arm.
-    ScriptDB.objects.filter(db_key__in=["world_clock", "wander"]).delete()
+    # 2) World clock (timer only arms when created here, in the server process).
+    ScriptDB.objects.filter(db_key="world_clock").delete()
     create_script(WorldClock)
-    for mob in ObjectDB.objects.filter(db_key="a giant rat"):
-        create_script(WanderScript, obj=mob)
 
-    # 3) Seed the demo character with GS4-flavored state so the rich client shows
-    #    populated depth (wounds, active spells, real hands, level, stance). This is
-    #    a showcase seed; real values come from the (upcoming) combat/spell systems.
+    # 3) Deep systems — each guarded so one failing never breaks the world or others.
+    try:
+        from world.nox_economy import build_economy, MarketDriftScript
+        build_economy(create_missing=True)
+        ScriptDB.objects.filter(db_key="market_drift").delete()
+        create_script(MarketDriftScript)
+    except Exception:
+        logger.log_trace("nox_economy wiring failed")
+    try:
+        from world.nox_crafting import wire_crafting_world, ensure_crafting_scripts
+        wire_crafting_world()
+        ensure_crafting_scripts()
+    except Exception:
+        logger.log_trace("nox_crafting wiring failed")
+    try:
+        from world.nox_magic import build_magic_world, MoonClock, SpellUpkeep
+        from evennia.utils.search import search_script
+        build_magic_world()
+        if not search_script("moon_clock"):
+            create_script(MoonClock)
+        if not search_script("spell_upkeep"):
+            create_script(SpellUpkeep)
+    except Exception:
+        logger.log_trace("nox_magic wiring failed")
+
+    # 4) Seed + seat the demo character in the Harrowgate hub (GS4 showcase state;
+    #    real values come from the trader/crafting/magic systems as they're played).
+    hub = ObjectDB.objects.filter(db_key=STARTER_TOWN_HUB).first()
     for pc in ObjectDB.objects.filter(db_key="noxadmin"):
         if not pc.db.vitals:
             pc.at_object_creation()
         pc.db.vitals = {"health": [92, 100], "mana": [64, 120], "spirit": [9, 10], "stamina": [78, 100]}
         pc.db.mind = 55
         pc.db.stance = "forward"
-        pc.db.encumbrance = 22
         pc.db.level = 12
-        pc.db.hands = {"left": "a rune-etched broadsword", "right": "a kite shield", "spell": "Elemental Blast (906)"}
-        pc.db.wounds = {"right arm": 2, "chest": 1, "left leg": 1}
-        pc.db.active_spells = [
-            {"name": "Spirit Shield (211)", "left": 320},
-            {"name": "Elemental Defense (401)", "left": 140},
-            {"name": "Strength (509)", "left": 600},
-        ]
-        pc.db.posture = "standing"
-        # start in the living Town Square (exits + the wandering rat visible in HERE)
-        sq = ObjectDB.objects.filter(db_key="Town Square").first()
-        if sq and pc.location != sq:
-            pc.location = sq
+        if hub and pc.location != hub:
+            pc.location = hub
             pc.save()
 
 
