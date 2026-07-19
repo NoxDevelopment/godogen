@@ -1,0 +1,3 @@
+# Cloned pieces are fetched on demand (see CATALOG.md). Don't bloat the repo with them.
+*/
+!*/.gitkeep
