@@ -33,6 +33,11 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_GENRES = os.path.normpath(os.path.join(HERE, "..", "genres"))
 REF = re.compile(r'(?:path|source_file)\s*=\s*"(res://[^"]+)"')
+# project.godot launch surface: main scene + path-based autoloads. uid:// autoloads
+# (addon-provided) can't be resolved statically here — the addon's own files are
+# covered by the res:// scan above — so only res://-path autoloads are checked.
+MAIN_SCENE = re.compile(r'run/main_scene\s*=\s*"(res://[^"]+)"')
+AUTOLOAD = re.compile(r'^\s*[A-Za-z_][A-Za-z0-9_]*\s*=\s*"\*?(res://[^"]+)"', re.M)
 
 # (template, source-substring, referenced res://) tuples that are known-benign:
 # content that lives inside a vendored addon's own example/demo scenes and is
@@ -92,7 +97,12 @@ def main():
                 except OSError:
                     continue
                 srcrel = os.path.relpath(fpath, skel).replace("\\", "/")
-                for ref in REF.findall(text):
+                refs_found = list(REF.findall(text))
+                if fn == "project.godot":
+                    # launch surface: main scene + path-based autoloads/theme
+                    refs_found += MAIN_SCENE.findall(text)
+                    refs_found += AUTOLOAD.findall(text)
+                for ref in refs_found:
                     if ref.startswith("res://.godot/"):
                         continue  # regenerated import cache
                     target = os.path.relpath(
