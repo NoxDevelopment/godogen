@@ -10,7 +10,7 @@ config_version=5
 
 config/name="Action Adventure 3D Template"
 run/main_scene="res://scenes/world.tscn"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.7", "Forward Plus")
 
 [audio]
 

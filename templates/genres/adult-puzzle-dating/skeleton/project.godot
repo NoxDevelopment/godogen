@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Adult Puzzle Dating Template"
 run/main_scene="res://scenes/puzzledate_view.tscn"
-config/features=PackedStringArray("4.6")
+config/features=PackedStringArray("4.7")
 
 [audio]
 

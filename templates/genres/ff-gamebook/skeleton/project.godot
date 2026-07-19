@@ -12,7 +12,7 @@ config_version=5
 
 config/name="FF Gamebook Template"
 run/main_scene="res://scenes/title.tscn"
-config/features=PackedStringArray("4.6")
+config/features=PackedStringArray("4.7")
 
 [autoload]
 
@@ -22,6 +22,8 @@ Sheet="*res://scripts/character_sheet.gd"
 Dice="*res://scripts/dice.gd"
 AssetBinder="*res://scripts/asset_binder.gd"
 SessionState="*res://scripts/session_state.gd"
+Net="*res://addons/nox_netcode/net_session.gd"
+NetBridge="*res://addons/nox_netcode/session_bridge.gd"
 
 [display]
 
@@ -46,3 +48,12 @@ pause={
 [internationalization]
 
 locale/translations_pot_files=PackedStringArray("res://dialogue/book.dialogue")
+
+[nox_netcode]
+
+profile="authority-turn"
+transport="websocket"
+arbitration="leader"
+default_port=24567
+max_peers=8
+disconnect_policy="pause-and-wait"
