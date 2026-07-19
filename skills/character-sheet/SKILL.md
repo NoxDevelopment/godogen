@@ -2,6 +2,8 @@
 
 Generate a **3×3 grid of poses for one character in a single ComfyUI call**, then post-process — magenta-key the background, slice into 9 cells, tight-crop each sprite, pad to a target aspect, and save 9 individual pose PNGs. 9× cheaper and 9× faster than running `animation-pipeline` for the same set of poses, with **perfect style consistency** because all nine sprites come from the same image bytes.
 
+> **Reuse first — generation is the last rung.** Before generating a sheet, run `skills/asset-reuse`: reuse an existing character base, restyle a gallery/kit character to the project look, or derive poses from an existing sprite. Generate a fresh sheet only when rungs 1–5 can't supply it. Verify the finished sprites with the **style-anchor** visual check (look at them side-by-side vs `reference.png`, not just the blob count). For a template, the character art must meet `skills/parity-build/STANDARDS.md`.
+
 ## TL;DR
 
 ```bash

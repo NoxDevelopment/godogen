@@ -4,6 +4,8 @@ Generators for scene-level game art that goes beyond single sprites: parallax ba
 
 This skill **composes** the `image-pipeline` primitives — `comfyui_client`, `zit_styles`, `pixel_art_toolkit`, and the 53-preset `pixel_art_presets` — into scene-level workflows. Run `--preset` and `--style` here and you get the same look as your sprites.
 
+> **Reuse before you generate.** Run `skills/asset-reuse` first — the owned/CC0 library (`pieces/asset-kits/_library/BY_THEME.md`, NAS bundles) has tilesets, skyboxes, and parallax packs; derive tile/biome variants via palette-swap / tile-deltas rather than regenerating a whole set. Generation is the LAST rung. For a template, scene art must meet `skills/parity-build/STANDARDS.md` → "Art & assets" (real assets via the reuse ladder, zero placeholder stand-ins).
+
 ## TL;DR
 
 ```bash

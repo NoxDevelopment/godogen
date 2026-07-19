@@ -129,6 +129,10 @@ two ways:
 
 Consumable by asset_gen / the workflow library (`zit-txt2img`, type `portrait`):
 
+- **Reuse rung 1 first (`skills/asset-reuse`).** Before generating, `asset-manifest
+  find` (+ the ml-workbench gallery) for an existing portrait of THIS NPC — a face
+  is unique so derive/palette-swap don't apply, but re-rendering one you already
+  approved wastes GPU and breaks identity lock. Generate only if none exists.
 - `prompt` is composed from the structured appearance projection (hair/eyes/
   skin/face/features/outfit + a personality-derived expression) and contains the
   literal `{style}` placeholder — resolve it via the **style-anchor** skill (or

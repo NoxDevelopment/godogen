@@ -9,6 +9,12 @@ Fidelity ladder: volume/VU < MFCC vowel-class < **TTS phoneme timestamps → vis
 table** < neural audio→blendshape (adds co-articulation + emotion). Pick the
 lowest rung that reads well — phoneme→viseme is free and deterministic.
 
+> **Watch it before shipping.** Lipsync is visible output — a completed bake is not
+> a pass. Play a line back and confirm the visemes actually track the audio (mouth
+> matches phonemes, timing reads, no drift). Reuse existing character frames/rigs
+> (`skills/asset-reuse`, character-sheet/daz-bridge chains) rather than regenerating.
+> Talking-portrait art bar: `skills/parity-build/STANDARDS.md`.
+
 ## Offline baking — Godot/Unity game dialogue
 
 1. **TTS lines (Kokoro/Orpheus)**: emit the viseme track AT SYNTHESIS TIME.

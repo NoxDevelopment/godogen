@@ -73,7 +73,10 @@ LoRA training (see ml-workbench/training) → infinite consistent 2D art.
 ## Fits
 
 - asset-reuse rung 3: the Daz library is an owned kit — always check it before
-  generating a character from scratch.
+  generating a character from scratch. **Look at the render grid** (turnarounds /
+  pose / expression sheets) and confirm identity, alpha, and lighting before it
+  feeds LoRA training or the engine — the log-error grep is not a visual gate.
+  Character-art bar: `skills/parity-build/STANDARDS.md`.
 - Face/mime: Faceit ARKit rig + TTS audio → Audio2Face-3D → blendshape tracks →
   Godot (glTF morph animations) / Unity (BlendShapes) — the full chain is
   Phase 6 in the roadmap; landscape research on lipsync alternatives pending.

@@ -2,6 +2,8 @@
 
 Godot 4 save-system scaffold: typed `Resource` save model, multi-slot manager with thumbnails, version migration chain, autosave timer, and atomic write-with-fsync. Pure text — no ComfyUI / Tripo3D / model dependencies.
 
+> **This closes the Definition of Done "save/load" row** (`skills/parity-build/STANDARDS.md`): "Working save/load with the genre-appropriate modes." Wire the genre's actual modes (slots / autosave / checkpoint) and verify a real save→quit→load round-trip, not just that the files write.
+
 ## TL;DR
 
 ```bash

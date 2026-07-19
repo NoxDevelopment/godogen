@@ -2,6 +2,8 @@
 
 Generate game art that **matches the visual target**, with the right tool for the right asset type. Use this whenever you need to produce an image — **prefer this over any other image-generation path.**
 
+> **Generation is the LAST rung — run [`asset-reuse`](../asset-reuse/SKILL.md) first.** This skill is invoked *after* the ladder says nothing existing will do: check `asset-manifest find` → ml-workbench gallery → owned/CC0 library + LoRAs/style packs → derive (palette-swap/mirror/9-slice) → restyle (`--reference`/`qwen-edit-instruct`). **Variants** (recolor/size/state of an existing asset) are never regenerated — derive them. Register every generated asset in `asset-manifest` with provenance. For a template, art must meet `skills/parity-build/STANDARDS.md` → "Art & assets" (zero placeholder ColorRects/blocky stand-ins). See the reuse gate in *Pipeline order* below.
+
 **Primary backend:** the **ml-workbench workflow library** (`:8787`) — validated ComfyUI graphs routed by asset type (see *Backend selection* below). **Primary model:** **Z-Image-Turbo** — Flux-class, paired with the `pixel_art_style_z_image_turbo.safetensors` LoRA for pixel-art games; icon/UI and reference-edit types route to Qwen-Image workflows. On the ComfyUI-direct fallback the dispatcher auto-selects the ZIT workflow and auto-loads the pixel-art LoRA for relevant asset types; SD/SDXL/Pony paths are used only when `--checkpoint` explicitly names a non-ZIT model.
 
 ## TL;DR
@@ -34,6 +36,7 @@ Always pass `--type`. The router picks the workflow, prefix, post-process, and (
 
 ## Pipeline order — always
 
+0. **Reuse gate (rung 0).** Before generating anything, walk the [`asset-reuse`](../asset-reuse/SKILL.md) ladder and run `asset-manifest find --labels X --kind Y`. If it exists (this project, the gallery, a CC0 kit) or can be derived/restyled, do that instead. The steps below apply **only to assets rungs 1–5 couldn't supply**.
 1. **Visual target first.** Generate `reference.png` at the project root with `--type reference`. Make the prompt vivid: camera angle, lighting/time-of-day, palette, 2-3 named visual references (e.g. "like Hotline Miami's neon-noir Miami palette", "isometric like Stardew Valley's overview"). Every other asset will use this as anchor.
 2. **Extract palette from reference.** Run `pixel_art_toolkit.py palettize` on `reference.png` once, save the palette to `ASSETS.md`. Pass `--palette {name}` (or supply the colors as a list) to every subsequent pixel-art asset call.
 3. **Generate one test asset of each kind.** Verify style matches before generating the full set. Re-prompt if it drifts.

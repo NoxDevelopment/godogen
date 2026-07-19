@@ -3,9 +3,9 @@
 
 Fills the GDScript template (dress_template.gd) with the concrete placements
 path, target scene, output path, and dimension, then writes a runnable headless
-scene builder. The agent runs it with:
+scene builder. The agent runs it with (always scope to this project with --path):
 
-    godot --headless --script scenes/build_<name>_dress.gd
+    godot --headless --path . --script scenes/build_<name>_dress.gd
 
 which patches the target scene (adds/replaces a single `SetDressing` subtree) and
 saves the .tscn. All the heavy lifting (GLB AABB-scaling, MultiMesh batching,
@@ -104,7 +104,7 @@ def emit(
         "target": target_token,
         "output_scene": output_token,
         "dimension": dimension,
-        "run": f"godot --headless --script {out_path}",
+        "run": f"godot --headless --path . --script {out_path}",
     }
 
 

@@ -8,6 +8,9 @@ description: |
 
 Generate and update Godot games from natural language.
 
+> **Standards apply to EVERY run (POC or product).** Dogfood our tools: follow the **reuse-first** asset ladder (`skills/asset-reuse` → the categorized library `pieces/asset-kits/_library/BY_THEME.md` + our LoRAs/style packs in `Noxdev-Studio/docs/STYLE_BENCHMARKS_2026-07.md`) **before** generating anything, and never ship placeholder/blocky art.
+> **Tiers:** a **POC** meets the baseline — dogfood + reuse-first + no-placeholder + per-task visual QA. A **game template/product** additionally meets the full Definition of Done in **`skills/parity-build/STANDARDS.md`** (parity vs reference + competitor, sound/music/**credits**, testing, MP where the genre wants it, **Studio asset-wiring**, and the lead's independent/adversarial verification — not the building agent's self-report). For templates/products, drive this from the **`parity-build`** skill, which wraps this pipeline.
+
 ## Capabilities
 
 Read each sub-file from `${CLAUDE_SKILL_DIR}/` when you reach its pipeline stage.
@@ -94,4 +97,4 @@ The final task in PLAN.md is a presentation video — a script that showcases ga
 If a task reports failure or you suspect integration issues:
 - Read `MEMORY.md` — task execution logs discoveries and workarounds
 - Read screenshots in `screenshots/{task_folder}/`
-- Run `timeout 30 godot --headless --quit 2>&1` to check cross-project compilation
+- Run `timeout 30 godot --headless --path . --quit 2>&1` to check compilation (always `--path .` — an unscoped run rewrites sibling templates' `project.godot`; see `skills/parity-build/STANDARDS.md` → "Build hygiene")

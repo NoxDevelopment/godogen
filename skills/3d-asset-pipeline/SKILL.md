@@ -2,6 +2,8 @@
 
 PNG → GLB, with quality presets, batch processing, and one-shot prop generation that chains image-pipeline (txt2img) → mesh → engine sidecars in a single command.
 
+> **Reuse before you mesh.** Run `skills/asset-reuse` first — an owned/CC0 kit GLB (Kenney packs, NAS bundles at `\\DXP4800PLUS-A79\NoxDev`), a gallery mesh, or a restyled existing prop beats a fresh reconstruction. Generation (even the free local Hunyuan3D lane) is the LAST rung. Register every new mesh in `asset-manifest` with provenance so the next project can reuse it. For a template, 3D assets must meet the Definition of Done in `skills/parity-build/STANDARDS.md`.
+
 ## Backends (local-first)
 
 Two image→3D backends, chosen with `--backend`:

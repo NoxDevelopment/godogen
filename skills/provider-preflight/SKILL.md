@@ -4,6 +4,8 @@ Run **before** any long-running asset batch. Verifies every external provider th
 
 Pure-CLI; no model dependencies. Probes the actual services with cheap health checks (no asset generation).
 
+> **Rung 0 — before you preflight a generation batch, check you need to generate at all.** Run the [`asset-reuse`](../asset-reuse/SKILL.md) ladder + `asset-manifest find` first; only preflight the providers for assets that rungs 1–5 genuinely can't supply. Preflighting (and then generating) a batch of assets you already own is the waste this whole stack exists to prevent. See `skills/parity-build/STANDARDS.md` → "Art & assets".
+
 ## TL;DR
 
 ```bash

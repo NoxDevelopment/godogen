@@ -2,6 +2,8 @@
 
 `reference.png` is **ground truth**. Every asset must match its palette, perspective, scale, and rendering style. This skill is the discipline layer on top of the [image-pipeline](../image-pipeline/SKILL.md) — what to do *before* any image generation and how to verify *after*.
 
+> **This discipline runs *after* the reuse ladder, not instead of it.** Generation is the LAST rung — always run `skills/asset-reuse` first (reuse → derive → restyle → generate). A reused/restyled asset that matches `reference.png` ships over a freshly generated one. The cardinal rule below applies equally to reused, restyled, AND generated assets. For a template, art must meet `skills/parity-build/STANDARDS.md` → "Art & assets" (zero placeholder ColorRects/blocky stand-ins).
+
 ## The cardinal rule
 
 > **If you can't tell the asset came from the same project as `reference.png`, it doesn't ship.**

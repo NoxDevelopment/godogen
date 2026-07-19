@@ -2,6 +2,8 @@
 
 Generate individual UI sprite assets — **buttons** (with hover/pressed states), **icons**, **healthbars** (frame + fill), **panels** (9-slice-ready) — at sprite resolutions appropriate for game HUDs. Wraps `image-pipeline` with curated prompts per category, post-processes outputs into clean transparent PNGs.
 
+> **Generation is the LAST rung (`skills/asset-reuse`).** Before generating UI, check owned/CC0 UI kits first — the house shell (`ui-shell`/`nox_ui`) already ships real **Kenney CC0** 9-slice buttons/panels (rung 3), and the gallery/manifest may hold on-style elements from prior projects. Derive states via brightness/palette passes (rung 4), restyle a kit piece to the project look (rung 5), and generate only what those can't supply. Eyeball outputs on a contact sheet (not just a green `{ok:true}`), register them in `asset-manifest`, and meet `skills/parity-build/STANDARDS.md`.
+
 ## TL;DR
 
 ```bash

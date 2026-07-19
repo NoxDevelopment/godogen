@@ -20,6 +20,8 @@ That copies a runnable skeleton, vendors the genre's pinned addons (MIT kits, li
 
 If no registry entry matches (or the user declines), fall back to the from-scratch scaffold below.
 
+> **Build hygiene — scope EVERY Godot run.** Every `godot` invocation below MUST pass `--path .` (this project only). An **unscoped** run scans the whole tree and silently rewrites OTHER templates' `project.godot` — downgrading the engine and stripping the `[audio]` bus ABI (it has already damaged READY templates). If a run downgrades this project's `project.godot` (e.g. a 4.6 → older `config_version`), revert it (`git checkout -- project.godot`). Respect the registry `engineVersion` pin — run headless checks with the matching binary. See [`../parity-build/STANDARDS.md`](../parity-build/STANDARDS.md) → "Build hygiene".
+
 ## Workflow
 
 1. **Read `reference.png`** — understand the visual target: camera angle, distance, FOV, lighting direction, environment structure, scene layout. Use this to inform architecture decisions (node hierarchy, camera setup, lighting rig).
@@ -32,9 +34,9 @@ If no registry entry matches (or the user declines), fall back to the from-scrat
 5. **Write/update `project.godot`** — create or merge input mappings.
 6. **Write `STRUCTURE.md`** — always the complete architecture, not a diff.
 7. **Write script stubs** — for new scripts and any existing scripts the task explicitly asks to replace.
-8. **Import assets** — `timeout 60 godot --headless --import 2>&1`. Ensures all assets (`.glb`, `.png`, etc.) are imported before scene builders reference them.
-9. **Build scene stubs** — for each new/changed scene, write a scene builder script to `scenes/build_{name}.gd` using the template below, then run in dependency order (leaf scenes first): `timeout 60 godot --headless --script scenes/build_{name}.gd`
-10. **Verify** — `timeout 60 godot --headless --quit 2>&1`. No `ERROR` or `Parser Error` lines. RID warnings are benign.
+8. **Import assets** — `timeout 60 godot --headless --path . --import 2>&1`. Ensures all assets (`.glb`, `.png`, etc.) are imported before scene builders reference them. **`--path .` is mandatory** (see Build hygiene above) — an unscoped import rewrites sibling templates' `project.godot`.
+9. **Build scene stubs** — for each new/changed scene, write a scene builder script to `scenes/build_{name}.gd` using the template below, then run in dependency order (leaf scenes first): `timeout 60 godot --headless --path . --script scenes/build_{name}.gd`
+10. **Verify** — `timeout 60 godot --headless --path . --quit 2>&1`. No `ERROR` or `Parser Error` lines. RID warnings are benign.
 11. **Git commit** — repo is already initialized before Claude Code starts:
     ```bash
     git add -A && git commit -m "scaffold: project skeleton"
@@ -206,7 +208,7 @@ Write each scene builder using this template — replace all UPPER_CASE placehol
 
 ```gdscript
 extends SceneTree
-## Scene builder — run: timeout 60 godot --headless --script scenes/build_<name>.gd
+## Scene builder — run: timeout 60 godot --headless --path . --script scenes/build_<name>.gd
 
 func _initialize() -> void:
 	var root := ROOT_TYPE.new()     # REPLACE ROOT_TYPE — e.g. CharacterBody3D
@@ -237,8 +239,8 @@ func _set_owners(node: Node, owner: Node) -> void:
 
 **CRITICAL: Build order matters.** Scenes that instantiate other scenes must be built AFTER their dependencies. A scene that loads `player.tscn` will fail if `player.tscn` doesn't exist yet. Always build leaf scenes (no child scenes) first, then parents:
 ```bash
-timeout 60 godot --headless --script scenes/build_player.gd   # leaf — no children
-timeout 60 godot --headless --script scenes/build_main.gd     # parent — loads player.tscn
+timeout 60 godot --headless --path . --script scenes/build_player.gd   # leaf — no children
+timeout 60 godot --headless --path . --script scenes/build_main.gd     # parent — loads player.tscn
 ```
 
 ## UI Overlay Architecture

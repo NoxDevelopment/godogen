@@ -12,6 +12,13 @@ Credit: ComfyUI workflow + `Deno2026/comfyui-deno-custom-nodes` by [Extension-Ya
 python3 .claude/skills/video-pipeline/tools/video_gen.py {t2v|i2v|bundle|inject|run|models|presets} [opts]
 ```
 
+> **Generate LAST + watch it (`skills/asset-reuse`, `skills/parity-build/STANDARDS.md`).** A
+> t2v/i2v run is ~6 min of GPU — before committing, check the ml-workbench gallery
+> and prior projects' cutscenes for a reusable/restylable clip. When you do
+> generate, **watch the finished MP4** and confirm it reads (motion, identity, no
+> artifacts) — a completed render is not a passed QA. Register the clip in
+> `asset-manifest` with provenance.
+
 ## Why this skill exists
 
 LTX 2.3 is a 22B-parameter video model. Naively, it needs 24+ GB VRAM. Deno's workflow gets it onto an RTX 3060/3070 (8 GB) by combining:

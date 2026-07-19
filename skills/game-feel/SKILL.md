@@ -64,3 +64,7 @@ Scale the default intensities; pick by genre, then tune the `const`s in the file
   should respect a reduced-motion setting.
 - `hit_stop` uses an `ignore_time_scale` timer so it works while time is frozen.
 - Resource/script generator — no backend, no cost, deterministic per profile.
+
+## Verification
+
+Juice is **visible output** — call each method (`Feel.impact()`, hit-stop, flash, pop) on a test sprite and **look at it** (screenshot/clip): confirm the flash, shake, and scale-pop actually read and don't overwhelm. For a template, this is the "Game feel" row of `skills/parity-build/STANDARDS.md`; keep it behind the reduced-motion gate (accessibility).

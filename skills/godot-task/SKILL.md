@@ -7,6 +7,8 @@ context: fork
 
 # Godot Task Executor
 
+> **Reuse-first + no placeholders (this fork has clean context — the standards do NOT carry over automatically).** When a task needs an asset, source it through the reuse ladder (`skills/asset-reuse` → library → derive → restyle → **generate LAST**) before generating anything; **never** ship placeholder/blocky/ColorRect stand-ins as final art (dim overlays and true engine primitives excepted). Visual QA (step 9) must actually catch these. For template/product work the full Definition of Done applies — `skills/parity-build/STANDARDS.md`.
+
 All files below are in `${CLAUDE_SKILL_DIR}/`. Load progressively — read each file when its phase begins, not upfront.
 
 | File | Purpose | When to read |
@@ -36,10 +38,10 @@ $ARGUMENTS
    - `scenes/*.tscn` targets → generate scene builder(s)
    - `scripts/*.gd` targets → generate runtime script(s)
    - Both → generate scenes FIRST, then scripts (scenes create nodes that scripts attach to)
-2. **Import assets** — run `timeout 60 godot --headless --import` to generate `.import` files for any new textures, GLBs, or resources. Without this, `load()` fails with "No loader found" errors. Re-run after modifying existing assets.
+2. **Import assets** — run `timeout 60 godot --headless --path . --import` to generate `.import` files for any new textures, GLBs, or resources. Without this, `load()` fails with "No loader found" errors. Re-run after modifying existing assets. **Always pass `--path .`** (see Build hygiene below) — an unscoped `--import` rewrites sibling templates' `project.godot`.
 3. **Generate scene(s)** — write GDScript scene builder, compile to produce `.tscn`
 4. **Generate script(s)** — write `.gd` files to `scripts/`
-5. **Validate** — run `timeout 60 godot --headless --quit` to check for parse errors across all project scripts
+5. **Validate** — run `timeout 60 godot --headless --path . --quit` to check for parse errors across all project scripts
 6. **Fix errors** — if Godot reports errors, read output, fix files, re-run. Repeat until clean.
 7. **Generate test harness** — write `test/test_{task_id}.gd` implementing the task's **Verify** scenario.
 8. **Capture screenshots** — run test with GPU display (or xvfb fallback) and `--write-movie` to produce PNGs
@@ -77,15 +79,17 @@ The caller (godogen orchestrator) will decide whether to adjust the task, re-sca
 
 ## Commands
 
+**Build hygiene — scope EVERY Godot run.** Every `godot` invocation MUST pass `--path .` (this project only). An **unscoped** run scans the whole tree and silently rewrites OTHER templates' `project.godot` — it downgrades the engine and strips the `[audio]` bus ABI, and has already damaged READY templates. If a run downgrades this project's `project.godot` (e.g. a 4.6 → older `config_version`), revert it (`git checkout -- project.godot`). Never run an unscoped import. See `skills/parity-build/STANDARDS.md` → "Build hygiene".
+
 ```bash
 # Import new/modified assets (MUST run before scene builders):
-timeout 60 godot --headless --import
+timeout 60 godot --headless --path . --import
 
 # Compile a scene builder (produces .tscn):
-timeout 60 godot --headless --script <path_to_gd_builder>
+timeout 60 godot --headless --path . --script <path_to_gd_builder>
 
 # Validate all project scripts (parse check):
-timeout 60 godot --headless --quit 2>&1
+timeout 60 godot --headless --path . --quit 2>&1
 ```
 
 **Error handling:** Parse Godot's stderr/stdout for error lines. Common issues:

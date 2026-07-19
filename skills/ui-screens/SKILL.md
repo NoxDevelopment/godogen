@@ -2,7 +2,7 @@
 
 Godot 4 Control-tree `.tscn` and Unity Canvas-layout JSON scaffolds for the five common game screens: **title**, **menu**, **hud**, **inventory**, **dialog**. Each subcommand emits a sensibly-laid-out scene that drops straight into the project — no UI guesswork required.
 
-UI element textures (buttons, icons, portraits) are out of scope for this skill — generate those separately with image-pipeline (`asset_gen.py --type icon` / `--type ui`) and assign them to the placeholder `TextureRect` / `Button` paths in the emitted `.tscn`.
+UI element textures (buttons, icons, portraits) are out of scope for this skill — **source** them reuse-first (`skills/asset-reuse`: owned/CC0 UI kits like `nox_ui`'s Kenney set + gallery/manifest before generating) via image-pipeline/ui-elements, and assign them to the placeholder `TextureRect` / `Button` paths in the emitted `.tscn`. Those texture slots are scaffolding — a screen still showing bare `ColorRect`/untextured placeholders is **not** shippable (`skills/parity-build/STANDARDS.md` → zero placeholder ColorRects); fill every slot with real art before it ships.
 
 > **Style these screens — don't ship the default gray theme.** Generate a project `theme.tres` once with the [ui-theme](../ui-theme/SKILL.md) skill (from the same palette as `reference.png`) and set each emitted root Control's `theme` to `res://assets/ui/theme.tres`. A good layout in the default Godot theme still looks generic; the theme is what makes it look like *this game*.
 
@@ -28,7 +28,7 @@ python3 .claude/skills/ui-screens/tools/screen_gen.py title \
   -o assets/ui/title/
 ```
 
-Emits `title.tscn` with: backdrop `TextureRect`, centered title `Label` (font_size 72), and a `VBoxContainer` of `Button`s stacked center. Without `--generate-backdrop`, the backdrop is a dark `ColorRect` placeholder.
+Emits `title.tscn` with: backdrop `TextureRect`, centered title `Label` (font_size 72), and a `VBoxContainer` of `Button`s stacked center. Without `--generate-backdrop`, the backdrop is a dark `ColorRect` **placeholder — a title screen must NOT ship on it**; source real backdrop art reuse-first (`skills/asset-reuse` → library/gallery/restyle before generating) and swap it into the `TextureRect`.
 
 ### menu — Pause menu (dim overlay + panel)
 

@@ -16,6 +16,14 @@ After our generators produce assets (PNGs, WAVs, MP4s, GLBs), there's still a st
 
 The skill is **deliberately simple** — it doesn't try to guess animation timings or layout. You give it raw asset paths and explicit parameters (frame count, FPS, grid dimensions), and it emits the boilerplate.
 
+> **Studio live-wiring + verify (`skills/parity-build/STANDARDS.md`).** For template/product
+> work the emitted resource must bind its asset **through the Studio-managed
+> manifest by stable asset ID**, not a frozen hardcoded `res://` path — so Jesus can
+> drop-in/replace the asset from the Studio without a code edit (register in
+> `asset-manifest`). After emitting, **verify it loads**: scoped `godot --headless
+> --path . --import` then boot — never an unscoped import (it rewrites sibling
+> templates' `project.godot`).
+
 ## Subcommands
 
 ### sprite-frames — Godot SpriteFrames `.tres` from a spritesheet

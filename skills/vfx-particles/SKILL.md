@@ -44,3 +44,7 @@ texture to the `GPUParticles2D` (generate one with `image-pipeline --type icon`)
 - Tune `amount` / `lifetime` / `explosiveness` per game; presets are sensible
   starting points, not final values.
 - Resource generator — no backend, no cost.
+
+## Verification
+
+These produce **visible in-game output** — don't ship on the preset table alone. Instance the scene, fire it once (`restart()` / `emitting = true`), and **look at it**: screenshot or grab a short clip and confirm color, lifetime, direction, and density read right against `reference.png`. Tune and re-check before committing.

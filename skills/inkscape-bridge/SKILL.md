@@ -15,6 +15,12 @@ The **CLI builder is pure + unit-tested** (`_selftest_inkscape.py`, 23 checks);
 execution needs **Inkscape 1.x** with `inkscape` on PATH (or a standard install
 dir — auto-detected; the console `inkscape.com` is preferred on Windows).
 
+> **Reuse-first (`skills/asset-reuse`).** Before authoring/generating a source SVG,
+> check owned/CC0 icon & UI kits (Kenney UI, NAS bundles) — this skill's job is
+> often to rasterize/derive from an existing vector, not to originate one. Eyeball
+> shipped icons/logos, register outputs in `asset-manifest` (stable IDs, not
+> hardcoded paths) for Studio swap, and meet `skills/parity-build/STANDARDS.md`.
+
 ## Ops
 
 ```bash

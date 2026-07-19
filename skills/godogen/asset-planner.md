@@ -1,6 +1,6 @@
 # Asset Planner
 
-Analyze a game, decide what assets it needs, and generate them within a budget.
+Analyze a game, decide what assets it needs, then **source them reuse-first** — only *generate* what our libraries can't provide, within budget. Generation is the last resort, not the default.
 
 ## Input
 
@@ -47,9 +47,20 @@ Read the **Art direction** from `ASSETS.md` (written by visual-target). Use it a
 
 Craft each prompt for its specific goal. The art direction tells you the visual identity; translate it appropriately per asset type.
 
+### 3.5 Reuse BEFORE you generate (MANDATORY — `skills/asset-reuse`)
+
+Run the asset-reuse ladder for **every** planned asset before spending a cent on generation:
+1. Already in this project's `asset-manifest`?
+2. Made in another project / the ml-workbench gallery?
+3. **Our owned/CC0 categorized library** — `pieces/asset-kits/_library/BY_THEME.md` + `by-theme/<theme>/` (+ NAS bundles at `\\DXP4800PLUS-A79\NoxDev\game assets`) — or a **style pack / LoRA** (`Noxdev-Studio/docs/STYLE_BENCHMARKS_2026-07.md`). Match the game's theme (325 fantasy packs, sci-fi, cyberpunk, horror, etc.).
+4. **Derive** from an existing asset (palette-swap / mirror / 9-slice / kit-bash) — deterministic and free.
+5. **Restyle** an existing asset to the project's look (`qwen-edit-instruct` / `--reference`, style-anchor).
+
+Record each asset's sourcing rung. **A plan where everything is rung-6 (generate) is a failed plan** — expect ≥50% from rungs 1–5. Never emit placeholder/blocky stand-ins; if you truly must ship before real art exists, bind a labeled placeholder ASSET through the asset-manifest so it's drop-in-replaceable, not a hardcoded ColorRect.
+
 ### 4. Generate images, review, convert to GLBs
 
-Use the asset-gen instructions for prompt templates, CLI commands, and review guidance. Generate all images in parallel, review each PNG, regenerate bad ones (max 1 retry each), then convert approved 3D images to GLBs in parallel.
+Only for assets rungs 1–5 couldn't supply. Use the asset-gen instructions for prompt templates, CLI commands, and review guidance. Generate all images in parallel, review each PNG, regenerate bad ones (max 1 retry each), then convert approved 3D images to GLBs in parallel.
 
 To prevent cost overruns, a JSON log is automatically maintained that tracks the cost of each request.
 

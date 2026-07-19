@@ -2,6 +2,8 @@
 
 A single, durable index of every generated asset in the project — its origin (`image-pipeline` / `3d-asset-pipeline` / `scene-art` / `animation-pipeline` / etc.), its SHA, the prompt + style + preset that produced it, plus human-readable labels and tags. Lives at `assets/manifest.json` by default.
 
+> **This is rung 1 of the [`asset-reuse`](../asset-reuse/SKILL.md) ladder** — `find` here is the first thing every asset request does before any generation. It's also the mechanism behind the Definition of Done's Studio asset-wiring (`skills/parity-build/STANDARDS.md` → "Studio integration & live asset wiring"): assets bound by **stable `asset_id`** with provenance (source, LoRA/style, license) are what let Jesus drop in a replacement from the Studio without code edits. Register every generated/reused asset here with rich labels + provenance.
+
 ## Why this skill exists
 
 Without a manifest, three things go wrong in any project past month 1:

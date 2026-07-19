@@ -2,7 +2,7 @@ extends SceneTree
 # scene-populate GDScript helper — data-driven set-dressing builder.
 #
 # Emitted (with tokens filled) by emit_scene.py as scenes/build_<name>_dress.gd,
-# then run headless:  godot --headless --script scenes/build_<name>_dress.gd
+# then run headless:  godot --headless --path . --script scenes/build_<name>_dress.gd
 #
 # It reads placements.json (produced by scatter.py), PATCHES the target scene by
 # adding/replacing a single "SetDressing" subtree — gameplay nodes are never

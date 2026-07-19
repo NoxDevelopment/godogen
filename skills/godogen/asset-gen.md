@@ -1,5 +1,7 @@
 # Asset Generator
 
+> **This is the LAST rung of the reuse ladder.** Only generate an asset the `asset-planner` / `skills/asset-reuse` ladder couldn't source from the manifest, gallery, owned/CC0 library, or a derive/restyle pass. If you're calling this for a *variant* (recolor/size/state) of an existing asset, stop — use palette-swap/derive instead. Every generated asset must be registered in `asset-manifest` with provenance afterward.
+
 Generate PNG images and GLB 3D models. **Routed through the `image-pipeline` skill** — ml-workbench workflow library first (`:8787`, validated graphs: `zit-pixel-art` / `qwen-icon` / `zit-txt2img` / `qwen-edit-instruct`), then ml-workbench legacy `/v1/generate`, then ComfyUI-direct, then Gemini fallback (paid, generic). See [image-pipeline/SKILL.md](../image-pipeline/SKILL.md) "Backend selection" for the routing table. Pixel types generated on the workflow path also write a 4x nearest preview alongside the asset (`<name>_preview.png`), and `--seed` is deterministic there.
 
 ## ⚠ Always pass `--type`

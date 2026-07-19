@@ -86,6 +86,9 @@ T-pose; blendshapes arrive as BlendShapes on SkinnedMeshRenderer.
 - Render-to-2D: NAS bundle asset or Daz export → turnaround renders → ComfyUI
   img2img with project style → 2D sprite set (see daz-bridge for the Daz leg,
   asset-reuse rung 3 for when to do this).
+- **Verify (look at it):** open the normalized GLB in-engine (scoped `--path .`)
+  and eyeball the turnaround grid before it feeds the engine or a LoRA set — the
+  manifest is not a visual gate. glTF/art bar: `skills/parity-build/STANDARDS.md`.
 
 ## bpy worker (SHIPPED 2026-07-11)
 

@@ -10,6 +10,12 @@ GIMP has no importable module; the bridge drives GIMP's batch mode
 (`_selftest_gimp.py`, 22 checks); execution needs **GIMP 2.10+** with
 `gimp-console` on PATH (or a standard Windows install dir — auto-detected).
 
+> **These ops ARE asset-reuse rung 4 (derive).** recolor/hue-shift, mirror/flip,
+> rotate, and palette-reduce are the 16-bit derive playbook — reach for them to
+> make a variant (enemy tier, team color, biome tile) **before** regenerating
+> anything (`skills/asset-reuse`). Eyeball every recolor/effect output — a green
+> `{ok:true}` is not a look-at-it check. Output quality bar: `skills/parity-build/STANDARDS.md`.
+
 ## Ops (chosen for game-asset work ComfyUI/sharp don't cover as cleanly)
 
 **12 ops.** The core four:

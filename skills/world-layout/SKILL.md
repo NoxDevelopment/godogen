@@ -2,6 +2,8 @@
 
 Author maps **deliberately**. Random tile placement produces "streets everywhere" — the most common failure mode in agent-generated games. Before any tile is placed, sketch the layout as ASCII, validate it, then transcribe it into Godot's TileMap with explicit grid coordinates.
 
+> **The tiles you place come reuse-first.** Source the tileset via [`asset-reuse`](../asset-reuse/SKILL.md) (owned/CC0 library → gallery → derive biome variants via palette-swap/tile-deltas) before generating a new set. This skill authors *placement*; the finished map must still meet `skills/parity-build/STANDARDS.md` → "Art & assets" (real tiles, no placeholder fills).
+
 ## When this skill applies
 
 Any task that involves placing things in a 2D grid: a city, dungeon, platformer level, arena, world map, ship interior, building floor plan. If the player will see "where things are," this skill applies.
@@ -197,4 +199,4 @@ After implementing the layout, capture an in-game screenshot from a wide camera.
 - Are there variety beats (parks, parking lots, landmarks) breaking up the building grid?
 - Can you tell what *kind* of place this is at a glance?
 
-If the screenshot reads as "tile soup," go back to `LAYOUT.md` and redo the sketch — don't try to fix it by tweaking individual tiles.
+If the screenshot reads as "tile soup," go back to `LAYOUT.md` and redo the sketch — don't try to fix it by tweaking individual tiles. And confirm the tiles themselves are **real art, not placeholder ColorRects** (see the reuse-first note at the top).

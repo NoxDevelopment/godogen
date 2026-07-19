@@ -92,6 +92,10 @@ Run **every** dimension. A miss here is a ship-blocker, not a nit.
 - **Anti-patterns** — walk the §12 list explicitly: no stacking toasts, no
   hover-only destructive actions, no modal for a flow that deserves a full
   surface, no second display font, no scroll-jacking.
+- **No placeholder/stand-in art** — refuse any screen shipping ColorRect fills,
+  blocky/"good enough" stand-ins, or un-restyled kit grabs as final art. Real
+  assets come via the reuse ladder (`skills/asset-reuse`); this is a ship-blocker
+  per `skills/parity-build/STANDARDS.md` (Art & assets).
 
 ### 4. Maintain (catch drift before it sets)
 - Did this screen invent a spacing value, a one-off color, a bespoke component

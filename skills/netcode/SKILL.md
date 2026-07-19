@@ -18,6 +18,8 @@ a host-authoritative model, and a transport chosen for the profile. Scenes never
 change — the layer intercepts at the autoload/signal boundary, the same promise the
 asset-binding manifest makes for art.
 
+> **This closes the Definition of Done "Multiplayer" row** (`skills/parity-build/STANDARDS.md`): "local + net, authoritative-host, where the genre wants it." A template whose genre wants MP isn't done until this is wired and verified two-instance.
+
 > **Status: implemented (Phase 1–2 + realtime contract).** The reusable
 > `nox_netcode` addon ships under `skills/netcode/addon/nox_netcode/` and
 > `netcode_gen.py inject` wires it into a target project idempotently. Validated

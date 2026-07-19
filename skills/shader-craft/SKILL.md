@@ -115,3 +115,7 @@ Each emit subcommand prints a JSON line with a `cheatsheet` field — the exact 
 - Don't apply the 2D outline shader at outline_width > 1 on pixel-art sprites — it breaks pixel-perfect alignment; for thicker outlines use a larger sprite + outline_width=1
 - Don't use smooth alpha fade on pixel-art sprites; that's what `pixel-dither` is for
 - Don't put the 3D outline shader on the same material slot as the regular surface — it must be a separate slot
+
+## Verification
+
+Shaders are **visible output** — don't ship on the code alone. Assign the material to a test sprite/mesh, drive the animated uniform (or let `TIME` run), and **look at it**: screenshot or grab a short clip and confirm the effect reads at the game's scale and against `reference.png`'s palette. For a template, visual polish must meet `skills/parity-build/STANDARDS.md` (game feel + art direction).

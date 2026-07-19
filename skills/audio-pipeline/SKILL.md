@@ -2,6 +2,8 @@
 
 All-in-one audio generation: procedural sound effects, scale-aware music, and TTS speech via local providers (Kokoro → Orpheus → EdgeTTS fallback chain). **All free, all local.**
 
+> **Reuse + Standards.** Check the `asset-manifest` / gallery for an existing SFX/loop before regenerating — procedural is cheap, but a project's audio should stay consistent (vary an existing cue over inventing a new one). For a template, audio must meet `skills/parity-build/STANDARDS.md` → "Sound, music, credits": music on the **Music** bus + SFX on the **SFX** bus, ambience where apt, settings volumes respected, and a **credits** entry for any borrowed/non-procedural audio (licenses honored).
+
 ## TL;DR
 
 ```bash

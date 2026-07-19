@@ -4,6 +4,8 @@ Sprite animation cycles, frame interpolation, and sprite-sheet assembly. Generat
 
 Composes the `image-pipeline` primitives (`build_zit_txt2img_workflow`, `build_zit_img2img_workflow`, `pixel_art_toolkit.make_spritesheet` / `save_gif`). `--preset` and `--style` work identically to `asset_gen.py` so animations match the rest of the project's aesthetic.
 
+> **Reuse before you generate a cycle** — run `skills/asset-reuse` first. Generation is the LAST rung: reuse existing frames, mirror left↔right, and build idle/blink/hurt as *deltas* on one base frame rather than fresh per-frame cycles (per `asset-reuse`: "Sprite animation reuses frames… don't generate per-frame from scratch"). A cycle where every frame is freshly generated is usually a failed plan. For a template, the animation set must also meet the Definition of Done in `skills/parity-build/STANDARDS.md`.
+
 ## TL;DR
 
 ```bash
@@ -137,7 +139,7 @@ done
 
 8 cycles × ~30s each ≈ 4 minutes for a complete character animation set.
 
-For 4-direction games, repeat with `--direction left/up/down`. The shared seed (pass `--seed 12345`) keeps the character recognizable across directions.
+For 4-direction games, **mirror `right`→`left`** (flip the frames — free, per `skills/asset-reuse`) rather than generating a `left` cycle; generate only the genuinely new views (`--direction up/down`). The shared seed (pass `--seed 12345`) keeps the character recognizable across the directions you do generate.
 
 ## What NOT to do
 

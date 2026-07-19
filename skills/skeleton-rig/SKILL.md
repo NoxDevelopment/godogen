@@ -80,7 +80,9 @@ Coordinate space is **0-100 horizontal, 0-150 vertical** (relative); the rendere
 ## Composing with image-pipeline (the killer use case)
 
 ```bash
-# 1. Generate the character reference (or use an existing one)
+# 1. Get the character reference — REUSE FIRST (run skills/asset-reuse: reuse an
+#    existing character, or restyle a gallery/kit one). Generate a fresh ref only
+#    if rungs 1-5 can't supply it — generation is the last rung.
 python3 .claude/skills/image-pipeline/tools/asset_gen.py image \
   --type character --prompt "armored knight in crimson cape" \
   --style default-pixel --size 1K \

@@ -66,3 +66,7 @@ textures (image-pipeline + style-anchor) = UI that looks designed, not defaulted
 - Re-running with the same palette is deterministic — safe to regenerate.
 - This is a *resource* generator, not an image generator — it costs nothing and
   needs no backend.
+- **Look at it before shipping.** The theme restyles the *entire* UI, so apply the
+  `theme.tres` to a `ui-screens` scaffold, boot it (scoped `--path .`), and
+  screenshot the themed screens — deterministic ≠ correct. Confirm contrast,
+  readable states, and that it matches `reference.png` (`skills/parity-build/STANDARDS.md`).
