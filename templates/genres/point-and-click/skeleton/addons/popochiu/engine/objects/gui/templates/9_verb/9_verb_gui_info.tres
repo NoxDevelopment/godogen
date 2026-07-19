@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PopochiuGUIInfo" load_steps=3 format=3 uid="uid://ecktw1j2mpea"]
+
+[ext_resource type="Texture2D" uid="uid://b8npdr2hnbf1h" path="res://addons/popochiu/icons/btn_setup_gui_9verbs.svg" id="1_h6e0h"]
+[ext_resource type="Script" uid="uid://dx8nbjp33mba4" path="res://addons/popochiu/engine/others/popochiu_gui_info.gd" id="1_pkhv6"]
+
+[resource]
+script = ExtResource("1_pkhv6")
+title = "9-Verbs"
+description = "[b]SCUMM-inspired nine verbs and inventory icons panel interface.[/b]
+
+Similar to the ones in \"Day of the Tentacle\", \"Simon the Sorcerer\", or \"Thimbleweed Park\"."
+icon = ExtResource("1_h6e0h")
+target_resolution = 0

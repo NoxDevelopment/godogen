@@ -1,0 +1,275 @@
+# @popochiu-docs-category game-user-interface
+class_name NineVerbGUI
+extends PopochiuGraphicInterface
+## Defines the behavior of the 9 Verbs GUI.
+##
+## In this GUI players interact with objects based on the active command, which can be changed by
+## clicking one of the nine buttons in the bottom panel. The inventory is always visible in the
+## bottom right corner of the screen, and the settings popup can be opened using the button in the
+## top right corner of the screen.
+
+signal settings_requested
+
+# Used to go back to the WALK_TO command when hovering an inventory item without a verb selected
+var _return_to_walk_to := false
+
+## Used to access the [b]9VerbPanel[/b] component (the one at the bottom containing the verbs,
+## the inventory, and the button to open the [b]9VerbSettingsPopup[/b].
+@onready var _9_verb_panel: Control = %"9VerbPanel"
+@onready var _inventory_grid: Control = _9_verb_panel.inventory_grid
+@onready var hover_text_cursor: Control = %HoverTextCursor
+## Used to access the [b]9VerbSettingsPopup[/b] node.
+@onready var settings_popup: Control = %"9VerbSettingsPopup"
+@onready var save_and_load_popup: Control = %SaveAndLoadPopup
+@onready var history_popup: Control = %HistoryPopup
+## Used to access the [b]9VerbQuitPopup[/b] node.
+@onready var quit_popup: Control = %"9VerbQuitPopup"
+
+
+#region Godot ######################################################################################
+func _ready() -> void:
+	super()
+	
+	PopochiuUtils.cursor.replace_frames($Cursor)
+	PopochiuUtils.cursor.show_cursor()
+	
+	$Cursor.hide()
+	
+	# Connect to own signals
+	settings_requested.connect(_on_settings_requested)
+	
+	# Connect to children's signals
+	settings_popup.classic_sentence_toggled.connect(_on_classic_sentence_toggled)
+	settings_popup.option_selected.connect(_on_settings_option_selected)
+	
+	
+	# Connect to singletons signals
+	PopochiuUtils.e.ready.connect(_on_popochiu_ready)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Make the PC move to the clicked point on RIGHT CLICK
+	if PopochiuUtils.get_click_or_touch_index(event) == MOUSE_BUTTON_RIGHT:
+		PopochiuUtils.c.player.walk(PopochiuUtils.r.current.get_local_mouse_position())
+
+
+#endregion
+
+#region Virtual ####################################################################################
+## Called when the GUI is blocked. Sets [member E.current_command] to none of the available
+## commands, hides the bottom panel, and stops processing unhandled input.
+func _on_blocked(props := { blocking = true }) -> void:
+	PopochiuUtils.e.current_command = -1
+	PopochiuUtils.g.show_hover_text()
+	_9_verb_panel.hide()
+	
+	set_process_unhandled_input(false)
+
+
+## Called when the GUI is unblocked. Restores [member E.current_command] to
+## [constant NineVerbCommands.WALK_TO], shows the bottom panel, and re-enables unhandled input
+## processing.
+func _on_unblocked() -> void:
+	if PopochiuUtils.d.current_dialog:
+		await get_tree().process_frame
+		
+		PopochiuUtils.g.block()
+		return
+	
+	PopochiuUtils.e.current_command = NineVerbCommands.Commands.WALK_TO
+	PopochiuUtils.g.show_hover_text()
+	PopochiuUtils.cursor.show_cursor()
+	_9_verb_panel.show()
+	
+	# Make all commands to look as no pressed
+	_9_verb_panel.unpress_commands()
+	
+	set_process_unhandled_input(true)
+
+
+## Called when [method G.show_system_text] is executed. Shows the [code]"wait"[/code] cursor.
+func _on_system_text_shown(_msg: String) -> void:
+	PopochiuUtils.cursor.show_cursor("wait")
+
+
+## Called when the system text is hidden. Shows the [code]"normal"[/code] cursor.
+func _on_system_text_hidden() -> void:
+	PopochiuUtils.cursor.show_cursor()
+
+
+## Called when the mouse enters (hovers) [param clickable]. Displays the
+## [member PopochiuClickable.description] in the [HoverText] component.
+func _on_mouse_entered_clickable(clickable: PopochiuClickable) -> void:
+	if PopochiuUtils.g.is_blocked: return
+	
+	PopochiuUtils.cursor.show_cursor(PopochiuUtils.cursor.get_type_name(clickable.cursor))
+
+	if clickable.get("suggested_command"):
+		_9_verb_panel.highlight_command(clickable.suggested_command)
+	
+	if PopochiuUtils.i.active:
+		_show_command_on(PopochiuUtils.i.active.description, clickable.description)
+	else:
+		PopochiuUtils.g.show_hover_text(clickable.description)
+
+
+## Called when the mouse exits [param clickable]. Clears the [HoverText] and shows the
+## [code]"normal"[/code] cursor.
+func _on_mouse_exited_clickable(clickable: PopochiuClickable) -> void:
+	if PopochiuUtils.g.is_blocked: return
+	
+	PopochiuUtils.cursor.show_cursor("normal")
+
+	if clickable.get("suggested_command"):
+		_9_verb_panel.highlight_command(clickable.suggested_command, false)
+	PopochiuUtils.cursor.show_cursor()
+	
+	if PopochiuUtils.i.active:
+		_show_command_on(PopochiuUtils.i.active.description)
+		return
+	
+	PopochiuUtils.g.show_hover_text()
+
+
+## Called when the mouse enters (hovers) [param inventory_item]. Displays the
+## [member PopochiuInventoryItem.description] in the [HoverText] component.
+func _on_mouse_entered_inventory_item(inventory_item: PopochiuInventoryItem) -> void:
+	if PopochiuUtils.e.current_command == NineVerbCommands.Commands.WALK_TO:
+		_return_to_walk_to = true
+		PopochiuUtils.e.current_command = NineVerbCommands.Commands.USE
+	
+	_9_verb_panel.highlight_command(NineVerbCommands.Commands.LOOK_AT)
+	PopochiuUtils.cursor.show_cursor()
+	
+	if PopochiuUtils.i.active:
+		_show_command_on(PopochiuUtils.i.active.description, inventory_item.description)
+	else:
+		PopochiuUtils.g.show_hover_text(inventory_item.description)
+
+
+## Called when the mouse exits [param inventory_item]. Clears the [HoverText] and shows the
+## [code]"normal"[/code] cursor.
+func _on_mouse_exited_inventory_item(inventory_item: PopochiuInventoryItem) -> void:
+	if not PopochiuUtils.i.active and _return_to_walk_to:
+		PopochiuUtils.e.current_command = NineVerbCommands.Commands.WALK_TO
+		_return_to_walk_to = false
+	
+	_9_verb_panel.highlight_command(NineVerbCommands.Commands.LOOK_AT, false)
+	PopochiuUtils.cursor.show_cursor()
+	
+	if PopochiuUtils.i.active:
+		_show_command_on(PopochiuUtils.i.active.description)
+		return
+	
+	PopochiuUtils.g.show_hover_text()
+
+
+## Called when a dialogue line starts. It shows the [code]"wait"[/code] cursor.
+func _on_dialog_line_started() -> void:
+	PopochiuUtils.cursor.show_cursor("wait")
+
+
+## Called when a dialogue line finishes. It shows the [code]"gui"[/code] cursor if there is an
+## active [PopochiuDialog], otherwise it shows the [code]"normal"[/code] cursor.
+func _on_dialog_line_finished() -> void:
+	PopochiuUtils.cursor.show_cursor("gui" if PopochiuUtils.d.current_dialog else "normal")
+
+
+## Called when a [PopochiuDialog] starts. It shows the [code]"gui"[/code] cursor.
+func _on_dialog_started(_dialog: PopochiuDialog) -> void:
+	PopochiuUtils.cursor.show_cursor("gui")
+
+
+## Called when the running [PopochiuDialog] shows its options on screen. It shows the
+## [code]"gui"[/code] cursor.
+func _on_dialog_options_shown() -> void:
+	PopochiuUtils.cursor.unblock()
+	PopochiuUtils.cursor.show_cursor("gui")
+
+
+## Called when a [PopochiuDialog] finishes. It shows the [code]"normal"[/code] cursor.
+func _on_dialog_finished(_dialog: PopochiuDialog) -> void:
+	PopochiuUtils.cursor.show_cursor()
+
+
+## Called when [param item] is selected in the inventory (i.e. by clicking it). For this GUI, this
+## will only occur when the current command is [constant NineVerbCommands.USE].
+func _on_inventory_item_selected(item: PopochiuInventoryItem) -> void:
+	if not item:
+		PopochiuUtils.e.current_command = NineVerbCommands.Commands.WALK_TO
+		PopochiuUtils.g.show_hover_text()
+	else:
+		_show_command_on(item.description)
+
+
+func _on_item_added(item: PopochiuInventoryItem) -> void:
+	await _inventory_grid.show_item(item)
+
+
+func _on_item_removed(item: PopochiuInventoryItem) -> void:
+	await _inventory_grid.hide_item(item)
+
+
+func _on_item_replaced(item: PopochiuInventoryItem, new_item: PopochiuInventoryItem) -> void:
+	await _inventory_grid.swap_item(item, new_item)
+
+
+## Called when the game is saved. By default, it shows [code]Game saved[/code] in the SystemText
+## component.
+func _on_game_saved() -> void:
+	PopochiuUtils.g.show_system_text("Game saved")
+
+
+## Called when a game is loaded. [param loaded_game] has the loaded data. By default, it shows
+## [code]Game loaded[/code] in the SystemText component.
+func _on_game_loaded(loaded_game: Dictionary) -> void:
+	await PopochiuUtils.g.show_system_text("Game loaded")
+	
+	super(loaded_game)
+
+
+#endregion
+
+#region Private ####################################################################################
+func _on_popochiu_ready() -> void:
+	if is_instance_valid(PopochiuUtils.c.player):
+		PopochiuUtils.c.player.started_walk_to.connect(_on_player_started_walk)
+
+
+func _on_settings_requested() -> void:
+	settings_popup.open()
+
+
+func _on_player_started_walk(
+	_character: PopochiuCharacter, _start_position: Vector2, _end_position: Vector2
+) -> void:
+	_on_unblocked()
+
+
+func _on_classic_sentence_toggled(button_pressed: bool) -> void:
+	hover_text_cursor.visible = not button_pressed
+	_9_verb_panel.hover_text_centered.visible = button_pressed
+
+
+func _on_settings_option_selected(option_name: String) -> void:
+	match option_name:
+		"save":
+			save_and_load_popup.open_save()
+		"load":
+			save_and_load_popup.open_load()
+		"history":
+			history_popup.open()
+		"quit":
+			quit_popup.open()
+
+
+func _show_command_on(item_1_name: String, item_2_name := "") -> void:
+	var preposition = "on"
+	if PopochiuUtils.e.current_command == NineVerbCommands.Commands.GIVE:
+		preposition = "to"
+	PopochiuUtils.g.show_hover_text("%s %s %s %s", [
+		PopochiuUtils.e.get_current_command_name(), item_1_name, preposition, item_2_name
+	])
+
+
+#endregion

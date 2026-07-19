@@ -1,0 +1,98 @@
+# @popochiu-docs-category engine
+@tool
+class_name PopochiuSettings
+extends Resource
+## Stores runtime configuration settings for the game.
+##
+## This resource holds game-wide settings such as text speed, dialog style, inventory limits,
+## and transition layer configuration. Values are loaded from [PopochiuConfig] at initialization.
+
+## The speed at which characters are displayed when a character speaks and the text is being
+## animated
+var text_speed := 0.0
+## If [code]true[/code], then dialog lines should auto continue once the animation that shows them
+## finishes. Otherwise, players will have to click the screen in order to continue.
+var auto_continue_text := false
+## An array with the [code]script_name[/code] of the inventory items that will be added to the
+## inventory when the game starts. You can use the context menu in front of each inventory item in
+## Popochiu's Main tab to add or remove items from start with the
+## [img]res://addons/popochiu/icons/inventory_item_start.png[/img] [b]Start with it[/b] option.
+var items_on_start := []
+## The max number of items players will be able to put in the inventory.
+var inventory_limit := 0
+## The color the screen changes to when a transition is played (e.g. move between rooms, skip a cutscene).
+var tl_fade_color: Color
+## The time, in seconds, that will take the game to skip a cutscene.
+var tl_skip_cutscene_time := 0.0
+## The transition animation that will be used when skipping a cutscene.
+var tl_cutscene_transition := ""
+## Cutscene transition mode (in, out, in_out).
+var tl_cutscene_transition_mode := PopochiuTransitionLayer.PLAY_MODE.IN
+## The transition animation that will be used when moving between rooms.
+var tl_room_transition := ""
+## The duration, in seconds, of the transition animation when moving between rooms.
+var tl_room_transition_duration := 0.0
+## A flag telling if the transition layer should be shown when the game starts.
+var show_tl_in_first_room := false
+## Whether the GUI should scale to match the native game resolution. The default GUI has a 356x200
+## resolution.
+var scale_gui := false
+## If [code]true[/code], the [member CanvasItem.texture_filter] of [PopochiuClickable]
+## and [PopochiuInventoryItem] will be set to
+## [enum CanvasItem.TextureFilter].TEXTURE_FILTER_NEAREST when those objects are created.
+var is_pixel_art_game := false
+## Whether the cursor should move in whole pixels or not.
+var is_pixel_perfect := false
+## The style to use in dialog lines:
+##
+## - [b]Above Character[/b]. Makes the text appear in top of each character. You can define
+## the position of if using the [b]DialogPos[/b] node in the character's scene.[br]
+## - [b]Portrait[/b]. Texts will appear in a panel located in the center of the game window
+## accompanied by the avatar of the character who is speaking. You can define an avatar for each
+## emotion with the [member PopochiuCharacter.avatars] property.[br]
+## - [b]Caption[/b]. The texts will appear at the bottom of the game window (as if they were
+## subtitles).
+var dialog_style := 0
+## Setting intended for development of the plugin. It makes the game to use the original files of
+## the selected template to make testing changes on it easier. This is a workaround while we find
+## how to make the scenes moved to [code]res://game/gui[/code] inherit from the
+## source ones.
+var dev_use_addon_template := false
+
+
+#region Godot ######################################################################################
+func _init() -> void:
+	# ---- GUI -------------------------------------------------------------------------------------
+	scale_gui = PopochiuConfig.is_scale_gui()
+	tl_fade_color = PopochiuConfig.get_tl_fade_color()
+	tl_skip_cutscene_time = PopochiuConfig.get_tl_skip_cutscene_time()
+	tl_cutscene_transition = PopochiuConfig.get_tl_default_cutscene_transition()
+	tl_cutscene_transition_mode = PopochiuConfig.get_tl_cutscene_transition_mode()
+	tl_room_transition = PopochiuConfig.get_tl_default_room_transition()
+	tl_room_transition_duration = PopochiuConfig.get_tl_room_transition_duration()
+	show_tl_in_first_room = PopochiuConfig.should_show_tl_in_first_room()
+	
+	# ---- Dialogs ---------------------------------------------------------------------------------
+	text_speed = PopochiuConfig.get_text_speed()
+	auto_continue_text = PopochiuConfig.is_auto_continue_text()
+	dialog_style = PopochiuConfig.get_dialog_style()
+	
+	# ---- Inventory -------------------------------------------------------------------------------
+	inventory_limit = PopochiuConfig.get_inventory_limit()
+	items_on_start = PopochiuConfig.get_inventory_items_on_start()
+	
+	# ---- Pixel game ------------------------------------------------------------------------------
+	is_pixel_art_game = PopochiuConfig.is_pixel_art_textures()
+	is_pixel_perfect = PopochiuConfig.is_pixel_perfect()
+	
+	# ---- DEV -------------------------------------------------------------------------------------
+	dev_use_addon_template = PopochiuConfig.is_use_addon_template()
+
+
+#endregion
+
+#region Public #####################################################################################
+#endregion
+
+#region Private ####################################################################################
+#endregion

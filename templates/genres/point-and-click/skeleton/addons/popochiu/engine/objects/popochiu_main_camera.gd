@@ -1,0 +1,128 @@
+# @popochiu-docs-category engine
+class_name PopochiuMainCamera
+extends Camera2D
+## Manages the main camera used by Popochiu for screen effects like shaking and zooming.
+##
+## This camera follows the player character and can be manipulated to create visual effects
+## during gameplay, such as screen shake for impacts or zoom for dramatic moments.
+
+var is_shaking := false
+
+var _camera_shake_amount := 15.0
+var _shake_timer := 0.0
+
+@onready var tween: Tween = null
+# Use the base project resolution (not the live viewport) so that expand-mode stretch settings
+# don't inflate the limits and lock the camera in place. See: #96
+@onready var default_limits := {
+	left = limit_left,
+	right = ProjectSettings.get_setting("display/window/size/viewport_width"),
+	top = limit_top,
+	bottom = ProjectSettings.get_setting("display/window/size/viewport_height")
+}
+
+
+#region Godot ######################################################################################
+func _process(delta: float) -> void:
+	if is_shaking:
+		_shake_timer -= delta
+		offset = Vector2.ZERO + Vector2(
+			randf_range(-1.0, 1.0) * _camera_shake_amount,
+			randf_range(-1.0, 1.0) * _camera_shake_amount
+		)
+		
+		if _shake_timer <= 0.0:
+			stop_shake()
+	elif (
+		is_instance_valid(PopochiuUtils.c.camera_owner)
+		and PopochiuUtils.c.camera_owner.is_inside_tree()
+	):
+		position = PopochiuUtils.c.camera_owner.get_buffered_position()
+
+#endregion
+
+#region Public #####################################################################################
+## Changes the main camera's offset by [param offset] pixels. Useful when zooming the camera.
+##
+## [i]This method is intended to be used inside a [method Popochiu.queue] of instructions.[/i]
+func queue_change_offset(offset := Vector2.ZERO) -> Callable:
+	return func(): await change_offset(offset)
+
+
+## Changes the main camera's offset by [param offset] pixels. Useful when zooming the camera.
+func change_offset(offset := Vector2.ZERO) -> void:
+	offset = offset
+	await get_tree().process_frame
+
+
+## Makes the camera shake with [param strength] intensity for [param duration] seconds.
+##
+## [i]This method is intended to be used inside a [method Popochiu.queue] of instructions.[/i]
+func queue_shake(strength := 1.0, duration := 1.0) -> Callable:
+	return func(): await shake(strength, duration)
+
+
+## Makes the camera shake with [param strength] intensity for [param duration] seconds.
+func shake(strength := 1.0, duration := 1.0) -> void:
+	_camera_shake_amount = strength
+	_shake_timer = duration
+	is_shaking = true
+	
+	await get_tree().create_timer(duration).timeout
+
+
+## Makes the camera shake with [param strength] intensity for [param duration] seconds without
+## blocking execution (runs in the background).
+##
+## [i]This method is intended to be used inside a [method Popochiu.queue] of instructions.[/i]
+func queue_shake_bg(strength := 1.0, duration := 1.0) -> Callable:
+	return func(): await shake_bg(strength, duration)
+
+
+## Makes the camera shake with [param strength] intensity for [param duration] seconds without
+## blocking execution (runs in the background).
+func shake_bg(strength := 1.0, duration := 1.0) -> void:
+	_camera_shake_amount = strength
+	_shake_timer = duration
+	is_shaking = true
+	
+	await get_tree().process_frame
+
+
+## Changes the camera zoom. If [param target] is greater than [code]Vector2(1, 1)[/code], the
+## camera will [b]zoom out[/b]; smaller values will make it [b]zoom in[/b]. The effect lasts
+## [param duration] seconds.
+##
+## [i]This method is intended to be used inside a [method Popochiu.queue] of instructions.[/i]
+func queue_change_zoom(target := Vector2.ONE, duration := 1.0) -> Callable:
+	return func(): await change_zoom(target, duration)
+
+
+## Changes the camera zoom. If [param target] is greater than [code]Vector2(1, 1)[/code], the
+## camera will [b]zoom out[/b]; smaller values will make it [b]zoom in[/b]. The effect lasts
+## [param duration] seconds.
+func change_zoom(target := Vector2.ONE, duration := 1.0) -> void:
+	if is_instance_valid(tween) and tween.is_running():
+		tween.kill()
+
+	tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "zoom", target, duration).from_current()
+	await tween.finished
+
+
+## Makes the camera stop shaking.
+func stop_shake() -> void:
+	is_shaking = false
+	offset = Vector2.ZERO
+	_shake_timer = 0.0
+
+
+## Restores the camera limits to their default values.
+func restore_default_limits() -> void:
+	limit_left = default_limits.left
+	limit_right = default_limits.right
+	limit_top = default_limits.top
+	limit_bottom = default_limits.bottom
+
+
+#endregion
