@@ -64,6 +64,31 @@ def at_server_start():
     for mob in ObjectDB.objects.filter(db_key="a giant rat"):
         create_script(WanderScript, obj=mob)
 
+    # 3) Seed the demo character with GS4-flavored state so the rich client shows
+    #    populated depth (wounds, active spells, real hands, level, stance). This is
+    #    a showcase seed; real values come from the (upcoming) combat/spell systems.
+    for pc in ObjectDB.objects.filter(db_key="noxadmin"):
+        if not pc.db.vitals:
+            pc.at_object_creation()
+        pc.db.vitals = {"health": [92, 100], "mana": [64, 120], "spirit": [9, 10], "stamina": [78, 100]}
+        pc.db.mind = 55
+        pc.db.stance = "forward"
+        pc.db.encumbrance = 22
+        pc.db.level = 12
+        pc.db.hands = {"left": "a rune-etched broadsword", "right": "a kite shield", "spell": "Elemental Blast (906)"}
+        pc.db.wounds = {"right arm": 2, "chest": 1, "left leg": 1}
+        pc.db.active_spells = [
+            {"name": "Spirit Shield (211)", "left": 320},
+            {"name": "Elemental Defense (401)", "left": 140},
+            {"name": "Strength (509)", "left": 600},
+        ]
+        pc.db.posture = "standing"
+        # start in the living Town Square (exits + the wandering rat visible in HERE)
+        sq = ObjectDB.objects.filter(db_key="Town Square").first()
+        if sq and pc.location != sq:
+            pc.location = sq
+            pc.save()
+
 
 def at_server_stop():
     """
