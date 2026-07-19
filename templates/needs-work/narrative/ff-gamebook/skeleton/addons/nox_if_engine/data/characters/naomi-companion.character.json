@@ -1,0 +1,78 @@
+{
+  "id": "naomi-nikkei",
+  "name": "Naomi Tanaka Oliveira",
+  "tier": "companion",
+  "ruleset": "ff-2d6",
+  "meta": {
+    "summary": "A character that IS a full companion_ai_core entity, bound CONSUME-ONLY via a stable id + a companion-interchange v1 projection (see skills/companion-npcs). On first use her ff-2d6 sheet is DERIVED from her interchange fields by the declared formula below; thereafter she carries her mutated sheet exactly like a sheet character. The engine never imports or edits companion_ai_core — it reads this projection only.",
+    "note": "The interchange block is a compacted point-in-time projection (identity + bigFive + fitness + top skills) — enough to derive a game sheet. A real pipeline supplies the full companion-interchange document from the companion-npcs export."
+  },
+  "companion": {
+    "ref": "cmp_9f3ab2e07d41",
+    "interchange": {
+      "interchangeVersion": 1,
+      "identity": { "id": "cmp_9f3ab2e07d41", "name": "Naomi Tanaka Oliveira", "age": 34 },
+      "personality": {
+        "archetype": "caregiver",
+        "bigFive": {
+          "openness": 0.68,
+          "conscientiousness": 0.82,
+          "extraversion": 0.57,
+          "agreeableness": 0.79,
+          "neuroticism": 0.38
+        }
+      },
+      "appearance": { "fitnessLevel": "active" },
+      "social": {
+        "skills": [
+          { "name": "artisan baking", "proficiency": 0.88 },
+          { "name": "espresso craft", "proficiency": 0.81 },
+          { "name": "small business accounting", "proficiency": 0.62 },
+          { "name": "conflict de-escalation", "proficiency": 0.57 }
+        ]
+      },
+      "meta": { "source": "companion_ai_core", "contentRating": "sfw" }
+    },
+    "derive": {
+      "attributes": {
+        "SKILL": {
+          "base": 4,
+          "round": "nearest",
+          "min": 1, "max": 12,
+          "terms": [
+            { "path": "social.skills.#max:proficiency", "weight": 5 },
+            { "path": "personality.bigFive.conscientiousness", "weight": 3 }
+          ]
+        },
+        "LUCK": {
+          "base": 4,
+          "round": "nearest",
+          "min": 0, "max": 12,
+          "terms": [
+            { "path": "personality.bigFive.openness", "weight": 4 }
+          ]
+        },
+        "STAMINA": {
+          "base": 15,
+          "round": "nearest",
+          "min": 0, "max": 24,
+          "terms": [
+            {
+              "path": "appearance.fitnessLevel", "weight": 8,
+              "map": { "sedentary": 0.1, "average": 0.4, "active": 0.7, "fit": 0.85, "athletic": 1.0 }
+            },
+            { "path": "personality.bigFive.neuroticism", "weight": -4 }
+          ]
+        }
+      },
+      "resources": {
+        "STAMINA": { "from": "STAMINA" },
+        "provisions": { "const": 4 }
+      }
+    }
+  },
+  "vars": { "char.recipe_lore": 3 },
+  "items": { "recipe_notebook": 1 },
+  "flags": {},
+  "history": []
+}

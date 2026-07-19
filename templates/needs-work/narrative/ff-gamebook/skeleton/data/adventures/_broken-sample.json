@@ -1,0 +1,50 @@
+{
+  "id": "broken-sample",
+  "name": "Deliberately Broken Sample (validator fixture)",
+  "meta": {
+    "author": "NoxDev",
+    "status": "TEST FIXTURE — NOT shipped content. Intentionally malformed so the authoring validator (IFAdventureValidator) can be proven to catch each class of defect: a dangling 'turn to N', an unreachable section, a dead-end, an unwinnable graph, and a codeword read that no effect ever sets."
+  },
+  "ruleset": "ff-2d6",
+  "start": "a",
+  "sheet": null,
+  "init": { "vars": {}, "items": {}, "flags": {} },
+  "passages": [
+    {
+      "id": "a",
+      "title": "Crossroads",
+      "text": "Two ways lead on; one is a lie.",
+      "choices": [
+        { "id": "go_b", "text": "Take the north road.", "goto": "b" },
+        { "id": "go_ghost", "text": "Follow the sign to the ghost town.", "goto": "ghost_town" }
+      ]
+    },
+    {
+      "id": "b",
+      "title": "The Barred Door",
+      "text": "A silver lock holds the only safe way on. Without the key, the side tunnel is all that's left.",
+      "choices": [
+        { "id": "unlock", "text": "Open the silver lock.", "goto": "c",
+          "conditions": [ { "kind": "codeword", "key": "silver_key" } ] },
+        { "id": "side_tunnel", "text": "Crawl into the side tunnel.", "goto": "deadend" }
+      ]
+    },
+    {
+      "id": "c",
+      "title": "The Trap",
+      "text": "Behind the silver door the floor gives way. There was never a way to win from here.",
+      "ending": { "id": "c", "kind": "death", "label": "Crushed in the Deeps" }
+    },
+    {
+      "id": "deadend",
+      "title": "The Blind Tunnel",
+      "text": "The tunnel narrows to solid rock. There is nowhere to go and nothing to do."
+    },
+    {
+      "id": "orphan",
+      "title": "The Forgotten Vault",
+      "text": "No passage in the book ever tells you to turn here.",
+      "ending": { "id": "orphan", "kind": "victory", "label": "The Unreachable Prize" }
+    }
+  ]
+}

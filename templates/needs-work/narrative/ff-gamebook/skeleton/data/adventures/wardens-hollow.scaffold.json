@@ -1,0 +1,56 @@
+{
+  "id": "wardens-hollow-scaffold",
+  "name": "Warden's Hollow (Phase-0 scaffold)",
+  "meta": {
+    "author": "NoxDev",
+    "status": "PLACEHOLDER CONTENT — Phase-0 scaffolding only, NOT the shipped adventure.",
+    "summary": "A five-passage vertical thread that exercises the Phase-0 backbone end to end: intro prose, a branching choice, a Test-your-Luck beat, a 2d6+SKILL combat encounter, and a victory ending. Prose is deliberately short scaffold text; the complete original adventure (~150-250 sections) is authored in Phase 8.",
+    "note": "Passages carry a custom `event` field (\"luck_test\"/\"combat\") the reading view interprets via the FF rules core. The if-engine ignores unknown keys, so the graph still validates and routes normally."
+  },
+  "ruleset": "ff-2d6",
+  "start": "hollow_mouth",
+  "sheet": null,
+  "init": { "vars": { "gold": 0 }, "items": {}, "flags": {} },
+  "passages": [
+    {
+      "id": "hollow_mouth",
+      "title": "The Mouth of the Hollow",
+      "text": "The forest track dies at a cleft in the hillside where two mossed standing-stones lean like broken teeth. Cold air sighs out of the dark. Somewhere below, the Warden of the Hollow keeps what you came for. You settle your pack, draw your sword, and consider the way in.",
+      "onEnter": [ { "kind": "flag", "key": "entered_hollow", "value": true } ],
+      "choices": [
+        { "id": "left_wards", "text": "Take the left passage — the one carved with old wards.", "goto": "rune_ward" },
+        { "id": "right_fast", "text": "Take the right passage — steeper, but it should be quicker.", "goto": "warden_gate" }
+      ]
+    },
+    {
+      "id": "rune_ward",
+      "title": "The Warded Stair",
+      "text": "Runes crawl down the stair-walls, and as your boot finds the third step they flare a sickly green. The old wards are waking, and they are hungry for the unlucky. Test your Luck.",
+      "event": "luck_test",
+      "unlucky_effect": { "stamina": -2 },
+      "choices": [
+        { "id": "press_on", "text": "Press on down the stair.", "goto": "warden_gate" }
+      ]
+    },
+    {
+      "id": "warden_gate",
+      "title": "The Warden of the Hollow",
+      "text": "The passage opens into a vaulted cellar of the earth. Something unfolds from the shadow of a fallen pillar — a WARDEN of bound bone and old iron, its eye-sockets kindling cold. It lifts a rusted glaive and comes for you.",
+      "event": "combat",
+      "enemy": { "name": "Bone Warden", "skill": 8, "stamina": 8 },
+      "choices": [
+        { "id": "into_the_hoard", "text": "Step over the shattered Warden.", "goto": "hoard" }
+      ]
+    },
+    {
+      "id": "hoard",
+      "title": "The Hollow's Heart",
+      "text": "Beyond the Warden's bones, a low chamber glitters. The Hollow gives up its heart to you at last — a fist-sized gem still warm to the touch — and you climb back to the light alive, and richer than you came.",
+      "onEnter": [
+        { "kind": "var", "key": "gold", "op": "add", "value": 25 },
+        { "kind": "item", "key": "hollow_heart_gem", "op": "grant", "value": 1 }
+      ],
+      "ending": { "id": "hoard", "kind": "victory", "label": "The Heart of the Hollow" }
+    }
+  ]
+}

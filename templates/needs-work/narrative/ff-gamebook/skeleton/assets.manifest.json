@@ -1,129 +1,61 @@
 {
-  "schemaVersion": 1,
-  "stylePack": "veritas-ink",
-  "updated": "2026-07-12",
+  "schemaVersion": 2,
+  "stylePack": "veritas-gamebook",
+  "updated": "2026-07-19",
+  "note": "Every art/audio surface is a stable-ID SLOT (GDD §10a). Reused fantasy assets (icons/portraits/UI/fonts) are bound to their res:// files with provenance; section illustration PLATES are bound to clearly-labelled veritas-gamebook PLACEHOLDER assets (real PNGs, not placeholder UI) that the Studio replaces with generated plates in Phase 5 — no code edits. Scene code resolves slots ONLY through AssetBinder by id.",
   "slots": [
-    {
-      "slotId": "illustration/passage_1",
-      "kind": "illustration",
-      "policy": "rule",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
-      "source": {
-        "dialogue": "res://dialogue/book.dialogue",
-        "passage": "passage_1",
-        "summary": "a squat stone toll bridge over a river of black water, a hulking troll with a ledger squatting beside the near post, a sign demanding ten gold pieces"
-      },
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "illustration/passage_2",
-      "kind": "illustration",
-      "policy": "rule",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
-      "source": {
-        "dialogue": "res://dialogue/book.dialogue",
-        "passage": "passage_2",
-        "summary": "an adventurer pushing into thorny bramble thickets beside a road, arms raked by thorns, a small brass key half-buried in the mud"
-      },
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "illustration/passage_3",
-      "kind": "illustration",
-      "policy": "rule",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
-      "source": {
-        "dialogue": "res://dialogue/book.dialogue",
-        "passage": "passage_3",
-        "summary": "a towering troll unfolding to full height before a stone bridge, snapping a ledger shut, a small toll-house with a side gate behind it"
-      },
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "illustration/passage_5",
-      "kind": "illustration",
-      "policy": "rule",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
-      "source": {
-        "dialogue": "res://dialogue/book.dialogue",
-        "passage": "passage_5",
-        "summary": "an adventurer creeping along the wet stone wall of a toll-house, boots on slick slates, a troll absorbed in its ledger in the background"
-      },
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "illustration/passage_6",
-      "kind": "illustration",
-      "policy": "rule",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
-      "source": {
-        "dialogue": "res://dialogue/book.dialogue",
-        "passage": "passage_6",
-        "summary": "a line of rotten planks fording a black flooded river, an adventurer balancing midway over the rushing water"
-      },
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "illustration/passage_7",
-      "kind": "illustration",
-      "policy": "rule",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "classic fantasy gamebook illustration, hand-drawn, {passage_summary}, traditional ink linework with muted watercolor, 1980s Fighting Fantasy book plate style",
-      "source": {
-        "dialogue": "res://dialogue/book.dialogue",
-        "passage": "passage_7",
-        "summary": "the far bank of a dark river, a road running east toward distant mountains, a stone bridge and a bellowing troll left behind"
-      },
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "ui/page_frame",
-      "kind": "ui",
-      "policy": "generated",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "aged parchment gamebook page background, ornate ink filigree border, empty center for text and plate, 1980s Fighting Fantasy book interior style",
-      "placeholderColor": "#221d17",
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "ui/dice_tray",
-      "kind": "ui",
-      "policy": "generated",
-      "workflowId": "zit-txt2img",
-      "stylePack": "veritas-ink",
-      "promptTemplate": "worn leather dice tray panel seen from above, hand-drawn ink linework with muted watercolor, empty center, 1980s Fighting Fantasy book style",
-      "placeholderColor": "#2a2119",
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    },
-    {
-      "slotId": "audio/page_turn",
-      "kind": "audio",
-      "policy": "static",
-      "workflowId": null,
-      "stylePack": null,
-      "promptTemplate": null,
-      "file": null,
-      "provenance": { "seed": null, "params": {}, "generatedAt": null }
-    }
+    { "slotId": "plate/s1", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "a sin-eater set down at a fog-drowned verge-stone where the road dissolves into black bog; a coach turning back" }, "file": "res://assets/plates/placeholder/s1.png", "provenance": { "kind": "placeholder", "note": "labelled veritas-gamebook placeholder; swap in Phase 5" } },
+    { "slotId": "plate/s2", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "the Grey Assessor, a faceless robed toll-wraith, folds out of fog at a ledger-carved stone bridge, one empty sleeve extended, palm up; blue untended lantern" }, "file": "res://assets/plates/placeholder/s2.png", "provenance": { "kind": "placeholder", "note": "BN1 key plate — swap first" } },
+    { "slotId": "plate/s3", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "two coins on wet parapet stone vanishing into fog as the Assessor thins away" }, "file": "res://assets/plates/placeholder/s3.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s4", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "a mossed Ledgerkeeper shrine-stone carved with grey robes and scales that weigh years, three legible lines of warning" }, "file": "res://assets/plates/placeholder/s4.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s5", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "the Assessor's faceless attention appraising an open pack; a lantern singled out" }, "file": "res://assets/plates/placeholder/s5.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s6", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "an empty robed sleeve passing an inch above a bared forearm, warmth withdrawing like mist" }, "file": "res://assets/plates/placeholder/s6.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s7", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "the hero's blade meeting the Grey Assessor as it hardens out of screaming fog, tally-stave swinging, on the toll-bridge" }, "file": "res://assets/plates/placeholder/s7.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s8", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "a flooded militia barricade at Harrowfell's drowned gate, grey ledger-script crawling up the doorframes, a crossbow at an arrow-slit" }, "file": "res://assets/plates/placeholder/s8.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s9", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "the huddled Harrowfell square at dusk: fever-house lantern, moot-hall tower, a single bright mercantile stall in a flooded market" }, "file": "res://assets/plates/placeholder/s9.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s10", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "Mother Grissel Thorne grinding a poultice in a close tallow-lit fever-house, three cots, one covered" }, "file": "res://assets/plates/placeholder/s10.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s11", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "Ferrant Coinwright's lantern-lit stall: rope, torches, dried fish, a physician's-cross bottle, and a saint-named sword wrapped in oilcloth" }, "file": "res://assets/plates/placeholder/s11.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/s12", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "a leg swallowed to the thigh in black fen; pale robed faceless shapes standing in the water, each writing a name in a little book" }, "file": "res://assets/plates/placeholder/s12.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/descent", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "a stair descending into the drowned Cathedra of Accounts, water rising, ledger-script whispering in the dark, a pale shape waiting below" }, "file": "res://assets/plates/placeholder/descent.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/isolde", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "Isolde the Unpaid, a girl of twelve in a decade-old funeral shift, grey ledger-script crawling over half her skin, too still, sorrowful not gory" }, "file": "res://assets/plates/placeholder/isolde.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/reckoner", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": { "summary": "the Reckoner (Ambrose Vael), a stooped grieving High Ledgerkeeper in a tag-hung robe with a hanging brass balance, at a great ledger; tragic not demonic" }, "file": "res://assets/plates/placeholder/reckoner.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/death", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook somber death vignette with a stamped PAID seal: {summary}", "source": { "summary": "grey ledger-script closing over a fallen figure; an Old-Arrears-Red 'PAID' seal stamped across the scene" }, "file": "res://assets/plates/placeholder/death.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/victory", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook warm victory plate: {summary}", "source": { "summary": "dawn over the Verge, the Tithe lifting, Isolde at rest — Tallow Flame warmth permitted to dominate for the only time" }, "file": "res://assets/plates/placeholder/victory.png", "provenance": { "kind": "placeholder" } },
+    { "slotId": "plate/cover", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook brooding cover key art: {summary}", "source": { "summary": "Harrowfell under fog, the drowned Cathedra spire, the Grey Assessor at the toll-bridge, the hero small against it; Ledger Verdigris used once as the eye-hook" }, "file": "res://assets/plates/placeholder/cover.png", "provenance": { "kind": "placeholder" } },
+
+    { "slotId": "portrait/grey_assessor", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/grey_assessor.png", "provenance": { "pack": "Monster Avatar Icons", "license": "commercial (asset pack)", "restyle": "recolour to Ledger Verdigris + ledger-script per STYLE_GUIDE 1.6 before ship" } },
+    { "slotId": "portrait/bog_wight", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/bog_wight.png", "provenance": { "pack": "Monster Avatar Icons", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/cutthroat", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/cutthroat.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/reckoner", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/reckoner.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/hero", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/hero.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/grissel", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/grissel.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/cael", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/cael.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/ferrant", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/ferrant.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+    { "slotId": "portrait/survivor", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/survivor.png", "provenance": { "pack": "RPG Character Portraits", "license": "commercial (asset pack)" } },
+
+    { "slotId": "icon/sword", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/sword.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/leather_armour", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/leather_armour.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/lantern", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/lantern.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/provisions", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/provisions.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/gold", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/gold.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/potion_skill", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/potion_skill.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/potion_strength", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/potion_strength.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/potion_fortune", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/potion_fortune.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/silver_key", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/silver_key.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/ledger", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/ledger.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/scroll", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/scroll.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/gem", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/gem.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/cure", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/cure.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+    { "slotId": "icon/blessed_blade", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/blessed_blade.png", "provenance": { "pack": "496 RPG Icons", "license": "CC0" } },
+
+    { "slotId": "ui/frame", "kind": "ui", "policy": "reused", "file": "res://assets/reused/ui/frame.png", "provenance": { "pack": "Kenney Fantasy UI Borders", "license": "CC0" } },
+    { "slotId": "ui/frame_dark", "kind": "ui", "policy": "reused", "file": "res://assets/reused/ui/frame_dark.png", "provenance": { "pack": "Kenney Fantasy UI Borders", "license": "CC0" } },
+    { "slotId": "ui/divider", "kind": "ui", "policy": "reused", "file": "res://assets/reused/ui/divider.png", "provenance": { "pack": "Kenney Fantasy UI Borders", "license": "CC0" } },
+    { "slotId": "ui/dice_tray", "kind": "ui", "policy": "reused", "placeholderColor": "#2a2119", "file": "res://assets/reused/ui/frame.png", "provenance": { "pack": "Kenney Fantasy UI Borders", "license": "CC0", "note": "stand-in tray frame; bespoke veritas leather tray in Phase 5" } },
+
+    { "slotId": "audio/page_turn", "kind": "audio", "policy": "static", "file": null, "provenance": { "note": "Phase 6 — Interface SFX pack" } },
+    { "slotId": "audio/dice", "kind": "audio", "policy": "static", "file": null, "provenance": { "note": "Phase 6 — bespoke honest-dice SFX" } },
+    { "slotId": "audio/combat_hit", "kind": "audio", "policy": "static", "file": null, "provenance": { "note": "Phase 6 — Combat Sounds bundle" } },
+    { "slotId": "audio/explore_bed", "kind": "audio", "policy": "static", "file": null, "provenance": { "note": "Phase 6 — dark-fantasy orchestral bed" } }
   ]
 }

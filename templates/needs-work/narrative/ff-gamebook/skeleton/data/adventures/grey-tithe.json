@@ -1,0 +1,373 @@
+{
+  "id": "grey-tithe",
+  "name": "The Grey Tithe",
+  "meta": {
+    "author": "NoxDev",
+    "world": "The Grey Tithe (NARRATIVE_BIBLE.md) — 100% original NoxDev canon, no FF IP.",
+    "status": "Playable vertical slice — the CONTENT_SAMPLE opening (Act I -> Harrowfell hub) plus a condensed Act III finale so the full roll-up -> play -> death/victory loop is complete and winnable. Scales to ~150-250 sections.",
+    "conventions": "Outcome routing for dice/combat lives in underscore-prefixed choices (_onwin/_ondeath/_onlucky/_onunlucky/_onsuccess/_onfailure/_onescape) that the reading/combat screens consume programmatically; the engine stays authoritative (Adventure.choose applies their effects + goto). Player-facing choices carry no target numbers (faithful mode)."
+  },
+  "ruleset": "ff-2d6",
+  "start": "s1",
+  "sheet": null,
+  "init": {
+    "vars": { "gold": 12, "tithe_debt": 0, "storylets": 0 },
+    "items": {},
+    "flags": {}
+  },
+  "passages": [
+    {
+      "id": "s1",
+      "title": "The Last Coach North",
+      "illustration": "plate/s1",
+      "text": "The coachman will take you no further than the Verge-stone. He reins in where the king's road dissolves into black bog and rotting reed, and he will not meet your eye.\n\n\"Harrowfell's that way,\" he says, pointing his whip down a causeway of sunken planks. \"Was. I don't go past the stone after dark, sin-eater, and it's near dark.\"\n\nThe fog smells of wet ash and old coins. Somewhere ahead a bell tolls once — slow, and wrong, as if rung underwater. Your satchel holds a sword, leather armour, a lantern, ten Provisions, and one Potion. The causeway forks at a leaning shrine.",
+      "onEnter": [ { "kind": "flag", "key": "arrived", "value": true } ],
+      "choices": [
+        { "id": "causeway", "text": "Take the plank causeway straight toward the tolling bell.", "goto": "s2" },
+        { "id": "reeds", "text": "Cut left through the reeds, where the ground looks firmer.", "goto": "s12" },
+        { "id": "shrine", "text": "Kneel at the shrine and read the weathered ledger-stone first.", "goto": "s4" }
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "The Ledger-Stone",
+      "illustration": "plate/s4",
+      "text": "The shrine is a Ledgerkeeper's marker — grey robes carved on it, scales that weigh not gold but years. Three lines are still legible, and they read like a threat left for a debtor:\n\n\"What is owed at the first gate? Not gold. Not blood. A name you would keep.\"\n\"The forgiven debt cannot be found in any book.\"\n\"Beware the kindness of the man who cannot let his daughter rest.\"\n\nThe words settle into you the way a splinter does.",
+      "onEnter": [ { "kind": "codeword", "key": "OMEN" } ],
+      "choices": [
+        { "id": "to_bridge", "text": "Return to the fork and take the causeway toward the bell.", "goto": "s2" }
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "The Toll-Bridge in the Fog",
+      "illustration": "plate/s2",
+      "text": "The planks give out at a slow black channel crossed by a stone toll-bridge, its parapet carved with columns of figures that might be prayer and might be arithmetic. A lantern burns blue at the far end, though no hand tends it.\n\nAs your boot touches the first stone, the fog gathers. It folds itself upright into a robed figure, faceless, patient, its sleeves hanging empty.\n\n\"A crossing is a service,\" it says, the voice coming from several distances at once. \"A service incurs a debt. We are the Grey Assessor. We find your account... opened.\"\n\nIt extends one empty sleeve, palm-up, and waits.",
+      "choices": [
+        { "id": "pay_gold", "text": "Pay in Gold — set two coins on the parapet.", "conditions": [ { "kind": "var", "key": "gold", "cmp": ">=", "value": 2 } ], "effects": [ { "kind": "var", "key": "gold", "op": "add", "value": -2 }, { "kind": "flag", "key": "toll1_gold", "value": true } ], "goto": "s3" },
+        { "id": "pay_item", "text": "Pay in kind — offer an item from your pack.", "goto": "s5" },
+        { "id": "pay_blood", "text": "Pay in blood — let it take its measure of you.", "goto": "s6" },
+        { "id": "refuse", "text": "Refuse. Draw your blade.", "goto": "s7" }
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Paid in Coin",
+      "illustration": "plate/s3",
+      "text": "You set two gold pieces on the wet stone. The Assessor does not pick them up; the coins simply are not there the moment your fingers leave them, and neither is the cold.\n\n\"Received. Entered. Carried forward.\" The figure thins back into fog — but not before one empty sleeve tilts toward you, almost courteous, almost a threat. \"You are, we note, a payer of debts. We will meet again at the third gate, and the price is set by the first.\"\n\nThe blue lantern gutters. Beyond the bridge, the drowned rooftops of Harrowfell lean out of the fog.",
+      "onEnter": [ { "kind": "flag", "key": "toll1_paid", "value": true } ],
+      "choices": [
+        { "id": "cross", "text": "Cross into Harrowfell.", "goto": "s8" }
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Paid in Kind",
+      "illustration": "plate/s5",
+      "text": "You unbuckle your pack. The Assessor's faceless attention settles on it with the weight of an appraiser's glance, and you understand — sickly — that it is not choosing; it already knows what you value most.\n\n\"The lantern,\" it says. \"You will want it, in the dark under the town. That is why it will do.\"",
+      "choices": [
+        { "id": "give_lantern", "text": "Give up the lantern.", "goto": "s5a" },
+        { "id": "offer_rope", "text": "Refuse this — offer the rope and blanket instead.", "conditions": [ { "kind": "item", "key": "rope" } ], "goto": "s5b" },
+        { "id": "recant_fight", "text": "Recant the offer. Draw your blade instead.", "goto": "s7" }
+      ]
+    },
+    {
+      "id": "s5a",
+      "title": "The Lightless Road",
+      "text": "You hand over the lantern. The Assessor folds it into a sleeve and is gone. You have paid, and you have paid dearly: the Cathedra will be lightless.",
+      "onEnter": [ { "kind": "item", "key": "lantern", "op": "consume", "value": 1 }, { "kind": "flag", "key": "darkPenalty", "value": true }, { "kind": "flag", "key": "toll1_paid", "value": true } ],
+      "choices": [
+        { "id": "cross", "text": "Cross into Harrowfell.", "goto": "s8" }
+      ]
+    },
+    {
+      "id": "s5b",
+      "title": "We Do Not Haggle",
+      "text": "\"Insufficient,\" it says, without heat. \"We do not haggle. We assess.\" The cold sharpens.",
+      "choices": [
+        { "id": "then_blood", "text": "Then pay in blood.", "goto": "s6" },
+        { "id": "then_fight", "text": "Then fight.", "goto": "s7" }
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Paid in Blood",
+      "illustration": "plate/s6",
+      "text": "\"As you wish,\" says the Assessor. \"Blood is an honest tender.\"\n\nThe empty sleeve passes an inch above your forearm and something withdraws — not blood exactly, but the warmth behind it, the small everyday luck of an unhurt body.\n\nTest your Luck.",
+      "event": "luck_test",
+      "test_prompt": "The toll takes its measure",
+      "choices": [
+        { "id": "_onlucky", "text": "Lucky — a shallow cost, quickly closed.", "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -2 }, { "kind": "flag", "key": "toll1_paid", "value": true } ], "goto": "s8" },
+        { "id": "_onunlucky", "text": "Unlucky — it takes more than it offered to.", "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -4 }, { "kind": "var", "key": "tithe_debt", "op": "add", "value": 1 }, { "kind": "flag", "key": "toll1_paid", "value": true } ], "goto": "s8" }
+      ]
+    },
+    {
+      "id": "s7",
+      "title": "Refusal",
+      "illustration": "plate/s7",
+      "text": "Your blade clears its sheath and the fog screams in three voices at once. The Grey Assessor gathers itself into something almost solid, a tally-stave of hardened mist swinging for your head. There is no escape from the bridge; you must put it down or be put down.",
+      "event": "combat",
+      "encounter": {
+        "enemies": [ { "name": "Grey Assessor", "skill": 8, "stamina": 9, "portrait": "portrait/grey_assessor" } ],
+        "escapeTarget": "",
+        "gangRules": {}
+      },
+      "choices": [
+        { "id": "_onwin", "text": "The robe collapses into wet fog.", "goto": "s7a" },
+        { "id": "_ondeath", "text": "The cold closes over you.", "goto": "death_toll" }
+      ]
+    },
+    {
+      "id": "s7a",
+      "title": "Dispersed, Not Discharged",
+      "text": "The robe collapses into wet fog and the cold blows out like a snuffed candle. But as it disperses, the several-distanced voice laughs, unbothered: \"Dispersed. Not discharged. An unpaid account only grows, sin-eater. We will present it again — with interest.\"",
+      "onEnter": [ { "kind": "codeword", "key": "DEFIANT" }, { "kind": "var", "key": "tithe_debt", "op": "add", "value": 1 }, { "kind": "flag", "key": "toll1_paid", "value": true } ],
+      "choices": [
+        { "id": "cross", "text": "Cross into Harrowfell, blade still wet.", "goto": "s8" }
+      ]
+    },
+    {
+      "id": "s8",
+      "title": "The Drowned Gate",
+      "illustration": "plate/s8",
+      "text": "Harrowfell begins where the water ends: a huddle of stone houses on a rise, half of them flooded to the sills, all of them shuttered. A militia barricade blocks the gate. Grey ledger-script, faint as frost, crawls up the doorframes.\n\nA voice cracks from an arrow-slit in the moot-hall tower: \"Far enough! State your business, or the bog gets another body!\" A crossbow, badly held, wavers at your chest.",
+      "choices": [
+        { "id": "call_grissel", "text": "Call back that Mother Grissel Thorne sent for you.", "goto": "s9" },
+        { "id": "sneak", "text": "Say nothing; test whether you can slip past the barricade in the fog.", "goto": "s8a" },
+        { "id": "force", "text": "Draw your blade and force the gate.", "goto": "s8b" }
+      ]
+    },
+    {
+      "id": "s8a",
+      "title": "Into the Fog",
+      "text": "You gauge the gaps in the overturned carts, the wandering muzzle of the crossbow, the drifting fog. Test your Skill.",
+      "event": "skill_test",
+      "test_stat": "skill",
+      "test_prompt": "Slip past the barricade",
+      "choices": [
+        { "id": "_onsuccess", "text": "Over the carts and into the eaves before the bolt thuds home.", "goto": "s9" },
+        { "id": "_onfailure", "text": "The bolt catches you.", "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -2 } ], "goto": "s8b" }
+      ]
+    },
+    {
+      "id": "s8b",
+      "title": "The Serjeant",
+      "text": "The gate is not the enemy you want. A haggard serjeant steps out, crossbow spent, sword shaking — this is Cael Dunmore — and behind him three civilians cower. Forcing this costs you an ally you will need.",
+      "onEnter": [ { "kind": "flag", "key": "caelFirstMet_hostile", "value": true } ],
+      "choices": [
+        { "id": "stand_down", "text": "Lower your blade and step inside.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s9",
+      "title": "The Square",
+      "illustration": "plate/s9",
+      "text": "Inside the barricade, Harrowfell holds its breath. A dozen souls, no more. The fever-house lantern burns in a low stone building to your right, Mother Grissel's shadow moving behind the oilcloth. The moot-hall tower ahead is where Serjeant Cael has walled himself in. In the flooded market to your left, a single stall still burns bright and mercantile against the gloom — Ferrant Coinwright, doing business at the end of the world.\n\nEverything you need to end this is somewhere in this square. Spend your time here well; the Verge is not patient.",
+      "choices": [
+        { "id": "to_grissel", "text": "Go to Mother Grissel's fever-house.", "goto": "s10" },
+        { "id": "to_moot", "text": "Climb to the moot-hall and speak with Serjeant Cael.", "goto": "s_moot" },
+        { "id": "to_ferrant", "text": "Cross to Ferrant Coinwright's stall.", "goto": "s11" },
+        { "id": "to_odo", "text": "Descend to the Cathedra ante-room, where a lamp still burns.", "goto": "s_odo" },
+        { "id": "descend", "text": "You have gathered what you can. Descend toward the Cathedra.", "conditions": [ { "kind": "var", "key": "storylets", "cmp": ">=", "value": 1 } ], "goto": "s_descent" }
+      ]
+    },
+    {
+      "id": "s10",
+      "title": "Mother Grissel's Fever-House",
+      "illustration": "plate/s10",
+      "text": "The room is close with tallow, thyme, and the sweet-rot undertone of the Grey Tithe. Three cots, two occupied, one covered. Mother Grissel does not look up from the poultice she is grinding.\n\n\"So he sent a sin-eater.\" She says the word the way you'd name a bad debt. \"You want to know what's killing my town. I'll tell you what I can afford to. The rest'll cost you — not gold. Trust. Come back when you've shown me you won't just spend us like he does.\"",
+      "onEnter": [ { "kind": "flag", "key": "metGrissel", "value": true }, { "kind": "var", "key": "storylets", "op": "add", "value": 1 } ],
+      "choices": [
+        { "id": "ask_reckoner", "text": "Ask about the Reckoner.", "goto": "s10a" },
+        { "id": "offer_provision", "text": "Ask what she needs; offer a Provision to the sick.", "conditions": [ { "kind": "resource", "key": "provisions", "cmp": ">=", "value": 1 } ], "effects": [ { "kind": "resource", "key": "provisions", "op": "add", "value": -1 }, { "kind": "flag", "key": "showedMercy", "value": true } ], "goto": "s10b" },
+        { "id": "confess", "text": "Ask her, gently, what it is she cannot forgive herself.", "conditions": [ { "kind": "flag", "key": "showedMercy", "value": true } ], "effects": [ { "kind": "codeword", "key": "RESTITUTION" } ], "goto": "s10c" },
+        { "id": "leave", "text": "Leave; return to the square.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s10a",
+      "title": "Ambrose Vael",
+      "text": "\"Ambrose Vael. High Ledgerkeeper, once. Good man, once.\" Her grinding stops. \"His girl died. He couldn't sign the account closed. So he opened it back up — and now he's opening all of them.\" She will say no more today.",
+      "choices": [
+        { "id": "back", "text": "Return to Grissel.", "goto": "s10" }
+      ]
+    },
+    {
+      "id": "s10b",
+      "title": "One Notch",
+      "text": "She watches you feed the dying stranger and something in her face unclenches, one notch. \"...Huh. Maybe you're not just his errand-boy.\"",
+      "choices": [
+        { "id": "back", "text": "Return to Grissel.", "goto": "s10" }
+      ]
+    },
+    {
+      "id": "s10c",
+      "title": "The Confession",
+      "text": "Grissel is quiet a long time. \"I was Isolde's nursemaid. I gave Ambrose the true-name rite that let him break the law. I started this.\" She presses something into your hand that is not a thing at all — a name, the girl's true name, the one the ledger cannot hold once it is forgiven.\n\n\"Her name is not Isolde. That is what they called her. Her true name — the one that closes the account — is RESTITUTION. Speak it, and let the debt go unpaid.\"",
+      "choices": [
+        { "id": "back", "text": "Return to the square, changed.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s_moot",
+      "title": "The Moot-Hall Stair",
+      "text": "Serjeant Cael Dunmore holds the stair with three terrified townsfolk at his back. \"Hold the line — what's left of it,\" he barks, to no one. His hands are shaking. He ran once, you can see it on him, and the shame is rotting him faster than the Tithe. If someone could steady his nerve, he might hold this stair when it matters.",
+      "onEnter": [ { "kind": "var", "key": "storylets", "op": "add", "value": 1 } ],
+      "choices": [
+        { "id": "steady", "text": "Steady the serjeant — meet his eye and give him a reason to stand. (Test your Skill.)", "goto": "s_moot_test" },
+        { "id": "leave", "text": "Leave him to it; return to the square.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s_moot_test",
+      "title": "A Reason to Stand",
+      "text": "You take the measure of the man and find the words. Test your Skill.",
+      "event": "skill_test",
+      "test_stat": "skill",
+      "test_prompt": "Steady the serjeant",
+      "choices": [
+        { "id": "_onsuccess", "text": "Something straightens in him.", "effects": [ { "kind": "flag", "key": "caelHolds", "value": true } ], "goto": "s_moot2" },
+        { "id": "_onfailure", "text": "He nods, but his eyes are still gone.", "goto": "s_moot2" }
+      ]
+    },
+    {
+      "id": "s_moot2",
+      "title": "The Line",
+      "text": "\"Go,\" Cael says. \"Do what a sin-eater does. We'll hold what we can.\"",
+      "choices": [
+        { "id": "back", "text": "Return to the square.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s11",
+      "title": "Ferrant Coinwright's Stall",
+      "illustration": "plate/s11",
+      "text": "Lantern-light, a velvet cloth over a plank, and on it: rope, torches, dried fish, a bottle marked with a physician's cross, and — wrapped in oilcloth like it's ashamed of itself — a sword with a saint's name etched down the fuller.\n\n\"A customer! Gods bless the apocalypse, it's marvelous for margins.\" Ferrant spreads his hands. \"Everything's for sale, friend. What'll it be — full belly, dry rope, or the only blade in the Verge that'll bite the Reckoner?\"",
+      "onEnter": [ { "kind": "var", "key": "storylets", "op": "add", "value": 1 } ],
+      "choices": [
+        { "id": "buy_blade", "text": "Buy Saint Vexcel's blade (8 Gold) — it wounds the Reckoner.", "conditions": [ { "kind": "var", "key": "gold", "cmp": ">=", "value": 8 } ], "effects": [ { "kind": "var", "key": "gold", "op": "add", "value": -8 }, { "kind": "codeword", "key": "blessedWeapon" }, { "kind": "item", "key": "saint_vexcels_blade", "op": "grant", "value": 1 } ], "goto": "s11" },
+        { "id": "buy_provisions", "text": "Buy Provisions x3 (3 Gold).", "conditions": [ { "kind": "var", "key": "gold", "cmp": ">=", "value": 3 } ], "effects": [ { "kind": "var", "key": "gold", "op": "add", "value": -3 }, { "kind": "resource", "key": "provisions", "op": "add", "value": 3 } ], "goto": "s11" },
+        { "id": "buy_seal_info", "text": "Buy the location of the Quittance Seal (4 Gold).", "conditions": [ { "kind": "var", "key": "gold", "cmp": ">=", "value": 4 }, { "kind": "not", "of": { "kind": "item", "key": "quittance_seal" } } ], "effects": [ { "kind": "var", "key": "gold", "op": "add", "value": -4 }, { "kind": "item", "key": "quittance_seal", "op": "grant", "value": 1 } ], "goto": "s11" },
+        { "id": "rob", "text": "Try to rob him.", "goto": "s11a" },
+        { "id": "leave", "text": "Leave; return to the square.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s11a",
+      "title": "Theft, Priced in Blood",
+      "text": "Ferrant's smile doesn't move, but a second, uglier man steps out of the shadow behind the stall with a hook-knife. \"Now, now. I did say everything's for sale. Theft, though — theft I price in blood.\"",
+      "event": "combat",
+      "encounter": {
+        "enemies": [ { "name": "Cutthroat", "skill": 6, "stamina": 6, "portrait": "portrait/cutthroat" } ],
+        "escapeTarget": "s9",
+        "gangRules": {}
+      },
+      "choices": [
+        { "id": "_onwin", "text": "The cutthroat folds over his own knife.", "effects": [ { "kind": "flag", "key": "ferrantHostile", "value": true } ], "goto": "s9" },
+        { "id": "_onescape", "text": "You break away into the fog.", "goto": "s9" },
+        { "id": "_ondeath", "text": "The hook finds your throat.", "goto": "death_toll" }
+      ]
+    },
+    {
+      "id": "s_odo",
+      "title": "Brother Odo in the Archive",
+      "text": "A half-mad acolyte crouches among rotting account-books, gnawing the corner of one. Brother Odo Wick has hidden here a decade, reading. He looks up, singsong and allusive.\n\n\"What is owed at the first gate? Not gold. Not blood. A name you'd keep.\" He giggles. \"The Seal closes what is forgiven. Would you like to know where it lies, kind one? Ask gently. Everyone else took.\"",
+      "onEnter": [ { "kind": "var", "key": "storylets", "op": "add", "value": 1 } ],
+      "choices": [
+        { "id": "ask_gently", "text": "Ask him gently for the Quittance Seal.", "conditions": [ { "kind": "not", "of": { "kind": "item", "key": "quittance_seal" } } ], "effects": [ { "kind": "item", "key": "quittance_seal", "op": "grant", "value": 1 } ], "goto": "s_odo2" },
+        { "id": "recall_omen", "text": "Recall the omen carved on the shrine, and finish his riddle for him.", "conditions": [ { "kind": "codeword", "key": "OMEN" } ], "goto": "s_odo2" },
+        { "id": "leave", "text": "Leave the old man to his reading.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s_odo2",
+      "title": "Paid in Full",
+      "text": "Odo presses a cold brass stamp into your palm — a Ledgerkeeper's \"paid in full\" seal. \"Only closes an account,\" he warns, \"when the one who stamps it forgives the debt. A kill won't do. You have to mean it.\"",
+      "choices": [
+        { "id": "back", "text": "Return to the square.", "goto": "s9" }
+      ]
+    },
+    {
+      "id": "s_descent",
+      "title": "The Descent",
+      "illustration": "plate/descent",
+      "text": "You go down where Harrowfell drowns — stair after stair into the Cathedra of Accounts, water to your knees, the ledger-script whispering numbers in the dark. Behind you the moot-hall either holds or falls; you cannot turn back to see. The town's fate is set now by what you gathered above.\n\nAhead, a small pale shape waits at the foot of the stair.",
+      "choices": [
+        { "id": "go_on", "text": "Go on, toward the pale shape.", "goto": "s_isolde" }
+      ]
+    },
+    {
+      "id": "s_isolde",
+      "title": "Isolde, the Unpaid",
+      "illustration": "plate/isolde",
+      "text": "A girl of twelve in a decade-old funeral shift, grey ledger-script crawling over half her skin, too still, hovering-slack. When she speaks she switches mid-breath between a child and the flat recitation of an account.\n\n\"I want to go home — balance carried forward, seven souls, interest accruing — Papa, it's cold.\"\n\nShe is the door the whole true path exists to open.",
+      "choices": [
+        { "id": "free_her", "text": "Speak her true name and seal her account paid.", "conditions": [ { "kind": "all", "of": [ { "kind": "codeword", "key": "RESTITUTION" }, { "kind": "item", "key": "quittance_seal" } ] } ], "effects": [ { "kind": "flag", "key": "isoldeFreed", "value": true } ], "goto": "s_reckoner" },
+        { "id": "past_her", "text": "You have not the means to free her. Press on toward her father.", "goto": "s_reckoner" }
+      ]
+    },
+    {
+      "id": "s_reckoner",
+      "title": "The Reckoner",
+      "illustration": "plate/reckoner",
+      "text": "Ambrose Vael stands at the great ledger, stooped under a robe hung with account-tags and a brass balance. He does not raise his voice. He never does.\n\n\"You are, I'm afraid, a receivable,\" he says, and apologises as he reaches for you. \"I only want to balance her account. Surely you, of all trades, understand a debt.\"",
+      "choices": [
+        { "id": "release", "text": "Show him Isolde is free, and let the debt go unpaid.", "conditions": [ { "kind": "all", "of": [ { "kind": "codeword", "key": "RESTITUTION" }, { "kind": "item", "key": "quittance_seal" } ] } ], "goto": "end_quittance" },
+        { "id": "fight", "text": "Draw the saint's blade and cut the ledger's servant down.", "conditions": [ { "kind": "codeword", "key": "blessedWeapon" } ], "goto": "s_reckoner_fight" },
+        { "id": "despair", "text": "You have neither name nor blade. Refuse him anyway.", "goto": "end_carried" }
+      ]
+    },
+    {
+      "id": "s_reckoner_fight",
+      "title": "Cold Steel in the Cathedra",
+      "text": "Saint Vexcel's blade drinks the ledger-light. The Reckoner sighs, and levies his old accounts against you, and the fight is joined.",
+      "event": "combat",
+      "encounter": {
+        "enemies": [ { "name": "The Reckoner", "skill": 12, "stamina": 20, "portrait": "portrait/reckoner" } ],
+        "escapeTarget": "",
+        "gangRules": {}
+      },
+      "choices": [
+        { "id": "_onwin", "text": "He folds, an old man again at the last.", "goto": "end_hollow" },
+        { "id": "_ondeath", "text": "The last account is called in.", "goto": "death_reckoner" }
+      ]
+    },
+    {
+      "id": "s12",
+      "title": "The Reeds",
+      "illustration": "plate/s12",
+      "text": "The reeds are firmer for six steps. On the seventh, the ground is not ground.\n\nThe bog takes your leg to the knee, then the thigh, with the patient grip of something that has been waiting to be owed a body. As you go down you see them — pale shapes standing in the water all around, robed and faceless, and every one of them holds a little book, and in every book a hand is writing your name.\n\n\"Account settled,\" says the fog.",
+      "ending": { "id": "death_reeds", "kind": "death", "label": "Claimed by the Tithe-taken", "cause": "Claimed by the Tithe-taken in the fen", "illustration": "plate/death" }
+    },
+    {
+      "id": "death_toll",
+      "title": "Your Account Is Settled",
+      "text": "The cold rolls over you like the closing of a great book. The Grey Assessor marks your account paid, and you are added, in a cramped columnar hand, to the ledger of the drowned.",
+      "ending": { "id": "death_toll", "kind": "death", "label": "The Grey Assessor collects", "cause": "STAMINA 0 — collected at the toll", "illustration": "plate/death" }
+    },
+    {
+      "id": "death_reckoner",
+      "title": "Carried to the Ledger",
+      "text": "The saint's blade slips in your failing grip. The Reckoner catches you as you fall, almost tenderly, and enters you into the account with an apology on his lips.",
+      "ending": { "id": "death_reckoner", "kind": "death", "label": "Balanced by the Reckoner", "cause": "STAMINA 0 — before the great ledger", "illustration": "plate/death" }
+    },
+    {
+      "id": "end_carried",
+      "title": "Carried Forward",
+      "text": "You have neither the name that frees her nor the blade that bites him. The Reckoner does not gloat. He simply enters you into the account, and the ledger carries you forward, and the Grey Tithe spreads out from Harrowfell into a kingdom that has already forgotten the Verge.",
+      "ending": { "id": "carried_forward", "kind": "death", "label": "CARRIED FORWARD", "cause": "Reached the finale without the true-path keys", "illustration": "plate/death" }
+    },
+    {
+      "id": "end_hollow",
+      "title": "The Hollow Victory",
+      "text": "The Reckoner dies as an old man dies — surprised, and grateful. But the ledger stays open. Isolde still wanders the drowned nave, and the Tithe only slows; it does not stop. You won the fight. The Verge lost the war.",
+      "ending": { "id": "hollow_victory", "kind": "victory", "variant": "pyrrhic", "label": "THE HOLLOW VICTORY", "illustration": "plate/victory" }
+    },
+    {
+      "id": "end_quittance",
+      "title": "Quittance",
+      "text": "You name her truly — RESTITUTION — and press the Quittance Seal to her account, and forgive the debt rather than pay it. The Grey Ledger cannot hold what is forgiven. Isolde lets go a breath ten years held, and rests. The Reckoner's reason to exist dissolves; he ages a century in a heartbeat, and is only a father again, weeping, and then gone.\n\nDawn comes over the Verge. The Tithe lifts. Harrowfell wakes.",
+      "ending": { "id": "quittance", "kind": "victory", "variant": "true", "label": "QUITTANCE", "illustration": "plate/victory" }
+    }
+  ]
+}

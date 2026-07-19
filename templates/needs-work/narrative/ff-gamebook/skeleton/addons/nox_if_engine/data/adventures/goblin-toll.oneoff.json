@@ -1,0 +1,13 @@
+{
+  "id": "goblin-toll-oneoff",
+  "name": "The Goblin Toll (one-off)",
+  "type": "oneoff",
+  "meta": {
+    "author": "NoxDev sample",
+    "summary": "The one-off front door: a single module, a fixed seed, one character in the slot, played straight to an ending. No campaign, no long-term store."
+  },
+  "ruleset": "ff-2d6",
+  "seed": 20260715,
+  "moduleRef": "res://addons/nox_if_engine/data/modules/goblin-toll.module.json",
+  "characterRef": "res://addons/nox_if_engine/data/characters/sir-alden.character.json"
+}

@@ -1,0 +1,86 @@
+{
+  "id": "ff-2d6",
+  "name": "Fighting Fantasy (2d6 roll-under)",
+  "meta": {
+    "family": "roll-under",
+    "license": "genericised — original NoxDev reimplementation of the classic 2d6 roll-under solo-gamebook mechanic; no third-party text or trademarks.",
+    "degreesOfSuccess": ["success", "failure"],
+    "advancement": "Attributes are restored toward their Initial values (never above); LUCK is spent by Testing your Luck.",
+    "notes": "Proven builtin for P0. Reuses the ff-gamebook dice mechanic (dice.gd: 2d6 <= stat, double-1 always succeeds, double-6 always fails) expressed here as pure ruleset data."
+  },
+  "dice": { "default": "2d6" },
+  "attributes": [
+    { "key": "SKILL",   "label": "Skill",   "gen": "1d6+6",  "min": 1, "max": 12 },
+    { "key": "STAMINA", "label": "Stamina", "gen": "2d6+12", "min": 0, "max": 24 },
+    { "key": "LUCK",    "label": "Luck",    "gen": "1d6+6",  "min": 0, "max": 12 }
+  ],
+  "resources": [
+    { "key": "STAMINA",    "label": "Stamina",    "from": "STAMINA", "min": 0, "trackMax": true },
+    { "key": "provisions", "label": "Provisions", "default": 10,     "min": 0 }
+  ],
+  "sheetTemplate": {
+    "attributes": ["SKILL", "STAMINA", "LUCK"],
+    "resources": ["STAMINA", "provisions"],
+    "inventory": true
+  },
+  "resolutionRules": [
+    {
+      "id": "test",
+      "label": "Test an attribute",
+      "dice": "2d6",
+      "operands": [
+        { "type": "attributeArg", "ref": "attr", "role": "target" }
+      ],
+      "compare": "roll-under",
+      "crit": { "mode": "doubles", "lowValue": 1, "lowResult": "success", "highValue": 6, "highResult": "fail" },
+      "bands": [
+        { "id": "success", "when": "success",     "label": "Success" },
+        { "id": "failure", "when": "fail",         "label": "Failure" }
+      ]
+    },
+    {
+      "id": "test-luck",
+      "label": "Test your Luck",
+      "dice": "2d6",
+      "operands": [
+        { "type": "attribute", "ref": "LUCK", "role": "target" }
+      ],
+      "compare": "roll-under",
+      "crit": { "mode": "doubles", "lowValue": 1, "lowResult": "success", "highValue": 6, "highResult": "fail" },
+      "bands": [
+        { "id": "success", "when": "success", "label": "Lucky" },
+        { "id": "failure", "when": "fail",    "label": "Unlucky" }
+      ],
+      "postEffects": [
+        { "kind": "attr", "key": "LUCK", "op": "add", "value": -1 }
+      ]
+    }
+  ],
+  "portability": {
+    "attributeMap": {
+      "prowess": "SKILL",
+      "agility": "SKILL",
+      "might": "STAMINA",
+      "wits": "SKILL",
+      "presence": "SKILL",
+      "resolve": "LUCK"
+    },
+    "outcomeMap": {
+      "success": "success",
+      "failure": "failure"
+    },
+    "semantics": {
+      "skill-test": {
+        "rule": "test",
+        "attrArg": "attr",
+        "difficulty": {
+          "mode": "targetDelta",
+          "ladder": {
+            "trivial": 4, "easy": 2, "standard": 0,
+            "hard": -2, "formidable": -4, "heroic": -6
+          }
+        }
+      }
+    }
+  }
+}

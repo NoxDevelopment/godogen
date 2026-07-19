@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="NoxShellConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://addons/nox_ui/nox_shell_config.gd" id="1"]
+[resource]
+script = ExtResource("1")
+game_title = "THE GREY TITHE"
+subtitle = "An illustrated Fighting-Fantasy gamebook  ·  a NoxDev production"
+new_game_scene = "res://scripts/screens/roll_up.tscn"
+show_continue = false
+backdrop = "res://assets/plates/placeholder/cover.png"
+credits = "THE GREY TITHE — a NoxDev Studio production.
+
+Original world, text & rules: NoxDev (no Fighting Fantasy IP).
+Engine: nox_if_engine (ff-2d6 ruleset)  ·  Shell: nox_ui.
+
+REUSED ART (bound by stable ID via the Studio asset manifest):
+  Icons — 496 RPG Icons (OpenGameArt, CC0)
+  Portraits & monster avatars — RPG Character Portraits / Monster Avatar Icons
+  UI frames — Kenney Fantasy UI Borders (CC0)
+  Fonts — Cinzel & UncialAntiqua (OFL), MedievalSharp (OFL)
+Section illustration plates: labelled veritas-gamebook placeholders,
+  drop-in-replaceable from the Studio (Phase 5 art generation)."
