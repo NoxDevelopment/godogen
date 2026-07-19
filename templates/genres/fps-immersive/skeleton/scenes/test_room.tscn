@@ -1,9 +1,9 @@
 [gd_scene load_steps=13 format=3 uid="uid://fpstestroom1"]
 
 [ext_resource type="Script" path="res://scripts/test_room.gd" id="1_tr"]
-[ext_resource type="PackedScene" uid="uid://kicjwmh02uwf" path="res://addons/cogito/PackedScenes/cogito_player.tscn" id="2_pl"]
-[ext_resource type="PackedScene" uid="uid://bdyukj85qkut0" path="res://addons/cogito/PackedScenes/door.tscn" id="3_dr"]
-[ext_resource type="PackedScene" uid="uid://0fj068bj0csc" path="res://addons/cogito/PackedScenes/Pickups/pickup_health_potion.tscn" id="4_hp"]
+[ext_resource type="PackedScene" path="res://COGITO/PrefabScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" path="res://COGITO/PrefabScenes/door.tscn" id="3_dr"]
+[ext_resource type="PackedScene" path="res://COGITO/PrefabScenes/Pickups/pickup_health_potion.tscn" id="4_hp"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.25098, 0.34902, 0.501961, 1)

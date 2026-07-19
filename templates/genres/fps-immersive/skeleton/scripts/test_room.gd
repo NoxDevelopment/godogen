@@ -1,4 +1,4 @@
-extends "res://addons/cogito/SceneManagement/cogito_scene.gd"
+extends "res://COGITO/SceneManagement/cogito_scene.gd"
 ## res://scripts/test_room.gd
 ## COGITO scene root for the test room: inherits the addon's scene contract
 ## (registers itself with CogitoSceneManager, connector spawn points, optional
