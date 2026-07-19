@@ -1,0 +1,3 @@
+Fonts (both SIL Open Font License 1.1 — free to use, embed, redistribute):
+- Montserrat-Bold.ttf — Montserrat (Julieta Ulanovsky), OFL 1.1
+- fantasy_serif.ttf — Cinzel (Natanael Gama), OFL 1.1

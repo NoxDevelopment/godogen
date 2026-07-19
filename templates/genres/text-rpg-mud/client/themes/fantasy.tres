@@ -1,0 +1,105 @@
+[gd_resource type="Theme" load_steps=10 format=3]
+
+[ext_resource type="FontFile" path="res://fonts/Montserrat-Bold.ttf" id="body"]
+[ext_resource type="FontFile" path="res://fonts/fantasy_serif.ttf" id="disp"]
+
+[sub_resource type="StyleBoxFlat" id="panel"]
+bg_color = Color(0.141, 0.106, 0.063, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.541, 0.416, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="btn_n"]
+bg_color = Color(0.18, 0.14, 0.09, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.541, 0.416, 0.18, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="btn_h"]
+bg_color = Color(0.29, 0.22, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.83, 0.69, 0.32, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="le"]
+bg_color = Color(0.09, 0.07, 0.04, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.541, 0.416, 0.18, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="pb_bg"]
+bg_color = Color(0.07, 0.055, 0.035, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="pb_fill"]
+bg_color = Color(0.66, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[resource]
+default_font = ExtResource("body")
+default_font_size = 15
+Panel/styles/panel = SubResource("panel")
+PanelContainer/styles/panel = SubResource("panel")
+Label/colors/font_color = Color(0.902, 0.863, 0.769, 1)
+Label/fonts/font = ExtResource("body")
+Button/colors/font_color = Color(0.83, 0.69, 0.32, 1)
+Button/colors/font_hover_color = Color(1, 0.9, 0.55, 1)
+Button/styles/normal = SubResource("btn_n")
+Button/styles/hover = SubResource("btn_h")
+Button/styles/pressed = SubResource("btn_h")
+Button/styles/focus = SubResource("btn_h")
+LineEdit/colors/font_color = Color(0.902, 0.863, 0.769, 1)
+LineEdit/colors/caret_color = Color(0.83, 0.69, 0.32, 1)
+LineEdit/styles/normal = SubResource("le")
+LineEdit/styles/focus = SubResource("le")
+ProgressBar/colors/font_color = Color(0.95, 0.92, 0.85, 1)
+ProgressBar/styles/background = SubResource("pb_bg")
+ProgressBar/styles/fill = SubResource("pb_fill")
+RichTextLabel/colors/default_color = Color(0.847, 0.82, 0.76, 1)
+RichTextLabel/fonts/normal_font = ExtResource("body")
