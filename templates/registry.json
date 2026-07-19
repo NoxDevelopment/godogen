@@ -543,10 +543,10 @@
     },
     {
       "id": "arcade-racing",
-      "name": "Arcade Racing (checkpoint laps)",
+      "name": "Arcade Racing (Kenney Starter Kit Racing)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "Arcade racing base on Godot-Easy-Vehicle-Physics (raycast vehicle: engine/torque curve, gearbox, per-wheel suspension and slip, arcade handling preset) plus first-party race logic: the addon's arcade car + VehicleController wired to the NoxDev input actions (throttle/brake/steer/handbrake/shift), a chase camera, a flat blockout track with three ordered checkpoint gates and a start/finish line, lap counting (timer armed on first line crossing, lap completed once all gates passed in order), lap/best-lap timing recorded into GameManager flags, and a HUD (lap, time, gate, speed/gear). Kit note (pinned 2026-07-11): upstream has no release tags — pinned to main @ c392257f (Aug 2025, latest); script-only addon, no editor plugin. Standard NoxDev ABI (Master/Music/SFX buses, game_manager/persistent groups, save_data() contract, pause action).",
+      "description": "Low-poly arcade racing. ADOPTED BASE: the official Kenney Starter Kit Racing (github.com/KenneyNL/Starter-Kit-Racing, MIT code + CC0 assets), replacing the old greybox self-driving skeleton. Real 3D car on a barriered track with pines, finish arch, road markings and a GridMap track builder with swappable CC0 meshes + audio. Godot 4.6. Screenshot-verified rendering the real racer in-factory. License in skeleton/LICENSE.md.",
       "status": "validated",
       "skeleton": "genres/arcade-racing/skeleton",
       "doc": "genres/arcade-racing/TEMPLATE.md",
@@ -597,7 +597,12 @@
         "Checkpoint gate arch model or banner (replaces translucent blockout gates)",
         "Skybox / horizon panorama (360°, outdoor daytime)",
         "Engine loop WAV (pitch-shiftable single-RPM sample) + tire screech + gate whoosh SFX"
-      ]
+      ],
+      "adoptedBase": {
+        "source": "https://github.com/KenneyNL/Starter-Kit-Racing",
+        "license": "MIT (code) + CC0 (assets)",
+        "note": "Kenney official kit; screenshot-verified in-factory."
+      }
     },
     {
       "id": "gamebook",
@@ -1645,10 +1650,10 @@
     },
     {
       "id": "match-three",
-      "name": "Match Three (grid puzzle / minigame, 2D)",
+      "name": "Match-Three (Kenney Starter Kit Match-3)",
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
-      "description": "A match-3 grid puzzle (Bejeweled/Candy-Crush lineage) — the classic dating-sim/gacha minigame — with the whole BOARD engine in a GameManager autoload as pure, seedable, headless-testable logic: an 8x8 grid of gem types generated with NO pre-made matches and a guaranteed legal move; try_swap validates an adjacent swap (only a swap that makes a line of 3+ commits, else it reverts), then resolves the full cascade — clear matched runs (score = gems x 10 x the chain step, so deeper cascades pay more), gravity pulls gems down, new gems refill from the top, repeat until stable; find_matches scans H+V runs; has_legal_move probes every adjacent swap and auto-reshuffles a dead board. match3.gd renders the gem grid in code, click a gem then an adjacent gem to swap, with a score/moves HUD + chain banner. NoxDev ABI: buses, game_manager+persistent groups with save_data/load_data (the exact board + score persist), pause + restart input, scalable_text. Drops in as a standalone game or a minigame inside a larger title.",
+      "description": "Bejeweled-style match-3. ADOPTED BASE: the official Kenney Starter Kit Match-3 (github.com/KenneyNL/Starter-Kit-Match-3, MIT code + CC0 assets), replacing the code-drawn gem primitives. Real swap/match/cascade/score board with CC0 gem sprites, particles and SFX. Godot 4.6. Screenshot-verified rendering the real board in-factory. CC0 assets per Kenney.",
       "status": "validated",
       "skeleton": "genres/match-three/skeleton",
       "doc": "genres/match-three/TEMPLATE.md",
@@ -1679,7 +1684,12 @@
         "Board frame + background via zit-txt2img",
         "Score / combo / chain HUD chrome via qwen-txt2img",
         "Match / cascade / reshuffle SFX + a stinger for big chains"
-      ]
+      ],
+      "adoptedBase": {
+        "source": "https://github.com/KenneyNL/Starter-Kit-Match-3",
+        "license": "MIT (code) + CC0 (assets)",
+        "note": "Kenney official kit; screenshot-verified in-factory."
+      }
     },
     {
       "id": "gacha-summon",
