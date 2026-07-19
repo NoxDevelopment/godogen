@@ -493,11 +493,11 @@ WORLD_HOOKS = {
     },
     "nodes": {
         # room db_key -> node id
-        "the old mine":      "ironvein",
-        "the wild trail":    "beast_trail",
-        "the herb garden":   "herb_grove",
-        "the forest spring": "clear_spring",
-        "the crystal cave":  "crystal_hollow",
+        "The Ratwarren, Sewer Grate": "ironvein",
+        "Mistwood, Tangled Path": "beast_trail",
+        "Mistwood, Forest Eaves": "herb_grove",
+        "The King's Road, Old Bridge": "clear_spring",
+        "The Ratwarren, Fungal Cavern": "crystal_hollow",
     },
 }
 
@@ -916,7 +916,7 @@ class CmdLearn(Command):
 
     Usage:
       learn                 (list trades the trainer here teaches)
-      learn <trade>
+      apprentice <trade>
 
     You must be in the same room as a trainer who teaches the trade — the
     weaponsmith teaches smithing, the tailor teaches tailoring, and so on. Once
@@ -924,7 +924,7 @@ class CmdLearn(Command):
     up from Novice toward Master.
     """
 
-    key = "learn"
+    key = "apprentice"
     locks = "cmd:all()"
     help_category = "Crafting"
 
@@ -948,7 +948,7 @@ class CmdLearn(Command):
             for t, npc in present.items():
                 status = " |g(already learned)|n" if has_learned(caller, t) else ""
                 lines.append(f"  {npc.key} teaches |c{TRADES[t]['name']}|n{status}")
-            lines.append("Type |wlearn <trade>|n to apprentice yourself.")
+            lines.append("Type |wapprentice <trade>|n to apprentice yourself.")
             caller.msg("\n".join(lines))
             return
 
@@ -1004,7 +1004,7 @@ class CmdTrades(Command):
         trades = caller.db.trades or {}
         if not trades:
             caller.msg("You have not apprenticed to any trade yet. Find a trainer "
-                       "and use |wlearn <trade>|n to begin.")
+                       "and use |wapprentice <trade>|n to begin.")
         else:
             table = EvTable("Trade", "Tier", "Rank", "XP -> Next", "Prestige",
                             border="cells")

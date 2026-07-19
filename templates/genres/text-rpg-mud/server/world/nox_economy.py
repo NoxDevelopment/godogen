@@ -25,10 +25,10 @@ so it maps 1:1 onto a future Ruleset builder:
 Commands (TraderCmdSet): WARES, APPRAISE, BUY, SELL, CONTRACT.
 
 WORLD / LORE (original, GS4-structured — coherent with Agent A's world):
-Two trading settlements on opposite sides of the Dragonspur range drive the
+Two trading settlements on opposite sides of the Ossaneth highlands drive the
 arbitrage loop:
 
-  * EMBERHOLD — an inland forge-and-mine town under the Dragonspur peaks. Chokes
+  * EMBERHOLD — an inland forge-and-mine town under the Ossaneth peaks. Chokes
     on its own output: iron ore, silver ingots and timber pile up in SURPLUS and
     sell cheap, while grain, salt, spice and pearl are NEARLY OUT and fetch a
     premium. Patron: Bruknar, the Anvil-Father (smithing / stone).

@@ -46,6 +46,12 @@ def at_server_start():
     from world.nox_world import build_world, STARTER_TOWN_HUB
     build_world()
 
+    # Remove legacy placeholder rooms superseded by build_world (safe: Aurethia
+    # uses fully-qualified keys like "Harrowgate Town Square, Central").
+    for _k in ("Town Square", "North Road", "Market Row"):
+        for _r in ObjectDB.objects.filter(db_key=_k):
+            _r.delete()
+
     # 2) World clock (timer only arms when created here, in the server process).
     ScriptDB.objects.filter(db_key="world_clock").delete()
     create_script(WorldClock)
