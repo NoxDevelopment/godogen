@@ -4,9 +4,9 @@ Human index of every game template, grouped by **readiness → genre**.
 Machine source of truth is [`registry.json`](registry.json); paths there are authoritative.
 Reorganized 2026-07-19 from a flat `genres/` tree. Readiness is Jesus's sign-off gate.
 
-**78 templates** · ready **4** · needs-work **74**
+**78 templates** · ready **3** · needs-work **75**
 
-## ✅ Ready (Jesus-verified look/feel + systems at/near parity) — 4
+## ✅ Ready (Jesus-verified look/feel + systems at/near parity) — 3
 
 ### action (1)
 
@@ -21,13 +21,7 @@ Reorganized 2026-07-19 from a flat `genres/` tree. Readiness is Jesus's sign-off
 | `cosmic-horror-coop` | Cosmic-Horror Co-op (investigation + doom, 2D board game) | godot | validated | `ready/board/cosmic-horror-coop/` |
 | `euro-engine-builder` | Euro Engine-Builder (competitive resource→production→VP engine, 2D) | godot | validated | `ready/board/euro-engine-builder/` |
 
-### mud (1)
-
-| id | name | engine | status | path |
-|----|------|--------|--------|------|
-| `text-rpg-mud` | (text-rpg-mud) | evennia+godot | deep-systems-live | `ready/mud/text-rpg-mud/` |
-
-## 🛠️ Needs-work (scaffold / gameplay-base short of full parity) — 74
+## 🛠️ Needs-work (scaffold / gameplay-base short of full parity) — 75
 
 ### action (11)
 
@@ -141,6 +135,12 @@ Reorganized 2026-07-19 from a flat `genres/` tree. Readiness is Jesus's sign-off
 | `noir-detective` | Noir Detective (investigation + deduction, 2D) | godot | validated | `needs-work/narrative/noir-detective/` |
 | `point-and-click` | Point-and-Click Adventure | godot | validated | `needs-work/narrative/point-and-click/` |
 | `visual-novel` | Visual Novel (with dice checks) | godot | validated | `needs-work/narrative/visual-novel/` |
+
+### mud (1)
+
+| id | name | engine | status | path |
+|----|------|--------|--------|------|
+| `text-rpg-mud` | (text-rpg-mud) | evennia+godot | deep-systems-live | `needs-work/mud/text-rpg-mud/` |
 
 ### multiplayer (2)
 
