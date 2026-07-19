@@ -4071,12 +4071,12 @@
       "id": "text-rpg-mud",
       "title": "Text MUD / MMORPG (living world)",
       "engine": "evennia+godot",
-      "status": "server-live",
-      "maturity": "living-world-foundation",
+      "status": "deep-systems-live",
+      "maturity": "living-world+trader+crafting+magic (verified)",
       "vetted": false,
       "reference": "GemStone IV (Simutronics)",
       "paritySpec": "docs/GEMSTONE4_PARITY_SPEC.md",
-      "note": "Evennia BSD server (Postgres) + planned Godot client. Live server + PROVEN living world (autonomous world-clock + wandering agent). NOT the old untracked SP stub. 89-item GS4 parity roadmap in the spec.",
+      "note": "Evennia(Postgres) live server + rich skinnable Godot client (5 themed skins) + Aurethia world (49 rooms: Harrowgate/Ravenholt/Mistwood/Ratwarren) + WORKING deep systems: trader economy (buy-low/sell-high, Trading levels w/o combat), crafting apprenticeship (apprentice/gather/craft), magic w/ 4 moons + societies. All live-verified via websocket play. GS4 parity spec = 188 items.",
       "todoForFullGame": "GS4-parity Godot client (tag protocol) + systems depth (professions/combat/spells) + full town+hunting-zones + townsfolk daily-routine agents"
     }
   ]
