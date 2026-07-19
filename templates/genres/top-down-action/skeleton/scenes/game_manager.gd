@@ -14,6 +14,10 @@ static func has_player()->bool:
 static func on_pickup_item(name:String):
 	if player:
 		player.inventory.append(name)
+	# Feed the full-game scoring layer (GameFlow autoload; present in every scene).
+	var gf = Engine.get_main_loop().root.get_node_or_null("GameFlow")
+	if gf:
+		gf.add_item()
 	if not level:
 		return
 	if name == "building_card":

@@ -455,7 +455,7 @@
       "engine": "godot",
       "engineVersion": "4.6.1-stable",
       "description": "Top-down action base, pure first-party (no vendored kit — build-cheap per the roadmap survey): CharacterBody2D player with 8-directional movement, mouse aim, hitscan raycast shot with tracer, dash with cooldown and health/respawn; three shootable practice targets; a NavigationAgent2D chaser enemy pathing across the arena's NavigationRegion2D with contact damage; arena with walls, HUD (HP + targets left), and the standard NoxDev ABI (Master/Music/SFX buses, player/game_manager/persistent groups, save_data() contract, topdown input action set).",
-      "status": "base",
+      "status": "full-game",
       "skeleton": "genres/top-down-action/skeleton",
       "doc": "genres/top-down-action/TEMPLATE.md",
       "vendoredAddons": [],
@@ -498,10 +498,30 @@
       "adoptedBase": {
         "source": "https://github.com/Nodragem/top-down-action-adventure-starter-kit",
         "license": "CC0",
-        "note": "GAMEPLAY BASE (loop + real art) — not yet a full game."
+        "note": "Nodragem Twin Shooter base (Beehave AI + Dialogic NPC + KayKit CC0 art), elevated to a full game."
       },
-      "maturity": "gameplay-base",
-      "todoForFullGame": "menus (Maaack shell) + start/end + multiple levels or generation + AI/NPCs + scoring/progression + save + editor where relevant"
+      "maturity": "full-game",
+      "fullGame": {
+        "titleMenu": true,
+        "options": "fullscreen + master volume",
+        "modes": [
+          "Arena run (3 escalating waves)",
+          "Story mode (narrative level w/ cutscene + NPC)"
+        ],
+        "ai": "Beehave behaviour-tree enemies",
+        "npc": "Dialogic dialogue/cutscenes",
+        "scoring": "kills*100 + pickups*50, live HUD",
+        "timer": true,
+        "winScreen": true,
+        "gameOver": true,
+        "save": "user://twinshooter_save.cfg (best score + best time via ConfigFile)",
+        "screenshots": [
+          "screenshots/01_title_menu.png",
+          "screenshots/02_arena_wave.png",
+          "screenshots/03_victory.png"
+        ],
+        "verifiedBy": "windowed screenshot capture of menu, arena+HUD, victory"
+      }
     },
     {
       "id": "iso-arpg",

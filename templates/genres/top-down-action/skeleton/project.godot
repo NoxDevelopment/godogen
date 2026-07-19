@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Twin Shooter Starting Kit"
 config/tags=PackedStringArray("starterkit")
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://ui/main_menu.tscn"
 config/features=PackedStringArray("4.6")
 config/icon="res://project_icon.png"
 
@@ -27,6 +27,7 @@ DebugOverlay="*res://tools/debugging/DebugOverlay.tscn"
 BeehaveGlobalMetrics="*uid://c3ktl6ontsdt7"
 BeehaveGlobalDebugger="*uid://bl3ma400hpvsh"
 Dialogic="*uid://34td1m823su1"
+GameFlow="*res://autoload/game_flow.gd"
 
 [dialogic]
 

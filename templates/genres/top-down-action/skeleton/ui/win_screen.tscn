@@ -1,0 +1,86 @@
+[gd_scene load_steps=2 format=3 uid="uid://cwin0twinshoot1"]
+
+[ext_resource type="Script" path="res://ui/win_screen.gd" id="1_win"]
+
+[node name="WinScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_win")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.08, 0.06, 1)
+
+[node name="CenterBox" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "VICTORY"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 80
+theme_override_colors/font_color = Color(0.55, 1, 0.55, 1)
+
+[node name="Sub" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "All waves cleared"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.7, 0.85, 0.7, 1)
+
+[node name="Score" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "SCORE  0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="Time" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "TIME  00:00.00"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+
+[node name="Best" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "BEST  0   ·   00:00.00"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.82, 0.35, 1)
+
+[node name="Spacer" type="Control" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+
+[node name="PlayAgain" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(300, 52)
+layout_mode = 2
+text = "PLAY AGAIN"
+
+[node name="Menu" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(300, 52)
+layout_mode = 2
+text = "MAIN MENU"
+
+[connection signal="pressed" from="CenterBox/VBox/PlayAgain" to="." method="_on_play_again_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Menu" to="." method="_on_menu_pressed"]

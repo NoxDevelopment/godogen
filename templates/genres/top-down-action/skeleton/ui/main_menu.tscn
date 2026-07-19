@@ -1,0 +1,152 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmenu0twinshoot1"]
+
+[ext_resource type="Script" path="res://ui/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.06, 0.09, 1)
+
+[node name="Accent" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 8.0
+grow_horizontal = 2
+color = Color(1, 0.72, 0.12, 1)
+
+[node name="CenterBox" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "TWIN  SHOOTER"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 72
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+
+[node name="Subtitle" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "Survive three waves of the lab's rogue droids"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+
+[node name="Best" type="Label" parent="CenterBox/VBox"]
+layout_mode = 2
+text = "No run recorded yet"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.82, 0.35, 1)
+
+[node name="Spacer" type="Control" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+
+[node name="NewGame" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+text = "NEW GAME  —  ARENA RUN"
+
+[node name="Story" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+text = "STORY MODE"
+
+[node name="Options" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+text = "OPTIONS"
+
+[node name="Quit" type="Button" parent="CenterBox/VBox"]
+custom_minimum_size = Vector2(320, 52)
+layout_mode = 2
+text = "QUIT"
+
+[node name="OptionsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -150.0
+offset_right = 220.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="OptionsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="Label" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "OPTIONS"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Fullscreen" type="CheckButton" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="VolLabel" type="Label" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "Master Volume"
+
+[node name="Volume" type="HSlider" parent="OptionsPanel/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="Spacer2" type="Control" parent="OptionsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Back" type="Button" parent="OptionsPanel/VBox"]
+layout_mode = 2
+text = "BACK"
+
+[connection signal="pressed" from="CenterBox/VBox/NewGame" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Story" to="." method="_on_story_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Options" to="." method="_on_options_pressed"]
+[connection signal="pressed" from="CenterBox/VBox/Quit" to="." method="_on_quit_pressed"]
+[connection signal="toggled" from="OptionsPanel/VBox/Fullscreen" to="." method="_on_fullscreen_toggled"]
+[connection signal="value_changed" from="OptionsPanel/VBox/Volume" to="." method="_on_volume_changed"]
+[connection signal="pressed" from="OptionsPanel/VBox/Back" to="." method="_on_back_pressed"]
