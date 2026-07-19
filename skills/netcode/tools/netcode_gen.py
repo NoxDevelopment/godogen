@@ -137,19 +137,26 @@ SESSION_STATE_PATCHES = [
         "\t\treturn await NetBridge.intercept_roll(\"luck\", true)  # nox_netcode\n"
         "\tvar ok: bool = await Dice.test_luck()",
     ),
-    # dm_push_passage — the no-op hook, now real (host-side, require_dm).
+    # dm_push_passage — route the DM's push through the host in MP; keep the local
+    # (single-player DM) behavior otherwise. Anchored on the current real hook.
     (
-        "func dm_push_passage(_passage_id: String) -> bool:\n"
-        "\treturn false",
         "func dm_push_passage(passage_id: String) -> bool:\n"
-        "\treturn NetBridge.dm_push_passage(passage_id)  # nox_netcode",
+        "\tadvance_passage(passage_id)\n"
+        "\treturn true",
+        "func dm_push_passage(passage_id: String) -> bool:\n"
+        "\tif Net.active and not has_meta(\"_net_applying\"):\n"
+        "\t\treturn NetBridge.dm_push_passage(passage_id)  # nox_netcode\n"
+        "\tadvance_passage(passage_id)\n"
+        "\treturn true",
     ),
-    # dm_override_roll — the no-op hook, now real (host-side, require_dm).
+    # dm_override_roll — route through the host in MP; keep local behavior otherwise.
     (
-        "func dm_override_roll(_result: Dictionary) -> bool:\n"
-        "\treturn false",
         "func dm_override_roll(result: Dictionary) -> bool:\n"
-        "\treturn NetBridge.dm_override_roll(result)  # nox_netcode",
+        "\tvar forced := result.duplicate(true)",
+        "func dm_override_roll(result: Dictionary) -> bool:\n"
+        "\tif Net.active and not has_meta(\"_net_applying\"):\n"
+        "\t\treturn NetBridge.dm_override_roll(result)  # nox_netcode\n"
+        "\tvar forced := result.duplicate(true)",
     ),
 ]
 
