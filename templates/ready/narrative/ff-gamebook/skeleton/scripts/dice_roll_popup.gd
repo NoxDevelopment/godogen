@@ -22,7 +22,8 @@ const TUMBLE_TICK := 0.05
 var _root: Control
 var _panel: PanelContainer
 var _context: Label
-var _dice_row: HBoxContainer          # test-mode dice
+var _tray: Dice3DTray                  # 3D physics dice (Options → Dice: "3D physics dice")
+var _dice_row: HBoxContainer          # test-mode dice (2D fallback)
 var _combat_box: VBoxContainer        # combat-mode two rows
 var _math: Label
 var _banner: Label
@@ -61,6 +62,13 @@ func _build() -> void:
 
 	_context = FFUI.title("", 22, FFUI.INK)
 	col.add_child(_context)
+
+	# The 3D physics tray sits above the 2D dice; only one is shown per roll (the 3D
+	# tower when Options→Dice "3D physics dice" is on and animation is available, else
+	# the honest-pips 2D dice). Built lazily on first 3D roll (needs a render context).
+	_tray = Dice3DTray.new()
+	_tray.visible = false
+	col.add_child(_tray)
 
 	_dice_row = HBoxContainer.new()
 	_dice_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -116,7 +124,10 @@ func run_test(p: Dictionary) -> void:
 	_deplete.visible = false
 	_continue.visible = false
 
-	await _tumble(_dice, faces)
+	var tints: Array = []
+	for _i in faces.size():
+		tints.append(Dice3DTray.BONE)
+	await _tumble(_dice, faces, tints)
 
 	_math.text = "2d6 = %d   %s" % [int(p.get("total", 0)), str(p.get("compare_label", ""))]
 	_math.visible = true
@@ -153,8 +164,13 @@ func run_combat(p: Dictionary) -> void:
 	var foe: Dictionary = p.get("enemy", {})
 	var you_dice := _combat_group("You", you)
 	var foe_dice := _combat_group(str(foe.get("name", "Foe")), foe)
-	# tumble both groups together
-	await _tumble(you_dice + foe_dice, (you.get("faces", []) as Array) + (foe.get("faces", []) as Array))
+	# tumble both groups together; in 3D the tray tints your bone dice vs the foe's greyer bone
+	var tints: Array = []
+	for _i in you_dice.size():
+		tints.append(Dice3DTray.BONE)
+	for _i in foe_dice.size():
+		tints.append(Dice3DTray.ENEMY_BONE)
+	await _tumble(you_dice + foe_dice, (you.get("faces", []) as Array) + (foe.get("faces", []) as Array), tints)
 
 	_banner.text = str(p.get("banner", ""))
 	_banner.add_theme_color_override(&"font_color", p.get("banner_color", FFUI.INK))
@@ -187,14 +203,35 @@ func _combat_group(who: String, g: Dictionary) -> Array[FFDie]:
 # --- shared animation + dismissal ------------------------------------------
 
 
-func _tumble(dice: Array[FFDie], final_faces: Array) -> void:
+func _tumble(dice: Array[FFDie], final_faces: Array, tints: Array = []) -> void:
 	# The sacred dice (STYLE_GUIDE §2.2): bone-clatter shake while tumbling, pips
 	# landing on the settle, and the music ducks under the roll — the roll is the
 	# moment nothing competes with. Reduced-motion snaps straight to the landing.
 	if _reduced:
+		_tray.visible = false
 		_settle(dice, final_faces)
 		AudioDirector.play_sfx("dice_land", true)
 		return
+
+	# --- 3D physics dice (Options → Dice) --------------------------------------
+	# HONEST: the tray throws real RigidBody3D bone-dice for the drama, then settles
+	# them and SNAP-rotates each to the face the seeded rules core already rolled
+	# (final_faces). The physics never changes the result — every peer shows the same
+	# authoritative faces. Falls back to the 2D dice below if 3D is off/unavailable.
+	if _use_3d():
+		for d in dice:
+			d.visible = false               # hand the stage to the 3D tray
+		_tray.visible = true
+		AudioDirector.play_sfx("dice_shake", true)
+		await _tray.roll(final_faces, tints)
+		_settle(dice, final_faces)          # keep the (hidden) 2D dice consistent
+		AudioDirector.play_sfx("dice_land")
+		return
+
+	# --- 2D honest-pips fallback -----------------------------------------------
+	_tray.visible = false
+	for d in dice:
+		d.visible = true
 	AudioDirector.play_sfx("dice_shake", true)
 	var tumble_time := TUMBLE_TIME / _speed
 	var elapsed := 0.0
@@ -206,6 +243,18 @@ func _tumble(dice: Array[FFDie], final_faces: Array) -> void:
 		elapsed += tick
 	_settle(dice, final_faces)
 	AudioDirector.play_sfx("dice_land")
+
+
+## 3D dice run only when the player enabled them, motion isn't reduced/snapped, and a
+## real render context exists (never in a headless probe). Guarded so the roll always
+## degrades to the honest 2D dice rather than failing.
+func _use_3d() -> bool:
+	if _reduced:
+		return false
+	if DisplayServer.get_name() == "headless":
+		return false
+	var ff := get_node_or_null("/root/FFSettings")
+	return ff != null and bool(ff.dice_3d)
 
 
 func _settle(dice: Array[FFDie], final_faces: Array) -> void:

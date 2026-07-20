@@ -95,11 +95,13 @@ func _combat_tab() -> Control:
 
 func _dice_tab() -> Control:
 	var t := _tab_body("Dice")
+	t.add_child(_check_row("3D physics dice (bone d6 tumbling in a tray)", FFSettings.dice_3d,
+		func(on): FFSettings.set_dice_3d(on)))
 	t.add_child(_check_row("Animate the dice (bone-clatter tumble)", FFSettings.dice_animation,
 		func(on): FFSettings.set_dice_animation(on)))
 	t.add_child(_slider_row("Animation speed", 0.5, 2.0, 0.05, FFSettings.dice_speed,
 		func(v): FFSettings.set_dice_speed(v), func(v): return "%.2f×" % v))
-	t.add_child(_hint("Speed scales the tumble length; turn animation off to snap straight to the result."))
+	t.add_child(_hint("3D dice roll real bone-dice in a physics tray, then settle on the same seeded result the rules already decided (honest — the throw never changes the number). Turn 3D off for the flat honest-pips dice. Speed scales the tumble length; turn animation off to snap straight to the result."))
 	return t
 
 func _accessibility_tab() -> Control:

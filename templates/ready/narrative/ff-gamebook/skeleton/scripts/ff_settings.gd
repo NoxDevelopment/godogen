@@ -32,6 +32,7 @@ var quick_combat: bool = false       # auto-run combat rounds
 # --- Dice ------------------------------------------------------------------------
 var dice_animation: bool = true      # animate the tumble (off = snap to result)
 var dice_speed: float = 1.0          # 0.5 (slow) .. 2.0 (fast) tumble-time scale
+var dice_3d: bool = true             # 3D physics dice (off = honest-pips 2D fallback)
 
 # --- Accessibility ---------------------------------------------------------------
 var text_scale: float = 1.0          # 0.8 .. 2.0 — global UI scale (content_scale)
@@ -84,6 +85,10 @@ func set_dice_speed(v: float) -> void:
 	dice_speed = clampf(v, 0.5, 2.0)
 	_commit()
 
+func set_dice_3d(on: bool) -> void:
+	dice_3d = on
+	_commit()
+
 func set_text_scale(v: float) -> void:
 	text_scale = clampf(v, 0.8, 2.0)
 	apply()
@@ -112,6 +117,7 @@ func save_settings() -> void:
 	c.set_value("combat", "quick_combat", quick_combat)
 	c.set_value("dice", "animation", dice_animation)
 	c.set_value("dice", "speed", dice_speed)
+	c.set_value("dice", "dice_3d", dice_3d)
 	c.set_value("accessibility", "text_scale", text_scale)
 	c.set_value("accessibility", "reduced_motion", reduced_motion)
 	c.set_value("rules", "save_mode", save_mode)
@@ -127,6 +133,7 @@ func load_settings() -> void:
 	quick_combat = bool(c.get_value("combat", "quick_combat", false))
 	dice_animation = bool(c.get_value("dice", "animation", true))
 	dice_speed = float(c.get_value("dice", "speed", 1.0))
+	dice_3d = bool(c.get_value("dice", "dice_3d", true))
 	text_scale = float(c.get_value("accessibility", "text_scale", 1.0))
 	reduced_motion = bool(c.get_value("accessibility", "reduced_motion", false))
 	save_mode = int(c.get_value("rules", "save_mode", SaveMode.BOOKMARKS))

@@ -49,6 +49,10 @@ pause={
 ]
 }
 
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
 [nox_netcode]
 
 profile="authority-turn"
