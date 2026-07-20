@@ -185,6 +185,12 @@ def cmd_add(args) -> None:
         "labels": labels,
         "params": params,
         "references": references,
+        # First-class provenance for the credits screen (STANDARDS "credits").
+        # license is the SPDX-ish tag (CC0-1.0, OFL-1.1, CC-BY-4.0, proprietary, ...).
+        "license": (args.license or "").strip(),
+        "source": (args.source or "").strip(),   # kit/pack/dataset the asset came from
+        "author": (args.author or "").strip(),    # creator to attribute (CC-BY etc.)
+        "url": (args.url or "").strip(),           # where it was obtained
         "created": _utc_now_iso(),
     }
     manifest["assets"].append(entry)
@@ -305,6 +311,68 @@ def cmd_prune(args) -> None:
     print(json.dumps({"dropped": dropped, "kept": len(kept)}, indent=2))
 
 
+def _render_credits(entries: list[dict], args) -> str:
+    """Assemble attribution grouped by license → source/author.
+
+    Emits JSON (default, for the `credits` skill to merge with fonts/tools/engine)
+    or Markdown. Also surfaces LoRA/style packs (params.lora) and the provider mix
+    (the generation tools that produced assets) so nothing goes un-attributed.
+    """
+    by_license: dict[str, dict[str, dict]] = {}
+    loras: set[str] = set()
+    providers: set[str] = set()
+    unlicensed: list[str] = []
+    for e in entries:
+        lic = (e.get("license") or "").strip() or "UNSPECIFIED"
+        src = (e.get("source") or "").strip() or (e.get("provider") or "generated")
+        key = f"{src} {e.get('author', '').strip()} {e.get('url', '').strip()}"
+        grp = by_license.setdefault(lic, {})
+        item = grp.setdefault(key, {
+            "source": src, "author": e.get("author", "").strip(),
+            "url": e.get("url", "").strip(), "count": 0,
+        })
+        item["count"] += 1
+        if e.get("provider"):
+            providers.add(e["provider"])
+        lora = (e.get("params") or {}).get("lora")
+        if lora:
+            loras.add(str(lora))
+        if lic == "UNSPECIFIED":
+            unlicensed.append(e.get("asset_id", "?"))
+
+    payload = {
+        "generated": _utc_now_iso(),
+        "by_license": {
+            lic: sorted(grp.values(), key=lambda i: (-i["count"], i["source"]))
+            for lic, grp in sorted(by_license.items())
+        },
+        "loras": sorted(loras),
+        "providers": sorted(providers),
+        "unlicensed": sorted(set(unlicensed)),
+    }
+    if args.credits_format == "json":
+        return json.dumps(payload, indent=2) + "\n"
+
+    # Markdown
+    lines = ["# Credits — assets & attribution", ""]
+    if payload["unlicensed"]:
+        lines += [f"> ⚠ {len(payload['unlicensed'])} asset(s) have NO license tag — "
+                  "fix before ship (`manifest.py add --license …`).", ""]
+    for lic, items in payload["by_license"].items():
+        lines.append(f"## {lic}")
+        for it in items:
+            who = f" — {it['author']}" if it["author"] else ""
+            url = f" <{it['url']}>" if it["url"] else ""
+            lines.append(f"- {it['source']}{who} ({it['count']} asset(s)){url}")
+        lines.append("")
+    if payload["loras"]:
+        lines += ["## Style / LoRA models", *[f"- {l}" for l in payload["loras"]], ""]
+    if payload["providers"]:
+        lines += ["## Generation tools",
+                  *[f"- {p}" for p in payload["providers"]], ""]
+    return "\n".join(lines)
+
+
 def cmd_export(args) -> None:
     manifest = _load_manifest(Path(args.manifest))
     root = Path(manifest["root"])
@@ -335,6 +403,8 @@ def cmd_export(args) -> None:
         flat = {e["asset_id"]: e["path"] for e in entries}
         # Unity-friendly: serializable dictionary shape (string -> string).
         out.write_text(json.dumps({"map": flat}, indent=2), encoding="utf-8")
+    elif fmt == "credits":
+        out.write_text(_render_credits(entries, args), encoding="utf-8")
     else:
         raise SystemExit(f"Unknown --format {fmt!r}")
 
@@ -373,6 +443,13 @@ def main():
                    help="key=value param (repeatable). Numeric values are coerced.")
     p.add_argument("--references", default="",
                    help="Comma-separated asset_ids this asset depends on (e.g. animation frames -> sprite)")
+    p.add_argument("--license", default="",
+                   help="License tag for the credits screen (CC0-1.0, OFL-1.1, CC-BY-4.0, proprietary, ...)")
+    p.add_argument("--source", default="",
+                   help="Kit/pack/dataset the asset came from (e.g. 'Kenney UI RPG Expansion')")
+    p.add_argument("--author", default="",
+                   help="Creator to attribute (required by CC-BY and similar)")
+    p.add_argument("--url", default="", help="Where the asset was obtained")
     p.set_defaults(func=cmd_add)
 
     p = sub.add_parser("find", help="Query the manifest")
@@ -400,7 +477,10 @@ def main():
 
     p = sub.add_parser("export", help="Emit a flat lookup table")
     _add_manifest_arg(p)
-    p.add_argument("--format", required=True, choices=["godot", "unity", "json"])
+    p.add_argument("--format", required=True,
+                   choices=["godot", "unity", "json", "credits"])
+    p.add_argument("--credits-format", default="json", choices=["json", "md"],
+                   help="For --format credits: machine-readable json (default) or Markdown")
     p.add_argument("--output", required=True)
     p.set_defaults(func=cmd_export)
 

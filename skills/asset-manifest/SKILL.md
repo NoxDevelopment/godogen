@@ -71,8 +71,19 @@ python3 .claude/skills/asset-manifest/tools/manifest.py add \
   --labels knight,hero,idle \
   --param prompt="armored knight with crimson cape, idle stance" \
   --param style=default-pixel \
-  --param preset=rpg_hero
+  --param preset=rpg_hero \
+  --license CC0-1.0 --source "Kenney UI RPG Expansion" --url https://kenney.nl
 ```
+
+**Provenance for credits (first-class fields, not `--param`):** `--license`
+(SPDX-ish tag: `CC0-1.0`, `OFL-1.1`, `CC-BY-4.0`, `proprietary`, `generated`…),
+`--source` (the kit/pack/dataset), `--author` (required by CC-BY & similar),
+`--url`. These are stored at the top level of the entry — the `export --format
+credits` path reads them to auto-assemble the credits screen (`skills/credits`,
+closing the STANDARDS "credits" box). **Every reused/generated asset must carry a
+`--license`**; anything left blank shows up under `unlicensed` in the credits
+export as a ship blocker. (LoRA/style packs are picked up automatically from
+`--param lora=…`.)
 
 `--kind` is one of: `sprite`, `character`, `portrait`, `tile`, `tileset`, `parallax`, `skybox`, `environment`, `ui`, `icon`, `mesh3d`, `texture`, `animation_frame`, `spritesheet`, `audio_sfx`, `audio_music`, `audio_voice`, `other`.
 
@@ -159,6 +170,17 @@ python3 .claude/skills/asset-manifest/tools/manifest.py export \
 `--format unity` writes a JSON `Dictionary<string, string>` that a runtime AssetRegistry class can deserialize.
 
 `--format json` writes a flat `{asset_id: relative_path}` map.
+
+`--format credits` assembles attribution grouped by license → source/author,
+plus a `loras` list, a `providers` (generation tools) list, and an `unlicensed`
+list of asset_ids missing a license. `--credits-format json` (default) is the
+machine-readable feed the [`credits`](../credits/SKILL.md) skill merges with
+fonts/tools/engine; `--credits-format md` emits a human-readable Markdown draft.
+
+```bash
+python3 .claude/skills/asset-manifest/tools/manifest.py export \
+  --format credits --output build/credits_assets.json
+```
 
 ## How the manifest plugs into other skills
 

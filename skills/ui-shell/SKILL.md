@@ -44,6 +44,23 @@ license notes are in [`addon/nox_ui/README.md`](addon/nox_ui/README.md).
 The menu, options, and pause scenes are **never edited per-template** — only the
 config resource changes.
 
+## Menus/start/pause are covered here; two things the shell only stubs
+
+The shell fully owns **start menu, options, pause, and quit-to-menu**. Two boxes it
+leaves for sibling skills — wire them or the shell reads as a demo:
+
+- **Continue is a stub.** `main_menu.gd`'s `_on_continue_pressed()` calls
+  `NoxShell.new_game()` — so "Continue" *starts a new game*. Make it resume the
+  newest save via [`loading-continue`](../loading-continue/SKILL.md)
+  (`ContinueService.resume_last()` + gate visibility on `has_resumable()`). Route
+  `new_game()`/transitions through its `SceneLoader` for real loading screens too.
+- **Credits are static text.** The inline Credits panel renders `NoxShellConfig.credits`
+  verbatim. Don't hand-maintain it — generate it from asset provenance with
+  [`credits`](../credits/SKILL.md) (`manifest.py export --format credits` →
+  `credits_gen assemble`): paste `credits.txt` into the config for short games, or
+  point the Credits button at the scrolling `credits.tscn` for asset-heavy ones.
+  This is what actually closes the STANDARDS "credits" box.
+
 ## Verify
 Boot the shell scoped (`godot --headless --path . --import` then run) and
 **screenshot the menu, options, pause, and credits** — confirm config-driven

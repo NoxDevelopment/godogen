@@ -49,6 +49,40 @@ python3 .claude/skills/ui-screens/tools/screen_gen.py hud --engine both -o asset
 
 Emits `hud.tscn`: `HealthBar` (ProgressBar) top-left, `AmmoLabel` top-right, `MinimapFrame` (PanelContainer with TextureRect) below ammo, `ActionPrompt` (Label) bottom-center. `mouse_filter = MOUSE_FILTER_IGNORE` so clicks pass through to gameplay.
 
+The scaffold is a starting point — a shipping HUD follows the patterns below.
+
+#### HUD patterns (UI/UX) — make it read at a glance, in the heat of play
+
+The HUD is the screen the player stares at for hours; it's parity-critical
+(`skills/parity-build/STANDARDS.md`). Rules that separate a real HUD from four
+labels in the corners:
+
+- **Anchor to corners/edges, never center-fixed.** Resources top-left, secondary
+  status/minimap top-right, action bar/hotbar bottom-center, prompts bottom-center
+  or over the target. Anchor-based so it survives every resolution.
+- **Respect the TV/title safe area.** Inset the whole HUD ~5% from the edges
+  (`offset` on the root margins) so nothing clips on overscan/notches.
+- **Clicks pass through.** Root `mouse_filter = MOUSE_FILTER_IGNORE`; only
+  interactive widgets (hotbar slots) opt back into `STOP`.
+- **Diegetic where it fits the genre.** Health-as-suit-glow / ammo-on-the-gun reads
+  more immersive than bars for sci-fi/horror; bars+numbers for RPG/strategy. Pick
+  per reference game, don't default to bars everywhere.
+- **Redundant encoding (accessibility, non-negotiable).** Every bar carries a
+  number and/or icon — never color alone (`skills/accessibility`). Low-health state
+  adds shape/pulse (respecting reduced-motion), not just "turns red".
+- **Contextual prompts show the CURRENT binding**, pulled from `input-handling`,
+  never a hardcoded key; they appear near the interactable and fade when gone.
+- **Damage/feedback belongs to game-feel.** Damage vignette, hit flashes, floating
+  combat text, low-health pulse — gate all of it on the reduced-motion setting
+  (`skills/game-feel` `Feel.enabled`).
+- **Objective / quest tracker + notification toasts** anchor to a consistent edge
+  and auto-dismiss; don't let them overlap the action bar.
+- **Everything defers to `theme.tres` and `typography`** — HUD numbers use the body/
+  mono face at consistent sizes in the `scalable_text` group so the UI-scale setting
+  grows them (`skills/ui-theme`, `skills/typography`, `skills/accessibility`).
+- **Show only what's actionable.** Fade non-essential elements during calm; surface
+  them on change. A permanently-full HUD reads as clutter.
+
 ### inventory — Grid inventory + stats side panel
 
 ```bash
