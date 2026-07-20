@@ -40,6 +40,7 @@
     },
     {
       "id": "s2",
+      "music": "tension",
       "title": "The Toll-Bridge in the Fog",
       "illustration": "plate/s2",
       "text": "The planks give out at a slow black channel crossed by a stone toll-bridge, its parapet carved with columns of figures that might be prayer and might be arithmetic. A lantern burns blue at the far end, though no hand tends it.\n\nAs your boot touches the first stone, the fog gathers. It folds itself upright into a robed figure, faceless, patient, its sleeves hanging empty.\n\n\"A crossing is a service,\" it says, the voice coming from several distances at once. \"A service incurs a debt. We are the Grey Assessor. We find your account... opened.\"\n\nIt extends one empty sleeve, palm-up, and waits.",
@@ -52,6 +53,7 @@
     },
     {
       "id": "s3",
+      "music": "tension",
       "title": "Paid in Coin",
       "illustration": "plate/s3",
       "text": "You set two gold pieces on the wet stone. The Assessor does not pick them up; the coins simply are not there the moment your fingers leave them, and neither is the cold.\n\n\"Received. Entered. Carried forward.\" The figure thins back into fog — but not before one empty sleeve tilts toward you, almost courteous, almost a threat. \"You are, we note, a payer of debts. We will meet again at the third gate, and the price is set by the first.\"\n\nThe blue lantern gutters. Beyond the bridge, the drowned rooftops of Harrowfell lean out of the fog.",
@@ -62,6 +64,7 @@
     },
     {
       "id": "s5",
+      "music": "tension",
       "title": "Paid in Kind",
       "illustration": "plate/s5",
       "text": "You unbuckle your pack. The Assessor's faceless attention settles on it with the weight of an appraiser's glance, and you understand — sickly — that it is not choosing; it already knows what you value most.\n\n\"The lantern,\" it says. \"You will want it, in the dark under the town. That is why it will do.\"",
@@ -73,6 +76,7 @@
     },
     {
       "id": "s5a",
+      "music": "tension",
       "title": "The Lightless Road",
       "text": "You hand over the lantern. The Assessor folds it into a sleeve and is gone. You have paid, and you have paid dearly: the Cathedra will be lightless.",
       "onEnter": [ { "kind": "item", "key": "lantern", "op": "consume", "value": 1 }, { "kind": "flag", "key": "darkPenalty", "value": true }, { "kind": "flag", "key": "toll1_paid", "value": true } ],
@@ -91,6 +95,7 @@
     },
     {
       "id": "s6",
+      "music": "tension",
       "title": "Paid in Blood",
       "illustration": "plate/s6",
       "text": "\"As you wish,\" says the Assessor. \"Blood is an honest tender.\"\n\nThe empty sleeve passes an inch above your forearm and something withdraws — not blood exactly, but the warmth behind it, the small everyday luck of an unhurt body.\n\nTest your Luck.",

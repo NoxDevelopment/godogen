@@ -15,6 +15,9 @@ func _ready() -> void:
 	var pyrrhic := str(ending.get("variant", "")) == "pyrrhic"
 	add_child(FFUI.page_background(pyrrhic))
 	add_child(FFUI.wash(FFUI.FLAME if not pyrrhic else FFUI.SLATE, 0.16 if not pyrrhic else 0.30))
+	# the true QUITTANCE gets the warm victory bed; the pyrrhic ending stays on the
+	# cold death bed so the ear signals the lesser ending (STYLE_GUIDE §2.2, §1.7).
+	AudioDirector.play_music("death" if pyrrhic else "victory")
 	_build(ending, pyrrhic)
 
 

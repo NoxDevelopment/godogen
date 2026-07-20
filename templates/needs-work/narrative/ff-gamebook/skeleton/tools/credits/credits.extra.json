@@ -1,0 +1,71 @@
+{
+  "game_title": "THE GREY TITHE",
+  "studio": "A NoxDev Studio production",
+  "roles": [
+    {
+      "role": "Original world, text, rules & code",
+      "names": [
+        "NoxDev Studio"
+      ]
+    }
+  ],
+  "fonts": [
+    {
+      "name": "Cinzel",
+      "license": "OFL-1.1",
+      "author": "Natanael Gama"
+    },
+    {
+      "name": "UncialAntiqua",
+      "license": "OFL-1.1",
+      "author": "Astigmatic"
+    },
+    {
+      "name": "MedievalSharp",
+      "license": "OFL-1.1",
+      "author": "Wojciech Kalinowski"
+    },
+    {
+      "name": "Montserrat",
+      "license": "OFL-1.1",
+      "author": "Julieta Ulanovsky"
+    }
+  ],
+  "audio": [
+    {
+      "name": "Shadow War \u2014 Dark Fantasy Orchestral Music Collection",
+      "license": "commercial (owned asset pack)",
+      "author": "GWriterStudio"
+    },
+    {
+      "name": "RPG Fantasy Music Pack",
+      "license": "commercial (owned asset pack)",
+      "author": "Cyberleaf Studio"
+    },
+    {
+      "name": "Interface SFX Vol. 2",
+      "license": "commercial (owned asset pack)",
+      "author": ""
+    },
+    {
+      "name": "Inventory SFX Bundle",
+      "license": "commercial (owned asset pack)",
+      "author": ""
+    },
+    {
+      "name": "Combat Sounds Bundle Collection",
+      "license": "commercial (owned asset pack)",
+      "author": ""
+    }
+  ],
+  "engine": "Godot Engine (MIT)",
+  "tools": [
+    "nox_if_engine (ff-2d6 ruleset)",
+    "nox_ui shell",
+    "ComfyUI",
+    "Z-Image-Turbo"
+  ],
+  "special_thanks": [
+    "OpenGameArt & Kenney (CC0 asset commons)"
+  ]
+}

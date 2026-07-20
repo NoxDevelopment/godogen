@@ -13,6 +13,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(FFUI.page_background(true))
 	add_child(FFUI.wash(FFUI.ARREARS, 0.10))
+	AudioDirector.play_music("death")   # somber finality — the account is closed
 	_build()
 
 

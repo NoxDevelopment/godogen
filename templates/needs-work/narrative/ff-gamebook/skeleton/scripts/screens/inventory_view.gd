@@ -178,6 +178,7 @@ func _show_read(id: String) -> void:
 
 func _on_drink() -> void:
 	if Adventure.sheet.drink_potion():
+		AudioDirector.play_sfx("potion")
 		Adventure.notify_sheet_changed()
 		if int(Adventure.sheet.potion.get("doses", 0)) <= 0:
 			_selected = ""

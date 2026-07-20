@@ -1,0 +1,49 @@
+{
+  "by_license": {
+    "NoxDev-generated (Z-Image-Turbo base model)": [
+      {
+        "source": "veritas-gamebook (NoxDev-generated plates)",
+        "author": "",
+        "count": 13
+      }
+    ],
+    "NoxDev-generated (placeholder \u2014 pending Phase-5 art)": [
+      {
+        "source": "veritas-gamebook placeholder plates",
+        "author": "",
+        "count": 5
+      }
+    ],
+    "commercial (asset pack)": [
+      {
+        "source": "Monster Avatar Icons",
+        "author": "",
+        "count": 2
+      },
+      {
+        "source": "RPG Character Portraits",
+        "author": "",
+        "count": 7
+      }
+    ],
+    "CC0": [
+      {
+        "source": "496 RPG Icons",
+        "author": "",
+        "count": 14
+      },
+      {
+        "source": "Kenney Fantasy UI Borders",
+        "author": "",
+        "count": 4
+      }
+    ]
+  },
+  "loras": [
+    "veritas-gamebook \u2014 NoxDev-generated on Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder) (no LoRA)"
+  ],
+  "providers": [
+    "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5"
+  ],
+  "unlicensed": []
+}

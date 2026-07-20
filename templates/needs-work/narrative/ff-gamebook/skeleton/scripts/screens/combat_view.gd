@@ -54,6 +54,9 @@ func _ready() -> void:
 	_build()
 	_refresh()
 	_append_log("[i]The encounter is joined.[/i]")
+	# combat music stinger (STYLE_GUIDE §2.2) — the Reckoner's own tragic bed on the
+	# boss fight, the grim combat bed otherwise.
+	AudioDirector.play_music("boss" if _section_no == "s_reckoner_fight" else "combat")
 
 
 func _build() -> void:
@@ -269,6 +272,13 @@ func _on_attack() -> void:
 			banner = "The %s wounds you  (−%d)" % [enemy.get("name"), int(res.wound)]
 			bcolor = FFUI.ARREARS
 	await _show_dice_combat(res, enemy, banner, bcolor)
+
+	# round resolution maps 1:1 to audio (STYLE_GUIDE §2.3): hit on a wound dealt,
+	# a fleshy wound-thud when struck, a distinct parry ring on a tie. Ducks music.
+	match str(res.outcome):
+		"player_wounds": AudioDirector.play_sfx("hit", true)
+		"enemy_wounds": AudioDirector.play_sfx("wound", true)
+		_: AudioDirector.play_sfx("parry", true)
 
 	# gang rule: other alive foes also swing this round
 	if _encounter != null and _encounter.is_gang():

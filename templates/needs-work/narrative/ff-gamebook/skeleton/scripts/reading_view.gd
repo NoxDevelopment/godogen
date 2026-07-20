@@ -38,6 +38,8 @@ var _event_resolved := false
 var _combat_open := false
 var _busy := false
 var _pause: Node
+var _last_gold := -1
+var _last_inv := -1
 
 
 func _ready() -> void:
@@ -183,9 +185,19 @@ func _sync_to_current() -> void:
 
 
 func _page_turn() -> void:
+	AudioDirector.play_sfx("page_turn")   # diegetic paper — the primary transition sound
 	_content.modulate = Color(1, 1, 1, 0.0)
 	var tw := create_tween()
 	tw.tween_property(_content, "modulate", Color(1, 1, 1, 1.0), 0.22)
+
+
+## Resolve the reading bed for a section: its optional "music" mood flag, else the
+## default cold explore bed. Kept here so writers/Studio drive mood from the data.
+func _update_music(section: IFSection) -> void:
+	var mood := str(section.raw().get("music", "")).strip_edges()
+	if mood == "" or not AudioDirector.MUSIC_SLOTS.has(mood):
+		mood = "explore"
+	AudioDirector.play_music(mood)
 
 
 func _render() -> void:
@@ -210,8 +222,14 @@ func _render() -> void:
 
 	# events
 	if section.has_event("combat") and not _event_resolved:
-		_enter_combat(section)
+		_enter_combat(section)   # combat_view drives combat/boss music
 		return
+
+	# adaptive reading music (STYLE_GUIDE §2.2): a passage may flag its mood via a
+	# "music" field (e.g. "tension" when the Assessor is near); default is the cold
+	# explore bed. Crossfades on change; a no-op if already on that bed.
+	_update_music(section)
+
 	if section.has_event("luck_test") and not _event_resolved:
 		_render_test("luck", section)
 		return
@@ -423,6 +441,7 @@ func _toggle_bookmark() -> void:
 
 func _on_eat() -> void:
 	if Adventure.sheet.eat_provision():
+		AudioDirector.play_sfx("eat")
 		Adventure.notify_sheet_changed()
 		_toast("+4 STAMINA")
 		_render()
@@ -467,11 +486,26 @@ func _refresh_hud() -> void:
 	_clear(_hud_stats)
 	if s == null:
 		return
+	_check_economy_sfx(s)
 	_hud_stats.add_child(FFUI.stat_pill("SK", str(s.cur("skill")), FFUI.VERDIGRIS))
 	_hud_stats.add_child(FFUI.stat_pill("ST", "%d/%d" % [s.cur("stamina"), s.init_of("stamina")], FFUI.ARREARS))
 	_hud_stats.add_child(FFUI.stat_pill("LK", "%d/%d" % [s.cur("luck"), s.init_of("luck")], FFUI.FLAME))
 	_hud_stats.add_child(FFUI.stat_pill("Gold", str(s.gold), FFUI.INK))
 	_hud_stats.add_child(FFUI.stat_pill("Prov", str(s.provisions), FFUI.INK))
+
+
+## A quiet gold-clink when the purse grows and a pack-rustle when an item is added
+## (STYLE_GUIDE §2.3 — the coin reinforces the economy motif). Diffs against the
+## last HUD refresh so it only fires on a genuine gain, never on first paint.
+func _check_economy_sfx(s: Object) -> void:
+	var gold := int(s.gold)
+	var inv_ct: int = s.state.inventory().size() if s.state != null else 0
+	if _last_gold >= 0 and gold > _last_gold:
+		AudioDirector.play_sfx("coin")
+	elif _last_inv >= 0 and inv_ct > _last_inv:
+		AudioDirector.play_sfx("pickup")
+	_last_gold = gold
+	_last_inv = inv_ct
 
 
 # --- helpers ----------------------------------------------------------------

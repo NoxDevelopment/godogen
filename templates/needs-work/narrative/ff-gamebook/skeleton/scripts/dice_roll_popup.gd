@@ -185,9 +185,14 @@ func _combat_group(who: String, g: Dictionary) -> Array[FFDie]:
 
 
 func _tumble(dice: Array[FFDie], final_faces: Array) -> void:
+	# The sacred dice (STYLE_GUIDE §2.2): bone-clatter shake while tumbling, pips
+	# landing on the settle, and the music ducks under the roll — the roll is the
+	# moment nothing competes with. Reduced-motion snaps straight to the landing.
 	if _reduced:
 		_settle(dice, final_faces)
+		AudioDirector.play_sfx("dice_land", true)
 		return
+	AudioDirector.play_sfx("dice_shake", true)
 	var elapsed := 0.0
 	while elapsed < TUMBLE_TIME:
 		for d in dice:
@@ -196,7 +201,7 @@ func _tumble(dice: Array[FFDie], final_faces: Array) -> void:
 		await get_tree().create_timer(tick).timeout
 		elapsed += tick
 	_settle(dice, final_faces)
-	# honest-dice SFX hook (Phase 6): play the settle here on the [SFX] bus.
+	AudioDirector.play_sfx("dice_land")
 
 
 func _settle(dice: Array[FFDie], final_faces: Array) -> void:

@@ -7,15 +7,46 @@ subtitle = "An illustrated Fighting-Fantasy gamebook  ·  a NoxDev production"
 new_game_scene = "res://scripts/screens/roll_up.tscn"
 show_continue = false
 backdrop = "res://assets/plates/generated/cover.png"
-credits = "THE GREY TITHE — a NoxDev Studio production.
+credits = "THE GREY TITHE
 
-Original world, text & rules: NoxDev (no Fighting Fantasy IP).
-Engine: nox_if_engine (ff-2d6 ruleset)  ·  Shell: nox_ui.
+A NoxDev Studio production
+  Original world, text, rules & code: NoxDev Studio
 
-REUSED ART (bound by stable ID via the Studio asset manifest):
-  Icons — 496 RPG Icons (OpenGameArt, CC0)
-  Portraits & monster avatars — RPG Character Portraits / Monster Avatar Icons
-  UI frames — Kenney Fantasy UI Borders (CC0)
-  Fonts — Cinzel & UncialAntiqua (OFL), MedievalSharp (OFL)
-Section illustration plates: labelled veritas-gamebook placeholders,
-  drop-in-replaceable from the Studio (Phase 5 art generation)."
+Art & Assets · NoxDev-generated (Z-Image-Turbo base model)
+  veritas-gamebook (NoxDev-generated plates) (13 asset(s))
+
+Art & Assets · NoxDev-generated (placeholder — pending Phase-5 art)
+  veritas-gamebook placeholder plates (5 asset(s))
+
+Art & Assets · commercial (asset pack)
+  Monster Avatar Icons (2 asset(s))
+  RPG Character Portraits (7 asset(s))
+
+Art & Assets · CC0
+  496 RPG Icons (14 asset(s))
+  Kenney Fantasy UI Borders (4 asset(s))
+
+Typefaces
+  Cinzel — Natanael Gama [OFL-1.1]
+  UncialAntiqua — Astigmatic [OFL-1.1]
+  MedievalSharp — Wojciech Kalinowski [OFL-1.1]
+  Montserrat — Julieta Ulanovsky [OFL-1.1]
+
+Music & Sound
+  Shadow War — Dark Fantasy Orchestral Music Collection — GWriterStudio [commercial (owned asset pack)]
+  RPG Fantasy Music Pack — Cyberleaf Studio [commercial (owned asset pack)]
+  Interface SFX Vol. 2 [commercial (owned asset pack)]
+  Inventory SFX Bundle [commercial (owned asset pack)]
+  Combat Sounds Bundle Collection [commercial (owned asset pack)]
+
+Style / LoRA Models
+  veritas-gamebook — NoxDev-generated on Z-Image-Turbo (no LoRA)
+
+Built With
+  Godot Engine (MIT)  ·  nox_if_engine (ff-2d6)  ·  nox_ui shell
+  ComfyUI  ·  Z-Image-Turbo  ·  godogen image-pipeline
+
+Special Thanks
+  OpenGameArt & Kenney (CC0 asset commons)
+
+— Credits auto-assembled from asset-manifest provenance (credits skill). —"
