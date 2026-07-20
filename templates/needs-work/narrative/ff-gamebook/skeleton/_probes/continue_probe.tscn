@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ffcontinueprobe01"]
+
+[ext_resource type="Script" path="res://_probes/continue_probe.gd" id="1_cp"]
+
+[node name="ContinueProbe" type="Node"]
+script = ExtResource("1_cp")

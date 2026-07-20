@@ -31,6 +31,7 @@ var _continue: Button
 var _dice: Array[FFDie] = []
 var _quick := false
 var _reduced := false
+var _speed := 1.0            # Options → Dice tumble-speed scale (0.5 slow .. 2.0 fast)
 
 
 func _ready() -> void:
@@ -104,6 +105,7 @@ func _make_dice(container: Node, count: int) -> Array[FFDie]:
 func run_test(p: Dictionary) -> void:
 	_quick = bool(p.get("quick", false))
 	_reduced = bool(p.get("reduced_motion", false))
+	_speed = clampf(float(p.get("speed", 1.0)), 0.25, 3.0)
 	_combat_box.visible = false
 	_dice_row.visible = true
 	_context.text = str(p.get("context", "TEST YOUR LUCK"))
@@ -136,6 +138,7 @@ func run_test(p: Dictionary) -> void:
 func run_combat(p: Dictionary) -> void:
 	_quick = bool(p.get("quick", false))
 	_reduced = bool(p.get("reduced_motion", false))
+	_speed = clampf(float(p.get("speed", 1.0)), 0.25, 3.0)
 	_dice_row.visible = false
 	_combat_box.visible = true
 	_context.text = str(p.get("context", "COMBAT"))
@@ -193,11 +196,12 @@ func _tumble(dice: Array[FFDie], final_faces: Array) -> void:
 		AudioDirector.play_sfx("dice_land", true)
 		return
 	AudioDirector.play_sfx("dice_shake", true)
+	var tumble_time := TUMBLE_TIME / _speed
 	var elapsed := 0.0
-	while elapsed < TUMBLE_TIME:
+	while elapsed < tumble_time:
 		for d in dice:
 			d.value = randi_range(1, 6)
-		var tick := TUMBLE_TICK * (1.0 + 3.0 * elapsed / TUMBLE_TIME)
+		var tick := (TUMBLE_TICK / _speed) * (1.0 + 3.0 * elapsed / tumble_time)
 		await get_tree().create_timer(tick).timeout
 		elapsed += tick
 	_settle(dice, final_faces)

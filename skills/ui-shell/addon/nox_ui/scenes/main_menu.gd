@@ -13,7 +13,7 @@ func _ready() -> void:
 	_title.text = NoxShell.title()
 	_subtitle.text = NoxShell.subtitle()
 	_subtitle.visible = _subtitle.text.strip_edges() != ""
-	_continue.visible = NoxShell.has_continue()
+	_continue.visible = NoxShell.has_resumable()
 	_options.visible = false
 	_credits.visible = false
 	var bp := NoxShell.backdrop_path()
@@ -33,7 +33,7 @@ func _first_focus() -> void:
 	$CenterBox/VBox/NewGame.grab_focus()
 
 func _on_new_game_pressed() -> void: NoxShell.new_game()
-func _on_continue_pressed() -> void: NoxShell.new_game()
+func _on_continue_pressed() -> void: NoxShell.resume_last()
 func _on_options_pressed() -> void:
 	_options.visible = true
 	$OptionsPanel/VBox/Back.grab_focus()

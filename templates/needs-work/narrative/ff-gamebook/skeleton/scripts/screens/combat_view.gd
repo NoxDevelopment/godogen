@@ -82,6 +82,11 @@ func _build() -> void:
 	var qc := CheckButton.new()
 	qc.text = "Quick Combat"
 	qc.add_theme_color_override(&"font_color", FFUI.PARCHMENT)
+	# seed from the Options → Combat preference (live per-fight toggle still overrides)
+	var ff := get_node_or_null("/root/FFSettings")
+	if ff != null:
+		_quick = ff.quick_combat
+		qc.button_pressed = _quick
 	qc.toggled.connect(_on_quick_toggled)
 	top.add_child(qc)
 	root.add_child(top)
@@ -444,6 +449,7 @@ func _show_dice_combat(res: Dictionary, enemy: Dictionary, banner: String, bcolo
 		"you": {"faces": res.player_faces, "total": int(res.player_total), "label": "+SK %d" % Adventure.sheet.cur("skill")},
 		"enemy": {"name": str(enemy.get("name", "Foe")), "faces": res.enemy_faces, "total": int(res.enemy_total), "label": "+SK %d" % int(enemy.get("skill"))},
 		"banner": banner, "banner_color": bcolor, "quick": _quick,
+		"reduced_motion": _dice_reduced(), "speed": _dice_speed(),
 	})
 	pop.queue_free()
 
@@ -459,8 +465,20 @@ func _show_dice_test(lr: Dictionary, context: String) -> void:
 		"banner_color": FFUI.VERDIGRIS if lr.lucky else FFUI.ARREARS,
 		"depletion": "LUCK %d → %d  (−1)" % [int(lr.luck_before), int(lr.luck_after)],
 		"quick": _quick,
+		"reduced_motion": _dice_reduced(), "speed": _dice_speed(),
 	})
 	pop.queue_free()
+
+
+## Dice preferences from Options (Dice / Accessibility), guarded so combat still runs
+## if FFSettings isn't present.
+func _dice_reduced() -> bool:
+	var ff := get_node_or_null("/root/FFSettings")
+	return ff != null and (ff.reduced_motion or not ff.dice_animation)
+
+func _dice_speed() -> float:
+	var ff := get_node_or_null("/root/FFSettings")
+	return ff.dice_speed if ff != null else 1.0
 
 
 # --- flow ------------------------------------------------------------------

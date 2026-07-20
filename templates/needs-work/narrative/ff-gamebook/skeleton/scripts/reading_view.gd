@@ -42,9 +42,13 @@ var _last_gold := -1
 var _last_inv := -1
 
 
+var _page_bg: ColorRect
+
+
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(FFUI.page_background())
+	_page_bg = FFUI.page_background()
+	add_child(_page_bg)
 	add_child(FFUI.wash(FFUI.FEN, 0.06))
 	_build_ui()
 	_pause = PAUSE_MENU.instantiate()
@@ -54,10 +58,32 @@ func _ready() -> void:
 	Adventure.sheet_changed.connect(_refresh_hud)
 	Adventure.hero_died.connect(_on_hero_died)
 
+	# Live reading preferences (Options → Reading/Accessibility): prose font size and
+	# page theme react immediately to FFSettings.changed.
+	var ff := get_node_or_null("/root/FFSettings")
+	if ff != null:
+		ff.changed.connect(_apply_reading_prefs)
+	_apply_reading_prefs()
+
 	if not Adventure.has_run():
 		Adventure.new_adventure()
 	_sync_to_current()
 	_render()
+
+
+## Apply the reading-comfort prefs live: scale the prose + heading to FFSettings.
+## font_scale, and switch the page ground to the Dark theme when selected.
+func _apply_reading_prefs() -> void:
+	var ff := get_node_or_null("/root/FFSettings")
+	if ff == null:
+		return
+	if _prose != null:
+		_prose.add_theme_font_size_override(&"normal_font_size", int(round(19.0 * ff.font_scale)))
+	if _heading != null:
+		_heading.add_theme_font_size_override(&"font_size", int(round(24.0 * ff.font_scale)))
+	if _page_bg != null:
+		var dark: bool = int(ff.reading_theme) == 2   # FFSettings.ReadingTheme.DARK
+		_page_bg.color = FFUI.VELLUM if dark else FFUI.PARCHMENT
 
 
 func _build_ui() -> void:
@@ -423,12 +449,10 @@ func _open_pause() -> void:
 
 
 func _quick_save() -> void:
-	var data := Adventure.save_data()
-	var f := FileAccess.open("user://ff_quicksave.json", FileAccess.WRITE)
-	if f != null:
-		f.store_string(JSON.stringify(data))
-		f.close()
-	_toast("Progress saved  ·  §%s" % _current_id)
+	# Route through the SaveManager (atomic slot write, GDD §5 FFGameState) so the HUD
+	# Quick-Save, Continue and the Save/Load picker all share one save layer.
+	var err := SaveManager.quick_save()
+	_toast(("Progress saved  ·  §%s" % _current_id) if err == OK else "Save failed")
 
 
 func _toggle_bookmark() -> void:
@@ -458,6 +482,10 @@ func _goto_end(kind: String) -> void:
 	if kind == "victory":
 		get_tree().change_scene_to_file(VICTORY_SCREEN)
 	else:
+		# Ironman is restart-on-death with no reload — wipe the run's save (GDD §4).
+		var sm := get_node_or_null("/root/SaveManager")
+		if sm != null:
+			sm.on_death()
 		get_tree().change_scene_to_file(DEATH_SCREEN)
 
 
@@ -467,12 +495,18 @@ func _goto_end(kind: String) -> void:
 func _show_dice_test(res: Dictionary, context: String, compare_label: String, banner: String, banner_color: Color, depletion: String) -> void:
 	var pop := DICE_POPUP.instantiate()
 	add_child(pop)
+	var ff := get_node_or_null("/root/FFSettings")
+	# Reduced-motion OR animation-off both snap the dice; speed scales the tumble.
+	var reduced: bool = ff != null and (ff.reduced_motion or not ff.dice_animation)
+	var speed: float = ff.dice_speed if ff != null else 1.0
 	await pop.run_test({
 		"context": context,
 		"faces": res.faces, "total": int(res.total),
 		"compare_label": compare_label,
 		"banner": banner, "banner_color": banner_color,
 		"depletion": depletion,
+		"reduced_motion": reduced,
+		"speed": speed,
 	})
 	pop.queue_free()
 

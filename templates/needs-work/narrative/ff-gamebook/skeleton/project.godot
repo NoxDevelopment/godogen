@@ -22,10 +22,14 @@ config/features=PackedStringArray("4.7")
 
 NoxSettings="*res://addons/nox_ui/game_settings.gd"
 NoxShell="*res://addons/nox_ui/nox_shell.gd"
+FFSettings="*res://scripts/ff_settings.gd"
 GameManager="*res://scripts/game_manager.gd"
 AssetBinder="*res://scripts/asset_binder.gd"
 AudioDirector="*res://scripts/audio_director.gd"
 Adventure="*res://scripts/adventure.gd"
+SaveManager="*res://scripts/save_manager.gd"
+SceneLoader="*res://addons/loading/scene_loader.gd"
+ContinueService="*res://addons/loading/continue_service.gd"
 Net="*res://addons/nox_netcode/net_session.gd"
 NetBridge="*res://addons/nox_netcode/session_bridge.gd"
 
