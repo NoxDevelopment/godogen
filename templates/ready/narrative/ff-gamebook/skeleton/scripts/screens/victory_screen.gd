@@ -28,13 +28,33 @@ func _build(ending: Dictionary, pyrrhic: bool) -> void:
 	var head_color := FFUI.SLATE if pyrrhic else warm
 	var text_color := Color(0.86, 0.82, 0.72) if pyrrhic else FFUI.INK
 
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+	# Scrolling body + PINNED action footer so New Adventure / Library / Menu are
+	# always visible and reachable, even on a tall victory page.
+	var root := VBoxContainer.new()
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(root)
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	root.add_child(scroll)
+	var pad := MarginContainer.new()
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for m in [&"margin_top", &"margin_bottom", &"margin_left", &"margin_right"]:
+		pad.add_theme_constant_override(m, 24)
+	scroll.add_child(pad)
 	var col := VBoxContainer.new()
 	col.custom_minimum_size = Vector2(580, 0)
+	col.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	col.add_theme_constant_override(&"separation", 12)
-	center.add_child(col)
+	pad.add_child(col)
+
+	var foot := MarginContainer.new()
+	foot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	foot.add_theme_constant_override(&"margin_top", 6)
+	for m in [&"margin_bottom", &"margin_left", &"margin_right"]:
+		foot.add_theme_constant_override(m, 24)
+	root.add_child(foot)
 
 	col.add_child(_plate(str(ending.get("illustration", "plate/victory")), FFUI.FLAME if not pyrrhic else FFUI.FEN))
 
@@ -80,7 +100,9 @@ func _build(ending: Dictionary, pyrrhic: bool) -> void:
 	menu.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	menu.pressed.connect(func() -> void: NoxShell.to_menu())
 	actions.add_child(menu)
-	col.add_child(actions)
+	actions.custom_minimum_size = Vector2(580, 0)
+	actions.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	foot.add_child(actions)
 	new_b.grab_focus()
 
 

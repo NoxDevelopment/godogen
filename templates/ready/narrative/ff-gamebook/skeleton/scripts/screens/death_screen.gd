@@ -22,13 +22,40 @@ func _build() -> void:
 	var section := Adventure.current_section()
 	var st := Adventure.runner.state if Adventure.runner != null else null
 
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+	# Scrolling body (plate/flavor/stats) + a PINNED action footer so Restart / Load /
+	# Menu are ALWAYS visible and reachable, even when the death page is tall.
+	var root := VBoxContainer.new()
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(root)
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	root.add_child(scroll)
+	var pad := MarginContainer.new()
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for m in [&"margin_top", &"margin_bottom", &"margin_left", &"margin_right"]:
+		pad.add_theme_constant_override(m, 24)
+	scroll.add_child(pad)
 	var col := VBoxContainer.new()
 	col.custom_minimum_size = Vector2(560, 0)
+	col.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	col.add_theme_constant_override(&"separation", 12)
-	center.add_child(col)
+	pad.add_child(col)
+
+	# pinned action footer
+	var foot := MarginContainer.new()
+	foot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	foot.add_theme_constant_override(&"margin_top", 6)
+	for m in [&"margin_bottom", &"margin_left", &"margin_right"]:
+		foot.add_theme_constant_override(m, 24)
+	root.add_child(foot)
+	var actions := VBoxContainer.new()
+	actions.custom_minimum_size = Vector2(560, 0)
+	actions.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	actions.add_theme_constant_override(&"separation", 8)
+	foot.add_child(actions)
+	actions.add_child(FFUI.divider_rule())
 
 	# death plate
 	var plate_slot := str(ending.get("illustration", "plate/death"))
@@ -69,15 +96,16 @@ func _build() -> void:
 	var restart := FFUI.choice_button("Restart  (roll a new hero)")
 	restart.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	restart.pressed.connect(_on_restart)
-	col.add_child(restart)
-	var load_b := FFUI.choice_button("Load / Bookmark")
+	actions.add_child(restart)
+	var has_saves := SaveManager.list_slots().size() > 0
+	var load_b := FFUI.choice_button("Load / Bookmark", not has_saves, "no saved games yet")
 	load_b.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	load_b.pressed.connect(func() -> void: NoxShell.to_menu())
-	col.add_child(load_b)
+	load_b.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://addons/loading/load_screen.tscn"))
+	actions.add_child(load_b)
 	var menu := FFUI.choice_button("Return to the menu")
 	menu.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	menu.pressed.connect(func() -> void: NoxShell.to_menu())
-	col.add_child(menu)
+	actions.add_child(menu)
 	restart.grab_focus()
 
 
