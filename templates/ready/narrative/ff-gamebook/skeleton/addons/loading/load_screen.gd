@@ -28,6 +28,12 @@ func _install_chrome() -> void:
 	_dim.color = Color(0, 0, 0, 0.6)
 	add_child(_dim)
 	move_child(_dim, 0)
+	# Vertical-only scrolling: without this the slot rows overflow HORIZONTALLY and the
+	# trailing Load/Delete/Overwrite buttons are pushed past the panel edge and clipped
+	# (unreachable). Constrain the rows to the viewport width so the buttons stay on-screen.
+	var scroll := get_node_or_null("Panel/VBox/Scroll") as ScrollContainer
+	if scroll != null:
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	# title reflects the mode + the active save mode
 	_title = $Panel/VBox/Title
 	_title.text = ("SAVE" if mode == Mode.SAVE else "LOAD") + _mode_suffix()
@@ -62,13 +68,20 @@ func _make_card(s: Dictionary) -> Control:
 
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# clip/wrap so a long summary can never force the row wider than the panel (which
+	# would shove the action buttons off the right edge — see _install_chrome).
+	info.clip_contents = true
 	var title := Label.new()
 	title.text = str(s.get("label", "Slot %d" % slot)) + ("" if exists else "  —  Empty")
 	title.add_theme_font_size_override(&"font_size", 20)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.add_child(title)
 	if exists:
 		var sub := Label.new()
 		sub.text = "%s   ·   %s" % [str(s.get("summary", "")), _fmt_time(s.get("modified_time", 0))]
+		sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		sub.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		info.add_child(sub)
 	row.add_child(info)
 
