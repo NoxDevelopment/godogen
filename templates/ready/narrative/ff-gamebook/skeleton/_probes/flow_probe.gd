@@ -16,6 +16,7 @@ const SCAFFOLD := "res://data/adventures/wardens-hollow.scaffold.json"
 const BROKEN := "res://data/adventures/_broken-sample.json"
 const READING_VIEW := preload("res://scenes/reading_view.tscn")
 const COMBAT_VIEW := preload("res://scripts/screens/combat_view.tscn")
+const ADVENTURE_SHEET := preload("res://scripts/screens/adventure_sheet.gd")
 
 # The pure-choice golden path to QUITTANCE (no dice events) — mirrors CONTENT_SAMPLE
 # + the condensed finale; every step is a legal, condition-met choice.
@@ -103,8 +104,47 @@ func _ready() -> void:
 	notes.append("combat_view_boot[ok=%s]" % cv_ok)
 	cv.queue_free()
 
+	# --- 6) Adventure Sheet boots + survives a full LAYOUT pass ----------------
+	# Reproduces the roll-up -> pick Potion -> Begin -> open-sheet path that crashed
+	# in the ruled-surface min-size computation. We instantiate the real sheet over a
+	# live run (potion picked, a codeword + note recorded so the ruled panels carry
+	# BOTH content and blank lines) and FORCE `get_combined_minimum_size()` on every
+	# Control descendant — the exact code path that previously threw. Headless (no
+	# rendering) still exercises layout/min-size, which is where the fault lived.
+	Adventure.new_adventure(20260719)
+	Adventure.runner.state.set_flag("potion", {"type": "skill", "doses": 2})   # a picked potion
+	Adventure.runner.state.set_codeword("RESTITUTION")
+	Adventure.runner.state.notes.append("the ledger cannot record a debt forgiven")
+	Adventure.sheet.apply_delta({"stamina": -5})
+	var sheet := ADVENTURE_SHEET.new()
+	add_child(sheet)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var laid := _force_layout(sheet)
+	# spent-potion variant (the other _render branch) must lay out too
+	Adventure.runner.state.set_flag("potion", {"type": "skill", "doses": 0})
+	sheet.call("_render")
+	await get_tree().process_frame
+	laid += _force_layout(sheet)
+	var sheet_ok := is_instance_valid(sheet) and laid > 0
+	if not sheet_ok: fails += 1
+	notes.append("adventure_sheet_boot[ok=%s controls_laid=%d]" % [sheet_ok, laid])
+	sheet.queue_free()
+
 	print("DEBUG: ff-gamebook phase-2 flow — %s  fails=%d" % [" ".join(notes), fails])
 	get_tree().quit(0 if fails == 0 else 1)
+
+
+## Recursively force min-size (layout) computation on every Control — this is the
+## path that a native-container `super._get_minimum_size()` misuse crashes on.
+func _force_layout(n: Node) -> int:
+	var count := 0
+	if n is Control:
+		(n as Control).get_combined_minimum_size()
+		count += 1
+	for c in n.get_children():
+		count += _force_layout(c)
+	return count
 
 
 func _has(cid: String) -> bool:
