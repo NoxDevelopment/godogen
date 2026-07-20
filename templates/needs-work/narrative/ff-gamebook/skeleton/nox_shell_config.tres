@@ -6,7 +6,7 @@ game_title = "THE GREY TITHE"
 subtitle = "An illustrated Fighting-Fantasy gamebook  ·  a NoxDev production"
 new_game_scene = "res://scripts/screens/roll_up.tscn"
 show_continue = false
-backdrop = "res://assets/plates/placeholder/cover.png"
+backdrop = "res://assets/plates/generated/cover.png"
 credits = "THE GREY TITHE — a NoxDev Studio production.
 
 Original world, text & rules: NoxDev (no Fighting Fantasy IP).
