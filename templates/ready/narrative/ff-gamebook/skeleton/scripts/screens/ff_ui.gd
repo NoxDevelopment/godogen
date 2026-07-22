@@ -28,10 +28,21 @@ const ARREARS     := Color("8a2e24")   # Old Arrears Red — wounds / blood / da
 const PROSE_INK   := Color("241c12")   # warm reading ink for body prose
 const GILT_EDGE   := Color("3a2c17")   # dark umber edge for the illuminated initial
 
+# --- The player's OWN ink (hand-entered values, never the printed form) -----
+# These separate "the pen the player wrote with" from the printed black form so the
+# Adventure Sheet reads as a real filled-in paper sheet (ADVENTURE_SHEET_SPEC §3):
+# scores/name go down in biro-blue, encounter-box scratchings in pencil graphite.
+const INK_PEN     := Color("2a3550")   # dark biro blue — scores, hero name, kit
+const GRAPHITE    := Color("2e2b26")   # pencil — encounter-box fill + scratch-downs
+
 # --- reused fantasy assets (CC0/OFL) — see credits + asset manifest ----------
 const FONT_DISPLAY := "res://assets/reused/fonts/Cinzel.ttf"          # titles / §N
 const FONT_BODY    := "res://assets/reused/fonts/MedievalSharp.ttf"   # prose / choices
 const FONT_RUNIC   := "res://assets/reused/fonts/UncialAntiqua.ttf"   # drop-cap / banners
+# The player's handwriting (OFL, see credits): Caveat is legible even at the tiny
+# encounter-box sizes; Reenie Beanie is looser/thinner, for large annotations only.
+const FONT_HAND    := "res://assets/reused/fonts/Caveat.ttf"          # hand-entered values
+const FONT_HAND_LOOSE := "res://assets/reused/fonts/ReenieBeanie.ttf" # large scrawl (name/notes)
 const FRAME_TEX    := "res://assets/reused/ui/frame.png"              # 96x96 9-slice
 const FRAME_DARK   := "res://assets/reused/ui/frame_dark.png"
 const DIVIDER_TEX  := "res://assets/reused/ui/divider.png"
@@ -50,6 +61,41 @@ static func _res(path: String) -> Resource:
 static func font_display() -> FontFile: return _res(FONT_DISPLAY) as FontFile
 static func font_body() -> FontFile:    return _res(FONT_BODY) as FontFile
 static func font_runic() -> FontFile:   return _res(FONT_RUNIC) as FontFile
+## The player's handwriting face — used for EVERY value the player/engine "wrote"
+## onto the sheet (scores, name, gold, kit, encounter stats). Falls back to the body
+## face if the OFL font isn't imported yet so a fresh clone never renders blank.
+static func font_hand() -> FontFile:
+	var f := _res(FONT_HAND) as FontFile
+	return f if f != null else font_body()
+## A looser, larger scrawl for big annotations only (hero name, long notes).
+static func font_hand_loose() -> FontFile:
+	var f := _res(FONT_HAND_LOOSE) as FontFile
+	return f if f != null else font_hand()
+
+
+## A hand-written value Label with per-glyph "life" (ADVENTURE_SHEET_SPEC §3): the
+## handwriting face in the player's ink, with a small DETERMINISTIC jitter in
+## rotation / size / baseline / colour-value seeded from `seed_key` (a hash of the
+## field key + value) so the same sheet state always looks identical — MP-safe and
+## screenshot-stable for visual-judge. Jitter is baked once, never animated per frame.
+static func handwritten(text: String, size: int = 22, color: Color = INK_PEN, seed_key: String = "", loose: bool = false) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_override(&"font", font_hand_loose() if loose else font_hand())
+	l.add_theme_font_size_override(&"font_size", size)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(seed_key if seed_key != "" else text)
+	# ±1px size, ±3% colour value, ±1.5° tilt, ±2px baseline — believable pen wobble.
+	l.add_theme_font_size_override(&"font_size", maxi(size + rng.randi_range(-1, 1), 8))
+	var vj := 1.0 + rng.randf_range(-0.03, 0.03)
+	l.add_theme_color_override(&"font_color", Color(color.r * vj, color.g * vj, color.b * vj, color.a))
+	l.rotation_degrees = rng.randf_range(-1.5, 1.5)
+	l.set_meta(&"jitter_off", Vector2(rng.randf_range(-2.0, 2.0), rng.randf_range(-2.0, 2.0)))
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# rotate about the glyph's own centre (containers drive the rect; pivot follows size)
+	l.resized.connect(func() -> void: l.pivot_offset = l.size * 0.5)
+	l.add_to_group(&"scalable_text")
+	return l
 
 
 ## The engraved display face with letter-spacing added — tracked caps read as

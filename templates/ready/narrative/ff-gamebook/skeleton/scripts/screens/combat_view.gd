@@ -187,6 +187,11 @@ func _build_actions() -> void:
 
 
 func _refresh() -> void:
+	# Feed the Adventure Sheet's Monster Encounter grid: each refresh upserts the live
+	# foes so the printed boxes fill in and their STAMINA scratches down in lock-step
+	# with the fight (ADVENTURE_SHEET_SPEC §6). Pure view mirror — combat math is
+	# untouched and still funnels through FFAdventureSheet.apply_delta.
+	Adventure.sheet.sync_encounters(_enemies)
 	# enemy panels
 	for c in _enemy_box.get_children():
 		c.queue_free()

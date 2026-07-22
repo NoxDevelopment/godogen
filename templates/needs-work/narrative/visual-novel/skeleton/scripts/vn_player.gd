@@ -38,6 +38,15 @@ var _emotion: Label
 var _hint: Label
 var _choices: VBoxContainer
 
+# Audio (Ren'Py scoring): a persistent looping music bed on the Music bus + one-shot
+# SFX on the SFX bus (the buses the template's default_bus_layout.tres declares).
+var _music: AudioStreamPlayer
+var _music_track := ""     # currently-loaded BGM track (skip restart on re-entry)
+
+# Scene-entry transition (Ren'Py `with fade/dissolve`): a full-rect black overlay
+# tweened by _play_transition_and_render. Hidden except while a transition plays.
+var _fade: ColorRect
+
 # Cutscene overlay (built on top of everything, hidden until a cutscene plays)
 var _cut_layer: Control
 var _cut_media: TextureRect
@@ -80,6 +89,9 @@ func _enter_scene(id: String) -> void:
 	_scene_id = id
 	_line_idx = 0
 	var sc := _cur_scene()
+	# Music/SFX apply on entry (before any cutscene) so the score sets the mood as
+	# the scene opens; absent bgm leaves the current track playing.
+	_apply_scene_audio(sc)
 	var cut = sc.get("cutscene", null)
 	if typeof(cut) == TYPE_DICTIONARY and not bool(_cut_done.get(id, false)):
 		var panels: Array = cut.get("panels", [])
@@ -90,9 +102,7 @@ func _enter_scene(id: String) -> void:
 			_cut_layer.visible = true
 			_render_panel()
 			return
-	_in_cutscene = false
-	_cut_layer.visible = false
-	_render()
+	_play_transition_and_render(sc)
 
 
 ## Draw the current cutscene panel — a Daz clip if the file is a playable VideoStream,
@@ -140,7 +150,8 @@ func _advance_panel() -> void:
 		_cut_done[_scene_id] = true
 		_cut_video.stop()
 		_cut_layer.visible = false
-		_render()
+		# Reveal the dialogue with the scene's transition (a nice fade off the cutscene).
+		_play_transition_and_render(_cur_scene())
 	else:
 		_panel_idx += 1
 		_render_panel()
@@ -186,6 +197,10 @@ func _render() -> void:
 		_portrait_tint.visible = false
 
 	_text.text = str(ln.get("text", ""))
+	# Per-line SFX stinger — fires as the line renders (once per line advance).
+	var line_sfx = ln.get("sfx", null)
+	if typeof(line_sfx) == TYPE_DICTIONARY:
+		_play_sfx(line_sfx)
 	_render_choices(sc)
 
 
@@ -284,10 +299,150 @@ func _color(hex: String) -> Color:
 	return Color.WHITE
 
 
+# --- Audio (music + SFX) ---------------------------------------------------
+
+## Apply a scene's audio directives on entry: the BGM cue (play / crossfade / stop)
+## and any on-enter SFX. Mirrors the Studio VnPlayer's scene-audio effect.
+func _apply_scene_audio(sc: Dictionary) -> void:
+	var bgm = sc.get("bgm", null)
+	if typeof(bgm) == TYPE_DICTIONARY:
+		var track := str(bgm.get("track", ""))
+		var fade := int(bgm.get("fadeMs", 0))
+		if track.strip_edges() == "":
+			_stop_music(fade)      # empty track = the "stop music" directive
+		else:
+			_play_music(track, float(bgm.get("volume", 1.0)), bool(bgm.get("loop", true)), fade)
+	var sfx = sc.get("sfx", null)
+	if typeof(sfx) == TYPE_DICTIONARY:
+		_play_sfx(sfx)
+
+
+## Play (or crossfade to) a music track on the Music bus. Re-entering a scene with
+## the same track already playing just re-levels it (no restart). fade_ms > 0 fades
+## the new track in from silence.
+func _play_music(track: String, vol: float, loop: bool, fade_ms: int) -> void:
+	var target_db := linear_to_db(maxf(vol, 0.0001))
+	if track == _music_track and _music.playing:
+		_music.volume_db = target_db
+		return
+	var stream = _load_audio(track)
+	if stream == null:
+		return
+	# Loop flag differs by stream type in Godot 4.
+	if stream is AudioStreamOggVorbis or stream is AudioStreamMP3:
+		stream.loop = loop
+	elif stream is AudioStreamWAV:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD if loop else AudioStreamWAV.LOOP_DISABLED
+	_music_track = track
+	_music.stream = stream
+	_music.volume_db = target_db if fade_ms <= 0 else -60.0
+	_music.play()
+	if fade_ms > 0:
+		create_tween().tween_property(_music, "volume_db", target_db, float(fade_ms) / 1000.0)
+
+
+## Stop the music bed, optionally fading out over fade_ms.
+func _stop_music(fade_ms: int) -> void:
+	_music_track = ""
+	if not _music.playing:
+		return
+	if fade_ms > 0:
+		var t := create_tween()
+		t.tween_property(_music, "volume_db", -60.0, float(fade_ms) / 1000.0)
+		t.tween_callback(_music.stop)
+	else:
+		_music.stop()
+
+
+## Fire a one-shot SFX cue on the SFX bus (self-frees when it finishes).
+func _play_sfx(cue: Dictionary) -> void:
+	var id := str(cue.get("id", ""))
+	if id.strip_edges() == "":
+		return
+	var stream = _load_audio(id)
+	if stream == null:
+		return
+	var p := AudioStreamPlayer.new()
+	p.bus = "SFX"
+	p.stream = stream
+	p.volume_db = linear_to_db(maxf(float(cue.get("volume", 1.0)), 0.0001))
+	add_child(p)
+	p.finished.connect(p.queue_free)
+	p.play()
+
+
+## Load an AudioStream from an exported path — a res:// resource when Godot imported
+## it, or a raw ogg/mp3 file (Studio absolute/web paths) decoded at runtime. Returns
+## null when the file is missing or an unsupported format (silent, never fatal).
+func _load_audio(path: String):
+	if path.strip_edges() == "":
+		return null
+	if ResourceLoader.exists(path):
+		var res = load(path)
+		if res is AudioStream:
+			return res
+	if FileAccess.file_exists(path):
+		var ext := path.get_extension().to_lower()
+		var bytes := FileAccess.get_file_as_bytes(path)
+		if ext == "ogg" or ext == "oga":
+			return AudioStreamOggVorbis.load_from_buffer(bytes)
+		elif ext == "mp3":
+			var s := AudioStreamMP3.new()
+			s.data = bytes
+			return s
+	return null
+
+
+# --- Transitions -----------------------------------------------------------
+
+## Render the current scene, wrapped in its entry transition (Ren'Py `with ...`).
+## - cut (or 0ms / unspecified): instant, no overlay (back-compatible default).
+## - fade / dissolve: swap immediately, then reveal from black over durationMs.
+## - fade_to_black: cover the OLD scene to black, swap at the midpoint, then reveal.
+## (dissolve is rendered as a reveal-from-black here; a true content crossfade would
+## need a snapshot layer — noted for a live playthrough.)
+func _play_transition_and_render(sc: Dictionary) -> void:
+	_in_cutscene = false
+	_cut_layer.visible = false
+	var trans = sc.get("transition", null)
+	var kind := "cut"
+	var ms := 0
+	if typeof(trans) == TYPE_DICTIONARY:
+		kind = str(trans.get("kind", "cut"))
+		ms = int(trans.get("durationMs", 0))
+	if kind == "cut" or ms <= 0:
+		_fade.visible = false
+		_fade.color = Color(0, 0, 0, 0)
+		_render()
+		return
+	var dur := float(ms) / 1000.0
+	if kind == "fade_to_black":
+		# The previous scene's visuals are still on screen (we haven't _render()ed
+		# the new one yet) — cover them, swap at black, then reveal.
+		_fade.color = Color(0, 0, 0, 0)
+		_fade.visible = true
+		var t := create_tween()
+		t.tween_property(_fade, "color:a", 1.0, dur * 0.5)
+		t.tween_callback(_render)
+		t.tween_property(_fade, "color:a", 0.0, dur * 0.5)
+		t.tween_callback(func() -> void: _fade.visible = false)
+	else:
+		_render()
+		_fade.color = Color(0, 0, 0, 1)
+		_fade.visible = true
+		var t := create_tween()
+		t.tween_property(_fade, "color:a", 0.0, dur)
+		t.tween_callback(func() -> void: _fade.visible = false)
+
+
 # --- UI construction -------------------------------------------------------
 
 func _build_ui() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+
+	_music = AudioStreamPlayer.new()
+	_music.bus = "Music"
+	add_child(_music)
 
 	_bg_color = ColorRect.new()
 	_bg_color.color = Color(0.07, 0.09, 0.11)
@@ -370,6 +525,15 @@ func _build_ui() -> void:
 	_choices.custom_minimum_size = Vector2(400, 0)
 	_choices.add_theme_constant_override("separation", 8)
 	add_child(_choices)
+
+	# Transition overlay — a full-rect black rect above the dialogue stage, driven
+	# by _play_transition_and_render. Hidden (and click-through) except mid-fade.
+	_fade = ColorRect.new()
+	_fade.color = Color(0, 0, 0, 0)
+	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.visible = false
+	add_child(_fade)
 
 	# --- Cutscene overlay (on top of everything; hidden until a cutscene plays) ---
 	_cut_layer = Control.new()

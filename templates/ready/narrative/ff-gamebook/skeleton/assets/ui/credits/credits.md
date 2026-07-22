@@ -22,6 +22,8 @@
 - UncialAntiqua — Astigmatic [OFL-1.1]
 - MedievalSharp — Wojciech Kalinowski [OFL-1.1]
 - Montserrat — Julieta Ulanovsky [OFL-1.1]
+- Caveat — The Caveat Project Authors [OFL-1.1]
+- Reenie Beanie — James Grieshaber (Typeco) [OFL-1.1]
 
 ## Music & Sound
 - Shadow War — Dark Fantasy Orchestral Music Collection — GWriterStudio [commercial (owned asset pack)]

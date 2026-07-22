@@ -29,6 +29,16 @@
       "name": "Montserrat",
       "license": "OFL-1.1",
       "author": "Julieta Ulanovsky"
+    },
+    {
+      "name": "Caveat",
+      "license": "OFL-1.1",
+      "author": "The Caveat Project Authors (Impallari Type / Pablo Impallari)"
+    },
+    {
+      "name": "Reenie Beanie",
+      "license": "OFL-1.1",
+      "author": "James Grieshaber (Typeco)"
     }
   ],
   "audio": [

@@ -87,6 +87,21 @@ format `noxdev-vn`):
   (which logs `[VN voice] <name> | <provider>/<voice> | <instruction>` by
   default). Override `_speak()` to synthesize with your TTS of choice or play a
   pre-rendered clip — the fields are already parsed and resolved.
+- **Music & SFX (Ren'Py scoring)**: a scene carries an optional `bgm` directive
+  (`track` + `loop` + `volume` + `fadeMs`) applied on entry — plays/crossfades on
+  the **Music** bus, an empty `track` STOPS the music, and an absent `bgm` leaves
+  the current track playing (music persists across scenes). One-shot **SFX** cues
+  (`id` + `volume`) fire per scene (`scene.sfx`, on enter) and per line
+  (`line.sfx`, as the line shows) on the **SFX** bus. Tracks load as `res://`
+  resources when imported, or raw `.ogg`/`.mp3` decoded at runtime (Studio paths);
+  a missing file is silent, never fatal. Volumes are linear (converted to dB).
+- **Transitions (Ren'Py `with`)**: a scene carries an optional `transition`
+  (`kind` + `durationMs`) played when it becomes visible — `cut` (instant, the
+  default when unspecified, so old scripts are unchanged), `fade`/`dissolve`
+  (reveal from black), and `fade_to_black` (cover the outgoing scene → swap at the
+  black midpoint → reveal). Driven by a black `ColorRect` + `Tween`; `dissolve` is
+  currently a reveal-from-black (a true content crossfade would need a snapshot
+  layer).
 - **Cutscenes (E1)**: a scene can open with a `cutscene` — an ordered list of
   `panels`, each a static screen (`image`) and/or a Daz clip (`clip`) + a
   `caption` + an auto-advance `durationMs`. The runtime plays them full-bleed, one
@@ -102,7 +117,12 @@ format `noxdev-vn`):
 Headless-verified (Godot 4.6.1): the runtime parses a sample export, resolves
 sprites/emotions/voice, plays a scene's multi-panel opening cutscene through to the
 dialogue, renders the first line, gates + takes a flag-setting choice, and
-navigates — all assertions green.
+navigates — all assertions green. The **music/SFX + transition** additions were
+verified the same way: BGM loads and plays on the Music bus with a fade-in, an
+empty-track cue stops it, per-line/scene SFX fire on the SFX bus, and a scene
+change renders under a `fade_to_black` (cover → swap → reveal) transition — all
+assertions green, no script errors. (Live playback of actual audio + the visual
+feel of each transition still wants a windowed playthrough to judge by eye/ear.)
 
 ## How to extend
 

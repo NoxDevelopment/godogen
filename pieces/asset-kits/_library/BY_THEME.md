@@ -1,8 +1,16 @@
 # Asset Library by Theme
 
-Primary-theme catalog of 638 packs. Generated from manifest.json.
+Primary-theme catalog of 639 packs. Generated from manifest.json.
 
-**Distribution:** fantasy (325), sci-fi (43), cyberpunk (7), horror (17), military (6), western (3), modern-urban (34), nature (46), casual-cute (35), retro-arcade (22), abstract-ui (52), audio-generic (48)
+**Distribution:** fantasy (325), sci-fi (43), cyberpunk (7), horror (17), military (6), western (3), modern-urban (34), nature (46), casual-cute (35), retro-arcade (22), abstract-ui (52), audio-generic (48), map-cartography (1)
+
+## map-cartography (1 pack)
+
+| name | category | files | sizeMB | zip | license |
+|------|----------|-------|--------|-----|---------|
+| NoBadMaps Vintage Cartography Brushes (K.M. Alexander) | map-stamps | 33820 | 1210.0 | nobadmaps/ | CC0 / permissive (redistribute + AI-train OK) |
+
+40 sets (33 vintage-map brush sets + 6 decorative/nautical sets + True Tags graffiti bonus), 16th–19th-c. engraved stamps: RELIEF/VEGETATION/SETTLEMENTS/STRUCTURES/POI/NAUTICAL/DÉCOR coverage for Map Studio Lane A2. Per-set license quotes + family mapping: `../nobadmaps/INDEX.md`.
 
 ## fantasy (325 packs)
 

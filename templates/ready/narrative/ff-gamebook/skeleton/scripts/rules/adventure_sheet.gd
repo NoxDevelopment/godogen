@@ -140,6 +140,11 @@ func apply_delta(delta: Dictionary) -> Dictionary:
 		state.add_attr(key, float(int(delta[stat])))
 		var after := int(state.get_attr(key))
 		applied[stat] = {"from": before, "to": after}
+		# Record the crossed-out history the FF sheet is famous for: when a current
+		# score actually moves, remember the value it moved FROM so the view can strike
+		# it through and write the new one beside it (ADVENTURE_SHEET_SPEC §3).
+		if after != before:
+			_push_history(stat, before)
 		if raw != after:
 			overflow[stat] = raw - after
 		if key == "STAMINA" and after <= 0 and before > 0:
@@ -286,6 +291,139 @@ func has_item(item: String) -> bool:
 
 func remove_item(item: String) -> bool:
 	return state != null and state.consume_item(item, 1)
+
+
+# --- Hero name (masthead) ----------------------------------------------------
+# Free text the player writes at the top of the sheet. Lives on the shared IFState
+# flags (IFState.vars is numeric-only), so it is covered by save_data/load_data with
+# zero extra glue — the same "unified payload" seam gold/potion/kit use.
+
+
+var hero_name: String:
+	get:
+		return str(state.get_flag("hero_name", "")) if state != null else ""
+	set(value):
+		if state != null:
+			state.set_flag("hero_name", value)
+
+
+# --- Crossed-out score history (the FF signature) ----------------------------
+# The last few values a current score moved AWAY from, newest last, so the view can
+# render "22̶ 18̶ 14" — the running column of a real in-play sheet. Capped so it reads,
+# not clutters. Persisted on flags with the rest of the state.
+
+const _HIST_CAP := 3
+
+
+func _push_history(stat: String, old_value: int) -> void:
+	if state == null:
+		return
+	var all: Dictionary = state.get_flag("stat_hist", {}) as Dictionary
+	all = all.duplicate(true)
+	var lst: Array = all.get(stat, []) as Array
+	lst.append(old_value)
+	while lst.size() > _HIST_CAP:
+		lst.pop_front()
+	all[stat] = lst
+	state.set_flag("stat_hist", all)
+
+
+## The struck-through prior values for `stat`, oldest→newest (may be empty).
+func history(stat: String) -> Array:
+	if state == null:
+		return []
+	var all: Dictionary = state.get_flag("stat_hist", {}) as Dictionary
+	return (all.get(stat, []) as Array).duplicate()
+
+
+# --- Monster-encounter ledger (the iconic FF grid) ---------------------------
+# Transient scratch records of the foes fought, mirroring the printed encounter
+# boxes. Each is { name, skill, stamina, stamina_max } — the SAME shape FFCombat
+# uses — keyed so repeated rounds UPDATE a foe's row (its STAMINA scratching down)
+# rather than adding duplicates. Stored on flags so the grid survives save/load.
+
+const _ENC_CAP := 18
+
+
+func _enc_key(rec: Dictionary) -> String:
+	return "%s|%d" % [str(rec.get("name", "Foe")), int(rec.get("stamina_max", rec.get("stamina", 0)))]
+
+
+## The encounter rows the grid renders, in the order first met.
+var encounters: Array:
+	get:
+		if state == null:
+			return []
+		return (state.get_flag("encounters", []) as Array).duplicate(true)
+
+
+## Upsert a whole live combat's enemy list (FFCombat's `_enemies`) into the ledger:
+## a foe already present (same name+max) has its current STAMINA updated; a new foe is
+## appended (capped at ~18 boxes). Combat calls this each refresh so the sheet's grid
+## fills in and scratches down in lock-step with the fight — no glue, no dup rows.
+func sync_encounters(enemies: Array) -> void:
+	if state == null:
+		return
+	var rows: Array = (state.get_flag("encounters", []) as Array).duplicate(true)
+	for e in enemies:
+		if not (e is Dictionary):
+			continue
+		var rec := {
+			"name": str(e.get("name", "Foe")),
+			"skill": int(e.get("skill", 0)),
+			"stamina": int(e.get("stamina", 0)),
+			"stamina_max": int(e.get("stamina_max", e.get("stamina", 0))),
+		}
+		var key := _enc_key(rec)
+		var found := false
+		for i in rows.size():
+			if _enc_key(rows[i]) == key:
+				rows[i]["stamina"] = rec["stamina"]
+				rows[i]["skill"] = rec["skill"]
+				found = true
+				break
+		if not found:
+			rows.append(rec)
+	while rows.size() > _ENC_CAP:
+		rows.pop_front()
+	state.set_flag("encounters", rows)
+
+
+## Hand-enter one foe into a blank box (the tap-to-track affordance, §6/§7). Returns
+## the row index. Same store as combat's auto-fill, so a manual foe reads identically.
+func record_encounter(enemy_name: String, enemy_skill: int, enemy_stamina: int) -> int:
+	if state == null:
+		return -1
+	var rows: Array = (state.get_flag("encounters", []) as Array).duplicate(true)
+	rows.append({
+		"name": enemy_name, "skill": enemy_skill,
+		"stamina": enemy_stamina, "stamina_max": enemy_stamina,
+	})
+	while rows.size() > _ENC_CAP:
+		rows.pop_front()
+	state.set_flag("encounters", rows)
+	return rows.size() - 1
+
+
+## Scratch a tracked foe's STAMINA down (or up) by `delta`; clamps 0..max.
+func note_encounter_stamina(index: int, new_stamina: int) -> void:
+	if state == null:
+		return
+	var rows: Array = (state.get_flag("encounters", []) as Array).duplicate(true)
+	if index < 0 or index >= rows.size():
+		return
+	rows[index]["stamina"] = clampi(new_stamina, 0, int(rows[index].get("stamina_max", 9999)))
+	state.set_flag("encounters", rows)
+
+
+# --- Free-text notes (editable ledger lines, §7) -----------------------------
+
+
+## Append a hand-written note to the shared ledger (Codewords & Notes panel).
+func add_note(text: String) -> void:
+	if state == null or text.strip_edges() == "":
+		return
+	state.notes.append(text.strip_edges())
 
 
 # --- "persistent" save contract (templates ABI) -----------------------------
