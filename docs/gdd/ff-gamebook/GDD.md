@@ -20,6 +20,7 @@ These five child docs close the benchmark gaps and carry the depth this GDD only
 - [`BALANCE.md`](BALANCE.md) — enemy roster/tiers, the Gold/Provisions economy, the difficulty model, and a verified probability sanity-check (win-rate + LUCK-depletion). *(gap #4)*
 - [`WIREFRAMES.md`](WIREFRAMES.md) — ASCII wireframes, per-screen states, and a screen-flow map for all §6 screens. *(gap #5)*
 - [`STYLE_GUIDE.md`](STYLE_GUIDE.md) — `veritas-gamebook` art direction (+ `sir-brante` variant) and the audio-design spec. *(gap #8)*
+- [`ADVENTURE_FORMAT.md`](ADVENTURE_FORMAT.md) — the installable adventure-BOOK package format (book.json + adventure.json + assets/, per-book asset-slot overlay, user://adventures install, offline validator) consumed by the in-game Library (§6.1 #2). Reference package: *The Grey Tithe*; second shipped book: *The Wrecker's Light*.
 
 ---
 

@@ -1,0 +1,267 @@
+{
+  "id": "wreckers-light",
+  "name": "The Wrecker's Light",
+  "meta": {
+    "author": "NoxDev",
+    "world": "Aldermere's west coast (the same original canon as The Grey Tithe — no FF IP). The salt-parish of Brinecombe Staithe, the Fangs, and the tide-isle lamp of Saint Maren.",
+    "status": "Complete 24-passage coastal tale — the second shipped book proving the ADVENTURE_FORMAT.md installable-package format. Full FF loop: three combats, two Luck tests, two Skill tests, an item economy, and five endings (true victory, pyrrhic victory, three failures).",
+    "conventions": "Same as the flagship: outcome routing for dice/combat lives in underscore-prefixed choices (_onwin/_ondeath/_onlucky/_onunlucky/_onsuccess/_onfailure/_onescape) the reading/combat screens consume; the engine stays authoritative. Player-facing choices carry no target numbers."
+  },
+  "ruleset": "ff-2d6",
+  "start": "w1",
+  "sheet": null,
+  "init": {
+    "vars": { "gold": 10 },
+    "items": {},
+    "flags": {}
+  },
+  "passages": [
+    {
+      "id": "w1",
+      "title": "The Salt Road",
+      "illustration": "plate/wl_shore",
+      "text": "Three days walking into a wind that tastes of iron and old rope, and the salt road finally gives out at Brinecombe Staithe: a dozen grey houses crouched behind a shingle bank, nets hung to dry that nobody has wet in weeks.\n\nThe letter in your coat is from the Mereward Shipping Combine, and it is blunt. Four ships lost on the Fangs since Candlemas. The light of Saint Maren, kept a hundred years without fail, has gone dark — and something else burns in its place on wreck-nights. Find out what. The Combine pays on proof.\n\nOut past the headland, low tide has bared a glistening causeway of weed-slick stone, running out to the lamp-isle. The village inn leaks smoke and lamplight. Along the shore, the wrack-line is humped with things the sea has given back.",
+      "onEnter": [ { "kind": "flag", "key": "arrived", "value": true } ],
+      "choices": [
+        { "id": "wrack", "text": "Walk the wrack-line first, where the sea leaves its evidence.", "goto": "w2" },
+        { "id": "inn", "text": "Go up to the inn — the Anchor & Candle — and ask questions.", "goto": "w3" },
+        { "id": "causeway", "text": "Make straight for the tide causeway while the water is low.", "goto": "w4" }
+      ]
+    },
+    {
+      "id": "w2",
+      "title": "The Wrack-Line",
+      "text": "The tide has been generous, if that is the word. Splintered spars. A ship's boy's boot. A crate of Mereward tea burst open and black with brine.\n\nAnd a drowned man, a week in the water, still lashed to a grating. In his oilskin, wrapped tight and almost dry, is a page torn from a cargo manifest — the *Speedwell*'s, lost in March — with a column of figures down the margin in a different, landsman's hand. Somebody tallied this cargo before the sea ever took it. Somebody priced the wreck in advance.",
+      "choices": [
+        { "id": "take_page", "text": "Take the manifest page and close the dead man's eyes.", "effects": [ { "kind": "item", "key": "manifest_page", "op": "grant", "value": 1 }, { "kind": "flag", "key": "searchedWreck", "value": true } ], "goto": "w4" },
+        { "id": "leave_it", "text": "Leave the dead their belongings. Head for the causeway.", "goto": "w4" }
+      ]
+    },
+    {
+      "id": "w3",
+      "title": "The Anchor & Candle",
+      "illustration": "plate/wl_inn",
+      "text": "The inn is low-beamed and close with tallow-smoke, and it goes quiet the way a rockpool goes still when your shadow falls on it. Maud Pellow keeps the bar: broad, unhurried, eyes like wet slate.\n\n\"Combine business,\" she says — not a question; the letter is showing at your coat. \"Then you'll want feeding, and you'll want telling things. One of those I sell.\"\n\nBehind her, above the bottles, an empty bracket on the wall shows a clean shadow where a lamp hung a long time and hangs no longer.",
+      "choices": [
+        { "id": "ask_light", "text": "Ask her straight: who burns the false fire on wreck-nights?", "goto": "w3a" },
+        { "id": "buy_provisions", "text": "Buy bread, salt fish and a flask (2 Gold — 2 Provisions).", "conditions": [ { "kind": "var", "key": "gold", "cmp": ">=", "value": 2 } ], "effects": [ { "kind": "var", "key": "gold", "op": "add", "value": -2 }, { "kind": "resource", "key": "provisions", "op": "add", "value": 2 } ], "goto": "w3" },
+        { "id": "to_causeway", "text": "Leave the quiet room and make for the tide causeway.", "goto": "w4" }
+      ]
+    },
+    {
+      "id": "w3a",
+      "title": "What Maud Won't Say",
+      "text": "Maud polishes a glass that is already clean. \"Nobody burns anything,\" she says, loud enough for the room. Then, low, under the clatter of her work: \"Old Tregarrick kept the saint's lamp forty years and died of a fall a month back — a fall, on stairs he climbed blind drunk his whole life. The wick went into somebody's pocket at the wake. You didn't hear it here.\"\n\nHer slate eyes flick to the harbourmaster's office at the quay, and away. \"Mind the lookout on the cliff path, Combine-man. He minds it very well.\"",
+      "onEnter": [ { "kind": "codeword", "key": "WARNED" } ],
+      "choices": [
+        { "id": "back", "text": "Set your coat against the wind and go.", "goto": "w3" }
+      ]
+    },
+    {
+      "id": "w4",
+      "music": "tension",
+      "title": "The Tide Causeway",
+      "illustration": "plate/wl_saintstone",
+      "text": "At the causeway's landward end stands Saint Maren's sea-stone, so weathered her carved lamp is only a hollow now, filled with rain. The old habit of the coast: touch the stone, cross on her patience.\n\nThe causeway itself is a half-mile of weed-slick blocks, laid bare twice a day and drowned twice a day, and the tide has already turned. Halfway out, the water is over your boots and pulling like a dog on a rope. The sea decides these crossings, and the sea keeps no appointments.\n\nTest your Luck.",
+      "event": "luck_test",
+      "test_prompt": "The tide decides",
+      "choices": [
+        { "id": "_onlucky", "text": "Lucky — the race slackens, and the stones hold you up.", "goto": "w6" },
+        { "id": "_onunlucky", "text": "Unlucky — the sea takes hold of your legs.", "goto": "w5" }
+      ]
+    },
+    {
+      "id": "w5",
+      "music": "tension",
+      "title": "The Race",
+      "text": "The undertow has you. The causeway is gone from under your feet and the cold shuts on your chest like a chest-lid closing; the lamp-isle swings past, tilting, further away each heave. There is one chance in it — the old mooring chain that runs out to the isle, slimed and freezing, whipping in the race.\n\nTest your Skill.",
+      "event": "skill_test",
+      "test_stat": "skill",
+      "test_prompt": "Catch the mooring chain",
+      "choices": [
+        { "id": "_onsuccess", "text": "Your hand closes on iron. You haul out, coughing brine.", "effects": [ { "kind": "attr", "key": "STAMINA", "op": "add", "value": -2 } ], "goto": "w6" },
+        { "id": "_onfailure", "text": "Your fingers find only water.", "goto": "end_drowned" }
+      ]
+    },
+    {
+      "id": "w6",
+      "title": "The Cold Lantern",
+      "text": "Saint Maren's light is a squat white tower on a shoulder of rock, door banging on a broken latch. Inside it smells of cold ash and gull-mess. Nobody has trimmed a lamp here in a month.\n\nOld Tregarrick's room is as he left it — bed made, boots paired — save for the keeper's log lying open on the table, and the stair he is supposed to have fallen down, which has a rope's worth of fresh scuffing along the third step where no drunk man's heel would drag.\n\nUp top, past the salt-blind glass, you can see the mainland cliffs. On the far headland above the Fangs, small and deliberate, someone is building a fire against the dusk.",
+      "choices": [
+        { "id": "read_log", "text": "Read the keeper's log.", "goto": "w6a" },
+        { "id": "lamp_room", "text": "Climb to the lamp room and examine the great lamp.", "goto": "w6b" },
+        { "id": "to_fire", "text": "Cross back with the ebb and climb toward the fire on the headland.", "goto": "w7" },
+        { "id": "slip_past", "text": "Cross back and skirt the headland through the blackthorn, wide of the path — you remember Maud's warning about the lookout.", "conditions": [ { "kind": "codeword", "key": "WARNED" } ], "goto": "w8" }
+      ]
+    },
+    {
+      "id": "w6a",
+      "title": "The Keeper's Log",
+      "text": "Tregarrick wrote a fair, cramped hand, and near the end he wrote scared. *\"S.M. at the quay again asking after the wick, which I told him it is the saint's and not the parish's to sell. He smiled at me. 12th: the Speedwell lost with nine hands, and a fire on the Fangs head that no one will own. He came to the light tonight. I have said no for the last time, I think.\"*\n\nS.M. — Silas Morcant. The harbourmaster. The man who logs the wrecks, salvages the cargoes, and pays the parish's grief-money out of the Combine's own purse.",
+      "onEnter": [ { "kind": "codeword", "key": "MORCANT" } ],
+      "choices": [
+        { "id": "back", "text": "Close the dead man's book gently.", "goto": "w6" }
+      ]
+    },
+    {
+      "id": "w6b",
+      "title": "The Lamp Room",
+      "text": "The great lamp is a beautiful old thing of brass and whale-glass, kept bright forty years by one man's stubbornness — and it has been robbed. The cradle at its heart stands empty. The wick of Saint Maren, the braided sea-flax relic that has outlived every keeper since the tower rose, is gone; without it the reservoir will not draw, and the lamp is so much cold metal.\n\nNo storm did this. The retaining pins were drawn by careful fingers and set down in a neat row.",
+      "onEnter": [ { "kind": "flag", "key": "knowsWick", "value": true } ],
+      "choices": [
+        { "id": "back", "text": "Go back down the scuffed stair.", "goto": "w6" }
+      ]
+    },
+    {
+      "id": "w7",
+      "music": "tension",
+      "title": "The False Fire",
+      "illustration": "plate/wl_lookout",
+      "text": "The cliff path climbs through blackthorn toward the headland, and the fire up there is burning wrong — too low, too red, set in a cradle of stones where a masthead lantern would swing. From the sea, in weather, it would read as the harbour light. It would read as *safe water*.\n\nBelow, on the Fangs, dark figures move along the tideline with hooks and coils of rope, unhurried as men at harvest.\n\nA man steps out of the blackthorn with a boat-hook levelled at your chest. \"Wrong path, friend,\" he says. \"No path at all, for you.\"",
+      "event": "combat",
+      "encounter": {
+        "enemies": [ { "name": "Wrecker Lookout", "skill": 6, "stamina": 5, "portrait": "portrait/cutthroat" } ],
+        "escapeTarget": "w6",
+        "gangRules": {}
+      },
+      "choices": [
+        { "id": "_onwin", "text": "The boat-hook clatters on the stones.", "goto": "w8" },
+        { "id": "_onescape", "text": "You break back down the path toward the shore.", "goto": "w6" },
+        { "id": "_ondeath", "text": "The hook takes you at the cliff's edge.", "goto": "end_hooked" }
+      ]
+    },
+    {
+      "id": "w8",
+      "title": "The Boathouse",
+      "text": "Under the headland, out of sight of the village, a long boathouse squats above its slip — new padlock, old door, and a smell through the boards of tar, tea and wet silk that no fishing crew ever paid duty on. The wreckers' store. Voices carry from the fire above; you will not have long.",
+      "choices": [
+        { "id": "pick", "text": "Work the padlock quietly with your knife-point.", "goto": "w8a" },
+        { "id": "force", "text": "Put your shoulder to the old door and force it, noise be damned.", "goto": "w10" }
+      ]
+    },
+    {
+      "id": "w8a",
+      "title": "The Padlock",
+      "text": "The lock is good; the hasp it hangs from is forty years of salt. Gently, now — a blade in the staple-screws, an even pull, and no ring of metal on stone to carry up the cliff.\n\nTest your Skill.",
+      "event": "skill_test",
+      "test_stat": "skill",
+      "test_prompt": "Draw the hasp in silence",
+      "choices": [
+        { "id": "_onsuccess", "text": "The hasp comes away like a rotten tooth, without a sound.", "goto": "w9" },
+        { "id": "_onfailure", "text": "The hasp shears — and the padlock rings off the slipway stone.", "goto": "w10" }
+      ]
+    },
+    {
+      "id": "w9",
+      "title": "The Cache",
+      "illustration": "plate/wl_cache",
+      "text": "Inside, the boathouse is a customs-house of the drowned. Bales of silk with the *Speedwell*'s marks. Tea, brandy, a crate of Mereward plate. A strongbox of run-gold, lid thrown back, careless as a lord.\n\nAnd on a shelf at the back, wrapped in oiled linen like the relic it is: a braided coil of sea-flax, pale with a hundred years of burning. The wick of Saint Maren. Beside it, a ledger in a neat landsman's hand — dates, tonnages, shares paid out — every wreck priced and every man's cut named, and at the foot of every page the same initials. S.M.",
+      "choices": [
+        { "id": "take_all", "text": "Take the saint's wick, the wreckers' ledger, and a fistful of the run-gold.", "effects": [ { "kind": "item", "key": "saints_wick", "op": "grant", "value": 1 }, { "kind": "item", "key": "wreckers_ledger", "op": "grant", "value": 1 }, { "kind": "var", "key": "gold", "op": "add", "value": 8 } ], "goto": "w11" }
+      ]
+    },
+    {
+      "id": "w10",
+      "music": "tension",
+      "title": "Hooks in the Dark",
+      "text": "Too loud. A whistle up on the headland, answered from the slip — and a wrecker comes around the boathouse at a run, hook first, a man built like a capstan with a decade of hauling drowned cargo behind each shoulder.",
+      "event": "combat",
+      "encounter": {
+        "enemies": [ { "name": "Wrecker", "skill": 7, "stamina": 7, "portrait": "portrait/cutthroat" } ],
+        "escapeTarget": "",
+        "gangRules": {}
+      },
+      "choices": [
+        { "id": "_onwin", "text": "He goes down among his stolen bales. The boathouse is yours.", "goto": "w9" },
+        { "id": "_ondeath", "text": "The hook finds you in the dark.", "goto": "end_hooked" }
+      ]
+    },
+    {
+      "id": "w11",
+      "music": "tension",
+      "title": "The Reeve on the Stair",
+      "text": "You come out of the boathouse into lantern-light. Silas Morcant stands on the slipway stair with the light held high and men gathering dark behind him — a trim, unhurried man in a good coat, the kind of face a parish trusts with its ledgers and its griefs.\n\n\"The Combine's creature,\" he says, pleasantly. \"You've been at my stores. That's theft, that is. This coast has a short way with thieves — the sea takes them, poor souls, like it takes so much.\" The men behind him spread out along the slip, hooks low.",
+      "choices": [
+        { "id": "show_ledger", "text": "Hold up his own wreckers' ledger and read the shares aloud — every man's cut, in his hand.", "conditions": [ { "kind": "item", "key": "wreckers_ledger" } ], "goto": "w12" },
+        { "id": "name_him", "text": "Name him — the keeper's log, the wick asked after, old Tregarrick's stair — loud enough for the men to hear.", "conditions": [ { "kind": "codeword", "key": "MORCANT" } ], "goto": "w12" },
+        { "id": "show_page", "text": "Show the drowned sailor's manifest page — a wreck priced before the sea ever took it.", "conditions": [ { "kind": "item", "key": "manifest_page" } ], "goto": "w12" },
+        { "id": "fight", "text": "Say nothing. Draw your blade on the stair.", "goto": "w13" }
+      ]
+    },
+    {
+      "id": "w12",
+      "title": "Named and Weighed",
+      "text": "You read, and the slipway goes very quiet. Wrecking is one thing on this coast — an old sin, half-forgiven, shared out like the catch. But there it is in Morcant's own neat hand: the keeper's fall priced at ten shillings to the man who managed it; the *Speedwell*'s nine drowned hands entered under *sundries*.\n\nThe men behind him do not move to help you. They do not move to help him either. One by one, the hooks go down.\n\n\"Gentlemen,\" Morcant says, and his voice has lost its parish smoothness. No one answers him. The lantern shakes, just slightly, in his hand.",
+      "choices": [
+        { "id": "bind", "text": "Bind him for the Combine's assize at Caister — let the law weigh him.", "effects": [ { "kind": "flag", "key": "reeveTaken", "value": true } ], "goto": "w14" },
+        { "id": "tide", "text": "Give him to the men he fed to the sea's account — and turn your back on what follows.", "effects": [ { "kind": "flag", "key": "reeveDrowned", "value": true } ], "goto": "w14" }
+      ]
+    },
+    {
+      "id": "w13",
+      "title": "The Wreck-Reeve",
+      "text": "Morcant sets the lantern down on the stair with terrible care, and draws a hanger-sword that has seen better use than any harbourmaster's should. \"As you like,\" he says. \"The sea takes thieves. I only keep the account.\" He fights the way he keeps his books: neat, patient, and quite without mercy.",
+      "event": "combat",
+      "encounter": {
+        "enemies": [ { "name": "Silas Morcant, the Wreck-Reeve", "skill": 9, "stamina": 10, "portrait": "portrait/ferrant" } ],
+        "escapeTarget": "",
+        "gangRules": {}
+      },
+      "choices": [
+        { "id": "_onwin", "text": "The good coat crumples on the slipway stair.", "effects": [ { "kind": "flag", "key": "reeveDead", "value": true } ], "goto": "w14" },
+        { "id": "_ondeath", "text": "Neat, patient, and quite without mercy.", "goto": "end_hooked" }
+      ]
+    },
+    {
+      "id": "w14",
+      "music": "tension",
+      "title": "The Lamp Must Burn",
+      "text": "Then the night tears open: a rocket, far out — one, then another — and a sail shows ghost-grey beyond the Fangs. The Mereward packet, the *Constance*, seven days from Caister with forty souls aboard, is standing in on the false fire's promise of safe water. The wreckers' beacon still burns on the headland; the saint's lamp is dark; and the tide, as ever, keeps no appointments.\n\nKick the false fire apart and the *Constance* is merely blind. Only a true light, in the true place, turns her in time.",
+      "choices": [
+        { "id": "true_light", "text": "Race the causeway with the saint's wick and set it in the great lamp.", "conditions": [ { "kind": "item", "key": "saints_wick" } ], "goto": "end_light" },
+        { "id": "makeshift", "text": "You carry no wick. Scatter the false fire and burn what you have — oil, rag and lantern — in the cold lamp's cradle.", "goto": "w15" }
+      ]
+    },
+    {
+      "id": "w15",
+      "title": "A Poor Flame",
+      "text": "The saint's lamp takes your makeshift wick the way a lord takes beggar's coin — reluctantly, and without promises. The flame catches, gutters, catches. Through the salt-blind glass it is a poor, stammering star, and the *Constance* is coming on with the wind behind her.\n\nTest your Luck.",
+      "event": "luck_test",
+      "test_prompt": "A stammering star against the dark",
+      "choices": [
+        { "id": "_onlucky", "text": "Lucky — the flame holds one breath longer than the dark.", "goto": "end_gutter" },
+        { "id": "_onunlucky", "text": "Unlucky — the wind reaches through the glass.", "goto": "end_wreck" }
+      ]
+    },
+    {
+      "id": "end_light",
+      "title": "The Light of Saint Maren",
+      "text": "The braided sea-flax drinks the oil as if it had never been away, and the great lamp lights with a sound like a held breath released — a broad, steady, hundred-year light, sweeping the Fangs bare of every lie told about them.\n\nOut in the dark the *Constance* answers: helm over, sails shivering, her lights swinging wide of the rocks and away toward the true harbour. On the headland the false fire dies, kicked apart by men suddenly anxious to have never existed.\n\nYou stay the night with the lamp, as the keepers always have. At dawn the parish comes over the causeway almost shyly, to see the saint's light burning and to begin, awkwardly, the accounting of what it let happen. The Combine will pay on proof. You have proof, and the coast has its light, and forty souls are asleep in Caister roads who will never know your name. That is the trade, and it is a fair one.",
+      "ending": { "id": "saint_light", "kind": "victory", "variant": "true", "label": "THE LIGHT OF SAINT MAREN", "illustration": "plate/wl_victory" }
+    },
+    {
+      "id": "end_gutter",
+      "title": "A Guttering Flame",
+      "text": "Your poor flame stammers — and holds. Aboard the *Constance* a sharp-eyed mate reads the wrongness of it, a light where the chart wants one but weak, wandering, ill; and wrongness, at sea, is warning enough. She stands off, feeling her way, and rounds the Fangs at a coward's distance as the dawn comes up grey.\n\nForty souls owe their lives to a rag in a dead man's lamp. But the wick of Saint Maren is still lost or ash, the great lamp will not draw for common flax, and this coast keeps its darkness yet. The Combine pays; the parish does not meet your eye. You leave Brinecombe with the wreckers broken and the light unlit — a debt paid in the smallest coin that would cover it.",
+      "ending": { "id": "guttering_flame", "kind": "victory", "variant": "pyrrhic", "label": "A GUTTERING FLAME", "illustration": "plate/wl_victory" }
+    },
+    {
+      "id": "end_wreck",
+      "title": "The Constance Founders",
+      "text": "The wind reaches through the salt-blind glass and pinches out your beggar's flame between two fingers.\n\nYou see the rest from the lamp room, and you will keep seeing it: the ghost-grey sail coming on trusting and blind, the first touch on the Fangs almost gentle, and then the sea opening its ledger. The wreckers are finished — you have seen to that — but the coast's oldest customer collects all the same.\n\nThe Combine pays you, afterward, in full and in silence. You do not keep the money long, and you never again sleep well in a west wind.",
+      "ending": { "id": "constance_founders", "kind": "death", "label": "THE CONSTANCE FOUNDERS", "cause": "The makeshift flame failed — forty souls on the Fangs", "illustration": "plate/wl_death" }
+    },
+    {
+      "id": "end_drowned",
+      "title": "The Sea Keeps No Appointments",
+      "text": "The chain swings past your fingers once, and does not swing back. The cold closes over you with the patience of a thing that has swallowed better swimmers for ten thousand years, and the tide carries you along the wrack-line to lie among the evidence — one more thing the sea gives back, in its own time, on its own account.",
+      "ending": { "id": "death_race", "kind": "death", "label": "Taken by the tide-race", "cause": "Drowned in the race off Saint Maren's causeway", "illustration": "plate/wl_death" }
+    },
+    {
+      "id": "end_hooked",
+      "title": "Salvage",
+      "text": "The hook takes you, and the dark comes down like water over a lamp. The wreckers are tidy men in their way; the sea gets what the sea is owed, and what washes up along the wrack-line in a week's time is only one more drowned stranger, lashed to nothing, claimed by no one, entered in a neat landsman's hand under *sundries*.",
+      "ending": { "id": "death_hooked", "kind": "death", "label": "Entered under sundries", "cause": "Killed by the wreckers on the Fangs shore", "illustration": "plate/wl_death" }
+    }
+  ]
+}

@@ -24,16 +24,17 @@ signal sheet_changed
 signal hero_died
 
 const RULESET_PATH := "res://addons/nox_if_engine/data/rulesets/ff-2d6.json"
-## Phase 2: the shipped vertical slice is *The Grey Tithe* (CONTENT_SAMPLE §§1-12 +
-## a condensed Act III finale so the full roll-up -> play -> death/victory loop is
-## winnable). The Phase-0 wardens-hollow scaffold remains in data/adventures/ for
-## the rules probes.
-const SCENARIO_PATH := "res://data/adventures/grey-tithe.json"
 
 const _STAT_ATTR := {"skill": "SKILL", "stamina": "STAMINA", "luck": "LUCK"}
 
 var ruleset: IFRuleset
 var scenario: IFScenario
+## The ACTIVE adventure BOOK (adventure-ecosystem drop 1): adventures are
+## installable packages the AdventureLibrary shelf discovers (ADVENTURE_FORMAT.md).
+## `book_id` names the selected package; its scenario is what the runner plays and
+## its per-book asset slots overlay the AssetBinder while it is active. Defaults to
+## the flagship (*The Grey Tithe*) so every legacy entry point keeps working.
+var book_id: String = ""
 var runner: IFRunner
 var sheet: FFAdventureSheet
 ## The combat/luck dice + the resolver the MIGRATED FF checks run on. Seeded per run
@@ -53,14 +54,45 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	ruleset = IFRuleset.from_file(RULESET_PATH)
-	scenario = IFScenario.from_file(SCENARIO_PATH)
+	set_book(AdventureLibrary.default_id())
+
+
+## Select the ACTIVE book: load its scenario and push its per-book asset slots
+## onto the AssetBinder overlay (via AdventureLibrary.select). Does NOT start a
+## run — call new_adventure() after. Returns false (keeping the previous book)
+## when the package is missing/incompatible or its scenario has no start.
+func set_book(id: String) -> bool:
+	if id == "":
+		return false
+	var entry := AdventureLibrary.get_entry(id)
+	if entry.is_empty() or not bool(entry.get("format_ok", false)):
+		push_error("Adventure.set_book: book '%s' is missing or incompatible" % id)
+		return false
+	var fresh := IFScenario.from_file(str(entry.get("entry_path", "")))
+	if fresh.start == "":
+		push_error("Adventure.set_book: book '%s' scenario failed to load" % id)
+		return false
+	if not AdventureLibrary.select(id):
+		return false
+	book_id = id
+	scenario = fresh
+	return true
+
+
+## The active book's shelf entry (title/author/blurb/difficulty/…), {} if none.
+func book() -> Dictionary:
+	return AdventureLibrary.get_entry(book_id)
+
+
+func book_title() -> String:
+	return str(book().get("title", scenario.name if scenario != null else ""))
 
 
 func _ensure_content() -> void:
 	if ruleset == null or ruleset.id == "":
 		ruleset = IFRuleset.from_file(RULESET_PATH)
 	if scenario == null or scenario.start == "":
-		scenario = IFScenario.from_file(SCENARIO_PATH)
+		set_book(book_id if book_id != "" else AdventureLibrary.default_id())
 
 
 ## Start a fresh run. `run_seed` of 0 picks a random seed (still recorded, so the
@@ -213,7 +245,10 @@ func jump_to(section_id: String) -> bool:
 func reload_scenario() -> bool:
 	if runner == null:
 		return false
-	var fresh := IFScenario.from_file(SCENARIO_PATH)
+	var entry_path := str(book().get("entry_path", ""))
+	if entry_path == "":
+		return false
+	var fresh := IFScenario.from_file(entry_path)
 	if fresh.start == "":
 		return false
 	scenario = fresh
@@ -246,12 +281,24 @@ func save_data() -> Dictionary:
 		runner.dice.get_state(),
 		dice.get_state(),
 		turn)
-	return gs.to_dict()
+	var d := gs.to_dict()
+	# per-adventure saves (adventure-ecosystem drop 1): every save knows which BOOK
+	# it belongs to, so loading re-selects that book's scenario + asset overlay.
+	d["bookId"] = book_id
+	return d
 
 
 func load_data(data: Dictionary) -> void:
 	if data.is_empty():
 		return
+	# Re-select the save's book BEFORE restoring state (per-adventure saves). A
+	# missing/incompatible book refuses the load rather than restoring into the
+	# wrong scenario graph.
+	var saved_book := str(data.get("bookId", ""))
+	if saved_book != "" and saved_book != book_id:
+		if not set_book(saved_book):
+			push_error("Adventure.load_data: save belongs to book '%s' which is not installed" % saved_book)
+			return
 	_ensure_content()
 	var gs := FFGameState.from_dict(data)
 	seed = gs.rng_seed

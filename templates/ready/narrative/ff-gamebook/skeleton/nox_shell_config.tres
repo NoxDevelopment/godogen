@@ -2,12 +2,13 @@
 [ext_resource type="Script" path="res://addons/nox_ui/nox_shell_config.gd" id="1"]
 [resource]
 script = ExtResource("1")
-game_title = "THE GREY TITHE"
-subtitle = "An illustrated Fighting-Fantasy gamebook  ·  a NoxDev production"
-new_game_scene = "res://scripts/screens/roll_up.tscn"
+game_title = "TALES OF ALDERMERE"
+subtitle = "An illustrated gamebook library  ·  The Grey Tithe · The Wrecker's Light  ·  a NoxDev production"
+new_game_scene = "res://scripts/screens/library_view.tscn"
 show_continue = false
 backdrop = "res://assets/plates/generated/cover.png"
-credits = "THE GREY TITHE
+credits = "TALES OF ALDERMERE
+The Grey Tithe  ·  The Wrecker's Light
 
 A NoxDev Studio production
   Original world, text, rules & code: NoxDev Studio

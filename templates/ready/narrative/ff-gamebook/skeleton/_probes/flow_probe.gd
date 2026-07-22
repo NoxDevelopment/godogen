@@ -11,7 +11,7 @@ extends Node
 ##     view instantiated headlessly without error).
 ## Run: godot --headless --path <skeleton> res://_probes/flow_probe.tscn
 
-const GREY := "res://data/adventures/grey-tithe.json"
+const GREY := "res://data/adventures/grey-tithe/adventure.json"
 const SCAFFOLD := "res://data/adventures/wardens-hollow.scaffold.json"
 const BROKEN := "res://data/adventures/_broken-sample.json"
 const READING_VIEW := preload("res://scenes/reading_view.tscn")

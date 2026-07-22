@@ -7,6 +7,7 @@ extends Control
 ## unlocks derived from GameState), and New / Library / Share / Menu.
 
 const ROLL_UP := "res://scripts/screens/roll_up.tscn"
+const LIBRARY := "res://scripts/screens/library_view.tscn"
 
 
 func _ready() -> void:
@@ -93,7 +94,8 @@ func _build(ending: Dictionary, pyrrhic: bool) -> void:
 	var lib := FFUI.choice_button("Library")
 	lib.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lib.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lib.pressed.connect(func() -> void: NoxShell.to_menu())
+	# the real bookshelf now exists — Library goes to the Library (drop 1)
+	lib.pressed.connect(func() -> void: get_tree().change_scene_to_file(LIBRARY))
 	actions.add_child(lib)
 	var menu := FFUI.choice_button("Menu")
 	menu.alignment = HORIZONTAL_ALIGNMENT_CENTER

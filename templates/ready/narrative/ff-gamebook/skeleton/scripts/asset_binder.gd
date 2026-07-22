@@ -18,6 +18,7 @@ extends Node
 ## full schema.
 
 signal manifest_loaded(slot_count: int)
+signal book_slots_changed(slot_count: int)
 
 const MANIFEST_PATH := "res://assets.manifest.json"
 
@@ -27,6 +28,12 @@ var loaded := false
 
 var _slots: Dictionary = {}
 var _order: Array[String] = []
+
+## Per-BOOK slot overlay (ADVENTURE_FORMAT.md §3): the active adventure package's
+## `slots` map, pushed by AdventureLibrary.select() with every value already
+## resolved to an absolute res:// or user:// file path. Book slots WIN over the
+## global manifest while the book is active; selecting another book swaps them.
+var _book_slots: Dictionary = {}
 
 
 func _ready() -> void:
@@ -57,6 +64,25 @@ func reload() -> void:
 	manifest_loaded.emit(_slots.size())
 
 
+## Install the active book's slot overlay (slotId -> ABSOLUTE res:///user:// file
+## path). Replaces any previous book's overlay — one active book at a time.
+func push_book_slots(slots: Dictionary) -> void:
+	_book_slots = slots.duplicate(true)
+	book_slots_changed.emit(_book_slots.size())
+
+
+## Drop the per-book overlay (back to the global manifest only).
+func clear_book_slots() -> void:
+	if _book_slots.is_empty():
+		return
+	_book_slots.clear()
+	book_slots_changed.emit(0)
+
+
+func book_slot_count() -> int:
+	return _book_slots.size()
+
+
 func slot_count() -> int:
 	return _slots.size()
 
@@ -66,7 +92,7 @@ func slot_ids() -> Array[String]:
 
 
 func has_slot(slot_id: String) -> bool:
-	return _slots.has(slot_id)
+	return _book_slots.has(slot_id) or _slots.has(slot_id)
 
 
 ## The raw slot entry (treat as read-only — the manifest is Studio-owned).
@@ -120,5 +146,9 @@ func placeholder_color(slot_id: String) -> Color:
 
 
 func _slot_file(slot_id: String) -> String:
+	# the active book's overlay wins (ADVENTURE_FORMAT.md §3)
+	var over: Variant = _book_slots.get(slot_id)
+	if over is String and str(over) != "":
+		return str(over)
 	var file: Variant = get_slot(slot_id).get("file")
 	return file if file is String else ""

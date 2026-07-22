@@ -1,0 +1,22 @@
+{
+  "formatVersion": 1,
+  "id": "wreckers-light",
+  "title": "The Wrecker's Light",
+  "author": "NoxDev",
+  "blurb": "On Aldermere's salt-bitten west coast, ships keep founding on the Fangs — because somebody burns a false beacon above the rocks. Cross the tide causeway, find who stole the wick of Saint Maren's lamp, and strike a true light before the Mereward packet rounds the head.",
+  "difficulty": 2,
+  "cover": "plate/wl_cover",
+  "entry": "adventure.json",
+  "ruleset": "ff-2d6",
+  "version": "1.0.0",
+  "slots": {
+    "plate/wl_cover": "res://assets/plates/generated/s9.png",
+    "plate/wl_shore": "res://assets/plates/generated/s1.png",
+    "plate/wl_inn": "res://assets/plates/generated/s10.png",
+    "plate/wl_saintstone": "res://assets/plates/generated/s4.png",
+    "plate/wl_lookout": "res://assets/plates/generated/s7.png",
+    "plate/wl_cache": "res://assets/plates/generated/s3.png",
+    "plate/wl_death": "res://assets/plates/generated/death.png",
+    "plate/wl_victory": "res://assets/plates/generated/victory.png"
+  }
+}

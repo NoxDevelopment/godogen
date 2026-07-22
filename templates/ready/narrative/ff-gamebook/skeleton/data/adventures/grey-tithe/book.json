@@ -1,0 +1,32 @@
+{
+  "formatVersion": 1,
+  "id": "grey-tithe",
+  "title": "The Grey Tithe",
+  "author": "NoxDev",
+  "blurb": "A plague-shrouded frontier town where the dead rise to collect old debts. Descend into the drowned Cathedra of Accounts and face the Reckoner — pay what is owed, or learn the one thing the Grey Ledger cannot record.",
+  "difficulty": 3,
+  "cover": "plate/cover",
+  "entry": "adventure.json",
+  "ruleset": "ff-2d6",
+  "version": "1.0.0",
+  "slots": {
+    "plate/cover": "res://assets/plates/generated/cover.png",
+    "plate/s1": "res://assets/plates/generated/s1.png",
+    "plate/s2": "res://assets/plates/generated/s2.png",
+    "plate/s3": "res://assets/plates/generated/s3.png",
+    "plate/s4": "res://assets/plates/generated/s4.png",
+    "plate/s5": "res://assets/plates/generated/s5.png",
+    "plate/s6": "res://assets/plates/generated/s6.png",
+    "plate/s7": "res://assets/plates/generated/s7.png",
+    "plate/s8": "res://assets/plates/generated/s8.png",
+    "plate/s9": "res://assets/plates/generated/s9.png",
+    "plate/s10": "res://assets/plates/generated/s10.png",
+    "plate/s11": "res://assets/plates/placeholder/s11.png",
+    "plate/s12": "res://assets/plates/placeholder/s12.png",
+    "plate/descent": "res://assets/plates/placeholder/descent.png",
+    "plate/isolde": "res://assets/plates/placeholder/isolde.png",
+    "plate/reckoner": "res://assets/plates/placeholder/reckoner.png",
+    "plate/death": "res://assets/plates/generated/death.png",
+    "plate/victory": "res://assets/plates/generated/victory.png"
+  }
+}

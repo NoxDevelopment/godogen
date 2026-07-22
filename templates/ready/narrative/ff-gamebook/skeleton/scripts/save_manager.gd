@@ -83,6 +83,8 @@ func capture_current() -> SaveEntry:
 		return e
 	e.payload = adv.save_data()
 	e.meta = {
+		"book": str(adv.book_id),
+		"book_title": str(adv.book_title()),
 		"section": str(adv.runner.state.current_passage),
 		"skill": adv.sheet.cur("skill"),
 		"stamina": adv.sheet.cur("stamina"),
@@ -99,7 +101,11 @@ func capture_current() -> SaveEntry:
 func _summary(meta: Dictionary) -> String:
 	if meta.is_empty():
 		return ""
-	return "§%s   ·   SK %d  ST %d/%d  LK %d/%d   ·   turn %d" % [
+	# the save's BOOK leads the summary (per-adventure saves, ADVENTURE_FORMAT §5)
+	var book := str(meta.get("book_title", ""))
+	var head := ("%s   ·   " % book) if book != "" else ""
+	return "%s§%s   ·   SK %d  ST %d/%d  LK %d/%d   ·   turn %d" % [
+		head,
 		str(meta.get("section", "?")),
 		int(meta.get("skill", 0)),
 		int(meta.get("stamina", 0)), int(meta.get("stamina_max", 0)),
@@ -175,6 +181,13 @@ func load_from_slot(slot: int) -> SaveEntry:
 	var entry := SaveEntry.new()
 	entry.payload = blob.get("payload", {})
 	entry.meta = blob.get("meta", {})
+	# per-adventure saves: refuse a save whose BOOK is no longer on the shelf
+	# (uninstalled package) instead of restoring into the wrong scenario graph.
+	var want_book := str(entry.payload.get("bookId", ""))
+	if want_book != "" and not AdventureLibrary.has_book(want_book):
+		push_error("SaveManager: slot %d belongs to book '%s' which is not installed" % [slot, want_book])
+		load_completed.emit(slot, false, null)
+		return null
 	var adv := get_node_or_null("/root/Adventure")
 	if adv != null and not entry.payload.is_empty():
 		adv.load_data(entry.payload)
@@ -264,6 +277,24 @@ func newest_slot() -> int:
 	var best_time := -1
 	for s in list_slots():
 		if not s.get("exists", false):
+			continue
+		var t := int(s.get("modified_time", 0))
+		if t > best_time:
+			best_time = t
+			best = int(s.get("slot", -1))
+	return best
+
+
+## The newest slot belonging to ONE book (the Library shelf's per-book Continue).
+## Returns -1 when that book has no save.
+func newest_slot_for_book(book_id: String) -> int:
+	var best := -1
+	var best_time := -1
+	for s in list_slots():
+		if not s.get("exists", false):
+			continue
+		var blob := _read_slot(int(s.get("slot", -1)))
+		if str((blob.get("meta", {}) as Dictionary).get("book", "")) != book_id:
 			continue
 		var t := int(s.get("modified_time", 0))
 		if t > best_time:

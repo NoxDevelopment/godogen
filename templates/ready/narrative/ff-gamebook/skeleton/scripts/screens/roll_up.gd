@@ -81,7 +81,14 @@ func _build() -> void:
 
 	var head := FFUI.title("ROLL UP YOUR HERO", 34, FFUI.INK)
 	col.add_child(head)
-	col.add_child(FFUI.label("The last coach north has already gone. The Verge is waiting.", 15, FFUI.UMBER))
+	# the roll-up belongs to the ACTIVE book from the Library shelf
+	var book: Dictionary = Adventure.book()
+	var tagline := "The book is open. The first section is waiting."
+	if not book.is_empty():
+		tagline = "%s  ·  by %s" % [str(book.get("title", "?")), str(book.get("author", "?"))]
+	var tag := FFUI.label(tagline, 15, FFUI.UMBER)
+	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(tag)
 
 	# --- Name your hero (printed caption, handwriting on a write-line) ---------
 	var name_row := HBoxContainer.new()
