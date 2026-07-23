@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ffgbdice3dprobe1"]
+
+[ext_resource type="Script" path="res://_probes/dice3d_probe.gd" id="1_d3p"]
+
+[node name="Dice3DProbe" type="Node"]
+script = ExtResource("1_d3p")

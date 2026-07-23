@@ -111,6 +111,15 @@ func _commit() -> void:
 # --- persistence -----------------------------------------------------------------
 
 func save_settings() -> void:
+	# NEVER persist from a headless run. Automated probes/CI share this project's
+	# user:// with a real install (same project name), and probes that forced
+	# fallback prefs through the persisting setters once wrote reduced_motion=true /
+	# dice_animation=false into user://ff_settings.cfg — silently turning the SHIPPED
+	# DEFAULT experience into 2D snap dice for a real player. Only a real windowed
+	# session (an actual player at the Options screen) may write to disk; headless
+	# runs keep their tweaks in memory.
+	if DisplayServer.get_name() == "headless":
+		return
 	var c := ConfigFile.new()
 	c.set_value("reading", "font_scale", font_scale)
 	c.set_value("reading", "theme", reading_theme)

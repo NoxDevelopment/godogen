@@ -1,0 +1,47 @@
+# THE GREY TITHE — Credits
+
+## A NoxDev Studio production
+- Original world, text, rules & code: NoxDev Studio
+
+## Art & Assets · NoxDev-generated (Z-Image-Turbo base model)
+- veritas-gamebook (NoxDev-generated plates) (13 asset(s))
+
+## Art & Assets · NoxDev-generated (placeholder — pending Phase-5 art)
+- veritas-gamebook placeholder plates (5 asset(s))
+
+## Art & Assets · commercial (asset pack)
+- Monster Avatar Icons (2 asset(s))
+- RPG Character Portraits (7 asset(s))
+
+## Art & Assets · CC0
+- 496 RPG Icons (14 asset(s))
+- Kenney Fantasy UI Borders (4 asset(s))
+
+## Typefaces
+- Cinzel — Natanael Gama [OFL-1.1]
+- UncialAntiqua — Astigmatic [OFL-1.1]
+- MedievalSharp — Wojciech Kalinowski [OFL-1.1]
+- Montserrat — Julieta Ulanovsky [OFL-1.1]
+- Caveat — The Caveat Project Authors [OFL-1.1]
+- Reenie Beanie — James Grieshaber (Typeco) [OFL-1.1]
+
+## Music & Sound
+- Shadow War — Dark Fantasy Orchestral Music Collection — GWriterStudio [commercial (owned asset pack)]
+- RPG Fantasy Music Pack — Cyberleaf Studio [commercial (owned asset pack)]
+- Interface SFX Vol. 2 [commercial (owned asset pack)]
+- Inventory SFX Bundle [commercial (owned asset pack)]
+- Combat Sounds Bundle Collection [commercial (owned asset pack)]
+
+## Style / LoRA Models
+- veritas-gamebook — NoxDev-generated on Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder) (no LoRA)
+
+## Built With
+- Godot Engine (MIT)
+- nox_if_engine (ff-2d6 ruleset)
+- nox_ui shell
+- ComfyUI
+- Z-Image-Turbo
+- godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5
+
+## Special Thanks
+- OpenGameArt & Kenney (CC0 asset commons)

@@ -23,9 +23,12 @@ func _ready() -> void:
 	_vp.size = Vector2i(1280, 720)
 	_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(_vp)
+	# TRANSIENT direct assignment ONLY — never the persisting set_*() setters (they
+	# write user://ff_settings.cfg, shared with a real install; that poisoned the
+	# shipped default experience once). See ff_settings.gd / qa_probe.gd.
 	if FFSettings != null:
-		FFSettings.set_reduced_motion(true)
-		FFSettings.set_dice_animation(false)
+		FFSettings.reduced_motion = true
+		FFSettings.dice_animation = false
 
 	await _t(2)
 

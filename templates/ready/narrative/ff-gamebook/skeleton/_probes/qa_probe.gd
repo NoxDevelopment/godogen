@@ -39,11 +39,14 @@ func _ready() -> void:
 	_vp.size = Vector2i(1280, 720)
 	_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(_vp)
-	# faithful reduced/quick so animated overlays snap + auto-advance (bounded timing)
+	# faithful reduced/quick so animated overlays snap + auto-advance (bounded timing).
+	# TRANSIENT direct assignment ONLY — never the set_*() setters: those _commit() to
+	# user://ff_settings.cfg, which is SHARED with a real install, and once poisoned the
+	# shipped DEFAULT experience (2D snap dice for a real player). See ff_settings.gd.
 	if FFSettings != null:
-		FFSettings.set_reduced_motion(true)
-		FFSettings.set_dice_animation(false)
-		FFSettings.set_dice_speed(2.0)
+		FFSettings.reduced_motion = true
+		FFSettings.dice_animation = false
+		FFSettings.dice_speed = 2.0
 
 	await _t(2)
 	await _run()
@@ -101,7 +104,7 @@ func _run() -> void:
 	# ---- ROLL-UP -----------------------------------------------------------
 	Adventure.new_adventure(20260719)
 	var ru := _mount(ROLL_UP.instantiate())
-	await _t(20)   # let the reveal-roll settle
+	await _wait_rolled(ru)   # deterministic: frame counts race the 0.06s pen timers
 	_audit("rollup", ru)
 	# Begin must start DISABLED (no potion picked)
 	if not _begin_disabled(ru):
@@ -112,7 +115,7 @@ func _run() -> void:
 		await _t(2)
 	# settings-reroll
 	ru._on_reroll()
-	await _t(18)
+	await _wait_rolled(ru)
 	ru._select_potion("skill")
 	await _t(2)
 	if _begin_disabled(ru):
@@ -624,6 +627,16 @@ func _begin_disabled(ru: Node) -> bool:
 func _t(frames: int) -> void:
 	for _i in frames:
 		await get_tree().process_frame
+
+## Wait until the roll-up's reveal-roll coroutine finishes (bounded). Headless frames
+## are UNCAPPED, so counting frames races the roll's real-time 0.06s pen timers —
+## polling the screen's own _rolling flag is the only deterministic settle.
+func _wait_rolled(ru: Node, timeout_sec: float = 10.0) -> void:
+	var waited := 0.0
+	await _t(2)   # let the reveal coroutine actually start
+	while bool(ru.get("_rolling")) and waited < timeout_sec:
+		await get_tree().create_timer(0.05).timeout
+		waited += 0.05
 
 func _shoot(name: String) -> void:
 	for _i in 6:
