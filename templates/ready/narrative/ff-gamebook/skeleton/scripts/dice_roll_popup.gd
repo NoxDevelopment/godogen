@@ -62,6 +62,7 @@ func _build() -> void:
 
 	_context = FFUI.title("", 22, FFUI.INK)
 	col.add_child(_context)
+	col.add_child(FFUI.diamond_rule(FFUI.VERDIGRIS))
 
 	# The 3D physics tray sits above the 2D dice; only one is shown per roll (the 3D
 	# tower when Options→Dice "3D physics dice" is on and animation is available, else

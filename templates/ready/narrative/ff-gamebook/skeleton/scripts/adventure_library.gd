@@ -202,6 +202,11 @@ static func _read_package(root: String, source: String) -> Dictionary:
 		"problems": problems,
 		"version": str(man.get("version", "")),
 		"ruleset": str(man.get("ruleset", "ff-2d6")),
+		# Optional Sorcery-style journey map (LOOKFEEL_PASS_2026-07): a per-book
+		# hand-drawn map plate (slot "plate/map") + normalized node coordinates
+		# {"nodes": {section_id: [x, y], ...}} laid onto it. Books without one get
+		# the parchment auto-chart.
+		"map": man.get("map", {}) if man.get("map", {}) is Dictionary else {},
 	}
 
 
@@ -231,6 +236,7 @@ static func _read_legacy(path: String, source: String) -> Dictionary:
 		"problems": [] as Array[String],
 		"version": "",
 		"ruleset": str(scen.get("ruleset", "ff-2d6")),
+		"map": {},
 	}
 
 

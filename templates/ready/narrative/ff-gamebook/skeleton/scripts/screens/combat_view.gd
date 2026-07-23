@@ -1,16 +1,21 @@
 extends Control
 ## res://scripts/screens/combat_view.gd
-## The Combat Screen (WIREFRAMES 5.4, GDD §6.1 #7) — resolves an encounter round by
-## round over the faithful FF rules core (FFCombat, seeded IFDice), staying
-## engine-authoritative: every wound routes through FFAdventureSheet.apply_delta and
-## every die is the one the seeded core rolled (shown honestly via the Dice overlay).
+## The Combat Screen (WIREFRAMES 5.4, GDD §6.1 #7; LOOKFEEL_PASS_2026-07 §combat)
+## — resolves an encounter round by round over the faithful FF rules core
+## (FFCombat, seeded IFDice), staying engine-authoritative: every wound routes
+## through FFAdventureSheet.apply_delta and every die is the one the seeded core
+## rolled.
 ##
-## Features: enemy panel(s) with portrait + SKILL + STAMINA bar (multi-enemy rows +
-## target select); player stat strip; a round-resolution area with both Attack
-## Strengths + totals + a scrolling log; action buttons (Attack / Test Luck /
-## Escape / Use Item / Eat); Luck-in-combat prompts after a wound; a Quick Combat
-## toggle that auto-runs rounds. On resolution it emits `resolved(outcome_id)` and
-## the reading view routes via Adventure.choose (which applies effects + goto).
+## PRESENTATION: the fight is A PAGE OF THE BOOK (FFC keeps the page visible;
+## Veritas rolls the dice onto the page and prints the math beneath) — paper
+## ground, the foe as a portrait plate under an engraved name banner, BOTH
+## combatants' sheet-strips in the printed-box idiom (foe STAMINA scratching
+## down), the 3D dice tray INLINE on the page with the round's arithmetic
+## printed under it in book type, and the round log written into a ruled ledger
+## in the player's hand. The dice popup remains only for Luck tests.
+##
+## On resolution it emits `resolved(outcome_id)` and the reading view routes via
+## Adventure.choose (which applies effects + goto).
 
 signal resolved(outcome_id: String)
 
@@ -31,13 +36,18 @@ var _log_lines: Array[String] = []
 
 # widgets
 var _enemy_box: VBoxContainer
-var _player_strip: Label
+var _player_strip: HBoxContainer
 var _round_head: Label
 var _round_you: Label
 var _round_foe: Label
 var _log: RichTextLabel
+var _log_scroll: ScrollContainer
 var _actions: HBoxContainer
 var _luck_bar: HBoxContainer
+var _tray: Dice3DTray
+var _dice_2d: HBoxContainer
+var _banner: Label
+var _continue_btn: Button
 
 
 func setup(encounter: FFEncounter, outcomes: Dictionary, section_no: String) -> void:
@@ -53,95 +63,138 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 	_refresh()
-	_append_log("[i]The encounter is joined.[/i]")
+	_append_log("The encounter is joined.")
 	# combat music stinger (STYLE_GUIDE §2.2) — the Reckoner's own tragic bed on the
 	# boss fight, the grim combat bed otherwise.
 	AudioDirector.play_music("boss" if _section_no == "s_reckoner_fight" else "combat")
 
 
 func _build() -> void:
-	add_child(FFUI.page_background(true))        # dark combat bed
-	add_child(FFUI.wash(FFUI.SLATE, 0.28))
+	add_child(FFUI.paper_ground())
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for s in ["left", "top", "right", "bottom"]:
-		margin.add_theme_constant_override("margin_" + s, 20)
+	margin.add_theme_constant_override("margin_left", 54)
+	margin.add_theme_constant_override("margin_right", 54)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_bottom", 28)
 	add_child(margin)
 
 	var root := VBoxContainer.new()
-	root.add_theme_constant_override(&"separation", 12)
+	root.add_theme_constant_override(&"separation", 8)
 	margin.add_child(root)
 
-	# top bar
-	var top := HBoxContainer.new()
-	var t := FFUI.title("§%s   COMBAT" % _section_no, 22, FFUI.PARCHMENT)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	# --- engraved combat banner ------------------------------------------------
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override(&"separation", 10)
+	var folio := FFUI.label("§ %s" % _section_no, 16, FFUI.UMBER)
+	folio.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(folio)
+	var t := FFUI.title(_banner_title(), 26, FFUI.ARREARS.darkened(0.15))
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top.add_child(t)
+	head.add_child(t)
 	var qc := CheckButton.new()
 	qc.text = "Quick Combat"
-	qc.add_theme_color_override(&"font_color", FFUI.PARCHMENT)
-	# seed from the Options → Combat preference (live per-fight toggle still overrides)
+	qc.add_theme_font_override(&"font", FFUI.font_body())
+	qc.add_theme_font_size_override(&"font_size", 15)
+	qc.add_theme_color_override(&"font_color", FFUI.UMBER)
 	var ff := get_node_or_null("/root/FFSettings")
 	if ff != null:
 		_quick = ff.quick_combat
 		qc.button_pressed = _quick
 	qc.toggled.connect(_on_quick_toggled)
-	top.add_child(qc)
-	root.add_child(top)
+	head.add_child(qc)
+	root.add_child(head)
+	root.add_child(FFUI.diamond_rule(FFUI.ARREARS))
 
-	# two columns
+	# --- two columns: the foe plate | the round on the page --------------------
 	var cols := HBoxContainer.new()
-	cols.add_theme_constant_override(&"separation", 16)
+	cols.add_theme_constant_override(&"separation", 20)
 	cols.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(cols)
 
-	# left: enemies + player
+	# left: foe portrait plate(s) + the player's sheet-strip
 	var left := VBoxContainer.new()
-	left.add_theme_constant_override(&"separation", 10)
-	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.add_theme_constant_override(&"separation", 8)
+	left.custom_minimum_size = Vector2(360, 0)
+	left.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	cols.add_child(left)
+	var enemy_scroll := ScrollContainer.new()
+	enemy_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	enemy_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_enemy_box = VBoxContainer.new()
 	_enemy_box.add_theme_constant_override(&"separation", 8)
-	left.add_child(_enemy_box)
-	var pl := FFUI.panel(Color("2a3330"), FFUI.VERDIGRIS)
-	var plc := VBoxContainer.new()
-	plc.add_child(FFUI.label("YOU", 15, FFUI.VERDIGRIS_2, false))
-	_player_strip = FFUI.label("", 18, FFUI.PARCHMENT)
-	plc.add_child(_player_strip)
-	pl.add_child(plc)
-	left.add_child(pl)
+	_enemy_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	enemy_scroll.add_child(_enemy_box)
+	left.add_child(enemy_scroll)
 
-	# right: round resolution + log
+	var you_cap := FFUI.label("YOUR SHEET", 12, FFUI.VERDIGRIS, false)
+	you_cap.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
+	left.add_child(you_cap)
+	_player_strip = HBoxContainer.new()
+	_player_strip.add_theme_constant_override(&"separation", 8)
+	left.add_child(_player_strip)
+
+	# right: the dice ON the page + printed math + the ledger log
 	var right := VBoxContainer.new()
-	right.add_theme_constant_override(&"separation", 8)
+	right.add_theme_constant_override(&"separation", 6)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cols.add_child(right)
-	var rr := FFUI.panel(Color("241f19"), FFUI.UMBER)
-	var rrc := VBoxContainer.new()
-	rrc.add_theme_constant_override(&"separation", 4)
-	_round_head = FFUI.label("ROUND 1", 18, FFUI.FLAME, false)
-	rrc.add_child(_round_head)
-	_round_you = FFUI.label("You    —", 17, FFUI.PARCHMENT)
-	_round_foe = FFUI.label("Enemy  —", 17, FFUI.PARCHMENT)
-	rrc.add_child(_round_you)
-	rrc.add_child(_round_foe)
-	rr.add_child(rrc)
-	right.add_child(rr)
 
-	var log_scroll := ScrollContainer.new()
-	log_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	var log_panel := FFUI.panel(Color("1c1814"), FFUI.UMBER)
-	_log = FFUI.rich(15, FFUI.PARCHMENT)
-	_log.add_theme_color_override(&"default_color", Color(0.86, 0.82, 0.72))
-	log_panel.add_child(_log)
-	log_scroll.add_child(log_panel)
-	right.add_child(log_scroll)
+	_round_head = FFUI.label("THE FIRST ROUND", 15, FFUI.UMBER, false)
+	_round_head.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
+	_round_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	right.add_child(_round_head)
+
+	var tray_center := CenterContainer.new()
+	_tray = Dice3DTray.new()
+	_tray.visible = false
+	tray_center.add_child(_tray)
+	right.add_child(tray_center)
+	_dice_2d = HBoxContainer.new()
+	_dice_2d.alignment = BoxContainer.ALIGNMENT_CENTER
+	_dice_2d.add_theme_constant_override(&"separation", 10)
+	right.add_child(_dice_2d)
+
+	# the arithmetic, printed like Veritas: "You — 2d6 = 7  + SKILL 9 = 16"
+	_round_you = FFUI.label("", 16, FFUI.INK)
+	_round_you.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	right.add_child(_round_you)
+	_round_foe = FFUI.label("", 16, FFUI.INK)
+	_round_foe.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	right.add_child(_round_foe)
+
+	_banner = FFUI.title("", 22, FFUI.VERDIGRIS)
+	right.add_child(_banner)
+
+	_continue_btn = FFUI.chip("Tap to continue")
+	_continue_btn.custom_minimum_size = Vector2(220, 44)
+	_continue_btn.visible = false
+	var cc := CenterContainer.new()
+	cc.add_child(_continue_btn)
+	right.add_child(cc)
+
+	# the round LEDGER — written in the player's hand on ruled paper
+	_log_scroll = ScrollContainer.new()
+	_log_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var ledger := _LedgerBox.new()
+	ledger.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_log = RichTextLabel.new()
+	_log.bbcode_enabled = true
+	_log.fit_content = true
+	_log.add_theme_font_override(&"normal_font", FFUI.font_hand())
+	_log.add_theme_font_size_override(&"normal_font_size", 18)
+	_log.add_theme_color_override(&"default_color", FFUI.GRAPHITE)
+	_log.add_theme_constant_override(&"line_separation", 9)
+	_log.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ledger.add_child(_log)
+	_log_scroll.add_child(ledger)
+	right.add_child(_log_scroll)
 
 	# luck-in-combat prompt bar (hidden until offered)
 	_luck_bar = HBoxContainer.new()
+	_luck_bar.alignment = BoxContainer.ALIGNMENT_CENTER
 	_luck_bar.add_theme_constant_override(&"separation", 10)
 	_luck_bar.visible = false
 	root.add_child(_luck_bar)
@@ -153,11 +206,15 @@ func _build() -> void:
 	_build_actions()
 
 
+func _banner_title() -> String:
+	return "COMBAT"
+
+
 func _build_actions() -> void:
 	for c in _actions.get_children():
 		c.queue_free()
 	var attack := FFUI.chip("⚔  Attack")
-	attack.custom_minimum_size = Vector2(0, 56)
+	attack.custom_minimum_size = Vector2(0, 52)
 	attack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	attack.pressed.connect(_on_attack)
 	_actions.add_child(attack)
@@ -187,47 +244,100 @@ func _build_actions() -> void:
 
 
 func _refresh() -> void:
-	# Feed the Adventure Sheet's Monster Encounter grid: each refresh upserts the live
-	# foes so the printed boxes fill in and their STAMINA scratches down in lock-step
-	# with the fight (ADVENTURE_SHEET_SPEC §6). Pure view mirror — combat math is
-	# untouched and still funnels through FFAdventureSheet.apply_delta.
+	# Feed the Adventure Sheet's Monster Encounter grid (ADVENTURE_SHEET_SPEC §6).
 	Adventure.sheet.sync_encounters(_enemies)
-	# enemy panels
+	# enemy plates
 	for c in _enemy_box.get_children():
 		c.queue_free()
 	for i in _enemies.size():
 		_enemy_box.add_child(_enemy_panel(i))
-	# player strip
+	# the player's sheet-strip: printed boxes, values in the player's hand
 	var s := Adventure.sheet
-	_player_strip.text = "SKILL %d    STAMINA %d/%d    LUCK %d/%d" % [
-		s.cur("skill"), s.cur("stamina"), s.init_of("stamina"), s.cur("luck"), s.init_of("luck")]
+	for c in _player_strip.get_children():
+		c.queue_free()
+	_player_strip.add_child(_strip_box("SKILL", s.cur("skill"), -1, FFUI.VERDIGRIS))
+	_player_strip.add_child(_strip_box("STAMINA", s.cur("stamina"), s.init_of("stamina"), FFUI.ARREARS))
+	_player_strip.add_child(_strip_box("LUCK", s.cur("luck"), s.init_of("luck"), FFUI.FLAME))
+	_player_strip.add_child(_strip_box("PROV", s.provisions, -1, FFUI.UMBER))
 
 
+## A printed sheet-strip box: engraved caption over a hand-written value; when
+## `initial` is given and higher, the value reads "of N" beneath (the sheet rule).
+func _strip_box(caption: String, value: int, initial: int, accent: Color) -> Control:
+	var box := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(FFUI.PARCHMENT.r, FFUI.PARCHMENT.g, FFUI.PARCHMENT.b, 0.4)
+	sb.border_color = Color(accent.r, accent.g, accent.b, 0.8)
+	sb.set_border_width_all(1)
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 4
+	box.add_theme_stylebox_override(&"panel", sb)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 0)
+	var cap := FFUI.label(caption, 10, FFUI.FEN, false)
+	cap.add_theme_font_override(&"font", FFUI.font_display_tracked(1))
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(cap)
+	var holder := CenterContainer.new()
+	holder.add_child(FFUI.handwritten(str(value), 24, FFUI.INK_PEN, "cbt_%s_%d" % [caption, value]))
+	v.add_child(holder)
+	if initial > 0:
+		var of := FFUI.label("of %d" % initial, 10, FFUI.UMBER, false)
+		of.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		v.add_child(of)
+	box.add_child(v)
+	return box
+
+
+## A foe presented as a book plate: the portrait in the double-rule frame, an
+## engraved name banner, SKILL / STAMINA in printed boxes (STAMINA scratching
+## down against its opening value), a diagonal cancel when dispersed.
 func _enemy_panel(index: int) -> Control:
 	var e: Dictionary = _enemies[index]
 	var alive := int(e.get("stamina", 0)) > 0
-	var panel := FFUI.panel(Color("2a2119") if alive else Color("1a1614"), FFUI.ARREARS if index == _target and alive else FFUI.UMBER)
+	var wrap := VBoxContainer.new()
+	wrap.add_theme_constant_override(&"separation", 4)
+
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 12)
-	panel.add_child(row)
-	var port := FFUI.portrait_panel(FFUI.portrait(_portrait_name(e)), 110, FFUI.VERDIGRIS if alive else FFUI.FEN)
+	row.add_theme_constant_override(&"separation", 10)
+	var port_tex := FFUI.portrait(_portrait_name(e))
+	var tr := TextureRect.new()
+	tr.custom_minimum_size = Vector2(120, 120)
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	if port_tex != null:
+		tr.texture = port_tex
+	var plate := FFUI.plate_frame(tr, FFUI.ARREARS if index == _target and alive else FFUI.UMBER)
 	if not alive:
-		port.modulate = Color(0.5, 0.5, 0.5)
-	row.add_child(port)
+		plate.modulate = Color(0.55, 0.55, 0.55)
+	row.add_child(plate)
+
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.add_theme_constant_override(&"separation", 4)
-	info.add_child(FFUI.label(str(e.get("name", "Foe")), 19, FFUI.PARCHMENT if alive else FFUI.FEN, false))
-	info.add_child(FFUI.label("SKILL %d" % int(e.get("skill", 0)), 15, FFUI.VERDIGRIS_2))
-	info.add_child(FFUI.stat_bar("STAMINA", int(e.get("stamina", 0)), int(e.get("stamina_max", 1)), FFUI.ARREARS))
+	var nm := FFUI.label(str(e.get("name", "Foe")).to_upper(), 17, FFUI.INK if alive else FFUI.FEN, false)
+	nm.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
+	info.add_child(nm)
+	var rule := FFUI.diamond_rule(FFUI.ARREARS if alive else FFUI.FEN)
+	rule.custom_minimum_size = Vector2(0, 8)
+	info.add_child(rule)
+	var cells := HBoxContainer.new()
+	cells.add_theme_constant_override(&"separation", 6)
+	cells.add_child(_strip_box("SKILL", int(e.get("skill", 0)), -1, FFUI.VERDIGRIS))
+	cells.add_child(_strip_box("STAMINA", int(e.get("stamina", 0)), int(e.get("stamina_max", 1)), FFUI.ARREARS))
+	info.add_child(cells)
 	if not alive:
-		info.add_child(FFUI.label("— dispersed —", 14, FFUI.FEN))
+		info.add_child(FFUI.label("— dispersed —", 13, FFUI.FEN))
 	elif _enemies.size() > 1:
 		var pick := FFUI.chip("Target" if index != _target else "◈ Target")
 		pick.pressed.connect(func() -> void: _target = index; _refresh())
 		info.add_child(pick)
 	row.add_child(info)
-	return panel
+	wrap.add_child(row)
+	return wrap
 
 
 func _portrait_name(e: Dictionary) -> String:
@@ -271,7 +381,6 @@ func _on_attack() -> void:
 	var res := FFCombat.attack_round(Adventure.sheet, enemy, Adventure.dice)
 	_last_player_total = int(res.player_total)
 
-	# dramatize with the honest dice overlay
 	var banner := "PARRIED — no blood drawn"
 	var bcolor := FFUI.FEN
 	match str(res.outcome):
@@ -281,10 +390,11 @@ func _on_attack() -> void:
 		"enemy_wounds":
 			banner = "The %s wounds you  (−%d)" % [enemy.get("name"), int(res.wound)]
 			bcolor = FFUI.ARREARS
-	await _show_dice_combat(res, enemy, banner, bcolor)
 
-	# round resolution maps 1:1 to audio (STYLE_GUIDE §2.3): hit on a wound dealt,
-	# a fleshy wound-thud when struck, a distinct parry ring on a tie. Ducks music.
+	# the dice roll ON the page (LOOKFEEL: FFC/Veritas), math printed beneath
+	await _roll_inline(res, enemy, banner, bcolor)
+
+	# round resolution maps 1:1 to audio (STYLE_GUIDE §2.3)
 	match str(res.outcome):
 		"player_wounds": AudioDirector.play_sfx("hit", true)
 		"enemy_wounds": AudioDirector.play_sfx("wound", true)
@@ -303,9 +413,6 @@ func _on_attack() -> void:
 				if bool(rep.get("died", false)):
 					break
 
-	_round_head.text = "ROUND %d" % _round_no()
-	_round_you.text = "You     2d6=%d  +SK %d = %d" % [int(res.player_faces[0]) + int(res.player_faces[1]), Adventure.sheet.cur("skill"), int(res.player_total)]
-	_round_foe.text = "%s   2d6=%d  +SK %d = %d" % [enemy.get("name"), int(res.enemy_faces[0]) + int(res.enemy_faces[1]), int(enemy.get("skill")), int(res.enemy_total)]
 	_append_log(banner)
 	Adventure.notify_sheet_changed(res)
 	_refresh()
@@ -327,8 +434,96 @@ func _on_attack() -> void:
 		_finish_turn()
 
 
-## Resolve one round with NO dice overlay — used by the screenshot harness so the
-## enemy panel + round-resolution area are visible together. Same math path.
+## The inline round roll: throw all four dice in the page's tray (yours bone,
+## the foe's greyer bone), then print the arithmetic + banner and gate on "Tap
+## to continue" exactly as the popup did (probe-compatible). Quick mode flashes.
+func _roll_inline(res: Dictionary, enemy: Dictionary, banner: String, bcolor: Color) -> void:
+	_round_head.text = "ROUND %d" % _round_no()
+	_round_you.text = ""
+	_round_foe.text = ""
+	_banner.text = ""
+	_continue_btn.visible = false
+
+	var you_faces: Array = res.player_faces
+	var foe_faces: Array = res.enemy_faces
+	var faces: Array = you_faces + foe_faces
+	var tints: Array = []
+	for _i in you_faces.size():
+		tints.append(Dice3DTray.BONE)
+	for _i in foe_faces.size():
+		tints.append(Dice3DTray.ENEMY_BONE)
+
+	if _reduced():
+		_tray.visible = false
+		_settle_2d(faces, tints)
+		AudioDirector.play_sfx("dice_land", true)
+	elif _use_3d():
+		_clear_2d()
+		_tray.visible = true
+		AudioDirector.play_sfx("dice_shake", true)
+		await _tray.roll(faces, tints)
+		AudioDirector.play_sfx("dice_land")
+	else:
+		_tray.visible = false
+		AudioDirector.play_sfx("dice_shake", true)
+		await _tumble_2d(faces, tints)
+		AudioDirector.play_sfx("dice_land")
+
+	_round_you.text = "You — 2d6 = %d   + SKILL %d   =  %d" % [
+		int(you_faces[0]) + int(you_faces[1]), Adventure.sheet.cur("skill"), int(res.player_total)]
+	_round_foe.text = "%s — 2d6 = %d   + SKILL %d   =  %d" % [
+		str(enemy.get("name", "Foe")), int(foe_faces[0]) + int(foe_faces[1]), int(enemy.get("skill")), int(res.enemy_total)]
+	_banner.text = banner
+	_banner.add_theme_color_override(&"font_color", bcolor)
+
+	if _quick:
+		await get_tree().create_timer(0.35).timeout
+		return
+	_continue_btn.visible = true
+	_continue_btn.grab_focus()
+	await _continue_btn.pressed
+	_continue_btn.visible = false
+
+
+func _clear_2d() -> void:
+	for c in _dice_2d.get_children():
+		c.queue_free()
+
+
+func _settle_2d(faces: Array, tints: Array) -> void:
+	_clear_2d()
+	for i in faces.size():
+		var d := FFDie.new()
+		d.custom_minimum_size = Vector2(56, 56)
+		if i < tints.size() and tints[i] == Dice3DTray.ENEMY_BONE:
+			d.modulate = Color(0.85, 0.83, 0.78)
+		d.value = int(faces[i])
+		_dice_2d.add_child(d)
+
+
+func _tumble_2d(faces: Array, tints: Array) -> void:
+	_clear_2d()
+	var dice: Array[FFDie] = []
+	for i in faces.size():
+		var d := FFDie.new()
+		d.custom_minimum_size = Vector2(56, 56)
+		if i < tints.size() and tints[i] == Dice3DTray.ENEMY_BONE:
+			d.modulate = Color(0.85, 0.83, 0.78)
+		_dice_2d.add_child(d)
+		dice.append(d)
+	var speed := _dice_speed()
+	var t := 0.0
+	while t < 0.7 / speed:
+		for d in dice:
+			d.value = randi_range(1, 6)
+		await get_tree().create_timer(0.05 / speed).timeout
+		t += 0.05 / speed
+	for i in dice.size():
+		dice[i].value = int(faces[i])
+
+
+## Resolve one round with NO dice theatre — used by the screenshot harness so the
+## foe plate + round arithmetic are visible together. Same math path.
 func debug_resolve_round() -> void:
 	if _all_defeated() or Adventure.sheet.is_dead():
 		return
@@ -340,8 +535,11 @@ func debug_resolve_round() -> void:
 		"player_wounds": banner = "You wound the %s (−%d)" % [enemy.get("name"), int(res.wound)]
 		"enemy_wounds": banner = "The %s wounds you (−%d)" % [enemy.get("name"), int(res.wound)]
 	_round_head.text = "ROUND %d" % _round
-	_round_you.text = "You     2d6=%d  +SK %d = %d" % [int(res.player_faces[0]) + int(res.player_faces[1]), Adventure.sheet.cur("skill"), int(res.player_total)]
-	_round_foe.text = "%s   2d6=%d  +SK %d = %d" % [enemy.get("name"), int(res.enemy_faces[0]) + int(res.enemy_faces[1]), int(enemy.get("skill")), int(res.enemy_total)]
+	_round_you.text = "You — 2d6 = %d   + SKILL %d   =  %d" % [int(res.player_faces[0]) + int(res.player_faces[1]), Adventure.sheet.cur("skill"), int(res.player_total)]
+	_round_foe.text = "%s — 2d6 = %d   + SKILL %d   =  %d" % [enemy.get("name"), int(res.enemy_faces[0]) + int(res.enemy_faces[1]), int(enemy.get("skill")), int(res.enemy_total)]
+	_settle_2d((res.player_faces as Array) + (res.enemy_faces as Array),
+		[Dice3DTray.BONE, Dice3DTray.BONE, Dice3DTray.ENEMY_BONE, Dice3DTray.ENEMY_BONE])
+	_banner.text = banner
 	_append_log(banner)
 	Adventure.notify_sheet_changed(res)
 	_refresh()
@@ -365,7 +563,7 @@ func _offer_luck(kind: String, prompt: String) -> void:
 	for c in _luck_bar.get_children():
 		c.queue_free()
 	_luck_bar.visible = true
-	_luck_bar.add_child(FFUI.label(prompt, 16, FFUI.FLAME))
+	_luck_bar.add_child(FFUI.label(prompt, 16, FFUI.FLAME.darkened(0.2)))
 	var yes := FFUI.chip("Yes — Test Luck")
 	yes.pressed.connect(_on_luck_yes)
 	_luck_bar.add_child(yes)
@@ -377,7 +575,6 @@ func _offer_luck(kind: String, prompt: String) -> void:
 
 func _on_luck_yes() -> void:
 	_luck_bar.visible = false
-	var before := Adventure.sheet.cur("luck")
 	var lr := Adventure.test_luck()
 	await _show_dice_test(lr, "TEST YOUR LUCK — combat")
 	var enemy: Dictionary = _enemies[_target]
@@ -443,20 +640,7 @@ func _on_use_item() -> void:
 	add_child(inv)
 
 
-# --- dice overlay helpers --------------------------------------------------
-
-
-func _show_dice_combat(res: Dictionary, enemy: Dictionary, banner: String, bcolor: Color) -> void:
-	var pop := DICE_POPUP.instantiate()
-	add_child(pop)
-	await pop.run_combat({
-		"context": "ROUND %d" % _round_no(),
-		"you": {"faces": res.player_faces, "total": int(res.player_total), "label": "+SK %d" % Adventure.sheet.cur("skill")},
-		"enemy": {"name": str(enemy.get("name", "Foe")), "faces": res.enemy_faces, "total": int(res.enemy_total), "label": "+SK %d" % int(enemy.get("skill"))},
-		"banner": banner, "banner_color": bcolor, "quick": _quick,
-		"reduced_motion": _dice_reduced(), "speed": _dice_speed(),
-	})
-	pop.queue_free()
+# --- dice overlay helper (Luck tests keep the pinned-card popup) ------------
 
 
 func _show_dice_test(lr: Dictionary, context: String) -> void:
@@ -470,16 +654,26 @@ func _show_dice_test(lr: Dictionary, context: String) -> void:
 		"banner_color": FFUI.VERDIGRIS if lr.lucky else FFUI.ARREARS,
 		"depletion": "LUCK %d → %d  (−1)" % [int(lr.luck_before), int(lr.luck_after)],
 		"quick": _quick,
-		"reduced_motion": _dice_reduced(), "speed": _dice_speed(),
+		"reduced_motion": _reduced(), "speed": _dice_speed(),
 	})
 	pop.queue_free()
 
 
-## Dice preferences from Options (Dice / Accessibility), guarded so combat still runs
-## if FFSettings isn't present.
-func _dice_reduced() -> bool:
+## Dice preferences from Options (Dice / Accessibility), guarded so combat still
+## runs if FFSettings isn't present.
+func _reduced() -> bool:
 	var ff := get_node_or_null("/root/FFSettings")
 	return ff != null and (ff.reduced_motion or not ff.dice_animation)
+
+
+func _use_3d() -> bool:
+	if _reduced():
+		return false
+	if DisplayServer.get_name() == "headless":
+		return false
+	var ff := get_node_or_null("/root/FFSettings")
+	return ff != null and bool(ff.dice_3d)
+
 
 func _dice_speed() -> float:
 	var ff := get_node_or_null("/root/FFSettings")
@@ -514,12 +708,34 @@ func _set_actions_enabled(on: bool) -> void:
 
 func _append_log(line: String) -> void:
 	_log_lines.append(line)
-	_log.text = ""
-	for l in _log_lines:
-		_log.text += "• " + l + "\n"
+	var text := ""
+	for i in _log_lines.size():
+		text += "— " + _log_lines[i] + "\n"
+	_log.text = text
+	if _log_scroll != null:
+		await get_tree().process_frame
+		_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)
 
 
 func _end(outcome_id: String, closing: String) -> void:
 	_append_log("[b]%s[/b]" % closing)
 	await get_tree().create_timer(0.2 if _quick else 0.5).timeout
 	resolved.emit(outcome_id)
+
+
+## Ruled ledger paper for the round log: faint rule lines + a red margin rule.
+class _LedgerBox extends MarginContainer:
+	func _init() -> void:
+		add_theme_constant_override(&"margin_left", 40)
+		add_theme_constant_override(&"margin_right", 10)
+		add_theme_constant_override(&"margin_top", 6)
+		add_theme_constant_override(&"margin_bottom", 6)
+
+	func _draw() -> void:
+		var rule := Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.25)
+		var y := 27.0
+		while y < size.y - 2.0:
+			draw_line(Vector2(6, y), Vector2(size.x - 6, y), rule, 1.0)
+			y += 27.0
+		draw_line(Vector2(30, 2), Vector2(30, size.y - 2),
+			Color(FFUI.ARREARS.r, FFUI.ARREARS.g, FFUI.ARREARS.b, 0.30), 1.0)

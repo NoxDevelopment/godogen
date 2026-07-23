@@ -1,78 +1,943 @@
 {
-  "schemaVersion": 2,
-  "stylePack": "veritas-gamebook",
-  "updated": "2026-07-19",
-  "note": "Every art/audio surface is a stable-ID SLOT (GDD \u00a710a). Reused fantasy assets (icons/portraits/UI/fonts) are bound to their res:// files with provenance; section illustration PLATES are bound to clearly-labelled veritas-gamebook PLACEHOLDER assets (real PNGs, not placeholder UI) that the Studio replaces with generated plates in Phase 5 \u2014 no code edits. Scene code resolves slots ONLY through AssetBinder by id.",
-  "slots": [
-    {"slotId": "plate/s1", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "a sin-eater set down at a fog-drowned verge-stone where the road dissolves into black bog; a coach turning back"}, "file": "res://assets/plates/generated/s1.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 101, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s2", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "the Grey Assessor, a faceless robed toll-wraith, folds out of fog at a ledger-carved stone bridge, one empty sleeve extended, palm up; blue untended lantern"}, "file": "res://assets/plates/generated/s2.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 102, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s3", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "two coins on wet parapet stone vanishing into fog as the Assessor thins away"}, "file": "res://assets/plates/generated/s3.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 103, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s4", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "a mossed Ledgerkeeper shrine-stone carved with grey robes and scales that weigh years, three legible lines of warning"}, "file": "res://assets/plates/generated/s4.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 104, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s5", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "the Assessor's faceless attention appraising an open pack; a lantern singled out"}, "file": "res://assets/plates/generated/s5.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 105, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s6", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "an empty robed sleeve passing an inch above a bared forearm, warmth withdrawing like mist"}, "file": "res://assets/plates/generated/s6.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 106, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s7", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "the hero's blade meeting the Grey Assessor as it hardens out of screaming fog, tally-stave swinging, on the toll-bridge"}, "file": "res://assets/plates/generated/s7.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 107, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s8", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "a flooded militia barricade at Harrowfell's drowned gate, grey ledger-script crawling up the doorframes, a crossbow at an arrow-slit"}, "file": "res://assets/plates/generated/s8.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 108, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s9", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "the huddled Harrowfell square at dusk: fever-house lantern, moot-hall tower, a single bright mercantile stall in a flooded market"}, "file": "res://assets/plates/generated/s9.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 109, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s10", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "Mother Grissel Thorne grinding a poultice in a close tallow-lit fever-house, three cots, one covered"}, "file": "res://assets/plates/generated/s10.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 110, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/s11", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "Ferrant Coinwright's lantern-lit stall: rope, torches, dried fish, a physician's-cross bottle, and a saint-named sword wrapped in oilcloth"}, "file": "res://assets/plates/placeholder/s11.png", "provenance": {"kind": "placeholder"}},
-    {"slotId": "plate/s12", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "a leg swallowed to the thigh in black fen; pale robed faceless shapes standing in the water, each writing a name in a little book"}, "file": "res://assets/plates/placeholder/s12.png", "provenance": {"kind": "placeholder"}},
-    {"slotId": "plate/descent", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "a stair descending into the drowned Cathedra of Accounts, water rising, ledger-script whispering in the dark, a pale shape waiting below"}, "file": "res://assets/plates/placeholder/descent.png", "provenance": {"kind": "placeholder"}},
-    {"slotId": "plate/isolde", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "Isolde the Unpaid, a girl of twelve in a decade-old funeral shift, grey ledger-script crawling over half her skin, too still, sorrowful not gory"}, "file": "res://assets/plates/placeholder/isolde.png", "provenance": {"kind": "placeholder"}},
-    {"slotId": "plate/reckoner", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}", "source": {"summary": "the Reckoner (Ambrose Vael), a stooped grieving High Ledgerkeeper in a tag-hung robe with a hanging brass balance, at a great ledger; tragic not demonic"}, "file": "res://assets/plates/placeholder/reckoner.png", "provenance": {"kind": "placeholder"}},
-    {"slotId": "plate/death", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook somber death vignette with a stamped PAID seal: {summary}", "source": {"summary": "grey ledger-script closing over a fallen figure; an Old-Arrears-Red 'PAID' seal stamped across the scene"}, "file": "res://assets/plates/generated/death.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 314, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/victory", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook warm victory plate: {summary}", "source": {"summary": "dawn over the Verge, the Tithe lifting, Isolde at rest — Tallow Flame warmth permitted to dominate for the only time"}, "file": "res://assets/plates/generated/victory.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 131, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "plate/cover", "kind": "illustration", "policy": "generated", "stylePack": "veritas-gamebook", "promptTemplate": "veritas-gamebook brooding cover key art: {summary}", "source": {"summary": "Harrowfell under fog, the drowned Cathedra spire, the Grey Assessor at the toll-bridge, the hero small against it; Ledger Verdigris used once as the eye-hook"}, "file": "res://assets/plates/generated/cover.png", "provenance": {"kind": "generated", "style": "veritas-gamebook", "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe", "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)", "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5", "seed": 77, "license": "NoxDev-generated (Z-Image-Turbo base model)", "generated": "2026-07-19"}},
-    {"slotId": "portrait/grey_assessor", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/grey_assessor.png", "provenance": {"pack": "Monster Avatar Icons", "license": "commercial (asset pack)", "restyle": "recolour to Ledger Verdigris + ledger-script per STYLE_GUIDE 1.6 before ship"}},
-    {"slotId": "portrait/bog_wight", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/bog_wight.png", "provenance": {"pack": "Monster Avatar Icons", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/cutthroat", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/cutthroat.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/reckoner", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/reckoner.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/hero", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/hero.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/grissel", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/grissel.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/cael", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/cael.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/ferrant", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/ferrant.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "portrait/survivor", "kind": "portrait", "policy": "reused", "file": "res://assets/reused/portraits/survivor.png", "provenance": {"pack": "RPG Character Portraits", "license": "commercial (asset pack)"}},
-    {"slotId": "icon/sword", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/sword.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/leather_armour", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/leather_armour.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/lantern", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/lantern.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/provisions", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/provisions.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/gold", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/gold.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/potion_skill", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/potion_skill.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/potion_strength", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/potion_strength.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/potion_fortune", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/potion_fortune.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/silver_key", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/silver_key.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/ledger", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/ledger.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/scroll", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/scroll.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/gem", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/gem.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/cure", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/cure.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "icon/blessed_blade", "kind": "icon", "policy": "reused", "file": "res://assets/reused/icons/blessed_blade.png", "provenance": {"pack": "496 RPG Icons", "license": "CC0"}},
-    {"slotId": "ui/frame", "kind": "ui", "policy": "reused", "file": "res://assets/reused/ui/frame.png", "provenance": {"pack": "Kenney Fantasy UI Borders", "license": "CC0"}},
-    {"slotId": "ui/frame_dark", "kind": "ui", "policy": "reused", "file": "res://assets/reused/ui/frame_dark.png", "provenance": {"pack": "Kenney Fantasy UI Borders", "license": "CC0"}},
-    {"slotId": "ui/divider", "kind": "ui", "policy": "reused", "file": "res://assets/reused/ui/divider.png", "provenance": {"pack": "Kenney Fantasy UI Borders", "license": "CC0"}},
-    {"slotId": "ui/dice_tray", "kind": "ui", "policy": "reused", "placeholderColor": "#2a2119", "file": "res://assets/reused/ui/frame.png", "provenance": {"pack": "Kenney Fantasy UI Borders", "license": "CC0", "note": "stand-in tray frame; bespoke veritas leather tray in Phase 5"}},
-    {"slotId": "mesh/d6", "kind": "mesh", "policy": "generated", "file": null, "provenance": {"kind": "procedural"}, "note": "3D dice (DICE_3D_SPEC §2). Studio-swappable d6 model; while unfilled the tray bakes a rounded/beveled ArrayMesh d6 at runtime. Drop a bone/ivory .glb here to hot-swap the die shape with no code edits (honest FACE_DIRS snap preserved)."},
-    {"slotId": "texture/dice_body", "kind": "texture", "policy": "generated", "file": null, "provenance": {"kind": "procedural"}, "note": "3D dice body albedo atlas (3x2 per-face pips). Unfilled = procedural bone bake. Fill to skin the dice from the Studio."},
-    {"slotId": "normal/dice_body", "kind": "texture", "policy": "generated", "file": null, "provenance": {"kind": "procedural"}, "note": "3D dice body normal atlas (inset pips + micro-grain). Unfilled = procedural bake."},
-    {"slotId": "texture/dice_felt", "kind": "texture", "policy": "generated", "file": null, "provenance": {"kind": "procedural"}, "note": "3D dice tray felt albedo (fabric). Unfilled = procedural weave bake."},
-    {"slotId": "normal/dice_felt", "kind": "texture", "policy": "generated", "file": null, "provenance": {"kind": "procedural"}, "note": "3D dice tray felt normal (cloth micro-normal). Unfilled = procedural bake."},
-    {"slotId": "texture/dice_tray_wood", "kind": "texture", "policy": "generated", "file": null, "provenance": {"kind": "procedural"}, "note": "3D dice tray wood-grain albedo. Unfilled = procedural grain bake."},
-    {"slotId": "audio/music/menu", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/menu.ogg", "provenance": {"pack": "Shadow War — Dark Fantasy Orchestral Music Collection", "source": "06 Forgotten Words (loop)", "license": "commercial (owned asset pack)", "author": "GWriterStudio", "note": "menu bed — brooding invitation (STYLE_GUIDE 2.2)"}},
-    {"slotId": "audio/music/explore", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/explore.ogg", "provenance": {"pack": "Shadow War — Dark Fantasy Orchestral Music Collection", "source": "11 Ambience of Wanderings (loop)", "license": "commercial (owned asset pack)", "author": "GWriterStudio", "note": "explore/reading bed — cold dread, kept quiet"}},
-    {"slotId": "audio/music/tension", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/tension.ogg", "provenance": {"pack": "Shadow War — Dark Fantasy Orchestral Music Collection", "source": "04 Ambience of Foretold Death (loop)", "license": "commercial (owned asset pack)", "author": "GWriterStudio", "note": "tension bed — the Assessor is counting you"}},
-    {"slotId": "audio/music/combat", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/combat.ogg", "provenance": {"pack": "Shadow War — Dark Fantasy Orchestral Music Collection", "source": "03 A Dire Foe (loop)", "license": "commercial (owned asset pack)", "author": "GWriterStudio", "note": "combat bed — grim, measured violence"}},
-    {"slotId": "audio/music/boss", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/boss.ogg", "provenance": {"pack": "Shadow War — Dark Fantasy Orchestral Music Collection", "source": "12 Disgraced Sovereign (loop)", "license": "commercial (owned asset pack)", "author": "GWriterStudio", "note": "boss bed — the Reckoner, tragic grandeur"}},
-    {"slotId": "audio/music/death", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/death.ogg", "provenance": {"pack": "Shadow War — Dark Fantasy Orchestral Music Collection", "source": "14 Ambience of Sorrow (loop)", "license": "commercial (owned asset pack)", "author": "GWriterStudio", "note": "death bed — somber finality, 'account closed'"}},
-    {"slotId": "audio/music/victory", "kind": "audio", "policy": "reused", "file": "res://assets/audio/music/victory.ogg", "provenance": {"pack": "RPG Fantasy Music Pack", "source": "Holy — Hymn (loop)", "license": "commercial (owned asset pack)", "author": "Cyberleaf Studio", "note": "victory bed — the one warm release (QUITTANCE)"}},
-    {"slotId": "audio/sfx/ui_click", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/ui_click.wav", "provenance": {"pack": "Interface SFX Vol. 2", "source": "WOODEN_MALLET", "license": "commercial (owned asset pack)", "note": "UI button click — soft wooden tap"}},
-    {"slotId": "audio/sfx/page_turn_1", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/page_turn_1.mp3", "provenance": {"pack": "Inventory SFX Bundle", "source": "Books & Scrolls / TurnPage1", "license": "commercial (owned asset pack)", "note": "page-turn on passage change (diegetic, STYLE_GUIDE 2.3)"}},
-    {"slotId": "audio/sfx/page_turn_2", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/page_turn_2.mp3", "provenance": {"pack": "Inventory SFX Bundle", "source": "Books & Scrolls / TurnPage3", "license": "commercial (owned asset pack)", "note": "page-turn variant"}},
-    {"slotId": "audio/sfx/dice_shake", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/dice_shake.wav", "provenance": {"pack": "Interface SFX Vol. 2", "source": "LITTLE_BONES sfxO01", "license": "commercial (owned asset pack)", "note": "the sacred dice — bone-clatter shake/tumble (STYLE_GUIDE 2.2 pillar)"}},
-    {"slotId": "audio/sfx/dice_land", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/dice_land.wav", "provenance": {"pack": "Interface SFX Vol. 2", "source": "LITTLE_BONES sfxO05", "license": "commercial (owned asset pack)", "note": "the sacred dice — pips landing/settle"}},
-    {"slotId": "audio/sfx/hit", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/hit.wav", "provenance": {"pack": "Combat Sounds Bundle Collection", "source": "Impact Sword To Body 01", "license": "commercial (owned asset pack)", "note": "combat — you wound the foe"}},
-    {"slotId": "audio/sfx/wound", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/wound.wav", "provenance": {"pack": "Combat Sounds Bundle Collection", "source": "Weapon Hit With Flesh 01", "license": "commercial (owned asset pack)", "note": "combat — the foe wounds you"}},
-    {"slotId": "audio/sfx/parry", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/parry.wav", "provenance": {"pack": "Combat Sounds Bundle Collection", "source": "Impact Sword Parry 01", "license": "commercial (owned asset pack)", "note": "combat — parried, no blood drawn (a tie)"}},
-    {"slotId": "audio/sfx/potion", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/potion.mp3", "provenance": {"pack": "Inventory SFX Bundle", "source": "Potions / PotionUse1", "license": "commercial (owned asset pack)", "note": "drink a potion dose"}},
-    {"slotId": "audio/sfx/eat", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/eat.mp3", "provenance": {"pack": "Inventory SFX Bundle", "source": "Food & Herbs / Food1", "license": "commercial (owned asset pack)", "note": "eat a Provision (+STAMINA)"}},
-    {"slotId": "audio/sfx/coin", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/coin.mp3", "provenance": {"pack": "Inventory SFX Bundle", "source": "Coins / Coin1", "license": "commercial (owned asset pack)", "note": "gold gained — the economy motif"}},
-    {"slotId": "audio/sfx/pickup", "kind": "audio", "policy": "reused", "file": "res://assets/audio/sfx/pickup.mp3", "provenance": {"pack": "Inventory SFX Bundle", "source": "Bags / BagOpen1", "license": "commercial (owned asset pack)", "note": "item added to pack"}}
-  ]
+ "schemaVersion": 2,
+ "stylePack": "veritas-gamebook",
+ "updated": "2026-07-19",
+ "note": "Every art/audio surface is a stable-ID SLOT (GDD §10a). Reused fantasy assets (icons/portraits/UI/fonts) are bound to their res:// files with provenance; section illustration PLATES are bound to clearly-labelled veritas-gamebook PLACEHOLDER assets (real PNGs, not placeholder UI) that the Studio replaces with generated plates in Phase 5 — no code edits. Scene code resolves slots ONLY through AssetBinder by id.",
+ "slots": [
+  {
+   "slotId": "plate/s1",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "a sin-eater set down at a fog-drowned verge-stone where the road dissolves into black bog; a coach turning back"
+   },
+   "file": "res://assets/plates/generated/s1.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 101,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s2",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "the Grey Assessor, a faceless robed toll-wraith, folds out of fog at a ledger-carved stone bridge, one empty sleeve extended, palm up; blue untended lantern"
+   },
+   "file": "res://assets/plates/generated/s2.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 102,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s3",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "two coins on wet parapet stone vanishing into fog as the Assessor thins away"
+   },
+   "file": "res://assets/plates/generated/s3.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 103,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s4",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "a mossed Ledgerkeeper shrine-stone carved with grey robes and scales that weigh years, three legible lines of warning"
+   },
+   "file": "res://assets/plates/generated/s4.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 104,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s5",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "the Assessor's faceless attention appraising an open pack; a lantern singled out"
+   },
+   "file": "res://assets/plates/generated/s5.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 105,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s6",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "an empty robed sleeve passing an inch above a bared forearm, warmth withdrawing like mist"
+   },
+   "file": "res://assets/plates/generated/s6.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 106,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s7",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "the hero's blade meeting the Grey Assessor as it hardens out of screaming fog, tally-stave swinging, on the toll-bridge"
+   },
+   "file": "res://assets/plates/generated/s7.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 107,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s8",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "a flooded militia barricade at Harrowfell's drowned gate, grey ledger-script crawling up the doorframes, a crossbow at an arrow-slit"
+   },
+   "file": "res://assets/plates/generated/s8.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 108,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s9",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "the huddled Harrowfell square at dusk: fever-house lantern, moot-hall tower, a single bright mercantile stall in a flooded market"
+   },
+   "file": "res://assets/plates/generated/s9.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 109,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s10",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "Mother Grissel Thorne grinding a poultice in a close tallow-lit fever-house, three cots, one covered"
+   },
+   "file": "res://assets/plates/generated/s10.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 110,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/s11",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "Ferrant Coinwright's lantern-lit stall: rope, torches, dried fish, a physician's-cross bottle, and a saint-named sword wrapped in oilcloth"
+   },
+   "file": "res://assets/plates/placeholder/s11.png",
+   "provenance": {
+    "kind": "placeholder"
+   }
+  },
+  {
+   "slotId": "plate/s12",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "a leg swallowed to the thigh in black fen; pale robed faceless shapes standing in the water, each writing a name in a little book"
+   },
+   "file": "res://assets/plates/placeholder/s12.png",
+   "provenance": {
+    "kind": "placeholder"
+   }
+  },
+  {
+   "slotId": "plate/descent",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "a stair descending into the drowned Cathedra of Accounts, water rising, ledger-script whispering in the dark, a pale shape waiting below"
+   },
+   "file": "res://assets/plates/placeholder/descent.png",
+   "provenance": {
+    "kind": "placeholder"
+   }
+  },
+  {
+   "slotId": "plate/isolde",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "Isolde the Unpaid, a girl of twelve in a decade-old funeral shift, grey ledger-script crawling over half her skin, too still, sorrowful not gory"
+   },
+   "file": "res://assets/plates/placeholder/isolde.png",
+   "provenance": {
+    "kind": "placeholder"
+   }
+  },
+  {
+   "slotId": "plate/reckoner",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook ink+watercolor book plate: {summary}",
+   "source": {
+    "summary": "the Reckoner (Ambrose Vael), a stooped grieving High Ledgerkeeper in a tag-hung robe with a hanging brass balance, at a great ledger; tragic not demonic"
+   },
+   "file": "res://assets/plates/placeholder/reckoner.png",
+   "provenance": {
+    "kind": "placeholder"
+   }
+  },
+  {
+   "slotId": "plate/death",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook somber death vignette with a stamped PAID seal: {summary}",
+   "source": {
+    "summary": "grey ledger-script closing over a fallen figure; an Old-Arrears-Red 'PAID' seal stamped across the scene"
+   },
+   "file": "res://assets/plates/generated/death.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 314,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/victory",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook warm victory plate: {summary}",
+   "source": {
+    "summary": "dawn over the Verge, the Tithe lifting, Isolde at rest — Tallow Flame warmth permitted to dominate for the only time"
+   },
+   "file": "res://assets/plates/generated/victory.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 131,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/cover",
+   "kind": "illustration",
+   "policy": "generated",
+   "stylePack": "veritas-gamebook",
+   "promptTemplate": "veritas-gamebook brooding cover key art: {summary}",
+   "source": {
+    "summary": "Harrowfell under fog, the drowned Cathedra spire, the Grey Assessor at the toll-bridge, the hero small against it; Ledger Verdigris used once as the eye-hook"
+   },
+   "file": "res://assets/plates/generated/cover.png",
+   "provenance": {
+    "kind": "generated",
+    "style": "veritas-gamebook",
+    "mechanism": "prompt-defined style on base Z-Image-Turbo (no LoRA) — the validated STYLE_BENCHMARKS_2026-07 recipe",
+    "baseModel": "Z-Image-Turbo (zImageTurbo_turbo.safetensors, lumina2 text encoder)",
+    "pipeline": "godogen image-pipeline / ComfyUI-direct, KSampler euler simple 15 steps cfg 3.5",
+    "seed": 77,
+    "license": "NoxDev-generated (Z-Image-Turbo base model)",
+    "generated": "2026-07-19"
+   }
+  },
+  {
+   "slotId": "plate/map",
+   "kind": "illustration",
+   "policy": "generated",
+   "file": "res://assets/plates/generated/map.png",
+   "provenance": {
+    "workflow": "zit-txt2img (z-image-turbo, ComfyUI direct)",
+    "prompt": "hand-drawn ink and watercolor journey map, sorcery-inkle lane, Grey Tithe geography",
+    "seed": 771004,
+    "note": "Sorcery-style travel map plate for The Grey Tithe (post-processed: desaturated toward the bog palette)"
+   }
+  },
+  {
+   "slotId": "portrait/grey_assessor",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/grey_assessor.png",
+   "provenance": {
+    "pack": "Monster Avatar Icons",
+    "license": "commercial (asset pack)",
+    "restyle": "recolour to Ledger Verdigris + ledger-script per STYLE_GUIDE 1.6 before ship"
+   }
+  },
+  {
+   "slotId": "portrait/bog_wight",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/bog_wight.png",
+   "provenance": {
+    "pack": "Monster Avatar Icons",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/cutthroat",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/cutthroat.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/reckoner",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/reckoner.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/hero",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/hero.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/grissel",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/grissel.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/cael",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/cael.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/ferrant",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/ferrant.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "portrait/survivor",
+   "kind": "portrait",
+   "policy": "reused",
+   "file": "res://assets/reused/portraits/survivor.png",
+   "provenance": {
+    "pack": "RPG Character Portraits",
+    "license": "commercial (asset pack)"
+   }
+  },
+  {
+   "slotId": "icon/sword",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/sword.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/leather_armour",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/leather_armour.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/lantern",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/lantern.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/provisions",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/provisions.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/gold",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/gold.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/potion_skill",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/potion_skill.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/potion_strength",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/potion_strength.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/potion_fortune",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/potion_fortune.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/silver_key",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/silver_key.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/ledger",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/ledger.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/scroll",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/scroll.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/gem",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/gem.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/cure",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/cure.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "icon/blessed_blade",
+   "kind": "icon",
+   "policy": "reused",
+   "file": "res://assets/reused/icons/blessed_blade.png",
+   "provenance": {
+    "pack": "496 RPG Icons",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "ui/frame",
+   "kind": "ui",
+   "policy": "reused",
+   "file": "res://assets/reused/ui/frame.png",
+   "provenance": {
+    "pack": "Kenney Fantasy UI Borders",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "ui/frame_dark",
+   "kind": "ui",
+   "policy": "reused",
+   "file": "res://assets/reused/ui/frame_dark.png",
+   "provenance": {
+    "pack": "Kenney Fantasy UI Borders",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "ui/divider",
+   "kind": "ui",
+   "policy": "reused",
+   "file": "res://assets/reused/ui/divider.png",
+   "provenance": {
+    "pack": "Kenney Fantasy UI Borders",
+    "license": "CC0"
+   }
+  },
+  {
+   "slotId": "ui/paper_page",
+   "kind": "ui",
+   "policy": "generated",
+   "file": "res://assets/ui/paper_page.png",
+   "provenance": {
+    "workflow": "zit-txt2img (z-image-turbo, ComfyUI direct)",
+    "prompt": "photograph of a sheet of antique blank parchment paper, aged cream, fibre grain, foxing, darkened edges",
+    "seed": 771003,
+    "note": "the LOOKFEEL paper page ground - every book screen's paper texture"
+   }
+  },
+  {
+   "slotId": "ui/dice_tray",
+   "kind": "ui",
+   "policy": "reused",
+   "placeholderColor": "#2a2119",
+   "file": "res://assets/reused/ui/frame.png",
+   "provenance": {
+    "pack": "Kenney Fantasy UI Borders",
+    "license": "CC0",
+    "note": "stand-in tray frame; bespoke veritas leather tray in Phase 5"
+   }
+  },
+  {
+   "slotId": "mesh/d6",
+   "kind": "mesh",
+   "policy": "generated",
+   "file": null,
+   "provenance": {
+    "kind": "procedural"
+   },
+   "note": "3D dice (DICE_3D_SPEC §2). Studio-swappable d6 model; while unfilled the tray bakes a rounded/beveled ArrayMesh d6 at runtime. Drop a bone/ivory .glb here to hot-swap the die shape with no code edits (honest FACE_DIRS snap preserved)."
+  },
+  {
+   "slotId": "texture/dice_body",
+   "kind": "texture",
+   "policy": "generated",
+   "file": null,
+   "provenance": {
+    "kind": "procedural"
+   },
+   "note": "3D dice body albedo atlas (3x2 per-face pips). Unfilled = procedural bone bake. Fill to skin the dice from the Studio."
+  },
+  {
+   "slotId": "normal/dice_body",
+   "kind": "texture",
+   "policy": "generated",
+   "file": null,
+   "provenance": {
+    "kind": "procedural"
+   },
+   "note": "3D dice body normal atlas (inset pips + micro-grain). Unfilled = procedural bake."
+  },
+  {
+   "slotId": "texture/dice_felt",
+   "kind": "texture",
+   "policy": "generated",
+   "file": null,
+   "provenance": {
+    "kind": "procedural"
+   },
+   "note": "3D dice tray felt albedo (fabric). Unfilled = procedural weave bake."
+  },
+  {
+   "slotId": "normal/dice_felt",
+   "kind": "texture",
+   "policy": "generated",
+   "file": null,
+   "provenance": {
+    "kind": "procedural"
+   },
+   "note": "3D dice tray felt normal (cloth micro-normal). Unfilled = procedural bake."
+  },
+  {
+   "slotId": "texture/dice_tray_wood",
+   "kind": "texture",
+   "policy": "generated",
+   "file": null,
+   "provenance": {
+    "kind": "procedural"
+   },
+   "note": "3D dice tray wood-grain albedo. Unfilled = procedural grain bake."
+  },
+  {
+   "slotId": "audio/music/menu",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/menu.ogg",
+   "provenance": {
+    "pack": "Shadow War — Dark Fantasy Orchestral Music Collection",
+    "source": "06 Forgotten Words (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "GWriterStudio",
+    "note": "menu bed — brooding invitation (STYLE_GUIDE 2.2)"
+   }
+  },
+  {
+   "slotId": "audio/music/explore",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/explore.ogg",
+   "provenance": {
+    "pack": "Shadow War — Dark Fantasy Orchestral Music Collection",
+    "source": "11 Ambience of Wanderings (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "GWriterStudio",
+    "note": "explore/reading bed — cold dread, kept quiet"
+   }
+  },
+  {
+   "slotId": "audio/music/tension",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/tension.ogg",
+   "provenance": {
+    "pack": "Shadow War — Dark Fantasy Orchestral Music Collection",
+    "source": "04 Ambience of Foretold Death (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "GWriterStudio",
+    "note": "tension bed — the Assessor is counting you"
+   }
+  },
+  {
+   "slotId": "audio/music/combat",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/combat.ogg",
+   "provenance": {
+    "pack": "Shadow War — Dark Fantasy Orchestral Music Collection",
+    "source": "03 A Dire Foe (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "GWriterStudio",
+    "note": "combat bed — grim, measured violence"
+   }
+  },
+  {
+   "slotId": "audio/music/boss",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/boss.ogg",
+   "provenance": {
+    "pack": "Shadow War — Dark Fantasy Orchestral Music Collection",
+    "source": "12 Disgraced Sovereign (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "GWriterStudio",
+    "note": "boss bed — the Reckoner, tragic grandeur"
+   }
+  },
+  {
+   "slotId": "audio/music/death",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/death.ogg",
+   "provenance": {
+    "pack": "Shadow War — Dark Fantasy Orchestral Music Collection",
+    "source": "14 Ambience of Sorrow (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "GWriterStudio",
+    "note": "death bed — somber finality, 'account closed'"
+   }
+  },
+  {
+   "slotId": "audio/music/victory",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/music/victory.ogg",
+   "provenance": {
+    "pack": "RPG Fantasy Music Pack",
+    "source": "Holy — Hymn (loop)",
+    "license": "commercial (owned asset pack)",
+    "author": "Cyberleaf Studio",
+    "note": "victory bed — the one warm release (QUITTANCE)"
+   }
+  },
+  {
+   "slotId": "audio/sfx/ui_click",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/ui_click.wav",
+   "provenance": {
+    "pack": "Interface SFX Vol. 2",
+    "source": "WOODEN_MALLET",
+    "license": "commercial (owned asset pack)",
+    "note": "UI button click — soft wooden tap"
+   }
+  },
+  {
+   "slotId": "audio/sfx/page_turn_1",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/page_turn_1.mp3",
+   "provenance": {
+    "pack": "Inventory SFX Bundle",
+    "source": "Books & Scrolls / TurnPage1",
+    "license": "commercial (owned asset pack)",
+    "note": "page-turn on passage change (diegetic, STYLE_GUIDE 2.3)"
+   }
+  },
+  {
+   "slotId": "audio/sfx/page_turn_2",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/page_turn_2.mp3",
+   "provenance": {
+    "pack": "Inventory SFX Bundle",
+    "source": "Books & Scrolls / TurnPage3",
+    "license": "commercial (owned asset pack)",
+    "note": "page-turn variant"
+   }
+  },
+  {
+   "slotId": "audio/sfx/dice_shake",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/dice_shake.wav",
+   "provenance": {
+    "pack": "Interface SFX Vol. 2",
+    "source": "LITTLE_BONES sfxO01",
+    "license": "commercial (owned asset pack)",
+    "note": "the sacred dice — bone-clatter shake/tumble (STYLE_GUIDE 2.2 pillar)"
+   }
+  },
+  {
+   "slotId": "audio/sfx/dice_land",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/dice_land.wav",
+   "provenance": {
+    "pack": "Interface SFX Vol. 2",
+    "source": "LITTLE_BONES sfxO05",
+    "license": "commercial (owned asset pack)",
+    "note": "the sacred dice — pips landing/settle"
+   }
+  },
+  {
+   "slotId": "audio/sfx/hit",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/hit.wav",
+   "provenance": {
+    "pack": "Combat Sounds Bundle Collection",
+    "source": "Impact Sword To Body 01",
+    "license": "commercial (owned asset pack)",
+    "note": "combat — you wound the foe"
+   }
+  },
+  {
+   "slotId": "audio/sfx/wound",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/wound.wav",
+   "provenance": {
+    "pack": "Combat Sounds Bundle Collection",
+    "source": "Weapon Hit With Flesh 01",
+    "license": "commercial (owned asset pack)",
+    "note": "combat — the foe wounds you"
+   }
+  },
+  {
+   "slotId": "audio/sfx/parry",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/parry.wav",
+   "provenance": {
+    "pack": "Combat Sounds Bundle Collection",
+    "source": "Impact Sword Parry 01",
+    "license": "commercial (owned asset pack)",
+    "note": "combat — parried, no blood drawn (a tie)"
+   }
+  },
+  {
+   "slotId": "audio/sfx/potion",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/potion.mp3",
+   "provenance": {
+    "pack": "Inventory SFX Bundle",
+    "source": "Potions / PotionUse1",
+    "license": "commercial (owned asset pack)",
+    "note": "drink a potion dose"
+   }
+  },
+  {
+   "slotId": "audio/sfx/eat",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/eat.mp3",
+   "provenance": {
+    "pack": "Inventory SFX Bundle",
+    "source": "Food & Herbs / Food1",
+    "license": "commercial (owned asset pack)",
+    "note": "eat a Provision (+STAMINA)"
+   }
+  },
+  {
+   "slotId": "audio/sfx/coin",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/coin.mp3",
+   "provenance": {
+    "pack": "Inventory SFX Bundle",
+    "source": "Coins / Coin1",
+    "license": "commercial (owned asset pack)",
+    "note": "gold gained — the economy motif"
+   }
+  },
+  {
+   "slotId": "audio/sfx/pickup",
+   "kind": "audio",
+   "policy": "reused",
+   "file": "res://assets/audio/sfx/pickup.mp3",
+   "provenance": {
+    "pack": "Inventory SFX Bundle",
+    "source": "Bags / BagOpen1",
+    "license": "commercial (owned asset pack)",
+    "note": "item added to pack"
+   }
+  }
+ ]
 }

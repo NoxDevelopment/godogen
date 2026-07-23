@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ffgblookfeel01"]
+
+[ext_resource type="Script" path="res://_probes/lookfeel_run.gd" id="1_lf"]
+
+[node name="LookfeelRun" type="Node"]
+script = ExtResource("1_lf")

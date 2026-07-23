@@ -1,12 +1,14 @@
 extends CanvasLayer
 ## res://scripts/screens/map_view.gd
-## Map / Progress (WIREFRAMES 5.8, GDD §6.1 #10) — the faithful passage-graph
-## auto-map. Nodes are the sections the hero has visited (from
-## GameState.passage_history); edges are the branches out of them
-## (Section.choices[].target). Current is highlighted; unvisited branch targets show
-## as outlines; a death-terminal seen shows a cross. View-only in faithful mode (a
-## Graph|Travel toggle is present; travel-as-movement is a COULD, GDD §13). A text
-## list alternative is provided for screen-reader/keyboard users. Esc / ✕ closes.
+## THE JOURNEY (LOOKFEEL_PASS_2026-07 §map — Sorcery!'s living travel map;
+## WIREFRAMES 5.8; STYLE_GUIDE §1.8 `sorcery-inkle` lane). A full-page map sheet:
+## when the active BOOK ships a hand-drawn map plate (slot "plate/map" + node
+## coordinates in book.json) the party's journey is inked across that map — the
+## traveled route dashed section-to-section, visited places ring-marked with
+## their titles, the party a red wax seal at the current section. Books without
+## a plate fall back to "the hero's own chart": the visited passage graph drawn
+## on parchment in the same ink vocabulary. View-only in faithful mode; a text
+## list alternative is kept for screen-reader/keyboard users. Esc / ✕ closes.
 
 signal closed
 
@@ -24,41 +26,43 @@ func _ready() -> void:
 func _build() -> void:
 	var dim := ColorRect.new()
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0.02, 0.03, 0.03, 0.55)
+	dim.color = Color(0.02, 0.015, 0.01, 0.66)
 	add_child(dim)
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
 	var panel := FFUI.framed_panel(FFUI.UMBER)
-	panel.custom_minimum_size = Vector2(760, 560)
-	center.add_child(panel)
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.offset_left = 34
+	panel.offset_right = -34
+	panel.offset_top = 22
+	panel.offset_bottom = -22
+	add_child(panel)
 	var outer := VBoxContainer.new()
-	outer.add_theme_constant_override(&"separation", 8)
+	outer.add_theme_constant_override(&"separation", 6)
 	panel.add_child(outer)
 
 	var head := HBoxContainer.new()
-	var t := FFUI.title("MAP  ·  THE VERGE OF HARROW", 22, FFUI.INK)
+	head.add_theme_constant_override(&"separation", 10)
+	var t := FFUI.title("THE JOURNEY  ·  %s" % Adventure.book_title().to_upper(), 22, FFUI.INK)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(t)
-	var graph_btn := FFUI.chip("Graph")
-	var travel_btn := FFUI.chip("Travel")
-	travel_btn.pressed.connect(func() -> void: _toast("Travel-map mode is a COULD (GDD §13) — not enabled for this book."))
-	head.add_child(graph_btn)
-	head.add_child(travel_btn)
-	var x := FFUI.chip("✕"); x.pressed.connect(_close); head.add_child(x)
+	var x := FFUI.chip("✕")
+	x.pressed.connect(_close)
+	head.add_child(x)
 	outer.add_child(head)
-	outer.add_child(FFUI.divider_rule())
+	outer.add_child(FFUI.diamond_rule(FFUI.VERDIGRIS))
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(0, 380)
 	_graph = FFMapGraph.new()
+	_graph.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_graph.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_graph)
 	outer.add_child(scroll)
 
-	outer.add_child(FFUI.label("Legend:   ● you    ○ visited    ◌ branch    ✝ death", 14, FFUI.UMBER))
-	_list = FFUI.rich(14, FFUI.UMBER)
+	var legend := FFUI.label("●  the party      ○  walked      ◌  heard of      ✕  a death seen", 13, FFUI.UMBER)
+	legend.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	outer.add_child(legend)
+	_list = FFUI.rich(13, FFUI.UMBER)
 	outer.add_child(_list)
 
 
@@ -79,7 +83,77 @@ func _populate() -> void:
 			visited[p] = true
 			visited_order.append(p)
 
-	# node set: visited + their direct branch targets
+	var book_map: Dictionary = Adventure.book().get("map", {})
+	var coords: Dictionary = book_map.get("nodes", {}) if book_map.get("nodes", {}) is Dictionary else {}
+	var plate_tex: Texture2D = null
+	if not coords.is_empty():
+		plate_tex = AssetBinder.get_texture(str(book_map.get("plate", "plate/map")))
+
+	if plate_tex != null:
+		_populate_book_map(scen, coords, plate_tex, visited_order, visited, current, history)
+	else:
+		_populate_auto_chart(scen, visited_order, visited, current)
+
+	# text-list alternative (both modes)
+	var line := "[b]Walked:[/b] "
+	for p in visited_order:
+		var title := _title_of(scen, p)
+		line += ("[u]%s (here)[/u]  ·  " % title) if p == current else ("%s  ·  " % title)
+	_list.text = line.trim_suffix("  ·  ")
+
+
+## BOOK-MAP mode: project the walk onto the book's hand-drawn plate. Sections
+## without a coordinate (interstitial beats) snap to their nearest mapped
+## ancestor in the walk, so the route and the wax seal always sit on the map.
+func _populate_book_map(scen: IFScenario, coords: Dictionary, plate_tex: Texture2D,
+		visited_order: Array[String], visited: Dictionary, current: String, history: Array) -> void:
+	# the traveled route, collapsed to mapped nodes (deduped consecutive repeats)
+	var route: Array = []
+	for pid in history:
+		var m := _mapped_id(str(pid), coords, history)
+		if m != "" and (route.is_empty() or route.back() != m):
+			route.append(m)
+	var cur_mapped := _mapped_id(current, coords, history)
+
+	var nodes: Array[Dictionary] = []
+	for id in coords.keys():
+		var sid := str(id)
+		var c: Array = coords[sid]
+		if c.size() < 2:
+			continue
+		var kind := "branch"
+		if sid == cur_mapped:
+			kind = "current"
+		elif visited.has(sid):
+			kind = "visited"
+		var passage: Dictionary = scen.passages.get(sid, {})
+		if passage.get("ending", {}).get("kind", "") == "death" and visited.has(sid):
+			kind = "death"
+		nodes.append({
+			"id": sid,
+			"pos": Vector2(float(c[0]), float(c[1])),
+			"kind": kind,
+			"label": _title_of(scen, sid) if (visited.has(sid) or sid == cur_mapped) else "",
+		})
+	_graph.build_on_plate(plate_tex, nodes, route)
+
+
+## The last mapped section at-or-before `pid` in the walk ("" if none yet).
+func _mapped_id(pid: String, coords: Dictionary, history: Array) -> String:
+	if coords.has(pid):
+		return pid
+	var at := history.rfind(pid)
+	if at < 0:
+		at = history.size() - 1
+	for i in range(at, -1, -1):
+		if coords.has(str(history[i])):
+			return str(history[i])
+	return ""
+
+
+## AUTO-CHART mode (books without a plate): the visited graph, laid out by BFS
+## depth with a deterministic hand-drawn stagger, titles on the walked nodes.
+func _populate_auto_chart(scen: IFScenario, visited_order: Array[String], visited: Dictionary, current: String) -> void:
 	var node_ids := {}
 	for p in visited_order:
 		node_ids[p] = true
@@ -88,17 +162,11 @@ func _populate() -> void:
 		var passage: Dictionary = scen.passages.get(p, {})
 		for ch in passage.get("choices", []):
 			var g := str(ch.get("goto", ""))
-			if g == "" or str(ch.get("id", "")).begins_with("_"):
-				# skip engine-consumed outcome choices from the player-facing map,
-				# but still surface their destinations as branch nodes
-				if g != "":
-					node_ids[g] = true
-					edges.append([p, g])
+			if g == "":
 				continue
 			node_ids[g] = true
 			edges.append([p, g])
 
-	# layer nodes by BFS depth over the full graph from start
 	var depth := _bfs_depth(scen, scen.start, node_ids)
 	var by_depth := {}
 	for id in node_ids.keys():
@@ -108,8 +176,8 @@ func _populate() -> void:
 		by_depth[d].append(id)
 
 	var nodes: Array[Dictionary] = []
-	var col_w := 150.0
-	var row_h := 74.0
+	var col_w := 190.0
+	var row_h := 92.0
 	var depths := by_depth.keys()
 	depths.sort()
 	for d in depths:
@@ -123,21 +191,28 @@ func _populate() -> void:
 			elif visited.has(id):
 				kind = "visited"
 			var passage: Dictionary = scen.passages.get(id, {})
-			if passage.get("ending", {}).get("kind", "") == "death":
+			if passage.get("ending", {}).get("kind", "") == "death" and visited.has(id):
 				kind = "death"
+			# deterministic hand-drawn stagger so the chart doesn't grid up
+			var jx := float((hash(id) % 23) - 11) * 1.6
+			var jy := float((hash(id + "y") % 19) - 9) * 1.8
 			nodes.append({
 				"id": id,
-				"pos": Vector2(60 + d * col_w, 48 + i * row_h),
+				"pos": Vector2(90 + d * col_w + jx, 64 + i * row_h + jy),
 				"kind": kind,
-				"label": id,
+				"label": _title_of(scen, id) if (visited.has(id) or id == current) else "",
 			})
-	_graph.build(nodes, edges)
-
-	# text-list alternative
-	var line := "[b]Visited:[/b] "
+	# the walked route in visit order
+	var route: Array = []
 	for p in visited_order:
-		line += ("[u]%s (current)[/u]  " % p) if p == current else ("%s  " % p)
-	_list.text = line
+		route.append(p)
+	_graph.build(nodes, edges, route)
+
+
+func _title_of(scen: IFScenario, id: String) -> String:
+	var passage: Dictionary = scen.passages.get(id, {})
+	var t := str(passage.get("title", ""))
+	return t if t != "" else id
 
 
 func _bfs_depth(scen: IFScenario, start: String, allowed: Dictionary) -> Dictionary:
@@ -155,15 +230,6 @@ func _bfs_depth(scen: IFScenario, start: String, allowed: Dictionary) -> Diction
 				depth[g] = int(depth[cur]) + 1
 				queue.append(g)
 	return depth
-
-
-func _toast(msg: String) -> void:
-	var t := FFUI.label(msg, 14, FFUI.FLAME)
-	t.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	add_child(t)
-	await get_tree().create_timer(2.0).timeout
-	if is_instance_valid(t):
-		t.queue_free()
 
 
 func _close() -> void:

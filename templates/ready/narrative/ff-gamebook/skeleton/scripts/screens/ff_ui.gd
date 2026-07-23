@@ -27,6 +27,9 @@ const ARREARS     := Color("8a2e24")   # Old Arrears Red — wounds / blood / da
 # jet-black on paper; this reads as pressed-in ink rather than a screen label.
 const PROSE_INK   := Color("241c12")   # warm reading ink for body prose
 const GILT_EDGE   := Color("3a2c17")   # dark umber edge for the illuminated initial
+# The desk the book lies on (FFC/Veritas study-desk framing) — near-black, warm,
+# so the paper page reads as a lit physical object, never a flat app background.
+const DESK        := Color("0f0c09")
 
 # --- The player's OWN ink (hand-entered values, never the printed form) -----
 # These separate "the pen the player wrote with" from the printed black form so the
@@ -46,6 +49,9 @@ const FONT_HAND_LOOSE := "res://assets/reused/fonts/ReenieBeanie.ttf" # large sc
 const FRAME_TEX    := "res://assets/reused/ui/frame.png"              # 96x96 9-slice
 const FRAME_DARK   := "res://assets/reused/ui/frame_dark.png"
 const DIVIDER_TEX  := "res://assets/reused/ui/divider.png"
+# The REAL paper (LOOKFEEL_PASS_2026-07): an aged-parchment page texture — fibre
+# grain, foxing, toasted ragged edges — bound Studio-side as slot "ui/paper_page".
+const PAPER_TEX    := "res://assets/ui/paper_page.png"
 
 static var _cache: Dictionary = {}
 
@@ -169,13 +175,89 @@ static func plate(slot_id: String) -> Texture2D:
 # --- Backgrounds ------------------------------------------------------------
 
 
-## A full-rect parchment ground (the reading page). `dark` uses Drowned Vellum.
+## The paper texture, Studio-swappable by stable ID first (LOOKFEEL_PASS_2026-07).
+static func paper_texture() -> Texture2D:
+	var t := AssetBinder.get_texture("ui/paper_page")
+	if t != null:
+		return t
+	return _res(PAPER_TEX) as Texture2D
+
+
+## THE page ground (every book screen): a real aged-paper sheet lying on a
+## near-black desk — page shadow, a stacked page-edge at right/bottom so it reads
+## as an open book, the parchment texture across the sheet (FFC's book-on-a-desk
+## framing). `mode` mirrors FFSettings.ReadingTheme: 0 Parchment · 1 Sepia (warmer
+## wash) · 2 Dark (the same page read by lantern-light — the paper darkens, the
+## ink on it is flipped to parchment by the caller). Falls back to a flat
+## Tallow/Vellum fill only if the texture asset is missing.
+static func paper_ground(mode: int = 0) -> Control:
+	var g := PaperGround.new()
+	g.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	g.set_mode(mode)
+	return g
+
+
+## Back-compat alias (screens that only ever wanted "a parchment page").
 static func page_background(dark: bool = false) -> Control:
-	var bg := ColorRect.new()
-	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	bg.color = VELLUM if dark else PARCHMENT
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return bg
+	return paper_ground(2 if dark else 0)
+
+
+## The physical page on the desk. The paper itself is a TextureRect CHILD (the
+## proven render path — plates use it), while the desk, cast shadow and stacked
+## page-edge are cheap parent draws underneath. Deterministic — screenshot-stable
+## for visual-judge.
+class PaperGround extends Control:
+	var mode: int = 0
+	var _paper: TextureRect
+	## Desk border around the sheet (the page never bleeds to the screen edge).
+	const M_X := 26.0
+	const M_TOP := 16.0
+	const M_BOT := 20.0
+
+	func _init() -> void:
+		_paper = TextureRect.new()
+		_paper.texture = FFUI.paper_texture()
+		_paper.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_paper.stretch_mode = TextureRect.STRETCH_SCALE
+		_paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_paper.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_paper.offset_left = M_X
+		_paper.offset_right = -M_X
+		_paper.offset_top = M_TOP
+		_paper.offset_bottom = -M_BOT
+		add_child(_paper)
+
+	func set_mode(m: int) -> void:
+		mode = m
+		if _paper != null:
+			match mode:
+				1:  _paper.self_modulate = Color(1.0, 0.90, 0.72)     # sepia — warmer wash
+				2:  _paper.self_modulate = Color(0.34, 0.335, 0.30)   # dark — lantern-lit page
+				_:  _paper.self_modulate = Color.WHITE
+		queue_redraw()
+
+	## The rect the page sheet occupies (children/callers may align columns to it).
+	func page_rect() -> Rect2:
+		return Rect2(Vector2(M_X, M_TOP), size - Vector2(M_X * 2.0, M_TOP + M_BOT))
+
+	func _draw() -> void:
+		# the desk
+		draw_rect(Rect2(Vector2.ZERO, size), FFUI.DESK, true)
+		var r := page_rect()
+		# soft cast shadow under the sheet (three widening translucent skirts)
+		for i in 3:
+			var grow := 3.0 + 4.0 * float(i)
+			draw_rect(r.grow(grow), Color(0, 0, 0, 0.16 - 0.045 * float(i)), true)
+		# the stacked page-edge: thin cream leaves peeking at right + bottom (a book,
+		# not a lone sheet)
+		var leaf := Color(FFUI.PARCHMENT.r * 0.86, FFUI.PARCHMENT.g * 0.84, FFUI.PARCHMENT.b * 0.78)
+		for i in 3:
+			var off := 2.0 + 2.0 * float(i)
+			var lr := Rect2(r.position + Vector2(off, off), r.size)
+			draw_rect(lr, leaf.darkened(0.10 * float(i)), true)
+		# flat parchment under the TextureRect child (covers a missing texture)
+		draw_rect(r, FFUI.VELLUM if mode == 2 else FFUI.PARCHMENT, true)
 
 
 ## A subtle vertical wash rectangle (paper-grain stand-in) for depth.
@@ -209,21 +291,140 @@ static func panel(bg: Color = PARCHMENT_2, border: Color = UMBER) -> PanelContai
 	return p
 
 
-## An OPAQUE parchment (or vellum) overlay panel with a strong colour border and a
-## doubled inner rule for a book-plate feel — used by the Dice overlay, Adventure
-## Sheet, Inventory and Map so the panel never bleeds the busy page behind it.
+## An OPAQUE engraved parchment card — the LOOKFEEL panel treatment shared by the
+## Dice overlay, Options, Map, popups and the combat chrome: a paper-textured fill,
+## a thin double rule (accent outer, umber hairline inner), corner ticks, and
+## pinned brass tacks (the FFC "card pinned to the page" read). `dark` keeps the
+## old vellum variant for night surfaces.
 static func framed_panel(border: Color = VERDIGRIS, dark: bool = false) -> PanelContainer:
-	var p := PanelContainer.new()
-	var fill := Color("241f19") if dark else PARCHMENT_2
-	var sb := panel_box(fill, border, 3, 5)
-	sb.content_margin_left = 22
-	sb.content_margin_right = 22
-	sb.content_margin_top = 20
-	sb.content_margin_bottom = 20
-	sb.shadow_size = 6
-	sb.shadow_color = Color(INK.r, INK.g, INK.b, 0.4)
-	p.add_theme_stylebox_override(&"panel", sb)
+	var p := EngravedCard.new()
+	p.accent = border
+	p.dark = dark
+	# the card IS paper: the page texture as the panel stylebox (StyleBoxTexture is
+	# the reliable canvas texture path), tinted toward vellum for dark cards
+	var tex := paper_texture()
+	if tex != null:
+		var sb := StyleBoxTexture.new()
+		sb.texture = tex
+		sb.modulate_color = Color(0.16, 0.155, 0.14) if dark else Color.WHITE
+		sb.content_margin_left = 26
+		sb.content_margin_right = 26
+		sb.content_margin_top = 22
+		sb.content_margin_bottom = 22
+		p.add_theme_stylebox_override(&"panel", sb)
+	else:
+		var fb := StyleBoxFlat.new()
+		fb.bg_color = Color("241f19") if dark else PARCHMENT_2
+		fb.set_corner_radius_all(2)
+		fb.content_margin_left = 26
+		fb.content_margin_right = 26
+		fb.content_margin_top = 22
+		fb.content_margin_bottom = 22
+		p.add_theme_stylebox_override(&"panel", fb)
 	return p
+
+
+## The engraved card body: paper texture + double rule + corner ticks + pin tacks.
+class EngravedCard extends PanelContainer:
+	var accent: Color = FFUI.VERDIGRIS
+	var dark := false
+	var pins := true
+
+	func _draw() -> void:
+		var r := Rect2(Vector2.ZERO, size)
+		# cast-shadow halo just outside the card (StyleBoxTexture has no shadow)
+		for i in 3:
+			draw_rect(r.grow(1.0 + 2.5 * float(i)), Color(0, 0, 0, 0.22 - 0.06 * float(i)), false, 2.5)
+		# double rule: accent outer + umber hairline inner
+		var o := r.grow(-7.0)
+		draw_rect(o, accent, false, 2.0)
+		var inner := o.grow(-4.0)
+		var hair := Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.55)
+		if dark:
+			hair = Color(FFUI.PARCHMENT.r, FFUI.PARCHMENT.g, FFUI.PARCHMENT.b, 0.25)
+		draw_rect(inner, hair, false, 1.0)
+		# corner ticks on the outer rule
+		var t := 7.0
+		for c in [o.position, Vector2(o.end.x, o.position.y), Vector2(o.position.x, o.end.y), o.end]:
+			draw_rect(Rect2(c - Vector2(t * 0.5, t * 0.5), Vector2(t, t)),
+				Color(accent.r, accent.g, accent.b, 0.30), true)
+		if pins:
+			# brass pin tacks (FFC) just inside each corner
+			var brass := Color("8a6f3c")
+			var lit := Color("c9ad6e")
+			for c in [o.position + Vector2(10, 10), Vector2(o.end.x - 10, o.position.y + 10),
+					Vector2(o.position.x + 10, o.end.y - 10), o.end - Vector2(10, 10)]:
+				draw_circle(c + Vector2(1, 1.5), 3.4, Color(0, 0, 0, 0.35))
+				draw_circle(c, 3.2, brass)
+				draw_circle(c - Vector2(0.9, 0.9), 1.1, lit)
+
+
+## A thin double rule with a small centre diamond — the Brante-style section rule
+## used beneath every engraved title.
+static func diamond_rule(accent: Color = VERDIGRIS) -> Control:
+	var c := DiamondRule.new()
+	c.accent = accent
+	c.custom_minimum_size = Vector2(0, 14)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return c
+
+
+class DiamondRule extends Control:
+	var accent: Color = FFUI.VERDIGRIS
+
+	func _draw() -> void:
+		var y := size.y * 0.5
+		var ink := Color(FFUI.INK.r, FFUI.INK.g, FFUI.INK.b, 0.85)
+		var cx := size.x * 0.5
+		var gap := 12.0
+		draw_line(Vector2(0, y), Vector2(cx - gap, y), ink, 1.6)
+		draw_line(Vector2(cx + gap, y), Vector2(size.x, y), ink, 1.6)
+		draw_line(Vector2(0, y + 3), Vector2(cx - gap, y + 3),
+			Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.45), 1.0)
+		draw_line(Vector2(cx + gap, y + 3), Vector2(size.x, y + 3),
+			Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.45), 1.0)
+		var d := 5.0
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(cx, y - d), Vector2(cx + d, y + 1.5), Vector2(cx, y + d + 3), Vector2(cx - d, y + 1.5)]),
+			accent)
+
+
+## An engraved screen/panel title: tracked small-caps over the diamond rule.
+static func engraved_header(text: String, size: int = 26, color: Color = INK, accent: Color = VERDIGRIS) -> Control:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 2)
+	var t := title(text, size, color)
+	v.add_child(t)
+	v.add_child(diamond_rule(accent))
+	return v
+
+
+## The Veritas plate presentation: the illustration set in a thin double-rule
+## frame on a paper mat with a soft shadow, caption in small-caps beneath.
+## `content` is added inside the frame (usually a TextureRect).
+static func plate_frame(content: Control, accent: Color = UMBER) -> Control:
+	var f := PlateFrame.new()
+	f.accent = accent
+	f.add_theme_constant_override(&"margin_left", 14)
+	f.add_theme_constant_override(&"margin_right", 14)
+	f.add_theme_constant_override(&"margin_top", 12)
+	f.add_theme_constant_override(&"margin_bottom", 12)
+	f.add_child(content)
+	return f
+
+
+class PlateFrame extends MarginContainer:
+	var accent: Color = FFUI.UMBER
+
+	func _draw() -> void:
+		var r := Rect2(Vector2.ZERO, size)
+		# shadow skirt + paper mat a touch lighter than the page
+		draw_rect(r.grow(2.0), Color(0, 0, 0, 0.18), true)
+		draw_rect(r, Color(FFUI.PARCHMENT.r * 1.02, FFUI.PARCHMENT.g * 1.02, FFUI.PARCHMENT.b * 1.0), true)
+		# double rule around the plate opening
+		var o := r.grow(-6.0)
+		draw_rect(o, Color(FFUI.INK.r, FFUI.INK.g, FFUI.INK.b, 0.9), false, 1.8)
+		draw_rect(o.grow(-3.0), Color(accent.r, accent.g, accent.b, 0.55), false, 1.0)
 
 
 ## A panel bordered with the REUSED Kenney fantasy frame texture (9-slice). Meant to
@@ -332,22 +533,39 @@ static func choice_button(text: String, locked: bool = false, reason: String = "
 	b.clip_text = false
 	b.add_theme_font_override(&"font", font_body())
 	b.add_theme_font_size_override(&"font_size", 18)
-	var normal := panel_box(PARCHMENT_2, UMBER, 2, 4)
-	var hover := panel_box(Color("e2d4b2"), VERDIGRIS, 2, 4)
-	var pressed := panel_box(Color("cbb98f"), UMBER, 2, 4)
-	b.add_theme_stylebox_override(&"normal", normal)
-	b.add_theme_stylebox_override(&"hover", hover)
-	b.add_theme_stylebox_override(&"pressed", pressed)
-	b.add_theme_stylebox_override(&"focus", panel_box(Color(0,0,0,0), ARREARS, 2, 4))
+	# Engraved book-entry treatment (LOOKFEEL): a quiet ruled line on the paper,
+	# not a grey web button — thin ink underline, a left accent stem on hover, the
+	# fill barely deeper than the page so the prose stays the loudest thing.
+	b.add_theme_stylebox_override(&"normal", _entry_box(Color(0.13, 0.10, 0.06, 0.035), Color(INK.r, INK.g, INK.b, 0.55), 0))
+	b.add_theme_stylebox_override(&"hover", _entry_box(Color(0.42, 0.55, 0.46, 0.12), VERDIGRIS, 3))
+	b.add_theme_stylebox_override(&"pressed", _entry_box(Color(0.13, 0.10, 0.06, 0.16), Color(INK.r, INK.g, INK.b, 0.8), 3))
+	b.add_theme_stylebox_override(&"focus", _entry_box(Color(0, 0, 0, 0), Color(ARREARS.r, ARREARS.g, ARREARS.b, 0.7), 3))
 	b.add_theme_color_override(&"font_color", INK)
 	b.add_theme_color_override(&"font_hover_color", INK)
+	b.add_theme_color_override(&"font_focus_color", INK)
+	b.add_theme_color_override(&"font_pressed_color", INK)
 	if locked:
 		b.disabled = true
-		var dis := panel_box(Color(0.72, 0.66, 0.52, 0.5), FEN, 1, 4)
-		b.add_theme_stylebox_override(&"disabled", dis)
-		b.add_theme_color_override(&"font_disabled_color", Color(UMBER.r, UMBER.g, UMBER.b, 0.75))
+		b.add_theme_stylebox_override(&"disabled", _entry_box(Color(0.3, 0.28, 0.22, 0.06), Color(FEN.r, FEN.g, FEN.b, 0.5), 0))
+		b.add_theme_color_override(&"font_disabled_color", Color(UMBER.r, UMBER.g, UMBER.b, 0.72))
 	b.add_to_group(&"scalable_text")
 	return b
+
+
+## A choice-entry stylebox: soft paper fill, an ink rule underneath, an optional
+## left accent stem (`stem` px) — the whole "choices are lines in the book" idiom.
+static func _entry_box(fill: Color, rule: Color, stem: int) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = fill
+	s.border_color = rule
+	s.border_width_bottom = 2
+	s.border_width_left = stem
+	s.set_corner_radius_all(1)
+	s.content_margin_left = 16
+	s.content_margin_right = 14
+	s.content_margin_top = 8
+	s.content_margin_bottom = 8
+	return s
 
 
 ## A small labelled action chip ([Test your Luck] / [Eat] etc.).
@@ -357,10 +575,13 @@ static func chip(text: String) -> Button:
 	b.custom_minimum_size = Vector2(0, 44)
 	b.add_theme_font_override(&"font", font_body())
 	b.add_theme_font_size_override(&"font_size", 16)
-	b.add_theme_stylebox_override(&"normal", panel_box(Color("cfe0d4"), VERDIGRIS, 1, 12))
-	b.add_theme_stylebox_override(&"hover", panel_box(Color("dbe9df"), VERDIGRIS, 2, 12))
-	b.add_theme_stylebox_override(&"pressed", panel_box(Color("bcd0c2"), VERDIGRIS, 1, 12))
+	b.add_theme_stylebox_override(&"normal", panel_box(Color("e0d5b6"), Color(UMBER.r, UMBER.g, UMBER.b, 0.7), 1, 2))
+	b.add_theme_stylebox_override(&"hover", panel_box(Color("e7ddc2"), VERDIGRIS, 1, 2))
+	b.add_theme_stylebox_override(&"pressed", panel_box(Color("cfc4a2"), Color(INK.r, INK.g, INK.b, 0.8), 1, 2))
+	b.add_theme_stylebox_override(&"focus", panel_box(Color(0, 0, 0, 0), Color(ARREARS.r, ARREARS.g, ARREARS.b, 0.6), 1, 2))
+	b.add_theme_stylebox_override(&"disabled", panel_box(Color(0.85, 0.8, 0.68, 0.35), Color(FEN.r, FEN.g, FEN.b, 0.5), 1, 2))
 	b.add_theme_color_override(&"font_color", INK)
+	b.add_theme_color_override(&"font_disabled_color", Color(UMBER.r, UMBER.g, UMBER.b, 0.6))
 	b.add_to_group(&"scalable_text")
 	return b
 
@@ -391,14 +612,27 @@ static func stat_bar(label_text: String, cur: int, maximum: int, fill: Color) ->
 	return row
 
 
-## A compact "SKILL 9" stat pill for the HUD.
+## A compact "SKILL 9" stat pill for the HUD — printed caption, the value in the
+## player's own hand (the sheet idiom carried into the page chrome).
 static func stat_pill(name: String, value: String, accent: Color = INK) -> Control:
-	var p := FFUI.panel(Color("ded0ac"), Color(UMBER.r, UMBER.g, UMBER.b, 0.6))
-	p.add_theme_constant_override(&"separation", 0)
+	var p := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.13, 0.10, 0.06, 0.05)
+	sb.border_color = Color(UMBER.r, UMBER.g, UMBER.b, 0.5)
+	sb.border_width_bottom = 1
+	sb.content_margin_left = 8
+	sb.content_margin_right = 8
+	sb.content_margin_top = 2
+	sb.content_margin_bottom = 2
+	p.add_theme_stylebox_override(&"panel", sb)
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 6)
-	var n := label(name, 14, UMBER); box.add_child(n)
-	var v := label(value, 17, accent); v.add_theme_font_override(&"font", font_display()); box.add_child(v)
+	var n := label(name, 12, UMBER, false)
+	n.add_theme_font_override(&"font", font_display_tracked(1))
+	n.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	box.add_child(n)
+	var v := handwritten(value, 20, accent if accent != INK else INK_PEN, "pill_%s_%s" % [name, value])
+	box.add_child(v)
 	p.add_child(box)
 	return p
 

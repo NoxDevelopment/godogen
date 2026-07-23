@@ -32,6 +32,7 @@ func _ready() -> void:
 		_backdrop.visible = true
 	else:
 		_backdrop.visible = false
+	_apply_book_dress()
 	# Title / Main Menu bed — brooding invitation (STYLE_GUIDE §2.2). AudioDirector is a
 	# project autoload; guard so the shell still runs where one isn't shipped. UI-click
 	# SFX is auto-wired onto every Button.
@@ -42,6 +43,69 @@ func _ready() -> void:
 
 func _first_focus() -> void:
 	$CenterBox/VBox/NewGame.grab_focus()
+
+
+## FF-template dress (LOOKFEEL_PASS_2026-07 §menu): the generic web-shell chrome
+## becomes a book cover — the amber accent bar goes, the title sets in the
+## engraved tracked display face over a diamond rule, and the menu entries become
+## engraved parchment plates over the darkened cover art. Per-template styling
+## lives in this vendored copy; the shared nox_ui SOURCE stays generic.
+func _apply_book_dress() -> void:
+	var accent := get_node_or_null("Accent")
+	if accent != null:
+		accent.visible = false
+	# deepen the cover art so the lockup carries
+	_backdrop.self_modulate = Color(0.34, 0.33, 0.36)
+	# engraved title lockup
+	_title.add_theme_font_override(&"font", FFUI.font_display_tracked(4))
+	_title.add_theme_font_size_override(&"font_size", 64)
+	_title.add_theme_color_override(&"font_color", FFUI.PARCHMENT)
+	_title.add_theme_color_override(&"font_shadow_color", Color(0, 0, 0, 0.6))
+	_title.add_theme_constant_override(&"shadow_offset_x", 2)
+	_title.add_theme_constant_override(&"shadow_offset_y", 3)
+	_subtitle.add_theme_font_override(&"font", FFUI.font_body())
+	_subtitle.add_theme_font_size_override(&"font_size", 17)
+	_subtitle.add_theme_color_override(&"font_color", FFUI.VERDIGRIS_2)
+	# a diamond rule between the lockup and the entries
+	var vbox := $CenterBox/VBox
+	var rule := FFUI.diamond_rule(FFUI.VERDIGRIS)
+	rule.custom_minimum_size = Vector2(360, 14)
+	vbox.add_child(rule)
+	vbox.move_child(rule, _subtitle.get_index() + 1)
+	# the entries: engraved parchment plates
+	for b in [$CenterBox/VBox/NewGame, _continue, $CenterBox/VBox/Load,
+			$CenterBox/VBox/Options, $CenterBox/VBox/Credits, $CenterBox/VBox/Quit]:
+		if b == null:
+			continue
+		_dress_button(b)
+
+
+func _dress_button(b: Button) -> void:
+	b.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
+	b.add_theme_font_size_override(&"font_size", 19)
+	b.add_theme_color_override(&"font_color", FFUI.INK)
+	b.add_theme_color_override(&"font_hover_color", FFUI.INK)
+	b.add_theme_color_override(&"font_pressed_color", FFUI.INK)
+	b.add_theme_color_override(&"font_focus_color", FFUI.INK)
+	b.add_theme_stylebox_override(&"normal", _plate_box(Color("e2d8bc"), Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.9)))
+	b.add_theme_stylebox_override(&"hover", _plate_box(Color("ece2c6"), FFUI.VERDIGRIS))
+	b.add_theme_stylebox_override(&"pressed", _plate_box(Color("cfc4a2"), FFUI.INK))
+	b.add_theme_stylebox_override(&"focus", _plate_box(Color(0, 0, 0, 0), Color(FFUI.ARREARS.r, FFUI.ARREARS.g, FFUI.ARREARS.b, 0.8)))
+
+
+func _plate_box(fill: Color, border: Color) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = fill
+	s.border_color = border
+	s.set_border_width_all(1)
+	s.set_corner_radius_all(2)
+	s.content_margin_left = 18
+	s.content_margin_right = 18
+	s.content_margin_top = 10
+	s.content_margin_bottom = 10
+	s.shadow_size = 6
+	s.shadow_color = Color(0, 0, 0, 0.35)
+	return s
 
 func _on_new_game_pressed() -> void: NoxShell.new_game()
 func _on_continue_pressed() -> void: NoxShell.resume_last()

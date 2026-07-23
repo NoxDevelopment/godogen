@@ -732,9 +732,21 @@ class _Ground extends MarginContainer:
 		add_theme_constant_override(&"margin_right", m)
 		add_theme_constant_override(&"margin_top", 22)
 		add_theme_constant_override(&"margin_bottom", 22)
+		# the REAL paper under the printed form (first child = beneath the form
+		# content; TextureRect is the reliable canvas texture path)
+		var paper := TextureRect.new()
+		paper.texture = FFUI.paper_texture()
+		paper.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		paper.stretch_mode = TextureRect.STRETCH_SCALE
+		paper.self_modulate = Color(1, 1, 1, 0.85)
+		paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(paper)
 
 	func _draw() -> void:
 		var r := Rect2(Vector2.ZERO, size)
+		# cast shadow — the sheet is a loose paper lying over the page (FFC)
+		for i in 3:
+			draw_rect(r.grow(3.0 + 4.0 * float(i)), Color(0, 0, 0, 0.14 - 0.04 * float(i)), true)
 		# aged paper ground (a hair darker than the reading page = a printed form)
 		draw_rect(r, FFUI.PARCHMENT_2, true)
 		# a faint top-to-bottom warm wash for depth

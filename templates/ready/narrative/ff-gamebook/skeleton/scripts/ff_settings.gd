@@ -22,9 +22,22 @@ const SAVE_MODE_NAMES := ["Bookmarks", "Ironman", "Rewind", "Checkpoints"]
 enum ReadingTheme { PARCHMENT, SEPIA, DARK }
 const READING_THEME_NAMES := ["Parchment", "Sepia", "Dark"]
 
+## Reading-view illustration plate presentation (LOOKFEEL_PASS_2026-07 §plates):
+## Large is the Veritas default — the page opens on the image.
+enum PlateSize { LARGE, MEDIUM, SMALL }
+const PLATE_SIZE_NAMES := ["Large", "Medium", "Small"]
+
+## Window sizes the Display tab offers (applied via DisplayServer when windowed).
+const WINDOW_SIZES: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1920, 1080), Vector2i(2560, 1440)]
+const WINDOW_SIZE_NAMES := ["1280 × 720", "1920 × 1080", "2560 × 1440"]
+
 # --- Reading ---------------------------------------------------------------------
 var font_scale: float = 1.0          # 0.8 .. 1.6 — reading prose size multiplier
 var reading_theme: int = ReadingTheme.PARCHMENT
+
+# --- Display ---------------------------------------------------------------------
+var plate_size: int = PlateSize.LARGE
+var window_size: int = 0             # index into WINDOW_SIZES
 
 # --- Combat ----------------------------------------------------------------------
 var quick_combat: bool = false       # auto-run combat rounds
@@ -55,6 +68,20 @@ func apply() -> void:
 		win.content_scale_factor = clampf(text_scale, 0.5, 3.0)
 
 
+## Apply the chosen window size (Display tab). Only meaningful for a real windowed
+## session — fullscreen and headless runs are left alone. Recenters after resize.
+func apply_window_size() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+		return
+	var wanted: Vector2i = WINDOW_SIZES[clampi(window_size, 0, WINDOW_SIZES.size() - 1)]
+	DisplayServer.window_set_size(wanted)
+	var screen := DisplayServer.window_get_current_screen()
+	var srect := DisplayServer.screen_get_usable_rect(screen)
+	DisplayServer.window_set_position(srect.position + (srect.size - wanted) / 2)
+
+
 func save_mode_name() -> String:
 	return SAVE_MODE_NAMES[clampi(save_mode, 0, SAVE_MODE_NAMES.size() - 1)]
 
@@ -71,6 +98,15 @@ func set_font_scale(v: float) -> void:
 
 func set_reading_theme(v: int) -> void:
 	reading_theme = clampi(v, 0, ReadingTheme.size() - 1)
+	_commit()
+
+func set_plate_size(v: int) -> void:
+	plate_size = clampi(v, 0, PlateSize.size() - 1)
+	_commit()
+
+func set_window_size(v: int) -> void:
+	window_size = clampi(v, 0, WINDOW_SIZES.size() - 1)
+	apply_window_size()
 	_commit()
 
 func set_quick_combat(on: bool) -> void:
@@ -123,6 +159,8 @@ func save_settings() -> void:
 	var c := ConfigFile.new()
 	c.set_value("reading", "font_scale", font_scale)
 	c.set_value("reading", "theme", reading_theme)
+	c.set_value("display", "plate_size", plate_size)
+	c.set_value("display", "window_size", window_size)
 	c.set_value("combat", "quick_combat", quick_combat)
 	c.set_value("dice", "animation", dice_animation)
 	c.set_value("dice", "speed", dice_speed)
@@ -139,6 +177,8 @@ func load_settings() -> void:
 		return
 	font_scale = float(c.get_value("reading", "font_scale", 1.0))
 	reading_theme = int(c.get_value("reading", "theme", ReadingTheme.PARCHMENT))
+	plate_size = int(c.get_value("display", "plate_size", PlateSize.LARGE))
+	window_size = int(c.get_value("display", "window_size", 0))
 	quick_combat = bool(c.get_value("combat", "quick_combat", false))
 	dice_animation = bool(c.get_value("dice", "animation", true))
 	dice_speed = float(c.get_value("dice", "speed", 1.0))

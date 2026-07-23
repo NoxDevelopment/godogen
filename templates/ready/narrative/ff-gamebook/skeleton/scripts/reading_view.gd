@@ -21,17 +21,21 @@ const DEATH_SCREEN := "res://scripts/screens/death_screen.tscn"
 const VICTORY_SCREEN := "res://scripts/screens/victory_screen.tscn"
 
 var _hud_section: Label
-var _hud_stats: HBoxContainer
+var _hud_title: Label
 var _bookmark_btn: Button
+var _plate_slot_top: Control      # LARGE/MEDIUM plates live here (the page opens on the image)
+var _plate_slot_bottom: Control   # SMALL plates tuck beneath the prose
 var _plate_panel: Control
-var _plate_divider: Control
 var _plate_tex: TextureRect
 var _plate_caption: Label
+var _plate_texture: Texture2D
 var _prose: RichTextLabel
 var _heading: Label
 var _content: VBoxContainer
 var _actions: VBoxContainer
 var _toast_layer: Control
+var _sheet_dock: Control
+var _dock_stats: VBoxContainer
 
 var _current_id := ""
 var _event_resolved := false
@@ -42,14 +46,13 @@ var _last_gold := -1
 var _last_inv := -1
 
 
-var _page_bg: ColorRect
+var _page_bg: Control
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_page_bg = FFUI.page_background()
+	_page_bg = FFUI.paper_ground()
 	add_child(_page_bg)
-	add_child(FFUI.wash(FFUI.FEN, 0.06))
 	_build_ui()
 	_pause = PAUSE_MENU.instantiate()
 	add_child(_pause)
@@ -72,7 +75,8 @@ func _ready() -> void:
 
 
 ## Apply the reading-comfort prefs live: scale the prose + heading to FFSettings.
-## font_scale, and switch the page ground to the Dark theme when selected.
+## font_scale, switch the paper mode (Parchment/Sepia/Dark) and — on the Dark,
+## lantern-lit page — flip the ink to parchment so the prose stays readable.
 func _apply_reading_prefs() -> void:
 	var ff := get_node_or_null("/root/FFSettings")
 	if ff == null:
@@ -81,26 +85,47 @@ func _apply_reading_prefs() -> void:
 		_prose.add_theme_font_size_override(&"normal_font_size", int(round(19.0 * ff.font_scale)))
 	if _heading != null:
 		_heading.add_theme_font_size_override(&"font_size", int(round(24.0 * ff.font_scale)))
-	if _page_bg != null:
-		var dark: bool = int(ff.reading_theme) == 2   # FFSettings.ReadingTheme.DARK
-		_page_bg.color = FFUI.VELLUM if dark else FFUI.PARCHMENT
+	var dark: bool = int(ff.reading_theme) == 2   # FFSettings.ReadingTheme.DARK
+	if _page_bg != null and _page_bg.has_method("set_mode"):
+		_page_bg.set_mode(int(ff.reading_theme))
+	if _prose != null:
+		_prose.add_theme_color_override(&"default_color", FFUI.PARCHMENT if dark else FFUI.PROSE_INK)
+	if _heading != null:
+		_heading.add_theme_color_override(&"font_color", FFUI.PARCHMENT if dark else FFUI.INK)
+	# plate size preference re-seats the plate immediately
+	if Adventure.has_run() and _plate_panel != null:
+		_seat_plate()
 
 
 func _build_ui() -> void:
+	# The reading column sits ON the paper page (LOOKFEEL: FFC's book) — inset from
+	# the page edge, width-capped so the prose keeps a book measure on wide windows.
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for s in ["left", "top", "right", "bottom"]:
-		margin.add_theme_constant_override("margin_" + s, 18)
+	margin.add_theme_constant_override("margin_left", 54)
+	margin.add_theme_constant_override("margin_right", 54)
+	margin.add_theme_constant_override("margin_top", 26)
+	margin.add_theme_constant_override("margin_bottom", 30)
 	add_child(margin)
 
+	var hrow := HBoxContainer.new()
+	margin.add_child(hrow)
+	var lspace := Control.new()
+	lspace.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hrow.add_child(lspace)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 10)
-	margin.add_child(col)
+	col.custom_minimum_size = Vector2(860, 0)
+	col.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	hrow.add_child(col)
+	var rspace := Control.new()
+	rspace.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hrow.add_child(rspace)
 
-	col.add_child(_build_hud())
+	col.add_child(_build_page_header())
 
 	# scrolling page body — the sacred page. The ScrollContainer expands to claim all
-	# vertical space left between the HUD and the choices, so the prose renders in full.
+	# vertical space left between the header and the choices.
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_stretch_ratio = 1.0
@@ -112,36 +137,51 @@ func _build_ui() -> void:
 	_content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_content)
 
-	# heading + drop-cap prose FIRST — "the page is sacred" (STYLE_GUIDE pillar #1).
-	# The prose is the centerpiece: it must open at the top of the page and be visible
-	# in full above the choices, never shouldered off-screen by the illustration.
+	# THE PLATE — the page opens on the image (STYLE_GUIDE §1.5 default placement;
+	# Veritas plate presentation): a large double-rule framed plate above the prose.
+	# The Options→Display "Illustration plates" preference re-seats it (Small tucks
+	# it beneath the prose at vignette size). Click to open the plate full-screen.
+	_plate_slot_top = VBoxContainer.new()
+	_content.add_child(_plate_slot_top)
+
 	_heading = FFUI.title("", 24, FFUI.INK)
 	_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_content.add_child(_heading)
-	_prose = FFUI.rich(19, FFUI.INK)
+	_prose = FFUI.rich(19, FFUI.PROSE_INK)
 	_prose.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_prose.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content.add_child(_prose)
 
-	# illustration plate — a modest accompanying vignette set BELOW the prose behind a
-	# ruled divider, bound by STABLE ID through the AssetBinder (IFSection.illustration).
-	# Sized so it never dominates the viewport nor pushes the prose out of view; a
-	# centred, height-capped frame reads as an inset woodcut, not a banner.
-	_plate_divider = FFUI.divider_rule()
-	_content.add_child(_plate_divider)
-	_plate_panel = FFUI.tex_framed(FFUI.VERDIGRIS)
-	_plate_panel.custom_minimum_size = Vector2(0, 168)
-	_plate_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_plate_slot_bottom = VBoxContainer.new()
+	_content.add_child(_plate_slot_bottom)
+
+	# the framed plate itself (re-parented between the two slots by _seat_plate)
+	var tex_btn := Button.new()
+	tex_btn.flat = true
+	tex_btn.focus_mode = Control.FOCUS_NONE
+	tex_btn.add_theme_stylebox_override(&"normal", StyleBoxEmpty.new())
+	tex_btn.add_theme_stylebox_override(&"hover", StyleBoxEmpty.new())
+	tex_btn.add_theme_stylebox_override(&"pressed", StyleBoxEmpty.new())
+	tex_btn.tooltip_text = "View the plate"
+	tex_btn.pressed.connect(_open_lightbox)
 	_plate_tex = TextureRect.new()
-	_plate_tex.custom_minimum_size = Vector2(440, 146)
 	_plate_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_plate_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_plate_panel.add_child(_plate_tex)
-	_plate_caption = FFUI.label("", 12, FFUI.FEN)
+	_plate_tex.custom_minimum_size = Vector2(0, 320)
+	_plate_tex.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_plate_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tex_btn.add_child(_plate_tex)
+	# keep the texture rect sized to the button
+	_plate_tex.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tex_btn.custom_minimum_size = Vector2(0, 320)
+	_plate_panel = FFUI.plate_frame(tex_btn, FFUI.VERDIGRIS)
+	_plate_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_plate_caption = FFUI.label("", 12, FFUI.FEN, false)
+	_plate_caption.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
 	_plate_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_content.add_child(_plate_panel)
-	_content.add_child(_plate_caption)
+	_plate_slot_top.add_child(_plate_panel)
+	_plate_slot_top.add_child(_plate_caption)
 
 	# actions (choices / event chips)
 	_actions = VBoxContainer.new()
@@ -150,6 +190,9 @@ func _build_ui() -> void:
 
 	col.add_child(_build_quickrow())
 
+	# the sheet-at-hand dock (FFC): a tilted sheet card pinned at the page's right edge
+	_build_sheet_dock()
+
 	# toast layer
 	_toast_layer = Control.new()
 	_toast_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -157,38 +200,124 @@ func _build_ui() -> void:
 	add_child(_toast_layer)
 
 
-func _build_hud() -> Control:
-	var panel := FFUI.panel(Color("ded0ac"), Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.6))
+## The page-top furniture: pause, the book's running title in small caps, the
+## section folio (§ N) printed at the top-right of the page, and the bookmark.
+func _build_page_header() -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 8)
-	panel.add_child(row)
+	row.add_theme_constant_override(&"separation", 10)
 	var pause := FFUI.chip("☰")
+	pause.custom_minimum_size = Vector2(44, 36)
 	pause.pressed.connect(_open_pause)
 	row.add_child(pause)
-	_hud_section = FFUI.label("§ —", 15, FFUI.UMBER)
-	_hud_section.custom_minimum_size = Vector2(64, 0)
+	_hud_title = FFUI.label(Adventure.book_title().to_upper(), 13, Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.9), false)
+	_hud_title.add_theme_font_override(&"font", FFUI.font_display_tracked(3))
+	_hud_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hud_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hud_title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_hud_title)
+	_hud_section = FFUI.label("§ —", 19, FFUI.INK)
+	_hud_section.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_hud_section)
-	_hud_stats = HBoxContainer.new()
-	_hud_stats.add_theme_constant_override(&"separation", 6)
-	_hud_stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(_hud_stats)
 	_bookmark_btn = FFUI.chip("🔖")
+	_bookmark_btn.custom_minimum_size = Vector2(44, 36)
 	_bookmark_btn.pressed.connect(_toggle_bookmark)
 	row.add_child(_bookmark_btn)
-	return panel
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 2)
+	v.add_child(row)
+	v.add_child(FFUI.diamond_rule(FFUI.VERDIGRIS))
+	return v
 
 
 func _build_quickrow() -> Control:
-	var panel := FFUI.panel(Color("d8c9a6"), Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.5))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 8)
-	panel.add_child(row)
-	for spec in [["📜  Sheet", "_open_sheet"], ["🎒  Inventory", "_open_inventory"], ["🗺  Map", "_open_map"], ["💾  Save", "_quick_save"]]:
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	for spec in [["🎒  Inventory", "_open_inventory"], ["🗺  Map", "_open_map"], ["💾  Save", "_quick_save"]]:
 		var b := FFUI.chip(spec[0])
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(150, 40)
 		b.pressed.connect(Callable(self, spec[1]))
 		row.add_child(b)
-	return panel
+	return row
+
+
+# --- the sheet-at-hand dock (LOOKFEEL item 7 — FFC's docked sheet card) ------
+
+
+## A slim, slightly-tilted Adventure-Sheet card pinned to the right edge of the
+## page while reading: SK / ST / LK in the player's hand (current large, initial
+## small beneath — the FFC circled-stat read), gold + provisions under a rule.
+## Clicking it opens the full Adventure Sheet.
+func _build_sheet_dock() -> void:
+	var dock := Button.new()
+	dock.name = "SheetDock"
+	dock.tooltip_text = "Open the Adventure Sheet"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("e2d8bc")
+	sb.border_color = Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.85)
+	sb.set_border_width_all(1)
+	sb.shadow_size = 8
+	sb.shadow_color = Color(0, 0, 0, 0.4)
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 10
+	sb.content_margin_bottom = 10
+	dock.add_theme_stylebox_override(&"normal", sb)
+	var hb := sb.duplicate()
+	hb.bg_color = Color("e9dfc6")
+	hb.border_color = FFUI.VERDIGRIS
+	dock.add_theme_stylebox_override(&"hover", hb)
+	dock.add_theme_stylebox_override(&"pressed", sb)
+	dock.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
+	dock.pressed.connect(_open_sheet)
+
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 4)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var cap := FFUI.label("SHEET", 11, FFUI.UMBER, false)
+	cap.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(cap)
+	v.add_child(FFUI.diamond_rule(FFUI.VERDIGRIS))
+	_dock_stats = VBoxContainer.new()
+	_dock_stats.add_theme_constant_override(&"separation", 2)
+	v.add_child(_dock_stats)
+	dock.add_child(v)
+	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for s in ["left", "top", "right", "bottom"]:
+		v.set("offset_" + s, v.get("offset_" + s) + (10 if s in ["left", "top"] else -10))
+
+	dock.custom_minimum_size = Vector2(108, 0)
+	dock.anchor_left = 1.0
+	dock.anchor_right = 1.0
+	dock.anchor_top = 0.5
+	dock.anchor_bottom = 0.5
+	dock.offset_left = -128.0
+	dock.offset_right = -14.0
+	dock.offset_top = -150.0
+	dock.offset_bottom = 150.0
+	dock.rotation_degrees = 1.6
+	dock.pivot_offset = Vector2(57, 150)
+	_sheet_dock = dock
+	add_child(dock)
+
+
+## One dock stat: printed caption, the current value written large in the
+## player's ink with the Initial small beneath it (never exceeded — the rule).
+func _dock_stat(cap: String, cur: int, initial: int, accent: Color) -> Control:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 0)
+	var c := FFUI.label(cap, 10, FFUI.FEN, false)
+	c.add_theme_font_override(&"font", FFUI.font_display_tracked(1))
+	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(c)
+	var holder := CenterContainer.new()
+	holder.add_child(FFUI.handwritten(str(cur), 26, FFUI.INK_PEN, "dock_%s_%d" % [cap, cur]))
+	v.add_child(holder)
+	var init_l := FFUI.label("of %d" % initial, 10, accent, false)
+	init_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(init_l)
+	return v
 
 
 # --- passage lifecycle ------------------------------------------------------
@@ -271,20 +400,83 @@ func _render() -> void:
 func _bind_plate(section: IFSection) -> void:
 	var slot := section.illustration()
 	if slot == "":
+		_plate_texture = null
 		_plate_panel.visible = false
 		_plate_caption.visible = false
-		_plate_divider.visible = false
 		return
 	_plate_panel.visible = true
-	_plate_divider.visible = true
 	var tex := FFUI.plate(slot)
+	_plate_texture = tex
 	if tex != null:
 		_plate_tex.texture = tex
-		_plate_caption.visible = false
+		_plate_caption.visible = true
+		_plate_caption.text = "· %s ·" % section.title().to_upper()
 	else:
 		_plate_tex.texture = null
 		_plate_caption.visible = true
 		_plate_caption.text = "[ %s — veritas-gamebook plate, awaiting generation ]" % slot
+	_seat_plate()
+
+
+## Seat the framed plate per Options→Display: Large/Medium open the page ON the
+## image above the prose (Veritas); Small tucks a vignette beneath it. The frame
+## hugs the plate's own aspect so the art never floats in side-mats.
+func _seat_plate() -> void:
+	var ff := get_node_or_null("/root/FFSettings")
+	var mode: int = ff.plate_size if ff != null else 0
+	var heights := [300.0, 220.0, 160.0]
+	var h: float = heights[clampi(mode, 0, 2)]
+	var w := 0.0
+	if _plate_texture != null:
+		var ts := _plate_texture.get_size()
+		if ts.y > 0.0:
+			w = minf(h * ts.x / ts.y, 800.0)
+	var btn: Control = _plate_tex.get_parent()
+	btn.custom_minimum_size = Vector2(w, h)
+	_plate_tex.custom_minimum_size = Vector2(w, h)
+	_plate_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var want_parent: Control = _plate_slot_bottom if mode == 2 else _plate_slot_top
+	if _plate_panel.get_parent() != want_parent:
+		_plate_panel.get_parent().remove_child(_plate_panel)
+		_plate_caption.get_parent().remove_child(_plate_caption)
+		want_parent.add_child(_plate_panel)
+		want_parent.add_child(_plate_caption)
+
+
+## Tap-to-expand (STYLE_GUIDE §1.5): the plate fills the screen over a dimmed
+## desk, caption beneath; click / Esc closes.
+func _open_lightbox() -> void:
+	if _plate_texture == null:
+		return
+	var lb := Button.new()
+	lb.name = "PlateLightbox"
+	lb.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.02, 0.015, 0.01, 0.92)
+	lb.add_theme_stylebox_override(&"normal", sb)
+	lb.add_theme_stylebox_override(&"hover", sb)
+	lb.add_theme_stylebox_override(&"pressed", sb)
+	lb.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 8)
+	var tr := TextureRect.new()
+	tr.texture = _plate_texture
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var vs := get_viewport_rect().size
+	tr.custom_minimum_size = Vector2(vs.x * 0.86, vs.y * 0.82)
+	v.add_child(FFUI.plate_frame(tr, FFUI.VERDIGRIS))
+	var cap := FFUI.label(_plate_caption.text, 13, FFUI.PARCHMENT_2, false)
+	cap.add_theme_font_override(&"font", FFUI.font_display_tracked(2))
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(cap)
+	center.add_child(v)
+	lb.add_child(center)
+	lb.pressed.connect(lb.queue_free)
+	add_child(lb)
 
 
 ## Open the section with an ORNAMENTED illuminated drop-cap: a large Uncial versal in
@@ -517,15 +709,24 @@ func _show_dice_test(res: Dictionary, context: String, compare_label: String, ba
 func _refresh_hud() -> void:
 	_hud_section.text = "§ %s" % _current_id
 	var s := Adventure.sheet
-	_clear(_hud_stats)
+	if _dock_stats == null:
+		return
+	_clear(_dock_stats)
 	if s == null:
 		return
 	_check_economy_sfx(s)
-	_hud_stats.add_child(FFUI.stat_pill("SK", str(s.cur("skill")), FFUI.VERDIGRIS))
-	_hud_stats.add_child(FFUI.stat_pill("ST", "%d/%d" % [s.cur("stamina"), s.init_of("stamina")], FFUI.ARREARS))
-	_hud_stats.add_child(FFUI.stat_pill("LK", "%d/%d" % [s.cur("luck"), s.init_of("luck")], FFUI.FLAME))
-	_hud_stats.add_child(FFUI.stat_pill("Gold", str(s.gold), FFUI.INK))
-	_hud_stats.add_child(FFUI.stat_pill("Prov", str(s.provisions), FFUI.INK))
+	_dock_stats.add_child(_dock_stat("SKILL", s.cur("skill"), s.init_of("skill"), FFUI.VERDIGRIS))
+	_dock_stats.add_child(_dock_stat("STAMINA", s.cur("stamina"), s.init_of("stamina"), FFUI.ARREARS))
+	_dock_stats.add_child(_dock_stat("LUCK", s.cur("luck"), s.init_of("luck"), FFUI.FLAME))
+	var rule := FFUI.diamond_rule(FFUI.UMBER)
+	rule.custom_minimum_size = Vector2(0, 10)
+	_dock_stats.add_child(rule)
+	var purse := HBoxContainer.new()
+	purse.alignment = BoxContainer.ALIGNMENT_CENTER
+	purse.add_theme_constant_override(&"separation", 6)
+	purse.add_child(FFUI.handwritten("%dg" % s.gold, 16, FFUI.INK_PEN, "dock_gold_%d" % s.gold))
+	purse.add_child(FFUI.handwritten("×%d🍖" % s.provisions, 16, FFUI.INK_PEN, "dock_prov_%d" % s.provisions))
+	_dock_stats.add_child(purse)
 
 
 ## A quiet gold-clink when the purse grows and a pack-rustle when an item is added

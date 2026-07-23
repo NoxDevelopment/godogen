@@ -37,9 +37,7 @@ func _build() -> void:
 	col.add_theme_constant_override(&"separation", 12)
 	panel.add_child(col)
 
-	var head := FFUI.title("OPTIONS", 30, FFUI.INK)
-	col.add_child(head)
-	col.add_child(FFUI.divider_rule())
+	col.add_child(FFUI.engraved_header("OPTIONS", 30, FFUI.INK, FFUI.VERDIGRIS))
 
 	var tabs := TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -47,9 +45,34 @@ func _build() -> void:
 	tabs.add_theme_color_override(&"font_selected_color", FFUI.INK)
 	tabs.add_theme_color_override(&"font_unselected_color", FFUI.UMBER)
 	tabs.add_theme_color_override(&"font_hovered_color", FFUI.INK)
+	# on-paper tab treatment: the body sits on the card's own parchment (no grey
+	# slab), the selected tab reads as an inked entry with a verdigris stem
+	var body_sb := StyleBoxFlat.new()
+	body_sb.bg_color = Color(0, 0, 0, 0)
+	body_sb.content_margin_top = 10
+	tabs.add_theme_stylebox_override(&"panel", body_sb)
+	var tab_sel := StyleBoxFlat.new()
+	tab_sel.bg_color = Color(0.13, 0.10, 0.06, 0.06)
+	tab_sel.border_color = FFUI.VERDIGRIS
+	tab_sel.border_width_bottom = 3
+	tab_sel.content_margin_left = 14
+	tab_sel.content_margin_right = 14
+	tab_sel.content_margin_top = 6
+	tab_sel.content_margin_bottom = 6
+	var tab_un: StyleBoxFlat = tab_sel.duplicate()
+	tab_un.bg_color = Color(0, 0, 0, 0)
+	tab_un.border_color = Color(FFUI.UMBER.r, FFUI.UMBER.g, FFUI.UMBER.b, 0.35)
+	tab_un.border_width_bottom = 1
+	var tab_hv: StyleBoxFlat = tab_un.duplicate()
+	tab_hv.border_color = FFUI.VERDIGRIS_2
+	tab_hv.border_width_bottom = 2
+	tabs.add_theme_stylebox_override(&"tab_selected", tab_sel)
+	tabs.add_theme_stylebox_override(&"tab_unselected", tab_un)
+	tabs.add_theme_stylebox_override(&"tab_hovered", tab_hv)
 	col.add_child(tabs)
 
 	tabs.add_child(_reading_tab())
+	tabs.add_child(_display_tab())
 	tabs.add_child(_audio_tab())
 	tabs.add_child(_combat_tab())
 	tabs.add_child(_dice_tab())
@@ -74,6 +97,23 @@ func _reading_tab() -> Control:
 	t.add_child(_hint("The reading page updates live as you change these."))
 	return t
 
+## Display (LOOKFEEL_PASS_2026-07): window size + fullscreen actually APPLY (the
+## critique: "the resolution doesn't even change or is adjustable"), and the
+## reading-plate presentation is player-tunable (Large is the Veritas default).
+func _display_tab() -> Control:
+	var t := _tab_body("Display")
+	t.add_child(_option_row("Window size", FFSettings.WINDOW_SIZE_NAMES, FFSettings.window_size,
+		func(i): FFSettings.set_window_size(i)))
+	t.add_child(_check_row("Fullscreen", NoxSettings.fullscreen, func(on):
+		NoxSettings.set_fullscreen(on)
+		if not on:
+			FFSettings.apply_window_size()))
+	t.add_child(_check_row("V-Sync", NoxSettings.vsync, func(on): NoxSettings.set_vsync(on)))
+	t.add_child(_option_row("Illustration plates", FFSettings.PLATE_SIZE_NAMES, FFSettings.plate_size,
+		func(i): FFSettings.set_plate_size(i)))
+	t.add_child(_hint("Window size applies immediately when windowed; fullscreen ignores it. Illustration plates: Large opens the page on the image (Veritas-style), Small tucks it beneath the prose."))
+	return t
+
 func _audio_tab() -> Control:
 	var t := _tab_body("Audio")
 	t.add_child(_slider_row("Master volume", 0.0, 1.0, 0.01, NoxSettings.master,
@@ -82,8 +122,6 @@ func _audio_tab() -> Control:
 		func(v): NoxSettings.set_volume("music", v), func(v): return "%d%%" % round(v * 100.0)))
 	t.add_child(_slider_row("SFX volume", 0.0, 1.0, 0.01, NoxSettings.sfx,
 		func(v): NoxSettings.set_volume("sfx", v), func(v): return "%d%%" % round(v * 100.0)))
-	t.add_child(_check_row("Fullscreen", NoxSettings.fullscreen, func(on): NoxSettings.set_fullscreen(on)))
-	t.add_child(_check_row("V-Sync", NoxSettings.vsync, func(on): NoxSettings.set_vsync(on)))
 	return t
 
 func _combat_tab() -> Control:
